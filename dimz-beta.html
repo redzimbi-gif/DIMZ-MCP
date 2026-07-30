@@ -98,13 +98,32 @@
   .main-tabs button[aria-selected="true"] { background: var(--bleu-vif); color: #fff; }
   .main-tabs button:focus-visible { outline: 2px solid var(--bleu-vif); outline-offset: 2px; }
 
-  .subtabs { display: flex; gap: 8px; margin: 4px 0 52px; flex-wrap: wrap; }
-  .subtabs button {
-    background: transparent; border: 1px solid var(--line); color: var(--ink-soft);
-    padding: 8px 17px; border-radius: 100px; cursor: pointer; font-weight: 700; font-size: 0.86rem;
-    transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  .subtabs-menu { position: relative; display: inline-block; margin: 4px 0 52px; }
+  .subtabs-menu-trigger {
+    display: inline-flex; align-items: center; gap: 9px;
+    background: var(--bg-raised); border: 1px solid var(--line); color: var(--ink);
+    padding: 9px 16px; border-radius: 100px; cursor: pointer; font-weight: 700; font-size: 0.88rem;
+    box-shadow: var(--shadow); transition: border-color 0.15s ease, color 0.15s ease;
   }
-  .subtabs button[aria-selected="true"] { color: var(--bleu-vif); border-color: var(--bleu-vif); background: color-mix(in srgb, var(--bleu-vif) 8%, transparent); }
+  .subtabs-menu-trigger:hover { border-color: var(--bleu-vif); color: var(--bleu-vif); }
+  .subtabs-menu-trigger:focus-visible { outline: 2px solid var(--bleu-vif); outline-offset: 2px; }
+  .subtabs-menu-trigger[aria-expanded="true"] { border-color: var(--bleu-vif); color: var(--bleu-vif); }
+  .subtabs-menu-trigger .chevron { width: 15px; height: 15px; flex: none; transition: transform 0.2s ease; }
+  .subtabs-menu-trigger[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+  .subtabs-menu-list {
+    position: absolute; top: calc(100% + 8px); left: 0; z-index: 20;
+    background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--r-md);
+    box-shadow: var(--shadow-lg); padding: 6px; min-width: 220px;
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .subtabs-menu-list button {
+    display: block; width: 100%; text-align: left; background: transparent; border: none;
+    color: var(--ink-soft); padding: 10px 12px; border-radius: var(--r-sm); cursor: pointer;
+    font-weight: 700; font-size: 0.88rem; transition: background 0.15s ease, color 0.15s ease;
+  }
+  .subtabs-menu-list button:hover { background: var(--bg-tint); color: var(--ink); }
+  .subtabs-menu-list button:focus-visible { outline: 2px solid var(--bleu-vif); outline-offset: -2px; }
+  .subtabs-menu-list button[aria-selected="true"] { color: var(--bleu-vif); background: color-mix(in srgb, var(--bleu-vif) 8%, transparent); }
 
   .btn {
     display: inline-flex; align-items: center; gap: 8px; border-radius: var(--r-sm); padding: 13px 24px;
@@ -383,9 +402,15 @@
 <!-- ===================== ONGLET ACCOMPAGNEMENT ===================== -->
 <div id="tab-accompagnement" role="tabpanel" aria-labelledby="tab-btn-accompagnement">
   <div class="wrap">
-    <div class="subtabs" role="tablist" aria-label="Sections Accompagnement">
-      <button type="button" role="tab" id="subtab-btn-offres" aria-selected="true" data-subtab="offres">Projet &amp; offres</button>
-      <button type="button" role="tab" id="subtab-btn-inspection" aria-selected="false" data-subtab="inspection">Inspection</button>
+    <div class="subtabs-menu">
+      <button type="button" class="subtabs-menu-trigger" id="subtabs-menu-trigger" aria-haspopup="true" aria-expanded="false" aria-controls="subtabs-menu-list">
+        <span id="subtabs-menu-label">Projet &amp; offres</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="subtabs-menu-list" id="subtabs-menu-list" role="menu" aria-label="Sections Accompagnement" hidden>
+        <button type="button" role="menuitemradio" id="subtab-btn-offres" aria-selected="true" data-subtab="offres">Projet &amp; offres</button>
+        <button type="button" role="menuitemradio" id="subtab-btn-inspection" aria-selected="false" data-subtab="inspection">Inspection</button>
+      </div>
     </div>
   </div>
 
@@ -1237,15 +1262,46 @@
     el.addEventListener('click', function () { showMainTab(el.dataset.gotoTab, true); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); });
   });
 
-  // ---------- Sous-onglets Accompagnement : Les offres / Inspection ----------
-  var subTabButtons = document.querySelectorAll('.subtabs button');
+  // ---------- Sous-onglets Accompagnement : menu déroulant (Projet & offres / Inspection) ----------
+  var subTabButtons = document.querySelectorAll('.subtabs-menu-list button');
+  var subtabsMenuTrigger = document.getElementById('subtabs-menu-trigger');
+  var subtabsMenuList = document.getElementById('subtabs-menu-list');
+  var subtabsMenuLabel = document.getElementById('subtabs-menu-label');
+
+  function openSubtabsMenu() {
+    subtabsMenuList.hidden = false;
+    subtabsMenuTrigger.setAttribute('aria-expanded', 'true');
+  }
+  function closeSubtabsMenu() {
+    subtabsMenuList.hidden = true;
+    subtabsMenuTrigger.setAttribute('aria-expanded', 'false');
+  }
 
   function showSubTab(sub) {
-    subTabButtons.forEach(function (b) { b.setAttribute('aria-selected', b.dataset.subtab === sub ? 'true' : 'false'); });
+    subTabButtons.forEach(function (b) {
+      var selected = b.dataset.subtab === sub;
+      b.setAttribute('aria-selected', selected ? 'true' : 'false');
+      if (selected) subtabsMenuLabel.textContent = b.textContent;
+    });
     document.getElementById('subtab-offres').hidden = sub !== 'offres';
     document.getElementById('subtab-inspection').hidden = sub !== 'inspection';
+    closeSubtabsMenu();
     observeNewReveals();
   }
+
+  subtabsMenuTrigger.addEventListener('click', function () {
+    if (subtabsMenuTrigger.getAttribute('aria-expanded') === 'true') closeSubtabsMenu();
+    else openSubtabsMenu();
+  });
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.subtabs-menu')) closeSubtabsMenu();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && subtabsMenuTrigger.getAttribute('aria-expanded') === 'true') {
+      closeSubtabsMenu();
+      subtabsMenuTrigger.focus();
+    }
+  });
 
   subTabButtons.forEach(function (btn) {
     btn.addEventListener('click', function () { showSubTab(btn.dataset.subtab); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); });
