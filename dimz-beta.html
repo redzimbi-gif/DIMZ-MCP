@@ -98,32 +98,36 @@
   .main-tabs button[aria-selected="true"] { background: var(--bleu-vif); color: #fff; }
   .main-tabs button:focus-visible { outline: 2px solid var(--bleu-vif); outline-offset: 2px; }
 
-  .subtabs-menu { position: relative; display: inline-block; margin: 4px 0 52px; }
-  .subtabs-menu-trigger {
-    display: inline-flex; align-items: center; gap: 9px;
-    background: var(--bg-raised); border: 1px solid var(--line); color: var(--ink);
-    padding: 9px 16px; border-radius: 100px; cursor: pointer; font-weight: 700; font-size: 0.88rem;
-    box-shadow: var(--shadow); transition: border-color 0.15s ease, color 0.15s ease;
+  /* ---------------- Sidebar Accompagnement ---------------- */
+  .acc-shell { display: flex; align-items: flex-start; gap: 0; }
+  .acc-sidebar {
+    flex: none; width: 240px; position: sticky; top: 73px; align-self: stretch;
+    display: flex; flex-direction: column; gap: 2px; padding: 28px 16px;
+    border-right: 1px solid var(--line);
   }
-  .subtabs-menu-trigger:hover { border-color: var(--bleu-vif); color: var(--bleu-vif); }
-  .subtabs-menu-trigger:focus-visible { outline: 2px solid var(--bleu-vif); outline-offset: 2px; }
-  .subtabs-menu-trigger[aria-expanded="true"] { border-color: var(--bleu-vif); color: var(--bleu-vif); }
-  .subtabs-menu-trigger .chevron { width: 15px; height: 15px; flex: none; transition: transform 0.2s ease; }
-  .subtabs-menu-trigger[aria-expanded="true"] .chevron { transform: rotate(180deg); }
-  .subtabs-menu-list {
-    position: absolute; top: calc(100% + 8px); left: 0; z-index: 20;
-    background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--r-md);
-    box-shadow: var(--shadow-lg); padding: 6px; min-width: 220px;
-    display: flex; flex-direction: column; gap: 2px;
+  .acc-sidebar button {
+    display: flex; align-items: center; gap: 12px; text-align: left;
+    background: transparent; border: none; border-radius: var(--r-sm); padding: 11px 14px;
+    color: var(--ink-soft); font-weight: 700; font-size: 0.92rem; cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
   }
-  .subtabs-menu-list button {
-    display: block; width: 100%; text-align: left; background: transparent; border: none;
-    color: var(--ink-soft); padding: 10px 12px; border-radius: var(--r-sm); cursor: pointer;
-    font-weight: 700; font-size: 0.88rem; transition: background 0.15s ease, color 0.15s ease;
+  .acc-sidebar button svg { width: 20px; height: 20px; flex: none; }
+  .acc-sidebar button:hover { background: var(--bg-tint); color: var(--ink); }
+  .acc-sidebar button:focus-visible { outline: 2px solid var(--bleu-vif); outline-offset: 2px; }
+  .acc-sidebar button[aria-selected="true"] { background: color-mix(in srgb, var(--bleu-vif) 10%, transparent); color: var(--bleu-vif); }
+  .acc-content { flex: 1; min-width: 0; }
+  .acc-content > div > section.dark, .acc-content > div > div.wrap > section.dark { border-radius: var(--r-xl); margin: 28px 28px 0; overflow: hidden; }
+  @media (max-width: 900px) {
+    .acc-shell { flex-direction: column; }
+    .acc-sidebar {
+      position: sticky; top: 65px; z-index: 15; width: 100%; align-self: auto;
+      flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--line);
+      padding: 12px 16px; gap: 8px; background: color-mix(in srgb, var(--bg) 94%, transparent);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    }
+    .acc-sidebar button { flex: none; white-space: nowrap; padding: 9px 14px; }
+    .acc-content > div > section.dark, .acc-content > div > div.wrap > section.dark { margin: 16px 16px 0; }
   }
-  .subtabs-menu-list button:hover { background: var(--bg-tint); color: var(--ink); }
-  .subtabs-menu-list button:focus-visible { outline: 2px solid var(--bleu-vif); outline-offset: -2px; }
-  .subtabs-menu-list button[aria-selected="true"] { color: var(--bleu-vif); background: color-mix(in srgb, var(--bleu-vif) 8%, transparent); }
 
   .btn {
     display: inline-flex; align-items: center; gap: 8px; border-radius: var(--r-sm); padding: 13px 24px;
@@ -310,6 +314,9 @@
   .chevron { width: 18px; height: 18px; flex: none; transition: transform 0.2s ease; color: var(--ink-soft); }
   details[open] .chevron { transform: rotate(180deg); color: var(--bleu-vif); }
   .faq-answer { padding: 0 0 20px; color: var(--ink-soft); font-size: 0.94rem; max-width: 64ch; }
+  .faq-answer p { margin: 0; }
+  .faq-answer p + p { margin-top: 10px; }
+  .faq-answer strong { color: var(--ink); }
 
   /* ---------------- Formulaires (communs) ---------------- */
   .form-card { background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--r-xl); padding: 42px; box-shadow: var(--shadow-lg); }
@@ -375,10 +382,15 @@
   /* ---------------- Contact ---------------- */
   .form-solo { max-width: 760px; margin: 0 auto; }
 
-  footer { padding: 44px 0 60px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; color: var(--ink-soft); font-size: 0.85rem; }
+  footer { padding: 44px 0 40px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 26px; color: var(--ink-soft); font-size: 0.85rem; }
+  .footer-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
   .footer-pillars { list-style: none; display: flex; gap: 22px; margin: 0; padding: 0; flex-wrap: wrap; justify-content: center; }
   .footer-pillars li { display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700; font-size: 0.74rem; color: var(--bleu-vif); }
   .footer-pillars svg { width: 15px; height: 15px; flex: none; }
+  .footer-legal { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; padding-top: 22px; border-top: 1px solid var(--line); }
+  .footer-legal a { color: var(--ink-soft); text-decoration: none; font-size: 0.82rem; font-weight: 600; transition: color 0.15s ease; }
+  .footer-legal a:hover { color: var(--bleu-vif); text-decoration: underline; }
+  .footer-legal a:focus-visible { outline: 2px solid var(--bleu-vif); outline-offset: 2px; }
 </style>
 
 <header class="topnav">
@@ -401,21 +413,30 @@
 
 <!-- ===================== ONGLET ACCOMPAGNEMENT ===================== -->
 <div id="tab-accompagnement" role="tabpanel" aria-labelledby="tab-btn-accompagnement">
-  <div class="wrap">
-    <div class="subtabs-menu">
-      <button type="button" class="subtabs-menu-trigger" id="subtabs-menu-trigger" aria-haspopup="true" aria-expanded="false" aria-controls="subtabs-menu-list">
-        <span id="subtabs-menu-label">Projet &amp; offres</span>
-        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  <div class="acc-shell">
+    <nav class="acc-sidebar" role="tablist" aria-label="Sections Accompagnement">
+      <button type="button" role="tab" id="subtab-btn-accueil" aria-selected="true" data-subtab="accueil">
+        <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg>
+        <span>Accueil</span>
       </button>
-      <div class="subtabs-menu-list" id="subtabs-menu-list" role="menu" aria-label="Sections Accompagnement" hidden>
-        <button type="button" role="menuitemradio" id="subtab-btn-offres" aria-selected="true" data-subtab="offres">Projet &amp; offres</button>
-        <button type="button" role="menuitemradio" id="subtab-btn-inspection" aria-selected="false" data-subtab="inspection">Inspection</button>
-      </div>
-    </div>
-  </div>
+      <button type="button" role="tab" id="subtab-btn-offres" aria-selected="false" data-subtab="offres">
+        <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9-9-9z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>
+        <span>Nos offres</span>
+      </button>
+      <button type="button" role="tab" id="subtab-btn-apropos" aria-selected="false" data-subtab="apropos">
+        <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><path d="M12 7h.01"/></svg>
+        <span>À propos de nous</span>
+      </button>
+      <button type="button" role="tab" id="subtab-btn-inspection" aria-selected="false" data-subtab="inspection">
+        <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+        <span>Inspection</span>
+      </button>
+    </nav>
 
-  <!-- ---------- Sous-onglet : Les offres ---------- -->
-  <div id="subtab-offres" role="tabpanel" aria-labelledby="subtab-btn-offres">
+    <div class="acc-content">
+
+  <!-- ---------- Page : Accueil ---------- -->
+  <div id="subtab-accueil" role="tabpanel" aria-labelledby="subtab-btn-accueil">
 
     <section class="dark hero">
       <div class="wrap hero-solo">
@@ -432,8 +453,8 @@
         </ul>
         <p class="lede">Un accompagnement mené dans votre seul intérêt, en toute indépendance du vendeur.</p>
         <div class="cta-row">
-          <a href="#formulaire" class="btn btn-primary">Décrire mon projet</a>
-          <a href="#offres" class="btn btn-outline-dark">Trouvez votre offre</a>
+          <a href="javascript:void(0)" class="btn btn-primary" data-goto-subtab="offres" data-scroll-to="formulaire">Décrire mon projet</a>
+          <a href="javascript:void(0)" class="btn btn-outline-dark" data-goto-subtab="offres" data-scroll-to="offres">Trouvez votre offre</a>
         </div>
       </div>
     </section>
@@ -471,6 +492,11 @@
         </div>
       </section>
     </div>
+
+  </div>
+
+  <!-- ---------- Page : À propos ---------- -->
+  <div id="subtab-apropos" role="tabpanel" aria-labelledby="subtab-btn-apropos" hidden>
 
     <section id="apropos">
       <div class="wrap">
@@ -519,10 +545,15 @@
           <p class="about-closing-lead">Plus qu'un prestataire, un partenaire de confiance.</p>
           <p>Mon ambition est simple : faire de DIMZ la référence de l'accompagnement automobile, en proposant un service humain, transparent et accessible à tous.</p>
           <p>Bienvenue chez <strong>DIMZ</strong>. Votre projet automobile mérite un copilote.</p>
-          <a href="#formulaire" class="btn btn-primary">Décrire mon projet</a>
+          <a href="javascript:void(0)" class="btn btn-primary" data-goto-subtab="offres" data-scroll-to="formulaire">Décrire mon projet</a>
         </div>
       </div>
     </section>
+
+  </div>
+
+  <!-- ---------- Page : Nos offres ---------- -->
+  <div id="subtab-offres" role="tabpanel" aria-labelledby="subtab-btn-offres" hidden>
 
     <section id="offres" class="tint">
       <div class="wrap">
@@ -930,28 +961,102 @@
         </div>
         <div class="faq-list" data-reveal>
           <details class="faq-item">
-            <summary>Qu'est-ce que Dimz exactement ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
-            <div class="faq-answer">Dimz est un copilote automobile indépendant. Concrètement : on vous aide à acheter ou à faire transporter un véhicule, en vous évitant les erreurs coûteuses et les semaines passées à comparer des annonces seul.</div>
+            <summary>À qui s'adresse DIMZ ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>DIMZ s'adresse à toutes les personnes qui souhaitent acheter, déplacer ou sécuriser un véhicule sans être seules face aux différentes étapes.</p>
+              <p>Que vous soyez à la recherche de votre premier véhicule, d'une voiture familiale, d'un modèle plus haut de gamme ou que vous ayez besoin de faire transporter un véhicule, DIMZ vous accompagne selon votre projet.</p>
+            </div>
           </details>
           <details class="faq-item">
-            <summary>Combien coûte l'offre Copilote ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
-            <div class="faq-answer">99 € pour une recherche simple, 149 € pour une recherche complexe (véhicules rares ou de collection). L'offre Découverte, elle, reste gratuite.</div>
+            <summary>Pourquoi faire appel à DIMZ plutôt que chercher seul ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Acheter un véhicule demande du temps, des connaissances et de la vigilance.</p>
+              <p>DIMZ vous apporte un regard professionnel pour vous aider à faire les bons choix, identifier les opportunités, éviter certaines erreurs et avancer avec plus de sérénité.</p>
+              <p>L'objectif n'est pas de décider à votre place, mais de vous accompagner dans votre décision.</p>
+            </div>
           </details>
           <details class="faq-item">
-            <summary>Si j'ai déjà payé 99 € ou 149 €, dois-je repayer pour l'offre Copilote Complète ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
-            <div class="faq-answer">Non. Cette somme est intégralement déduite du prix de l'offre Copilote Complète si vous décidez de passer à cette formule.</div>
+            <summary>Est-ce que DIMZ vend des véhicules ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Non. DIMZ n'est pas un vendeur automobile.</p>
+              <p>Nous sommes un accompagnateur indépendant qui vous aide à trouver, analyser et sécuriser votre projet d'achat. La décision finale d'achat reste toujours entre vous et le vendeur.</p>
+            </div>
           </details>
           <details class="faq-item">
-            <summary>Le convoyage est-il inclus dans l'offre Copilote Complète ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
-            <div class="faq-answer">Non, il est proposé en option, sur devis. C'est un service indépendant, accessible depuis l'onglet Convoyage.</div>
+            <summary>Est-ce que DIMZ peut rechercher un véhicule à ma place ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Oui.</p>
+              <p>Après avoir défini vos critères (budget, modèle recherché, utilisation, contraintes), DIMZ peut vous accompagner dans la recherche de véhicules correspondant à votre projet.</p>
+            </div>
           </details>
           <details class="faq-item">
-            <summary>Intervenez-vous partout en France ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
-            <div class="faq-answer">Dimz est basé à Lyon, mais votre copilote intervient partout en France pour la recherche, l'inspection et le convoyage.</div>
+            <summary>Est-ce que vous travaillez uniquement avec des professionnels ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Non.</p>
+              <p>DIMZ peut vous accompagner dans des projets impliquant des vendeurs professionnels ou particuliers, selon les besoins et la situation.</p>
+            </div>
           </details>
           <details class="faq-item">
-            <summary>Combien de temps prend un accompagnement ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
-            <div class="faq-answer">Ça dépend du véhicule recherché : une citadine courante se trouve vite, un modèle rare peut prendre plusieurs semaines. Votre copilote vous donne un délai réaliste dès le premier échange.</div>
+            <summary>Est-ce que vous pouvez vérifier un véhicule avant l'achat ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Oui, selon la prestation choisie.</p>
+              <p>DIMZ peut vous accompagner dans l'analyse des informations disponibles, l'échange avec le vendeur et la vérification des éléments importants avant votre décision.</p>
+              <p>Des prestations d'inspection plus poussées peuvent également être proposées.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Est-ce que vous négociez le prix du véhicule ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Selon la prestation choisie, DIMZ peut vous conseiller dans votre approche et vous accompagner dans les échanges avec le vendeur.</p>
+              <p>L'objectif est de vous aider à réaliser un achat cohérent et sécurisé.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Est-ce que DIMZ transporte les véhicules ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Oui.</p>
+              <p>Grâce au service de convoyage, DIMZ peut organiser et réaliser le déplacement de votre véhicule entre son lieu de départ et son lieu d'arrivée.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Combien coûte un accompagnement DIMZ ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Le tarif dépend du niveau d'accompagnement souhaité et de la complexité du projet.</p>
+              <p>Certaines prestations commencent à partir de 99 € pour un accompagnement conseil, tandis que les accompagnements complets sont établis selon les besoins du client.</p>
+              <p>Un devis personnalisé est proposé avant toute prestation.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Où intervient DIMZ ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>DIMZ accompagne ses clients partout en France selon la nature du projet.</p>
+              <p>Les modalités d'intervention sont définies au cas par cas afin de garantir un service adapté.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Est-ce que je garde le choix final du véhicule ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Oui, toujours.</p>
+              <p>DIMZ vous conseille et vous accompagne, mais la décision finale vous appartient. Notre rôle est de vous donner les meilleurs éléments pour décider en toute confiance.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Comment commencer mon projet avec DIMZ ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>C'est simple.</p>
+              <p>Remplissez le formulaire de contact en indiquant votre projet automobile. Nous reprendrons ensuite contact avec vous afin d'échanger sur vos besoins et définir l'accompagnement le plus adapté.</p>
+              <p><strong>DIMZ, votre copilote automobile.</strong></p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Pourquoi payer un accompagnement alors que les annonces sont accessibles gratuitement en ligne ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Les annonces sont accessibles à tous, mais trouver le bon véhicule demande bien plus que simplement consulter des offres.</p>
+              <p>Un achat automobile implique de nombreuses questions : le véhicule correspond-il réellement à vos besoins ? Le prix est-il cohérent avec le marché ? L'annonce est-elle fiable ? Quels éléments faut-il vérifier avant de s'engager ?</p>
+              <p>DIMZ vous apporte un regard extérieur, une expertise et un accompagnement personnalisé pour vous faire gagner du temps, limiter les risques et prendre une décision plus sereine.</p>
+              <p>L'objectif n'est pas seulement de trouver une voiture, mais de trouver la bonne voiture, au bon moment et dans les meilleures conditions.</p>
+              <p>Votre temps, votre argent et votre tranquillité méritent un accompagnement professionnel.</p>
+            </div>
           </details>
         </div>
       </div>
@@ -1038,6 +1143,9 @@
         </div>
       </div>
     </section>
+  </div>
+
+    </div>
   </div>
 </div>
 
@@ -1204,14 +1312,21 @@
 </main>
 
 <footer class="wrap">
-  <span>© 2026 Dimz · Mon copilote auto. <span class="footer-beta">Bêta</span></span>
-  <ul class="footer-pillars">
-    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-5-5"/></svg>Trouver</li>
-    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>Sécuriser</li>
-    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6.3 6-6.3s6 2.8 6 6.3"/><circle cx="17" cy="7" r="2.4"/><path d="M14.8 20c.2-3 2.2-5.4 4.7-6"/></svg>Accompagner</li>
-    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="15" r="4"/><path d="M10 12l9-9"/><path d="M15 6l3 3"/><path d="M17 4l3 3"/></svg>Livrer</li>
-  </ul>
-  <span>Page de démonstration</span>
+  <div class="footer-top">
+    <span>© 2026 Dimz · Mon copilote auto. <span class="footer-beta">Bêta</span></span>
+    <ul class="footer-pillars">
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-5-5"/></svg>Trouver</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>Sécuriser</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6.3 6-6.3s6 2.8 6 6.3"/><circle cx="17" cy="7" r="2.4"/><path d="M14.8 20c.2-3 2.2-5.4 4.7-6"/></svg>Accompagner</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="15" r="4"/><path d="M10 12l9-9"/><path d="M15 6l3 3"/><path d="M17 4l3 3"/></svg>Livrer</li>
+    </ul>
+    <span>Page de démonstration</span>
+  </div>
+  <nav class="footer-legal" aria-label="Informations légales">
+    <a href="javascript:void(0)">Politique de confidentialité (RGPD)</a>
+    <a href="javascript:void(0)">Mentions légales</a>
+    <a href="javascript:void(0)">CGV</a>
+  </nav>
 </footer>
 
 <script>
@@ -1250,7 +1365,7 @@
     document.getElementById('tab-accompagnement').hidden = tab !== 'accompagnement';
     document.getElementById('tab-convoyage').hidden = tab !== 'convoyage';
     setNavCta(tab);
-    if (tab === 'accompagnement' && resetSubtab) showSubTab('offres');
+    if (tab === 'accompagnement' && resetSubtab) showSubTab('accueil');
     observeNewReveals();
   }
 
@@ -1262,53 +1377,32 @@
     el.addEventListener('click', function () { showMainTab(el.dataset.gotoTab, true); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); });
   });
 
-  // ---------- Sous-onglets Accompagnement : menu déroulant (Projet & offres / Inspection) ----------
-  var subTabButtons = document.querySelectorAll('.subtabs-menu-list button');
-  var subtabsMenuTrigger = document.getElementById('subtabs-menu-trigger');
-  var subtabsMenuList = document.getElementById('subtabs-menu-list');
-  var subtabsMenuLabel = document.getElementById('subtabs-menu-label');
-
-  function openSubtabsMenu() {
-    subtabsMenuList.hidden = false;
-    subtabsMenuTrigger.setAttribute('aria-expanded', 'true');
-  }
-  function closeSubtabsMenu() {
-    subtabsMenuList.hidden = true;
-    subtabsMenuTrigger.setAttribute('aria-expanded', 'false');
-  }
+  // ---------- Navigation latérale Accompagnement : Accueil / Nos offres / À propos / Inspection ----------
+  var subTabButtons = document.querySelectorAll('.acc-sidebar button');
+  var ACC_PAGES = ['accueil', 'offres', 'apropos', 'inspection'];
 
   function showSubTab(sub) {
-    subTabButtons.forEach(function (b) {
-      var selected = b.dataset.subtab === sub;
-      b.setAttribute('aria-selected', selected ? 'true' : 'false');
-      if (selected) subtabsMenuLabel.textContent = b.textContent;
-    });
-    document.getElementById('subtab-offres').hidden = sub !== 'offres';
-    document.getElementById('subtab-inspection').hidden = sub !== 'inspection';
-    closeSubtabsMenu();
+    subTabButtons.forEach(function (b) { b.setAttribute('aria-selected', b.dataset.subtab === sub ? 'true' : 'false'); });
+    ACC_PAGES.forEach(function (p) { document.getElementById('subtab-' + p).hidden = p !== sub; });
     observeNewReveals();
   }
-
-  subtabsMenuTrigger.addEventListener('click', function () {
-    if (subtabsMenuTrigger.getAttribute('aria-expanded') === 'true') closeSubtabsMenu();
-    else openSubtabsMenu();
-  });
-  document.addEventListener('click', function (e) {
-    if (!e.target.closest('.subtabs-menu')) closeSubtabsMenu();
-  });
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && subtabsMenuTrigger.getAttribute('aria-expanded') === 'true') {
-      closeSubtabsMenu();
-      subtabsMenuTrigger.focus();
-    }
-  });
 
   subTabButtons.forEach(function (btn) {
     btn.addEventListener('click', function () { showSubTab(btn.dataset.subtab); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); });
   });
 
   document.querySelectorAll('[data-goto-subtab]').forEach(function (el) {
-    el.addEventListener('click', function () { showSubTab(el.dataset.gotoSubtab); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); });
+    el.addEventListener('click', function () {
+      showSubTab(el.dataset.gotoSubtab);
+      if (el.dataset.scrollTo) {
+        requestAnimationFrame(function () {
+          var target = document.getElementById(el.dataset.scrollTo);
+          if (target) target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+        });
+      } else {
+        window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+      }
+    });
   });
 
   // ---------- Nav CTA (dynamique selon l'onglet actif) ----------
