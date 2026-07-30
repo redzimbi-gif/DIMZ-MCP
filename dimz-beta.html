@@ -151,7 +151,7 @@
   @keyframes heroCarIn { from { opacity: 0; transform: translateX(-26px); } to { opacity: 0.95; transform: translateX(0); } }
   @keyframes heroCarFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
   @media (prefers-reduced-motion: reduce) { .hero-illustration { animation: none; opacity: 0.95; } }
-  .hero-points { list-style: none; margin: 6px 0 26px; padding: 0 4px 6px; display: flex; flex-wrap: nowrap; gap: 9px; justify-content: safe center; overflow-x: auto; }
+  .hero-points { list-style: none; margin: 6px 0 26px; padding: 0 4px 6px; display: flex; flex-wrap: wrap; gap: 9px; justify-content: center; }
   .hero-points li { display: inline-flex; align-items: center; gap: 7px; flex: none; white-space: nowrap; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.16); border-radius: 100px; padding: 8px 15px; font-size: 0.84rem; font-weight: 600; color: rgba(255,255,255,0.92); }
   .hero-points svg { width: 13px; height: 13px; color: #9db9ec; flex: none; }
   .hero .kicker { display: inline-flex; align-items: center; gap: 8px; font-size: 0.76rem; letter-spacing: 0.16em; text-transform: uppercase; color: #b9cdf5; font-weight: 700; margin-bottom: 24px; }
@@ -259,6 +259,28 @@
   .reco-pill.vert.active { background: color-mix(in srgb, var(--vert) 16%, transparent); color: var(--vert); }
   .reco-pill.ambre.active { background: color-mix(in srgb, var(--ambre) 18%, transparent); color: var(--ambre); }
   .reco-pill.rouge.active { background: color-mix(in srgb, var(--rouge) 16%, transparent); color: var(--rouge); }
+
+  /* ---------------- À propos ---------------- */
+  .about-body { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; font-size: 1.02rem; color: var(--ink-soft); }
+  .about-body strong { color: var(--ink); font-weight: 700; }
+  .about-body p:first-child { font-size: 1.08rem; }
+  .about-closing { max-width: 640px; margin: 56px auto 0; text-align: center; display: flex; flex-direction: column; gap: 14px; }
+  .about-closing-lead { font-family: var(--serif); font-weight: 600; font-size: 1.3rem; color: var(--ink); margin: 0; }
+  .about-closing p { color: var(--ink-soft); margin: 0; }
+  .about-closing .btn { align-self: center; margin-top: 8px; }
+
+  /* ---------------- Récapitulatif (formulaires) ---------------- */
+  .recap-group { border: 1px solid var(--line); border-radius: var(--r-md); padding: 18px 20px; margin-bottom: 14px; }
+  .recap-group-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 12px; }
+  .recap-group-head h4 { font-size: 0.95rem; font-weight: 700; margin: 0; font-family: inherit; }
+  .recap-edit { background: transparent; border: none; color: var(--bleu-vif); font-weight: 700; font-size: 0.82rem; cursor: pointer; padding: 4px 2px; }
+  .recap-edit:hover { text-decoration: underline; }
+  .recap-edit:focus-visible { outline: 2px solid var(--bleu-vif); outline-offset: 2px; }
+  .recap-list { display: flex; flex-direction: column; gap: 9px; margin: 0; }
+  .recap-item { display: flex; justify-content: space-between; gap: 16px; font-size: 0.88rem; }
+  .recap-item dt { color: var(--ink-soft); flex: none; }
+  .recap-item dd { margin: 0; text-align: right; font-weight: 600; max-width: 60%; }
+  .recap-empty { margin: 0; color: var(--ink-soft); font-size: 0.86rem; font-style: italic; }
 
   /* ---------------- FAQ ---------------- */
   .faq-list { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
@@ -425,6 +447,58 @@
       </section>
     </div>
 
+    <section id="apropos">
+      <div class="wrap">
+        <div class="section-head" data-reveal>
+          <span class="label">À propos de DIMZ</span>
+          <h2>Votre copilote automobile, du premier doute jusqu'à la remise des clés.</h2>
+        </div>
+        <div class="about-body" data-reveal>
+          <p>Acheter une voiture devrait être un moment de plaisir. Pourtant, entre les annonces trompeuses, les arnaques, les véhicules mal entretenus et les démarches administratives, cette expérience devient souvent une source de stress.</p>
+          <p>C'est de ce constat qu'est née <strong>DIMZ</strong>.</p>
+          <p>Après plusieurs années passées dans le monde de l'automobile et du convoyage de véhicules, j'ai accompagné des centaines de trajets et découvert les attentes, les inquiétudes et les erreurs que rencontrent les automobilistes. Une évidence s'est imposée : beaucoup de personnes ont besoin d'un professionnel de confiance, capable de les conseiller, de les protéger et de les accompagner à chaque étape de leur projet.</p>
+          <p>DIMZ a été créé avec une idée simple : <strong>vous offrir l'accompagnement que j'aimerais recevoir si j'achetais une voiture.</strong></p>
+          <p>Ici, il ne s'agit pas seulement de trouver un véhicule ou de le livrer. Mon rôle est d'être votre copilote : vous aider à faire le bon choix, vérifier que tout est conforme, vous éviter les mauvaises surprises et vous accompagner jusqu'à la remise des clés.</p>
+          <p>Que vous recherchiez votre première voiture, un véhicule familial, un modèle premium ou que vous ayez simplement besoin de faire transporter votre véhicule en toute sécurité, vous bénéficiez du même niveau d'exigence : transparence, disponibilité et professionnalisme.</p>
+          <p>Chez DIMZ, chaque projet est unique. C'est pourquoi l'accompagnement est personnalisé, avec un seul objectif : que vous puissiez prendre le volant en toute sérénité.</p>
+        </div>
+
+        <div class="section-head" data-reveal style="margin-top:64px;">
+          <span class="label">Nos valeurs</span>
+          <h2>Les valeurs qui nous guident</h2>
+        </div>
+        <div class="values-grid">
+          <div class="value-card" data-reveal>
+            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24" stroke-width="1.8"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-5-5"/></svg></div>
+            <h3>Trouver</h3>
+            <p>Parce que chaque conducteur mérite un véhicule qui correspond réellement à ses besoins, à son budget et à son mode de vie.</p>
+          </div>
+          <div class="value-card" data-reveal>
+            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24" stroke-width="1.8"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></div>
+            <h3>Sécuriser</h3>
+            <p>Chaque décision est prise avec rigueur afin de limiter les risques et d'éviter les mauvaises surprises.</p>
+          </div>
+          <div class="value-card" data-reveal>
+            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6.3 6-6.3s6 2.8 6 6.3"/><circle cx="17" cy="7" r="2.4"/><path d="M14.8 20c.2-3 2.2-5.4 4.7-6"/></svg></div>
+            <h3>Accompagner</h3>
+            <p>Vous n'êtes jamais seul. DIMZ reste à vos côtés du premier échange jusqu'à la fin de votre projet.</p>
+          </div>
+          <div class="value-card" data-reveal>
+            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24" stroke-width="1.8"><circle cx="7" cy="15" r="4"/><path d="M10 12l9-9"/><path d="M15 6l3 3"/><path d="M17 4l3 3"/></svg></div>
+            <h3>Livrer</h3>
+            <p>Parce qu'un accompagnement complet se termine par une remise de véhicule dans les meilleures conditions.</p>
+          </div>
+        </div>
+
+        <div class="about-closing" data-reveal>
+          <p class="about-closing-lead">Plus qu'un prestataire, un partenaire de confiance.</p>
+          <p>Mon ambition est simple : faire de DIMZ la référence de l'accompagnement automobile, en proposant un service humain, transparent et accessible à tous.</p>
+          <p>Bienvenue chez <strong>DIMZ</strong>. Votre projet automobile mérite un copilote.</p>
+          <a href="#formulaire" class="btn btn-primary">Décrire mon projet</a>
+        </div>
+      </div>
+    </section>
+
     <section id="offres" class="tint">
       <div class="wrap">
         <div class="section-head" data-reveal>
@@ -514,7 +588,7 @@
           <div class="form-card">
             <div class="form-progress">
               <div class="form-progress-bar"><div class="form-progress-fill" id="acc-progress-fill" style="width:16.66%"></div></div>
-              <div class="form-progress-label">Étape <strong id="acc-step-current">1</strong> sur <span id="acc-step-total">6</span></div>
+              <div class="form-progress-label">Étape <strong id="acc-step-current">1</strong> sur <span id="acc-step-total">7</span></div>
             </div>
             <form id="form-accompagnement" novalidate>
 
@@ -551,6 +625,9 @@
                     <input type="email" id="a-email" required>
                   </div>
                 </div>
+                <div class="field full toggle-row" style="margin-top:22px;">
+                  <label><input type="checkbox" id="a-consentement" required> J'accepte que mes données soient utilisées par DIMZ afin d'être recontacté dans le cadre de ma demande d'accompagnement automobile.</label>
+                </div>
               </div>
 
               <div class="form-step">
@@ -567,7 +644,7 @@
                   </div>
                   <div class="field full">
                     <label>Usages principaux</label>
-                    <div class="choice-grid">
+                    <div class="choice-grid" id="usages-choices">
                       <label><input type="checkbox" value="travail"> Trajets travail</label>
                       <label><input type="checkbox" value="loisirs"> Loisirs</label>
                       <label><input type="checkbox" value="quotidien"> Trajets quotidiens</label>
@@ -621,7 +698,7 @@
                 <div class="field-grid" style="margin-top:26px;">
                   <div class="field full">
                     <label>Type de carrosserie souhaité</label>
-                    <div class="choice-grid">
+                    <div class="choice-grid" id="carrosserie-choices">
                       <label><input type="checkbox" value="citadine"> Citadine</label>
                       <label><input type="checkbox" value="berline"> Berline</label>
                       <label><input type="checkbox" value="break"> Break</label>
@@ -634,7 +711,7 @@
                   </div>
                   <div class="field full">
                     <label>Énergie du véhicule</label>
-                    <div class="choice-grid">
+                    <div class="choice-grid" id="energie-choices">
                       <label><input type="checkbox" value="essence"> Essence</label>
                       <label><input type="checkbox" value="diesel"> Diesel</label>
                       <label><input type="checkbox" value="hybride"> Hybride</label>
@@ -744,13 +821,13 @@
                     </select>
                   </div>
                   <div class="field full">
-                    <label>Mode de financement souhaité</label>
+                    <label>Mode de financement souhaité <span class="hint">(plusieurs choix possibles)</span></label>
                     <div class="choice-grid">
-                      <label><input type="radio" name="financement" value="comptant"> Comptant</label>
-                      <label><input type="radio" name="financement" value="credit"> Crédit classique</label>
-                      <label><input type="radio" name="financement" value="loa"> LOA</label>
-                      <label><input type="radio" name="financement" value="lld"> LLD</label>
-                      <label><input type="radio" name="financement" value="indecis"> Je ne sais pas encore</label>
+                      <label><input type="checkbox" name="financement" value="comptant"> Comptant</label>
+                      <label><input type="checkbox" name="financement" value="credit"> Crédit classique</label>
+                      <label><input type="checkbox" name="financement" value="loa"> LOA</label>
+                      <label><input type="checkbox" name="financement" value="lld"> LLD</label>
+                      <label><input type="checkbox" name="financement" value="indecis"> Je ne sais pas encore</label>
                     </div>
                   </div>
                 </div>
@@ -793,6 +870,12 @@
                     <textarea id="a-inquietudes" placeholder="Panne cachée, prix trop élevé, manque de temps pour chercher…"></textarea>
                   </div>
                 </div>
+              </div>
+
+              <div class="form-step">
+                <h3>Récapitulatif</h3>
+                <p class="hint" style="display:block; margin-bottom:20px;">Vérifiez vos informations avant l'envoi. Cliquez sur « Modifier » pour revenir à n'importe quelle étape.</p>
+                <div id="acc-recap"></div>
               </div>
 
               <div class="form-nav">
@@ -939,9 +1022,9 @@
   <section class="dark hero">
     <div class="wrap hero-solo">
       <div class="hero-illustration" aria-hidden="true"></div>
-      <span class="kicker"><span class="dot"></span>Un service entièrement indépendant</span>
+      <span class="kicker"><span class="dot"></span>DIMZ - Convoyage</span>
       <h1>Besoin de déplacer votre véhicule ? <em>Votre copilote prend le relais.</em></h1>
-      <p class="lede">Achat à distance, déménagement, manque de temps : Dimz confie votre véhicule à un professionnel du convoyage, du point de départ jusqu'à la porte d'arrivée.</p>
+      <p class="lede">Achat à distance, déménagement, manque de temps : confiez votre véhicule à un professionnel du convoyage, du point de départ jusqu'à la porte d'arrivée.</p>
       <div class="cta-row">
         <a href="#convoyage-formulaire" class="btn btn-primary">Demander un convoyage</a>
       </div>
@@ -959,7 +1042,7 @@
       <div class="form-card">
         <div class="form-progress">
           <div class="form-progress-bar"><div class="form-progress-fill" id="cvg-progress-fill" style="width:33.33%"></div></div>
-          <div class="form-progress-label">Étape <strong id="cvg-step-current">1</strong> sur <span id="cvg-step-total">3</span></div>
+          <div class="form-progress-label">Étape <strong id="cvg-step-current">1</strong> sur <span id="cvg-step-total">4</span></div>
         </div>
         <form id="form-convoyage" novalidate>
 
@@ -1066,6 +1149,12 @@
                 <textarea id="c-instructions" placeholder="Accès au parking, code portail, personne à contacter sur place…"></textarea>
               </div>
             </div>
+          </div>
+
+          <div class="form-step">
+            <h3>Récapitulatif</h3>
+            <p class="hint" style="display:block; margin-bottom:20px;">Vérifiez votre demande avant l'envoi. Cliquez sur « Modifier » pour revenir à n'importe quelle étape.</p>
+            <div id="cvg-recap"></div>
           </div>
 
           <div class="form-nav">
@@ -1459,6 +1548,7 @@
       nextBtn.hidden = isLast;
       submitBtn.hidden = !isLast;
       submitBtn.disabled = !isLast;
+      if (isLast && opts.onLast) opts.onLast();
     }
 
     function scrollTop() {
@@ -1479,16 +1569,170 @@
     });
 
     render();
-    return { reset: function () { current = 0; render(); } };
+    return {
+      reset: function () { current = 0; render(); },
+      goTo: function (i) { if (i >= 0 && i < total && i !== current) { current = i; render(); scrollTop(); } }
+    };
+  }
+
+  // ---------- Récapitulatif : utilitaires ----------
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function recapRow(label, value) {
+    if (!value) return '';
+    return '<div class="recap-item"><dt>' + escapeHtml(label) + '</dt><dd>' + escapeHtml(value) + '</dd></div>';
+  }
+  function inputVal(id) {
+    var el = document.getElementById(id);
+    return el && el.value ? el.value.trim() : '';
+  }
+  function selectText(id) {
+    var el = document.getElementById(id);
+    if (!el || !el.value) return '';
+    return el.options[el.selectedIndex].text;
+  }
+  function isChecked(id) {
+    var el = document.getElementById(id);
+    return !!(el && el.checked);
+  }
+  function recapCheckedList(selector) {
+    var vals = Array.prototype.filter.call(document.querySelectorAll(selector), function (el) { return el.checked; })
+      .map(function (el) {
+        var lbl = el.closest('label');
+        return lbl ? lbl.textContent.trim() : el.value;
+      });
+    return vals.join(', ');
+  }
+  function renderRecap(containerId, groups) {
+    var container = document.getElementById(containerId);
+    container.innerHTML = groups.map(function (g) {
+      var body = g.html && g.html.trim()
+        ? '<dl class="recap-list">' + g.html + '</dl>'
+        : '<p class="recap-empty">Non renseigné</p>';
+      return '<div class="recap-group">' +
+        '<div class="recap-group-head"><h4>' + escapeHtml(g.title) + '</h4><button type="button" class="recap-edit" data-goto-step="' + g.step + '">Modifier</button></div>' +
+        body +
+        '</div>';
+    }).join('');
+  }
+
+  function buildRecapAccompagnement() {
+    var groups = [];
+
+    groups.push({ title: 'Informations personnelles', step: 0, html: [
+      recapRow('Civilité', selectText('a-civilite')),
+      recapRow('Âge', inputVal('a-age')),
+      recapRow('Nom', inputVal('a-nom')),
+      recapRow('Prénom', inputVal('a-prenom')),
+      recapRow('Téléphone', inputVal('a-tel')),
+      recapRow('Email', inputVal('a-email')),
+      recapRow('Consentement', isChecked('a-consentement') ? 'Accepté' : '')
+    ].join('') });
+
+    groups.push({ title: 'Votre quotidien', step: 1, html: [
+      recapRow('Véhicule destiné à', selectText('a-pourqui')),
+      recapRow('Usages principaux', recapCheckedList('#usages-choices input')),
+      recapRow('Kilométrage annuel estimé', selectText('a-km')),
+      recapRow('Type de parcours', selectText('a-parcours'))
+    ].join('') });
+
+    var bubbles = document.querySelectorAll('#vehicule-bubbles .veh-bubble');
+    var vehText = bubbles.length ? Array.prototype.map.call(bubbles, function (b) { return b.textContent.trim(); }).join(' · ') : '';
+    groups.push({ title: 'Véhicules souhaités', step: 2, html: [
+      recapRow('Véhicules ciblés', vehText),
+      recapRow('Véhicule non trouvé dans la liste', inputVal('a-veh-absente-desc')),
+      recapRow('Carrosserie souhaitée', recapCheckedList('#carrosserie-choices input')),
+      recapRow('Énergie souhaitée', recapCheckedList('#energie-choices input'))
+    ].join('') });
+
+    var situationParts = [recapRow('Véhicule actuel', selectText('a-vehicule-actuel'))];
+    if (document.getElementById('a-vehicule-actuel').value === 'oui') {
+      var actuelVeh = [inputVal('a-actuel-marque'), inputVal('a-actuel-modele'), inputVal('a-actuel-generation')].filter(Boolean).join(' ');
+      situationParts.push(recapRow('Véhicule', actuelVeh || inputVal('a-actuel-absent-desc')));
+      situationParts.push(recapRow('Année', inputVal('a-actuel-annee')));
+      situationParts.push(recapRow('Kilométrage actuel', inputVal('a-actuel-km')));
+      situationParts.push(recapRow('Prix / mensualité', inputVal('a-actuel-prix')));
+      situationParts.push(recapRow('Financement en cours', selectText('a-financement-cours')));
+      if (document.getElementById('a-financement-cours').value === 'oui') {
+        situationParts.push(recapRow('Type de financement', recapCheckedList('input[name="financement-actuel-type"]')));
+        var duree = inputVal('a-financement-duree');
+        var restant = inputVal('a-financement-restant');
+        var solde = inputVal('a-solde-restant');
+        situationParts.push(recapRow('Durée', duree ? duree + ' mois' : ''));
+        situationParts.push(recapRow('Temps restant', restant ? restant + ' mois' : ''));
+        situationParts.push(recapRow('Solde restant dû', solde ? solde + ' €' : ''));
+      }
+    }
+    groups.push({ title: 'Situation actuelle', step: 3, html: situationParts.join('') });
+
+    groups.push({ title: 'Budget et financement', step: 4, html: [
+      recapRow('Budget total envisagé', selectText('a-budget')),
+      recapRow('Mode de financement souhaité', recapCheckedList('input[name="financement"]'))
+    ].join('') });
+
+    var besoinChecked = document.querySelector('#besoin-choices input:checked');
+    groups.push({ title: 'Projet et délai', step: 5, html: [
+      recapRow('Accompagnement recherché', besoinChecked ? besoinChecked.closest('label').textContent.trim() : ''),
+      recapRow('Délai souhaité', selectText('a-delai')),
+      recapRow('Comment vous avez connu Dimz', selectText('a-source')),
+      recapRow('Inquiétudes principales', inputVal('a-inquietudes'))
+    ].join('') });
+
+    return groups;
+  }
+
+  function buildRecapConvoyage() {
+    var groups = [];
+    groups.push({ title: 'Le véhicule', step: 0, html: [
+      recapRow('Marque', inputVal('c-marque')),
+      recapRow('Modèle', inputVal('c-modele')),
+      recapRow('Immatriculation', isChecked('c-pas-immatricule') ? 'Pas encore immatriculé' : inputVal('c-immat')),
+      recapRow('VIN', inputVal('c-vin')),
+      recapRow('Année', inputVal('c-annee')),
+      recapRow('Transmission', recapCheckedList('input[name="c-transmission"]'))
+    ].join('') });
+
+    groups.push({ title: 'Le trajet', step: 1, html: [
+      recapRow('Départ', inputVal('c-depart')),
+      recapRow('Arrivée', inputVal('c-arrivee')),
+      recapRow('Date de prise en charge', inputVal('c-date-depart')),
+      recapRow('Date de livraison souhaitée', inputVal('c-date-arrivee')),
+      recapRow('Téléphone', inputVal('c-tel')),
+      recapRow('Email', inputVal('c-email'))
+    ].join('') });
+
+    groups.push({ title: 'Prise en charge & options', step: 2, html: [
+      recapRow('Mise en main à la livraison', isChecked('c-mise-en-main') ? 'Oui' : ''),
+      recapRow('Niveau de carburant actuel', recapCheckedList('input[name="c-carburant-niveau"]')),
+      recapRow('Option carburant à la livraison', recapCheckedList('input[name="carburant-option"]')),
+      recapRow('Option lavage', recapCheckedList('input[name="lavage-option"]')),
+      recapRow('Instructions libres', inputVal('c-instructions'))
+    ].join('') });
+
+    return groups;
   }
 
   wizards['form-accompagnement'] = setupWizard({
     formId: 'form-accompagnement', fillId: 'acc-progress-fill', currentId: 'acc-step-current',
-    backId: 'acc-back', nextId: 'acc-next', submitId: 'acc-submit'
+    backId: 'acc-back', nextId: 'acc-next', submitId: 'acc-submit',
+    onLast: function () { renderRecap('acc-recap', buildRecapAccompagnement()); }
   });
   wizards['form-convoyage'] = setupWizard({
     formId: 'form-convoyage', fillId: 'cvg-progress-fill', currentId: 'cvg-step-current',
-    backId: 'cvg-back', nextId: 'cvg-next', submitId: 'cvg-submit'
+    backId: 'cvg-back', nextId: 'cvg-next', submitId: 'cvg-submit',
+    onLast: function () { renderRecap('cvg-recap', buildRecapConvoyage()); }
+  });
+
+  document.getElementById('acc-recap').addEventListener('click', function (e) {
+    var btn = e.target.closest('.recap-edit');
+    if (btn) wizards['form-accompagnement'].goTo(parseInt(btn.dataset.gotoStep, 10));
+  });
+  document.getElementById('cvg-recap').addEventListener('click', function (e) {
+    var btn = e.target.closest('.recap-edit');
+    if (btn) wizards['form-convoyage'].goTo(parseInt(btn.dataset.gotoStep, 10));
   });
 
   // ---------- Champs conditionnels (étape "Situation actuelle") ----------
