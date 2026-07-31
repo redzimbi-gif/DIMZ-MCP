@@ -1,0 +1,254 @@
+export const DOSSIER_STATUTS = [
+  "demande_recue",
+  "analyse_besoin",
+  "recherche",
+  "vehicules_selectionnes",
+  "inspection",
+  "negociation",
+  "achat_valide",
+  "convoyage",
+  "livraison",
+  "dossier_termine",
+] as const;
+
+export type DossierStatut = (typeof DOSSIER_STATUTS)[number];
+
+export const DOSSIER_STATUT_LABELS: Record<DossierStatut, string> = {
+  demande_recue: "Demande reçue",
+  analyse_besoin: "Analyse du besoin",
+  recherche: "Recherche",
+  vehicules_selectionnes: "Véhicules sélectionnés",
+  inspection: "Inspection",
+  negociation: "Négociation",
+  achat_valide: "Achat validé",
+  convoyage: "Convoyage",
+  livraison: "Livraison",
+  dossier_termine: "Dossier terminé",
+};
+
+export const DOSSIER_OFFRES = [
+  "decouverte",
+  "copilote",
+  "copilote_plus",
+  "convoyage_seul",
+  "expertise_seule",
+] as const;
+export type DossierOffre = (typeof DOSSIER_OFFRES)[number];
+
+export const DOSSIER_OFFRE_LABELS: Record<DossierOffre, string> = {
+  decouverte: "Découverte",
+  copilote: "Copilote",
+  copilote_plus: "Copilote Plus",
+  convoyage_seul: "Livraison seule",
+  expertise_seule: "Expertise seule",
+};
+
+export const DOCUMENT_TYPES = [
+  "carte_grise",
+  "certificat_cession",
+  "facture",
+  "contrat",
+  "rapport_inspection",
+  "photo",
+  "administratif",
+  "autre",
+] as const;
+export type DocumentType = (typeof DOCUMENT_TYPES)[number];
+
+export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
+  carte_grise: "Carte grise",
+  certificat_cession: "Certificat de cession",
+  facture: "Facture",
+  contrat: "Contrat",
+  rapport_inspection: "Rapport d'inspection",
+  photo: "Photo",
+  administratif: "Administratif",
+  autre: "Autre",
+};
+
+export const AGENDA_EVENT_TYPES = [
+  "rendez_vous",
+  "visioconference",
+  "inspection",
+  "convoyage",
+  "livraison",
+] as const;
+export type AgendaEventType = (typeof AGENDA_EVENT_TYPES)[number];
+
+export const AGENDA_EVENT_TYPE_LABELS: Record<AgendaEventType, string> = {
+  rendez_vous: "Rendez-vous",
+  visioconference: "Visioconférence",
+  inspection: "Inspection",
+  convoyage: "Convoyage",
+  livraison: "Livraison",
+};
+
+export const CONVOYAGE_STATUTS = ["planifie", "en_cours", "livre", "annule"] as const;
+export type ConvoyageStatut = (typeof CONVOYAGE_STATUTS)[number];
+export const CONVOYAGE_STATUT_LABELS: Record<ConvoyageStatut, string> = {
+  planifie: "Planifié",
+  en_cours: "En cours",
+  livre: "Livré",
+  annule: "Annulé",
+};
+
+export interface Client {
+  id: string;
+  civilite: string | null;
+  nom: string;
+  prenom: string | null;
+  telephone: string | null;
+  email: string | null;
+  adresse: string | null;
+  notes_privees: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Dossier {
+  id: string;
+  client_id: string;
+  reference: string;
+  offre: DossierOffre | null;
+  budget: string | null;
+  vehicule_recherche: string | null;
+  marques_souhaitees: string | null;
+  motorisation: string | null;
+  boite_vitesses: string | null;
+  km_max: string | null;
+  region: string | null;
+  commentaires: string | null;
+  statut: DossierStatut;
+  valeur_estimee: number | null;
+  source: string;
+  portal_token: string;
+  created_at: string;
+  updated_at: string;
+  clients?: Client;
+}
+
+export interface DossierStatutHistory {
+  id: string;
+  dossier_id: string;
+  statut: DossierStatut;
+  note: string | null;
+  changed_by: string | null;
+  created_at: string;
+}
+
+export interface Annonce {
+  id: string;
+  dossier_id: string;
+  titre: string;
+  lien: string | null;
+  prix: number | null;
+  prix_negocie: number | null;
+  kilometrage: number | null;
+  annee: number | null;
+  localisation: string | null;
+  avis_copilote: string | null;
+  points_forts: string | null;
+  points_faibles: string | null;
+  score_confiance: number | null;
+  selectionnee: boolean;
+  photos: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Inspection {
+  id: string;
+  dossier_id: string;
+  annonce_id: string | null;
+  date_inspection: string;
+  etat_exterieur: string | null;
+  etat_interieur: string | null;
+  pneus: string | null;
+  freins: string | null;
+  carrosserie: string | null;
+  mecanique: string | null;
+  essai_routier: string | null;
+  defauts_constates: string | null;
+  commentaires: string | null;
+  note_finale: number | null;
+  photos: string[];
+  videos: string[];
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Convoyage {
+  id: string;
+  dossier_id: string;
+  adresse_depart: string | null;
+  adresse_arrivee: string | null;
+  date_convoyage: string | null;
+  heure: string | null;
+  conducteur: string | null;
+  km_depart: number | null;
+  km_arrivee: number | null;
+  niveau_carburant: string | null;
+  photos_avant: string[];
+  photos_apres: string[];
+  signature_client: string | null;
+  rapport_notes: string | null;
+  statut: ConvoyageStatut;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AgendaEvent {
+  id: string;
+  titre: string;
+  type: AgendaEventType;
+  dossier_id: string | null;
+  client_id: string | null;
+  date_debut: string;
+  date_fin: string | null;
+  lieu: string | null;
+  notes: string | null;
+  rappel_envoye: boolean;
+  created_at: string;
+}
+
+export interface DocumentRow {
+  id: string;
+  dossier_id: string | null;
+  client_id: string | null;
+  type: DocumentType;
+  nom: string;
+  storage_path: string;
+  taille: number | null;
+  uploaded_by: string | null;
+  created_at: string;
+}
+
+export interface NoteInterne {
+  id: string;
+  dossier_id: string | null;
+  client_id: string | null;
+  auteur: string | null;
+  contenu: string;
+  created_at: string;
+}
+
+export interface Notification {
+  id: string;
+  titre: string;
+  message: string | null;
+  type: string;
+  lien: string | null;
+  lue: boolean;
+  created_at: string;
+}
+
+export interface ActivityLogEntry {
+  id: string;
+  action: string;
+  entite_type: string;
+  entite_id: string | null;
+  description: string;
+  acteur: string | null;
+  created_at: string;
+}

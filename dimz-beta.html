@@ -1780,7 +1780,12 @@
 </footer>
 
 <script>
-  // ---------- Connexion des formulaires à Google Sheets ----------
+  // ---------- Connexion des formulaires au back-office DIMZ ----------
+  // Colle ici l'URL de ton déploiement Vercel (l'app Next.js du dossier
+  // backoffice/), ex : 'https://dimz-backoffice.vercel.app'
+  var BACKOFFICE_URL = '';
+
+  // ---------- Connexion des formulaires à Google Sheets (facultatif) ----------
   // Colle ici l'URL de ton déploiement Google Apps Script (Web App), ex :
   // 'https://script.google.com/macros/s/XXXXXXXXXXXXXXXXXXXXXXXX/exec'
   var SHEETS_ENDPOINT = '';
@@ -2381,18 +2386,29 @@
     immatInput.placeholder = this.checked ? 'Pas encore immatriculé' : 'AA-123-AA';
   });
 
-  // ---------- Envoi des réponses vers Google Sheets ----------
+  // ---------- Envoi des réponses vers le back-office et/ou Google Sheets ----------
   function sendToSheet(formType, groups) {
-    if (!SHEETS_ENDPOINT || SHEETS_ENDPOINT.indexOf('https://script.google.com') !== 0) return;
     var data = groupsToFlatObject(groups);
     data['Formulaire'] = formType;
     data['Horodatage'] = new Date().toISOString();
-    fetch(SHEETS_ENDPOINT, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(data)
-    }).catch(function () { /* envoi silencieux : la confirmation ne dépend pas du réseau */ });
+    var body = JSON.stringify(data);
+
+    if (BACKOFFICE_URL) {
+      fetch(BACKOFFICE_URL.replace(/\/$/, '') + '/api/public/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: body
+      }).catch(function () { /* envoi silencieux : la confirmation ne dépend pas du réseau */ });
+    }
+
+    if (SHEETS_ENDPOINT && SHEETS_ENDPOINT.indexOf('https://script.google.com') === 0) {
+      fetch(SHEETS_ENDPOINT, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: body
+      }).catch(function () { /* envoi silencieux : la confirmation ne dépend pas du réseau */ });
+    }
   }
 
   // ---------- Soumission des formulaires ----------
