@@ -415,6 +415,33 @@
   .footer-legal a { color: var(--ink-soft); text-decoration: none; font-size: 0.82rem; font-weight: 600; transition: color 0.15s ease; }
   .footer-legal a:hover { color: var(--bleu-vif); text-decoration: underline; }
   .footer-legal a:focus-visible { outline: 2px solid var(--bleu-vif); outline-offset: 2px; }
+  .footer-social { display: flex; gap: 14px; justify-content: center; padding-top: 22px; border-top: 1px solid var(--line); }
+  .footer-social a {
+    display: flex; align-items: center; justify-content: center; width: 36px; height: 36px;
+    border-radius: 50%; border: 1px solid var(--line); color: var(--ink-soft);
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .footer-social a:hover { color: var(--bleu-vif); border-color: var(--bleu-vif); }
+  .footer-social a:focus-visible { outline: 2px solid var(--bleu-vif); outline-offset: 2px; }
+  .footer-social svg { width: 17px; height: 17px; }
+
+  /* ---------------- Pages légales ---------------- */
+  .legal-page { padding: 64px 0 96px; }
+  .legal-back {
+    display: inline-flex; align-items: center; gap: 8px; color: var(--bleu-vif); font-weight: 700;
+    font-size: 0.9rem; text-decoration: none; margin-bottom: 40px; background: transparent; border: none; cursor: pointer; padding: 0;
+  }
+  .legal-back svg { width: 16px; height: 16px; }
+  .legal-back:hover { text-decoration: underline; }
+  .legal-doc { max-width: 720px; margin: 0 auto; }
+  .legal-doc h1 { font-size: clamp(1.8rem, 3.4vw, 2.3rem); margin-bottom: 36px; }
+  .legal-doc h2 { font-size: 1.12rem; margin: 36px 0 12px; }
+  .legal-doc h2:first-of-type { margin-top: 0; }
+  .legal-doc p { color: var(--ink-soft); line-height: 1.7; margin: 0 0 14px; font-size: 0.96rem; }
+  .legal-doc ul { margin: 0 0 14px; padding-left: 22px; color: var(--ink-soft); line-height: 1.7; font-size: 0.96rem; }
+  .legal-doc li { margin-bottom: 4px; }
+  .legal-doc strong { color: var(--ink); }
+  .legal-doc .todo { background: color-mix(in srgb, var(--ambre) 18%, transparent); color: var(--ambre); padding: 1px 7px; border-radius: 5px; font-weight: 700; font-size: 0.92em; white-space: nowrap; }
 </style>
 
 <header class="topnav">
@@ -1374,6 +1401,205 @@
   </section>
 </div>
 
+<!-- ===================== PAGES LÉGALES ===================== -->
+<div id="page-legal-confidentialite" class="legal-page" hidden>
+  <div class="wrap">
+    <button type="button" class="legal-back" data-back-to-site><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/></svg>Retour au site</button>
+    <div class="legal-doc">
+      <h1>Politique de confidentialité</h1>
+
+      <h2>1. Collecte des données personnelles</h2>
+      <p>Dans le cadre de son activité, DIMZ peut être amené à collecter certaines données personnelles lorsque vous utilisez le site, notamment via les formulaires de contact ou de demande d'accompagnement.</p>
+      <p>Les données pouvant être collectées sont notamment :</p>
+      <ul>
+        <li>Nom et prénom ;</li>
+        <li>Adresse e-mail ;</li>
+        <li>Numéro de téléphone ;</li>
+        <li>Informations liées à votre projet automobile.</li>
+      </ul>
+
+      <h2>2. Utilisation des données</h2>
+      <p>Les données collectées sont utilisées uniquement afin de :</p>
+      <ul>
+        <li>Répondre à vos demandes ;</li>
+        <li>Vous proposer un accompagnement adapté ;</li>
+        <li>Établir un devis ou assurer le suivi d'une prestation.</li>
+      </ul>
+      <p>DIMZ ne vend, ne loue et ne transmet aucune donnée personnelle à des tiers à des fins commerciales.</p>
+
+      <h2>3. Conservation des données</h2>
+      <p>Les données sont conservées uniquement pendant la durée nécessaire au traitement de votre demande et au respect des obligations légales applicables.</p>
+
+      <h2>4. Protection des données</h2>
+      <p>DIMZ met en œuvre les mesures nécessaires afin de protéger vos données personnelles et d'éviter tout accès non autorisé.</p>
+
+      <h2>5. Vos droits</h2>
+      <p>Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez d'un droit :</p>
+      <ul>
+        <li>d'accès ;</li>
+        <li>de rectification ;</li>
+        <li>d'effacement ;</li>
+        <li>d'opposition ;</li>
+        <li>de limitation du traitement de vos données.</li>
+      </ul>
+      <p>Pour exercer vos droits, vous pouvez contacter DIMZ à l'adresse suivante :</p>
+      <p>E-mail : <span class="todo">[À compléter]</span></p>
+
+      <h2>6. Cookies</h2>
+      <p>Le site peut utiliser des cookies afin d'améliorer votre expérience et mesurer son audience.</p>
+      <p>Vous pouvez gérer ou refuser l'utilisation des cookies depuis les paramètres de votre navigateur ou via le bandeau de consentement présent sur le site.</p>
+
+      <h2>7. Mise à jour</h2>
+      <p>DIMZ se réserve le droit de modifier la présente politique de confidentialité afin de rester conforme aux évolutions réglementaires.</p>
+    </div>
+  </div>
+</div>
+
+<div id="page-legal-cgv" class="legal-page" hidden>
+  <div class="wrap">
+    <button type="button" class="legal-back" data-back-to-site><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/></svg>Retour au site</button>
+    <div class="legal-doc">
+      <h1>Conditions Générales de Vente (CGV)</h1>
+
+      <h2>1. Objet</h2>
+      <p>Les présentes Conditions Générales de Vente définissent les modalités selon lesquelles DIMZ, entreprise individuelle sous le régime de la micro-entreprise, propose des prestations d'accompagnement automobile, de conseil, de recherche de véhicule, d'inspection et de convoyage automobile.</p>
+      <p>Toute commande d'une prestation implique l'acceptation pleine et entière des présentes CGV.</p>
+
+      <h2>2. Présentation des services</h2>
+      <p>DIMZ propose notamment les services suivants :</p>
+      <ul>
+        <li>Accompagnement dans la recherche et l'achat d'un véhicule ;</li>
+        <li>Analyse des besoins et orientation vers des véhicules adaptés ;</li>
+        <li>Recherche et sélection d'annonces correspondant aux critères du client ;</li>
+        <li>Conseil lors du processus d'achat ;</li>
+        <li>Vérification visuelle et administrative du véhicule selon la prestation choisie ;</li>
+        <li>Organisation et réalisation du convoyage du véhicule ;</li>
+        <li>Accompagnement jusqu'à la remise des clés.</li>
+      </ul>
+      <p>Les prestations proposées sont personnalisées selon les besoins du client.</p>
+
+      <h2>3. Commande et acceptation de la prestation</h2>
+      <p>Toute demande de prestation fait l'objet d'un échange préalable permettant de définir les besoins du client et la prestation adaptée.</p>
+      <p>La commande est considérée comme validée après :</p>
+      <ul>
+        <li>acceptation du devis ou de l'offre proposée ;</li>
+        <li>paiement de l'acompte ou du montant prévu selon les modalités indiquées.</li>
+      </ul>
+      <p>DIMZ se réserve le droit de refuser une prestation incompatible avec ses conditions d'intervention ou ses disponibilités.</p>
+
+      <h2>4. Tarifs et paiement</h2>
+      <p>Les tarifs des prestations sont indiqués en euros et communiqués au client avant validation.</p>
+      <p>Le paiement peut être réalisé :</p>
+      <ul>
+        <li>par virement bancaire ;</li>
+        <li>par tout autre moyen accepté par DIMZ.</li>
+      </ul>
+      <p>Sauf indication contraire, le règlement est dû selon les conditions précisées sur le devis ou la facture.</p>
+      <p>En cas de retard de paiement, DIMZ se réserve le droit de suspendre la prestation jusqu'à régularisation.</p>
+
+      <h2>5. Obligations de DIMZ</h2>
+      <p>DIMZ s'engage à fournir un accompagnement professionnel, transparent et personnalisé.</p>
+      <p>DIMZ met en œuvre son expertise afin d'aider le client dans ses décisions, mais ne garantit pas :</p>
+      <ul>
+        <li>la disponibilité d'un véhicule précis ;</li>
+        <li>l'acceptation d'une négociation par un vendeur ;</li>
+        <li>l'absence totale de défauts futurs sur un véhicule acheté.</li>
+      </ul>
+      <p>L'achat final du véhicule reste une décision du client.</p>
+
+      <h2>6. Responsabilité liée aux véhicules</h2>
+      <p>DIMZ intervient en qualité de conseiller et d'accompagnateur.</p>
+      <p>Sauf prestation spécifique prévue au contrat, DIMZ n'est pas vendeur du véhicule et ne peut être tenu responsable :</p>
+      <ul>
+        <li>des informations fournies par un vendeur tiers ;</li>
+        <li>de vices cachés non détectables lors des contrôles réalisés ;</li>
+        <li>des décisions prises par le client concernant l'achat.</li>
+      </ul>
+      <p>Le client reste propriétaire de son choix d'achat.</p>
+
+      <h2>7. Convoyage automobile</h2>
+      <p>Dans le cadre d'une prestation de convoyage, DIMZ s'engage à transporter le véhicule confié dans des conditions professionnelles et sécurisées.</p>
+      <p>Le client doit fournir :</p>
+      <ul>
+        <li>les informations nécessaires concernant le véhicule ;</li>
+        <li>les documents obligatoires ;</li>
+        <li>les informations relatives à l'état connu du véhicule.</li>
+      </ul>
+      <p>Toute dégradation constatée lors de la prise en charge ou de la livraison fera l'objet d'un constat contradictoire.</p>
+
+      <h2>8. Annulation et remboursement</h2>
+      <p>Toute demande d'annulation doit être formulée par écrit.</p>
+      <p>En cas d'annulation après le début de la prestation, les travaux déjà réalisés pourront être facturés.</p>
+      <p>Les conditions spécifiques d'annulation peuvent être précisées dans le devis accepté par le client.</p>
+
+      <h2>9. Droit de rétractation</h2>
+      <p>Conformément au Code de la consommation, le client consommateur dispose d'un délai légal de rétractation de 14 jours pour les contrats conclus à distance.</p>
+      <p>Toutefois, lorsque le client demande expressément le début de la prestation avant la fin de ce délai, les règles applicables prévues par la réglementation s'appliquent.</p>
+
+      <h2>10. Données personnelles</h2>
+      <p>Les informations collectées dans le cadre des prestations sont utilisées uniquement pour assurer le suivi de la relation commerciale.</p>
+      <p>DIMZ s'engage à respecter la réglementation applicable en matière de protection des données personnelles.</p>
+
+      <h2>11. Litiges</h2>
+      <p>En cas de difficulté, DIMZ et le client chercheront une solution amiable.</p>
+      <p>À défaut d'accord, le litige sera soumis aux juridictions compétentes conformément au droit français.</p>
+
+      <h2>12. Acceptation des CGV</h2>
+      <p>La validation d'une prestation implique l'acceptation sans réserve des présentes Conditions Générales de Vente.</p>
+    </div>
+  </div>
+</div>
+
+<div id="page-legal-mentions" class="legal-page" hidden>
+  <div class="wrap">
+    <button type="button" class="legal-back" data-back-to-site><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/></svg>Retour au site</button>
+    <div class="legal-doc">
+      <h1>Mentions légales</h1>
+
+      <h2>Éditeur du site</h2>
+      <p>Le présent site est édité par DIMZ.</p>
+      <p>Nom de l'entreprise : DIMZ<br>
+      Statut juridique : Micro-entrepreneur<br>
+      Nom du dirigeant : Roland Edzimbi<br>
+      Adresse : <span class="todo">[À compléter]</span><br>
+      SIREN : <span class="todo">[À compléter]</span><br>
+      E-mail : <span class="todo">[À compléter]</span><br>
+      Téléphone : <span class="todo">[À compléter]</span></p>
+
+      <h2>Directeur de la publication</h2>
+      <p>Le directeur de la publication est Roland Edzimbi.</p>
+
+      <h2>Hébergement</h2>
+      <p>Le site est hébergé par :</p>
+      <p>Nom de l'hébergeur : <span class="todo">[À compléter – ex. Hostinger, OVHcloud, IONOS, etc.]</span><br>
+      Adresse : <span class="todo">[À compléter]</span><br>
+      Site internet : <span class="todo">[À compléter]</span></p>
+
+      <h2>Propriété intellectuelle</h2>
+      <p>L'ensemble des contenus présents sur ce site (textes, images, logos, graphismes, icônes, vidéos et autres éléments) est protégé par les dispositions du Code de la propriété intellectuelle.</p>
+      <p>Toute reproduction, représentation, modification, publication ou adaptation, totale ou partielle, sans autorisation préalable écrite de DIMZ est interdite.</p>
+
+      <h2>Responsabilité</h2>
+      <p>DIMZ s'efforce de fournir des informations exactes et régulièrement mises à jour. Toutefois, aucune garantie ne peut être apportée quant à l'exactitude, à l'exhaustivité ou à l'actualité des informations diffusées sur le site.</p>
+      <p>L'utilisateur reconnaît utiliser ces informations sous sa seule responsabilité.</p>
+
+      <h2>Données personnelles</h2>
+      <p>Les données personnelles collectées via les formulaires du site sont utilisées uniquement pour répondre aux demandes des utilisateurs, établir des devis ou assurer le suivi des prestations.</p>
+      <p>Les données ne sont ni vendues ni cédées à des tiers, sauf obligation légale.</p>
+      <p>Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation, d'opposition et de portabilité de vos données.</p>
+      <p>Pour exercer ces droits, vous pouvez contacter DIMZ à l'adresse e-mail indiquée ci-dessus.</p>
+
+      <h2>Cookies</h2>
+      <p>Le site peut utiliser des cookies afin d'améliorer l'expérience utilisateur, mesurer l'audience et assurer le bon fonctionnement des services proposés.</p>
+      <p>Vous pouvez à tout moment modifier vos préférences relatives aux cookies depuis votre navigateur ou via le bandeau prévu à cet effet.</p>
+
+      <h2>Droit applicable</h2>
+      <p>Les présentes mentions légales sont régies par le droit français.</p>
+      <p>Tout litige relatif à l'utilisation du site relève de la compétence des juridictions françaises, sauf disposition légale contraire.</p>
+    </div>
+  </div>
+</div>
+
 </main>
 
 <footer class="wrap">
@@ -1387,10 +1613,15 @@
     </ul>
     <span>Page de démonstration</span>
   </div>
+  <div class="footer-social" aria-label="Réseaux sociaux">
+    <a href="javascript:void(0)" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10.5 9.3v5.4l4.7-2.7z" fill="currentColor" stroke="none"/></svg></a>
+    <a href="javascript:void(0)" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3.5v11.2a3.3 3.3 0 1 1-2.8-3.26"/><path d="M14 3.5c.4 2.4 2.1 4.2 4.6 4.5"/></svg></a>
+    <a href="javascript:void(0)" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="0.9" fill="currentColor" stroke="none"/></svg></a>
+  </div>
   <nav class="footer-legal" aria-label="Informations légales">
-    <a href="javascript:void(0)">Politique de confidentialité (RGPD)</a>
-    <a href="javascript:void(0)">Mentions légales</a>
-    <a href="javascript:void(0)">CGV</a>
+    <a href="javascript:void(0)" data-goto-legal="confidentialite">Politique de confidentialité (RGPD)</a>
+    <a href="javascript:void(0)" data-goto-legal="mentions">Mentions légales</a>
+    <a href="javascript:void(0)" data-goto-legal="cgv">CGV</a>
   </nav>
 </footer>
 
@@ -1425,12 +1656,30 @@
   var mainTabButtons = document.querySelectorAll('.main-tabs button');
 
   function showMainTab(tab, resetSubtab) {
+    document.querySelectorAll('.legal-page').forEach(function (p) { p.hidden = true; });
     mainTabButtons.forEach(function (b) { b.setAttribute('aria-selected', b.dataset.tab === tab ? 'true' : 'false'); });
     document.getElementById('tab-accompagnement').hidden = tab !== 'accompagnement';
     document.getElementById('tab-convoyage').hidden = tab !== 'convoyage';
     if (tab === 'accompagnement' && resetSubtab) showSubTab('accueil');
     observeNewReveals();
   }
+
+  // ---------- Pages légales (RGPD, CGV, Mentions légales) ----------
+  function showLegalPage(name) {
+    document.getElementById('tab-accompagnement').hidden = true;
+    document.getElementById('tab-convoyage').hidden = true;
+    document.querySelectorAll('.legal-page').forEach(function (p) { p.hidden = p.id !== 'page-legal-' + name; });
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    observeNewReveals();
+  }
+
+  document.querySelectorAll('[data-goto-legal]').forEach(function (el) {
+    el.addEventListener('click', function () { showLegalPage(el.dataset.gotoLegal); });
+  });
+
+  document.querySelectorAll('[data-back-to-site]').forEach(function (el) {
+    el.addEventListener('click', function () { showMainTab('accompagnement', true); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); });
+  });
 
   mainTabButtons.forEach(function (btn) {
     btn.addEventListener('click', function () { showMainTab(btn.dataset.tab, true); });
