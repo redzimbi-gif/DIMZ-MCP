@@ -862,10 +862,10 @@
                     </div>
                     <div class="field">
                       <label for="a-actuel-km">Kilométrage actuel</label>
-                      <input type="number" id="a-actuel-km" step="1000">
+                      <input type="number" id="a-actuel-km" min="1" max="999999">
                     </div>
                     <div class="field full">
-                      <label for="a-actuel-prix">Prix d'achat ou mensualité restante</label>
+                      <label for="a-actuel-prix">Prix d'achat ou mensualités</label>
                       <input type="text" id="a-actuel-prix" placeholder="ex. Acheté 14 000 €, ou 220 €/mois restants">
                     </div>
                   </div>
@@ -892,16 +892,16 @@
                       </div>
                     </div>
                     <div class="field">
-                      <label for="a-financement-duree">Sur combien de temps ? (mois)</label>
+                      <label for="a-financement-duree">Durée du financement (mois)</label>
                       <input type="number" id="a-financement-duree" min="1">
                     </div>
                     <div class="field">
-                      <label for="a-financement-restant">Temps restant à solder (mois)</label>
+                      <label for="a-financement-restant">Durée restante (mois)</label>
                       <input type="number" id="a-financement-restant" min="0">
                     </div>
                     <div class="field">
                       <label for="a-solde-restant">Solde restant dû approximatif (€)</label>
-                      <input type="number" id="a-solde-restant" step="100">
+                      <input type="number" id="a-solde-restant" min="1" max="9999">
                     </div>
                   </div>
                 </div>
@@ -982,6 +982,9 @@
                 <h3>Récapitulatif</h3>
                 <p class="hint" style="display:block; margin-bottom:20px;">Vérifiez vos informations avant l'envoi. Cliquez sur « Modifier » pour revenir à n'importe quelle étape.</p>
                 <div id="acc-recap"></div>
+                <div class="field full toggle-row" style="margin-top:22px;">
+                  <label><input type="checkbox" id="a-accept-legal" required> J'ai lu et j'accepte les <a href="javascript:void(0)" data-goto-legal="confidentialite">politiques</a> et les <a href="javascript:void(0)" data-goto-legal="cgv">CGV</a>.</label>
+                </div>
               </div>
 
               <div class="form-nav">
@@ -2252,8 +2255,7 @@
       recapRow('Nom', inputVal('a-nom')),
       recapRow('Prénom', inputVal('a-prenom')),
       recapRow('Téléphone', inputVal('a-tel')),
-      recapRow('Email', inputVal('a-email')),
-      recapRow('Consentement', isChecked('a-consentement') ? 'Accepté' : '')
+      recapRow('Email', inputVal('a-email'))
     ].filter(Boolean) });
 
     groups.push({ title: 'Votre quotidien', step: 1, rows: [
