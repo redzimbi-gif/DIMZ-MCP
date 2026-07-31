@@ -59,8 +59,8 @@
     },
     {
       "@type": "Offer",
-      "name": "Copilote Complète",
-      "description": "Accompagnement clé en main : expertise physique du véhicule, livraison et mise en main.",
+      "name": "Copilote Plus",
+      "description": "Accompagnement de bout en bout : mise en relation avec le vendeur, expertise physique du véhicule, livraison et mise en main.",
       "price": "749",
       "priceCurrency": "EUR"
     }
@@ -204,6 +204,9 @@
   .offres-teaser-price { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--bleu-vif); font-weight: 600; font-size: 0.92rem; }
   .offres-teaser-desc { color: var(--ink-soft); font-size: 0.88rem; margin-left: auto; }
   @media (max-width: 560px) { .offres-teaser-desc { margin-left: 0; } }
+  .offres-teaser-list li.featured { position: relative; background: color-mix(in srgb, var(--bleu-vif) 8%, transparent); border: 1px solid color-mix(in srgb, var(--bleu-vif) 30%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--bleu-vif) 30%, transparent); border-radius: 10px; padding: 14px 16px; margin: 2px 0; }
+  .offres-teaser-list li.featured .offres-teaser-name { color: var(--bleu-vif); }
+  .offres-teaser-badge { display: inline-block; background: var(--bleu-vif); color: #fff; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; padding: 3px 8px; border-radius: 100px; margin-left: 8px; vertical-align: middle; }
   @media (max-width: 640px) {
     .acc-collapse summary { padding: 24px 22px; }
     .acc-collapse-body { padding: 0 22px 28px; }
@@ -669,8 +672,8 @@
           <p class="acc-collapse-intro">Que vous ayez juste besoin d'un avis ou que vous souhaitiez être accompagné de A à Z, il y a une offre faite pour vous.</p>
           <ul class="offres-teaser-list">
             <li><span class="offres-teaser-name">Découverte</span><span class="offres-teaser-price">Gratuit</span><span class="offres-teaser-desc">Le premier coup d'œil</span></li>
-            <li><span class="offres-teaser-name">Copilote</span><span class="offres-teaser-price">dès 99 €</span><span class="offres-teaser-desc">Je cherche, vous choisissez</span></li>
-            <li><span class="offres-teaser-name">Copilote Complète</span><span class="offres-teaser-price">à partir de 749 €</span><span class="offres-teaser-desc">Clé en main</span></li>
+            <li class="featured"><span class="offres-teaser-name">Copilote<span class="offres-teaser-badge">Le plus choisi</span></span><span class="offres-teaser-price">dès 99 €</span><span class="offres-teaser-desc">Je cherche, vous choisissez</span></li>
+            <li><span class="offres-teaser-name">Copilote Plus</span><span class="offres-teaser-price">à partir de 749 €</span><span class="offres-teaser-desc">Vous n'avez plus qu'à conduire</span></li>
           </ul>
           <a href="javascript:void(0)" class="btn btn-primary" data-goto-subtab="offres">Voir toutes nos offres</a>
         </div>
@@ -944,7 +947,7 @@
                     <div class="choice-grid" id="besoin-choices">
                       <label><input type="radio" name="besoin" value="conseil"> Découverte</label>
                       <label><input type="radio" name="besoin" value="accompagnement"> Copilote</label>
-                      <label><input type="radio" name="besoin" value="complet"> Copilote Complète</label>
+                      <label><input type="radio" name="besoin" value="complet"> Copilote Plus</label>
                       <label><input type="radio" name="besoin" value="inspection"> Inspection</label>
                     </div>
                   </div>
@@ -1109,8 +1112,8 @@
 
           <div class="offer-card" data-reveal>
             <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><circle cx="7" cy="15" r="4"/><path d="M10 12l9-9"/><path d="M15 6l3 3"/><path d="M17 4l3 3"/></svg></div>
-            <h3>Copilote Complète</h3>
-            <p class="offer-subtitle">Clé en main</p>
+            <h3>Copilote Plus</h3>
+            <p class="offer-subtitle">Vous n'avez plus qu'à conduire</p>
             <p class="offer-texte">Faisons la route ensemble.</p>
             <div class="offer-price"><span class="from-label">À partir de</span>749 €</div>
             <ul>
@@ -1122,11 +1125,11 @@
               <li>Frais administratifs offerts (carte grise, certificat de cession)</li>
               <li>Rapport d'inspection complet</li>
             </ul>
-            <a href="javascript:void(0)" class="btn btn-outline preselect-need" data-need="complet" data-goto-subtab="accueil" data-scroll-to="formulaire">Je veux la solution clé en main</a>
+            <a href="javascript:void(0)" class="btn btn-outline preselect-need" data-need="complet" data-goto-subtab="accueil" data-scroll-to="formulaire">Je veux la formule complète</a>
           </div>
         </div>
 
-        <p class="offer-note" data-reveal>Le convoyage est proposé en option, sur devis. Et si vous avez déjà réglé une offre Copilote à <strong>99 €</strong> ou <strong>149 €</strong>, cette somme est intégralement déduite du prix de l'offre Copilote Complète.</p>
+        <p class="offer-note" data-reveal>Le convoyage est proposé en option, sur devis. Et si vous avez déjà réglé une offre Copilote à <strong>99 €</strong> ou <strong>149 €</strong>, cette somme est intégralement déduite du prix de l'offre Copilote Plus.</p>
 
         <div class="grid-2" style="margin-top:32px;" data-reveal>
           <div class="option-card">
@@ -1158,7 +1161,7 @@
                 <th scope="col">Services inclus</th>
                 <th scope="col">Découverte</th>
                 <th scope="col">Copilote</th>
-                <th scope="col">Copilote Complète</th>
+                <th scope="col">Copilote Plus</th>
               </tr>
             </thead>
             <tbody>
