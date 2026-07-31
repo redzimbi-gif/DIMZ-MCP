@@ -101,7 +101,7 @@
   /* ---------------- Sidebar Accompagnement ---------------- */
   .acc-shell { display: flex; align-items: flex-start; gap: 0; }
   .acc-sidebar {
-    flex: none; width: 240px; position: sticky; top: 73px; align-self: stretch;
+    flex: none; width: 240px; position: sticky; top: var(--header-h, 83px);
     display: flex; flex-direction: column; gap: 2px; padding: 28px 16px;
     border-right: 1px solid var(--line);
   }
@@ -118,9 +118,9 @@
   .acc-content { flex: 1; min-width: 0; }
   .acc-content > div > section.dark, .acc-content > div > div.wrap > section.dark { border-radius: var(--r-xl); margin: 28px 28px 0; overflow: hidden; }
   @media (max-width: 900px) {
-    .acc-shell { flex-direction: column; }
+    .acc-shell { flex-direction: column; align-items: stretch; }
     .acc-sidebar {
-      position: sticky; top: 65px; z-index: 15; width: 100%; align-self: auto;
+      position: sticky; top: var(--header-h, 65px); z-index: 15; width: 100%; align-self: auto;
       flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--line);
       padding: 12px 16px; gap: 8px; background: color-mix(in srgb, var(--bg) 94%, transparent);
       backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
@@ -231,14 +231,18 @@
   @keyframes featuredSweep { 0% { background-position: 0% 0; } 50% { background-position: 100% 0; } 100% { background-position: 0% 0; } }
   @media (prefers-reduced-motion: reduce) { .offer-card.featured::before { animation: none; } }
   .offer-tag { position: absolute; top: 20px; right: 20px; background: color-mix(in srgb, var(--bleu-vif) 14%, transparent); color: var(--bleu-vif); font-size: 0.66rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 11px; border-radius: 100px; }
-  .offer-card h3 { font-size: 1.18rem; margin-bottom: 14px; }
+  .offer-card .value-icon { margin-bottom: 16px; }
+  .offer-card h3 { font-size: 1.18rem; margin-bottom: 4px; }
+  .offer-subtitle { margin: 0 0 12px; color: var(--ink-soft); font-size: 0.85rem; font-weight: 600; }
+  .offer-texte { margin: 0 0 18px; color: var(--ink); font-size: 0.92rem; line-height: 1.5; }
   .price-toggle { display: inline-flex; background: var(--bg-tint); border-radius: 100px; padding: 3px; margin-bottom: 16px; gap: 2px; }
   .price-toggle button { border: none; background: transparent; padding: 6px 14px; border-radius: 100px; font-size: 0.77rem; font-weight: 700; color: var(--ink-soft); cursor: pointer; }
   .price-toggle button[aria-selected="true"] { background: var(--bg-raised); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
-  .offer-price { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: 2rem; color: var(--bleu); margin-bottom: 5px; letter-spacing: -0.02em; }
+  .offer-price { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: 2rem; color: var(--bleu); margin-bottom: 16px; letter-spacing: -0.02em; }
   :root[data-theme="dark"] .offer-price { color: var(--bleu-vif); }
   @media (prefers-color-scheme: dark) { .offer-price { color: var(--bleu-vif); } }
   .offer-price .free { color: var(--vert); font-family: var(--serif); font-size: 0.85em; }
+  .offer-price .from-label { display: block; font-family: var(--sans); font-weight: 700; font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin-bottom: 3px; }
   .offer-sub { color: var(--ink-soft); font-size: 0.84rem; margin-bottom: 20px; min-height: 2.6em; }
   .offer-card ul { list-style: none; margin: 0 0 28px; padding: 0; display: flex; flex-direction: column; gap: 11px; flex: 1; }
   .offer-card li { display: flex; gap: 10px; font-size: 0.91rem; line-height: 1.45; }
@@ -252,6 +256,26 @@
   .option-card .value-icon { margin-bottom: 0; }
   .option-card h3 { font-size: 1.02rem; margin-bottom: 6px; font-family: inherit; font-weight: 700; }
   .option-card p { margin: 0 0 16px; color: var(--ink-soft); font-size: 0.9rem; }
+
+  /* ---------------- Tableau comparatif des offres ---------------- */
+  .compare-table-wrap { overflow-x: auto; margin-top: 40px; width: 100%; max-width: 100%; }
+  .compare-table { width: 100%; min-width: 640px; border-collapse: collapse; }
+  .compare-table th, .compare-table td { padding: 14px 16px; text-align: center; border-bottom: 1px solid var(--line); font-size: 0.88rem; white-space: nowrap; }
+  .compare-table thead th { font-family: var(--serif); font-weight: 600; font-size: 1rem; color: var(--ink); padding-bottom: 18px; white-space: normal; }
+  .compare-table thead th:first-child { text-align: left; }
+  .compare-table thead th:not(:first-child) { color: var(--bleu-vif); }
+  .compare-table tbody th { text-align: left; font-weight: 600; color: var(--ink); font-size: 0.87rem; white-space: normal; }
+  .compare-table tbody tr:last-child th, .compare-table tbody tr:last-child td { border-bottom: none; }
+  .compare-check { display: inline-flex; width: 22px; height: 22px; border-radius: 50%; background: color-mix(in srgb, var(--vert) 16%, transparent); color: var(--vert); align-items: center; justify-content: center; }
+  .compare-check svg { width: 12px; height: 12px; }
+  .compare-dash { color: var(--ink-soft); opacity: 0.45; }
+  .compare-price-row th, .compare-price-row td { font-weight: 700; color: var(--ink); padding-top: 20px; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .compare-price-row th { font-family: var(--sans); }
+
+  /* ---------------- Conclusion offres ---------------- */
+  .offers-closing { max-width: 620px; margin: 64px auto 0; text-align: center; }
+  .offers-closing-quote { font-size: 1.05rem; color: var(--ink-soft); margin: 0 0 26px; line-height: 1.6; }
+  .offers-closing-cta { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
 
   /* ---------------- Inspection : 6 étapes ---------------- */
   .control-steps { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
@@ -405,7 +429,6 @@
       <button type="button" role="tab" id="tab-btn-accompagnement" aria-selected="true" data-tab="accompagnement">Accompagnement</button>
       <button type="button" role="tab" id="tab-btn-convoyage" aria-selected="false" data-tab="convoyage">Convoyage</button>
     </div>
-    <button type="button" class="btn btn-primary btn-sm" id="nav-cta">Décrire mon projet</button>
   </div>
 </header>
 
@@ -493,11 +516,6 @@
       </section>
     </div>
 
-  </div>
-
-  <!-- ---------- Page : À propos ---------- -->
-  <div id="subtab-apropos" role="tabpanel" aria-labelledby="subtab-btn-apropos" hidden>
-
     <section id="apropos">
       <div class="wrap">
         <div class="section-head" data-reveal>
@@ -550,35 +568,36 @@
       </div>
     </section>
 
-  </div>
-
-  <!-- ---------- Page : Nos offres ---------- -->
-  <div id="subtab-offres" role="tabpanel" aria-labelledby="subtab-btn-offres" hidden>
-
     <section id="offres" class="tint">
       <div class="wrap">
         <div class="section-head" data-reveal>
-          <span class="label">Les offres</span>
-          <h2>Choisissez le niveau d'accompagnement qui vous correspond.</h2>
-          <p>Du premier conseil gratuit à la remise des clés, votre copilote s'adapte à votre projet.</p>
+          <span class="label">Nos offres</span>
+          <h2>Trois façons de rouler l'esprit tranquille.</h2>
+          <p>Que vous ayez juste besoin d'un avis ou que vous souhaitiez être accompagné de A à Z, il y a une offre faite pour vous.</p>
         </div>
 
         <div class="offers">
           <div class="offer-card" data-reveal>
+            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-5-5"/></svg></div>
             <h3>Découverte</h3>
+            <p class="offer-subtitle">Le premier coup d'œil</p>
+            <p class="offer-texte">Vous voulez découvrir le parcours ? Votre copilote vous guide.</p>
             <div class="offer-price"><span class="free">Gratuit</span></div>
-            <div class="offer-sub">Pour y voir clair avant de se lancer</div>
             <ul>
-              <li>Vous indiquez budget, type de véhicule, usage et critères</li>
-              <li>Votre copilote vous conseille une sélection de modèles adaptés</li>
-              <li>Une estimation du marché pour ce type de véhicule</li>
+              <li>Un formulaire de briefing à remplir (budget, usage, délai)</li>
+              <li>3 annonces sélectionnées pour vous</li>
+              <li>3 conseils personnalisés sur les modèles repérés</li>
+              <li>Une première prise de contact sans engagement</li>
             </ul>
-            <a href="#formulaire" class="btn btn-outline preselect-need" data-need="conseil">Demander mon conseil gratuit</a>
+            <a href="#formulaire" class="btn btn-outline preselect-need" data-need="conseil">Je commence gratuitement</a>
           </div>
 
           <div class="offer-card featured" data-reveal>
             <span class="offer-tag">Le plus choisi</span>
+            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.3"/><path d="M12 3.5v6.2"/><path d="M6.4 15.2l5-3"/><path d="M17.6 15.2l-5-3"/></svg></div>
             <h3>Copilote</h3>
+            <p class="offer-subtitle">Je cherche, vous choisissez</p>
+            <p class="offer-texte">Votre copilote vous accompagne sur un bout du parcours.</p>
             <div class="price-toggle" role="tablist" aria-label="Type de recherche">
               <button type="button" role="tab" aria-selected="true" data-price="99" data-sub="Pour une recherche courante, sur des véhicules classiques.">Recherche simple</button>
               <button type="button" role="tab" aria-selected="false" data-price="149" data-sub="Concerne les véhicules rares, de collection, ou les recherches qui demandent plus de temps.">Recherche complexe</button>
@@ -586,25 +605,31 @@
             <div class="offer-price"><span id="offer-price-value">99 €</span></div>
             <div class="offer-sub" id="offer-sub-copilote">Pour une recherche courante, sur des véhicules classiques.</div>
             <ul>
-              <li>Conseils personnalisés tout au long de la recherche</li>
-              <li>Sélection d'annonces pertinentes, triées pour vous</li>
-              <li>Analyse détaillée de chaque offre retenue</li>
-              <li>Recommandations pour éviter les mauvaises affaires</li>
+              <li>Analyse approfondie de votre formulaire</li>
+              <li>Recherche et présélection de 5 à 7 véhicules</li>
+              <li>Analyse détaillée de chaque annonce (prix, kilométrage, historique, équipements)</li>
+              <li>Rapport écrit avec avis et recommandations</li>
+              <li>1 appel téléphonique de synthèse (30 min)</li>
             </ul>
-            <a href="#formulaire" class="btn btn-primary preselect-need" data-need="accompagnement">Confier ma recherche</a>
+            <a href="#formulaire" class="btn btn-primary preselect-need" data-need="accompagnement">Je veux être accompagné</a>
           </div>
 
           <div class="offer-card" data-reveal>
+            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><circle cx="7" cy="15" r="4"/><path d="M10 12l9-9"/><path d="M15 6l3 3"/><path d="M17 4l3 3"/></svg></div>
             <h3>Copilote Complète</h3>
-            <div class="offer-price">749 €</div>
-            <div class="offer-sub">Hors convoyage · clé en main</div>
+            <p class="offer-subtitle">Clé en main</p>
+            <p class="offer-texte">Faisons la route ensemble.</p>
+            <div class="offer-price"><span class="from-label">À partir de</span>749 €</div>
             <ul>
-              <li>Tout le contenu de l'offre Copilote</li>
-              <li>Prise de contact directe avec le vendeur</li>
-              <li>Vérifications administratives complètes</li>
-              <li>Organisation de l'achat jusqu'à la remise des clés</li>
+              <li>Tout le contenu de l'offre Copilote (recherche + analyse)</li>
+              <li>Mise en relation avec le vendeur</li>
+              <li>Expertise physique du véhicule : carrosserie, intérieur, pneus, moteur, historique, essai routier, avis clair « OK » ou « à éviter »</li>
+              <li>Livraison du véhicule jusqu'à votre domicile (convoyage)</li>
+              <li>Mise en main : fonctions principales et bons gestes d'entretien</li>
+              <li>Frais administratifs offerts (carte grise, certificat de cession)</li>
+              <li>Rapport d'inspection complet</li>
             </ul>
-            <a href="#formulaire" class="btn btn-outline preselect-need" data-need="complet">Être accompagné clé en main</a>
+            <a href="#formulaire" class="btn btn-outline preselect-need" data-need="complet">Je veux la solution clé en main</a>
           </div>
         </div>
 
@@ -614,18 +639,58 @@
           <div class="option-card">
             <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></div>
             <div>
-              <h3>Inspection</h3>
-              <p>Vous avez déjà trouvé un véhicule ? Faites-le vérifier par votre copilote avant de vous engager.</p>
+              <h3>Expertise seule <span class="hint">— sur devis</span></h3>
+              <p>Vous avez déjà trouvé votre voiture ? Je me déplace pour l'inspecter et vous donner mon avis.</p>
               <button type="button" class="btn btn-outline" data-goto-subtab="inspection">Découvrir l'inspection</button>
             </div>
           </div>
           <div class="option-card">
             <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><rect x="1" y="7" width="14" height="10"/><path d="M15 10h4l3 3v4h-7z"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg></div>
             <div>
-              <h3>Livraison</h3>
-              <p>Une fois le véhicule acheté, Dimz organise sa livraison jusqu'à chez vous.</p>
+              <h3>Livraison seule <span class="hint">— sur devis</span></h3>
+              <p>Vous achetez seul(e) votre voiture ? Je vous la livre où vous voulez (convoyage).</p>
               <button type="button" class="btn btn-outline" data-goto-tab="convoyage">Découvrir Dimz - Convoyage</button>
             </div>
+          </div>
+        </div>
+
+        <div class="section-head" data-reveal style="margin-top:64px;">
+          <span class="label">Comparatif</span>
+          <h2>Comparez les offres en un coup d'œil.</h2>
+        </div>
+        <div class="compare-table-wrap" data-reveal>
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th scope="col">Services inclus</th>
+                <th scope="col">Découverte</th>
+                <th scope="col">Copilote</th>
+                <th scope="col">Copilote Complète</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Formulaire de briefing</th><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Sélection de 3 annonces</th><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td></tr>
+              <tr><th scope="row">3 conseils personnalisés</th><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td></tr>
+              <tr><th scope="row">Recherche approfondie (5 à 7 annonces)</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Analyse détaillée des annonces</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Rapport écrit avec avis</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Appel de synthèse (30 min)</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Mise en relation avec le vendeur</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Expertise physique du véhicule</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Livraison (convoyage)</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Mise en main</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Frais administratifs offerts</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr class="compare-price-row"><th scope="row">Tarif</th><td>Gratuit</td><td>99 € / 149 €</td><td>À partir de 749 €</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="offers-closing" data-reveal>
+          <p class="offers-closing-quote">Pas sûr de l'offre qui vous correspond ?<br>Pas de problème. Commencez par l'offre Découverte, gratuite, et on verra ensuite. Je suis là pour vous guider, pas pour vous vendre.</p>
+          <div class="offers-closing-cta">
+            <a href="#formulaire" class="btn btn-primary">Trouver votre projet</a>
+            <a href="#faq" class="btn btn-outline">J'ai une question</a>
           </div>
         </div>
       </div>
@@ -1064,7 +1129,7 @@
 
   </div>
 
-  <!-- ---------- Sous-onglet : Inspection ---------- -->
+  <!-- ---------- Page : Inspection ---------- -->
   <div id="subtab-inspection" role="tabpanel" aria-labelledby="subtab-btn-inspection" hidden>
 
     <section class="dark intro-band">
@@ -1330,6 +1395,14 @@
 </footer>
 
 <script>
+  // ---------- Hauteur de l'en-tête (pour caler la sidebar sticky) ----------
+  function syncHeaderHeight() {
+    var h = document.querySelector('header.topnav').offsetHeight;
+    document.documentElement.style.setProperty('--header-h', h + 'px');
+  }
+  syncHeaderHeight();
+  window.addEventListener('resize', syncHeaderHeight);
+
   // ---------- Révélation au scroll ----------
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var io = null;
@@ -1350,21 +1423,11 @@
 
   // ---------- Onglets principaux : Accompagnement / Convoyage ----------
   var mainTabButtons = document.querySelectorAll('.main-tabs button');
-  var navCta = document.getElementById('nav-cta');
-
-  function setNavCta(tab) {
-    if (tab === 'convoyage') {
-      navCta.textContent = 'Demander un convoyage';
-    } else {
-      navCta.textContent = 'Décrire mon projet';
-    }
-  }
 
   function showMainTab(tab, resetSubtab) {
     mainTabButtons.forEach(function (b) { b.setAttribute('aria-selected', b.dataset.tab === tab ? 'true' : 'false'); });
     document.getElementById('tab-accompagnement').hidden = tab !== 'accompagnement';
     document.getElementById('tab-convoyage').hidden = tab !== 'convoyage';
-    setNavCta(tab);
     if (tab === 'accompagnement' && resetSubtab) showSubTab('accueil');
     observeNewReveals();
   }
@@ -1377,18 +1440,32 @@
     el.addEventListener('click', function () { showMainTab(el.dataset.gotoTab, true); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); });
   });
 
-  // ---------- Navigation latérale Accompagnement : Accueil / Nos offres / À propos / Inspection ----------
+  // ---------- Navigation latérale Accompagnement : Accueil (avec Nos offres / À propos en ancres) / Inspection ----------
   var subTabButtons = document.querySelectorAll('.acc-sidebar button');
-  var ACC_PAGES = ['accueil', 'offres', 'apropos', 'inspection'];
+  // "offres" et "apropos" sont des sections de la page Accueil (ancres), pas des pages séparées.
+  var ACC_ANCHOR_SECTIONS = { offres: 'offres', apropos: 'apropos' };
 
   function showSubTab(sub) {
+    var pageToShow = sub === 'inspection' ? 'inspection' : 'accueil';
+    document.getElementById('subtab-accueil').hidden = pageToShow !== 'accueil';
+    document.getElementById('subtab-inspection').hidden = pageToShow !== 'inspection';
     subTabButtons.forEach(function (b) { b.setAttribute('aria-selected', b.dataset.subtab === sub ? 'true' : 'false'); });
-    ACC_PAGES.forEach(function (p) { document.getElementById('subtab-' + p).hidden = p !== sub; });
     observeNewReveals();
   }
 
   subTabButtons.forEach(function (btn) {
-    btn.addEventListener('click', function () { showSubTab(btn.dataset.subtab); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); });
+    btn.addEventListener('click', function () {
+      var sub = btn.dataset.subtab;
+      showSubTab(sub);
+      var anchor = ACC_ANCHOR_SECTIONS[sub];
+      if (anchor) {
+        requestAnimationFrame(function () {
+          document.getElementById(anchor).scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+        });
+      } else {
+        window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+      }
+    });
   });
 
   document.querySelectorAll('[data-goto-subtab]').forEach(function (el) {
@@ -1406,19 +1483,7 @@
   });
 
   // ---------- Nav CTA (dynamique selon l'onglet actif) ----------
-  navCta.addEventListener('click', function () {
-    var activeTab = document.querySelector('.main-tabs button[aria-selected="true"]').dataset.tab;
-    if (activeTab === 'convoyage') {
-      document.getElementById('convoyage-formulaire').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
-    } else {
-      showSubTab('offres');
-      requestAnimationFrame(function () {
-        document.getElementById('formulaire').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
-      });
-    }
-  });
-
-  // ---------- Présélection du besoin (radio #besoin-choices) ----------
+// ---------- Présélection du besoin (radio #besoin-choices) ----------
   function presetBesoin(need) {
     var radio = document.querySelector('#besoin-choices input[value="' + need + '"]');
     if (radio) radio.checked = true;
