@@ -568,6 +568,10 @@
         <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><path d="M12 7h.01"/></svg>
         <span>À propos de nous</span>
       </button>
+      <button type="button" role="tab" id="subtab-btn-faq" aria-selected="false" data-subtab="faq">
+        <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.5a2.8 2.8 0 0 1 5.4 1c0 1.8-2.6 2-2.6 3.7"/><path d="M12 17.2h.01"/></svg>
+        <span>Questions fréquentes</span>
+      </button>
       <button type="button" role="tab" id="subtab-btn-inspection" aria-selected="false" data-subtab="inspection">
         <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
         <span>Inspection</span>
@@ -1179,12 +1183,16 @@
           <p class="offers-closing-quote">Pas sûr de l'offre qui vous correspond ?<br>Pas de problème. Commencez par l'offre Découverte, gratuite, et on verra ensuite. Je suis là pour vous guider, pas pour vous vendre.</p>
           <div class="offers-closing-cta">
             <a href="javascript:void(0)" class="btn btn-primary" data-goto-subtab="accueil" data-scroll-to="formulaire">Trouver votre projet</a>
-            <a href="#faq" class="btn btn-outline">J'ai une question</a>
+            <a href="javascript:void(0)" class="btn btn-outline" data-goto-subtab="faq">J'ai une question</a>
           </div>
         </div>
       </div>
     </section>
 
+  </div>
+
+  <!-- ---------- Page : FAQ ---------- -->
+  <div id="subtab-faq" role="tabpanel" aria-labelledby="subtab-btn-faq" hidden>
 
     <section id="faq">
       <div class="wrap">
@@ -1296,6 +1304,7 @@
     </section>
 
   </div>
+
 
 
   <!-- ---------- Page : Inspection ---------- -->
@@ -1833,7 +1842,7 @@
 
   // ---------- Navigation latérale Accompagnement : Accueil / Nos offres / À propos / Inspection ----------
   var subTabButtons = document.querySelectorAll('.acc-sidebar button');
-  var ACC_PAGES = ['accueil', 'offres', 'apropos', 'inspection'];
+  var ACC_PAGES = ['accueil', 'offres', 'apropos', 'faq', 'inspection'];
 
   function showSubTab(sub) {
     ACC_PAGES.forEach(function (p) { document.getElementById('subtab-' + p).hidden = p !== sub; });
