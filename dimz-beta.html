@@ -1,5 +1,73 @@
-<title>Dimz · Mon copilote auto (Bêta)</title>
+<title>Dimz · Mon copilote auto — Achat, inspection et convoyage (Bêta)</title>
+<meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="DIMZ accompagne votre achat automobile de A à Z : recherche de véhicule, inspection avant achat et convoyage, partout en France. Un copilote, pas un vendeur." />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="DIMZ" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Dimz · Mon copilote auto" />
+<meta property="og:title" content="Dimz · Mon copilote auto — Achat, inspection et convoyage" />
+<meta property="og:description" content="DIMZ accompagne votre achat automobile de A à Z : recherche de véhicule, inspection avant achat et convoyage, partout en France. Un copilote, pas un vendeur." />
+<meta property="og:locale" content="fr_FR" />
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Dimz · Mon copilote auto — Achat, inspection et convoyage" />
+<meta name="twitter:description" content="DIMZ accompagne votre achat automobile de A à Z : recherche de véhicule, inspection avant achat et convoyage, partout en France. Un copilote, pas un vendeur." />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AutomotiveBusiness",
+  "name": "DIMZ",
+  "alternateName": "Dimz · Mon copilote auto",
+  "description": "Accompagnement automobile indépendant : recherche de véhicule, inspection avant achat et convoyage, partout en France.",
+  "slogan": "Trouver · Sécuriser · Accompagner · Livrer",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Lyon",
+    "addressCountry": "FR"
+  },
+  "areaServed": {
+    "@type": "Country",
+    "name": "France"
+  },
+  "founder": {
+    "@type": "Person",
+    "name": "Roland Edzimbi"
+  },
+  "priceRange": "€€",
+  "makesOffer": [
+    {
+      "@type": "Offer",
+      "name": "Découverte",
+      "description": "Premier conseil et sélection d'annonces sans engagement.",
+      "price": "0",
+      "priceCurrency": "EUR"
+    },
+    {
+      "@type": "Offer",
+      "name": "Copilote",
+      "description": "Recherche, analyse et sélection de véhicules avec rapport et appel de synthèse.",
+      "priceCurrency": "EUR",
+      "priceSpecification": {
+        "@type": "PriceSpecification",
+        "minPrice": "99",
+        "maxPrice": "149",
+        "priceCurrency": "EUR"
+      }
+    },
+    {
+      "@type": "Offer",
+      "name": "Copilote Complète",
+      "description": "Accompagnement clé en main : expertise physique du véhicule, livraison et mise en main.",
+      "price": "749",
+      "priceCurrency": "EUR"
+    }
+  ]
+}
+</script>
+
 <style>
   :root {
     --noir: #10141c;
@@ -202,8 +270,8 @@
   .hero-points svg { width: 13px; height: 13px; color: #9db9ec; flex: none; }
   .hero .kicker { display: inline-flex; align-items: center; gap: 8px; font-size: 0.76rem; letter-spacing: 0.16em; text-transform: uppercase; color: #b9cdf5; font-weight: 700; margin-bottom: 24px; }
   .hero .kicker .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--bleu-vif); }
-  .hero h1 { font-size: clamp(2.3rem, 4.4vw, 3.4rem); line-height: 1.08; color: #fff; margin-bottom: 22px; }
-  .hero h1 em { font-style: normal; color: #9db9ec; }
+  .hero h1, .hero h2 { font-size: clamp(2.3rem, 4.4vw, 3.4rem); line-height: 1.08; color: #fff; margin-bottom: 22px; }
+  .hero h1 em, .hero h2 em { font-style: normal; color: #9db9ec; }
   .hero p.lede { color: rgba(255,255,255,0.68); font-size: 1.07rem; max-width: 48ch; margin: 0 auto 32px; }
   .hero .cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
 
@@ -457,7 +525,7 @@
   .legal-back svg { width: 16px; height: 16px; }
   .legal-back:hover { text-decoration: underline; }
   .legal-doc { max-width: 720px; margin: 0 auto; }
-  .legal-doc h1 { font-size: clamp(1.8rem, 3.4vw, 2.3rem); margin-bottom: 36px; }
+  .legal-doc h1, .legal-doc h2.legal-title { font-size: clamp(1.8rem, 3.4vw, 2.3rem); margin-bottom: 36px; }
   .legal-doc h2 { font-size: 1.12rem; margin: 36px 0 12px; }
   .legal-doc h2:first-of-type { margin-top: 0; }
   .legal-doc p { color: var(--ink-soft); line-height: 1.7; margin: 0 0 14px; font-size: 0.96rem; }
@@ -526,7 +594,7 @@
         </ul>
         <p class="lede">Un accompagnement mené dans votre seul intérêt, en toute indépendance du vendeur.</p>
         <div class="cta-row">
-          <a href="javascript:void(0)" class="btn btn-primary" data-goto-subtab="offres" data-scroll-to="formulaire">Décrire mon projet</a>
+          <a href="#formulaire" class="btn btn-primary">Décrire mon projet</a>
           <a href="javascript:void(0)" class="btn btn-outline-dark" data-goto-subtab="offres">Trouvez votre offre</a>
         </div>
       </div>
@@ -605,195 +673,6 @@
       </details>
     </div>
 
-
-  </div>
-  <!-- ---------- Page : À propos ---------- -->
-  <div id="subtab-apropos" role="tabpanel" aria-labelledby="subtab-btn-apropos" hidden>
-
-    <section id="apropos">
-      <div class="wrap">
-        <div class="section-head" data-reveal>
-          <span class="label">À propos de DIMZ</span>
-          <h2>Votre copilote automobile, du premier doute jusqu'à la remise des clés.</h2>
-        </div>
-        <div class="about-body" data-reveal>
-          <p>Acheter une voiture devrait être un moment de plaisir. Pourtant, entre les annonces trompeuses, les arnaques, les véhicules mal entretenus et les démarches administratives, cette expérience devient souvent une source de stress.</p>
-          <p>C'est de ce constat qu'est née <strong>DIMZ</strong>.</p>
-          <p>Après plusieurs années passées dans le monde de l'automobile et du convoyage de véhicules, j'ai accompagné des centaines de trajets et découvert les attentes, les inquiétudes et les erreurs que rencontrent les automobilistes. Une évidence s'est imposée : beaucoup de personnes ont besoin d'un professionnel de confiance, capable de les conseiller, de les protéger et de les accompagner à chaque étape de leur projet.</p>
-          <p>DIMZ a été créé avec une idée simple : <strong>vous offrir l'accompagnement que j'aimerais recevoir si j'achetais une voiture.</strong></p>
-          <p>Ici, il ne s'agit pas seulement de trouver un véhicule ou de le livrer. Mon rôle est d'être votre copilote : vous aider à faire le bon choix, vérifier que tout est conforme, vous éviter les mauvaises surprises et vous accompagner jusqu'à la remise des clés.</p>
-          <p>Que vous recherchiez votre première voiture, un véhicule familial, un modèle premium ou que vous ayez simplement besoin de faire transporter votre véhicule en toute sécurité, vous bénéficiez du même niveau d'exigence : transparence, disponibilité et professionnalisme.</p>
-          <p>Chez DIMZ, chaque projet est unique. C'est pourquoi l'accompagnement est personnalisé, avec un seul objectif : que vous puissiez prendre le volant en toute sérénité.</p>
-        </div>
-
-        <div class="section-head" data-reveal style="margin-top:64px;">
-          <span class="label">Nos valeurs</span>
-          <h2>Les valeurs qui nous guident</h2>
-        </div>
-        <div class="values-grid">
-          <div class="value-card" data-reveal>
-            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24" stroke-width="1.8"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-5-5"/></svg></div>
-            <h3>Trouver</h3>
-            <p>Parce que chaque conducteur mérite un véhicule qui correspond réellement à ses besoins, à son budget et à son mode de vie.</p>
-          </div>
-          <div class="value-card" data-reveal>
-            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24" stroke-width="1.8"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></div>
-            <h3>Sécuriser</h3>
-            <p>Chaque décision est prise avec rigueur afin de limiter les risques et d'éviter les mauvaises surprises.</p>
-          </div>
-          <div class="value-card" data-reveal>
-            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6.3 6-6.3s6 2.8 6 6.3"/><circle cx="17" cy="7" r="2.4"/><path d="M14.8 20c.2-3 2.2-5.4 4.7-6"/></svg></div>
-            <h3>Accompagner</h3>
-            <p>Vous n'êtes jamais seul. DIMZ reste à vos côtés du premier échange jusqu'à la fin de votre projet.</p>
-          </div>
-          <div class="value-card" data-reveal>
-            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24" stroke-width="1.8"><circle cx="7" cy="15" r="4"/><path d="M10 12l9-9"/><path d="M15 6l3 3"/><path d="M17 4l3 3"/></svg></div>
-            <h3>Livrer</h3>
-            <p>Parce qu'un accompagnement complet se termine par une remise de véhicule dans les meilleures conditions.</p>
-          </div>
-        </div>
-
-        <div class="about-closing" data-reveal>
-          <p class="about-closing-lead">Plus qu'un prestataire, un partenaire de confiance.</p>
-          <p>Mon ambition est simple : faire de DIMZ la référence de l'accompagnement automobile, en proposant un service humain, transparent et accessible à tous.</p>
-          <p>Bienvenue chez <strong>DIMZ</strong>. Votre projet automobile mérite un copilote.</p>
-          <a href="javascript:void(0)" class="btn btn-primary" data-goto-subtab="offres" data-scroll-to="formulaire">Décrire mon projet</a>
-        </div>
-      </div>
-    </section>
-
-  </div>
-
-  <!-- ---------- Page : Nos offres ---------- -->
-  <div id="subtab-offres" role="tabpanel" aria-labelledby="subtab-btn-offres" hidden>
-
-    <section id="offres" class="tint">
-      <div class="wrap">
-        <div class="section-head" data-reveal>
-          <span class="label">Nos offres</span>
-          <h2>Trois façons de rouler l'esprit tranquille.</h2>
-          <p>Que vous ayez juste besoin d'un avis ou que vous souhaitiez être accompagné de A à Z, il y a une offre faite pour vous.</p>
-        </div>
-
-        <div class="offers">
-          <div class="offer-card" data-reveal>
-            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-5-5"/></svg></div>
-            <h3>Découverte</h3>
-            <p class="offer-subtitle">Le premier coup d'œil</p>
-            <p class="offer-texte">Vous voulez découvrir le parcours ? Votre copilote vous guide.</p>
-            <div class="offer-price"><span class="free">Gratuit</span></div>
-            <ul>
-              <li>Un formulaire de briefing à remplir (budget, usage, délai)</li>
-              <li>3 annonces sélectionnées pour vous</li>
-              <li>3 conseils personnalisés sur les modèles repérés</li>
-              <li>Une première prise de contact sans engagement</li>
-            </ul>
-            <a href="#formulaire" class="btn btn-outline preselect-need" data-need="conseil">Je commence gratuitement</a>
-          </div>
-
-          <div class="offer-card featured" data-reveal>
-            <span class="offer-tag">Le plus choisi</span>
-            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.3"/><path d="M12 3.5v6.2"/><path d="M6.4 15.2l5-3"/><path d="M17.6 15.2l-5-3"/></svg></div>
-            <h3>Copilote</h3>
-            <p class="offer-subtitle">Je cherche, vous choisissez</p>
-            <p class="offer-texte">Votre copilote vous accompagne sur un bout du parcours.</p>
-            <div class="price-toggle" role="tablist" aria-label="Type de recherche">
-              <button type="button" role="tab" aria-selected="true" data-price="99" data-sub="Pour une recherche courante, sur des véhicules classiques.">Recherche simple</button>
-              <button type="button" role="tab" aria-selected="false" data-price="149" data-sub="Concerne les véhicules rares, de collection, ou les recherches qui demandent plus de temps.">Recherche complexe</button>
-            </div>
-            <div class="offer-price"><span id="offer-price-value">99 €</span></div>
-            <div class="offer-sub" id="offer-sub-copilote">Pour une recherche courante, sur des véhicules classiques.</div>
-            <ul>
-              <li>Analyse approfondie de votre formulaire</li>
-              <li>Recherche et présélection de 5 à 7 véhicules</li>
-              <li>Analyse détaillée de chaque annonce (prix, kilométrage, historique, équipements)</li>
-              <li>Rapport écrit avec avis et recommandations</li>
-              <li>1 appel téléphonique de synthèse (30 min)</li>
-            </ul>
-            <a href="#formulaire" class="btn btn-primary preselect-need" data-need="accompagnement">Je veux être accompagné</a>
-          </div>
-
-          <div class="offer-card" data-reveal>
-            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><circle cx="7" cy="15" r="4"/><path d="M10 12l9-9"/><path d="M15 6l3 3"/><path d="M17 4l3 3"/></svg></div>
-            <h3>Copilote Complète</h3>
-            <p class="offer-subtitle">Clé en main</p>
-            <p class="offer-texte">Faisons la route ensemble.</p>
-            <div class="offer-price"><span class="from-label">À partir de</span>749 €</div>
-            <ul>
-              <li>Tout le contenu de l'offre Copilote (recherche + analyse)</li>
-              <li>Mise en relation avec le vendeur</li>
-              <li>Expertise physique du véhicule : carrosserie, intérieur, pneus, moteur, historique, essai routier, avis clair « OK » ou « à éviter »</li>
-              <li>Livraison du véhicule jusqu'à votre domicile (convoyage)</li>
-              <li>Mise en main : fonctions principales et bons gestes d'entretien</li>
-              <li>Frais administratifs offerts (carte grise, certificat de cession)</li>
-              <li>Rapport d'inspection complet</li>
-            </ul>
-            <a href="#formulaire" class="btn btn-outline preselect-need" data-need="complet">Je veux la solution clé en main</a>
-          </div>
-        </div>
-
-        <p class="offer-note" data-reveal>Le convoyage est proposé en option, sur devis. Et si vous avez déjà réglé une offre Copilote à <strong>99 €</strong> ou <strong>149 €</strong>, cette somme est intégralement déduite du prix de l'offre Copilote Complète.</p>
-
-        <div class="grid-2" style="margin-top:32px;" data-reveal>
-          <div class="option-card">
-            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></div>
-            <div>
-              <h3>Expertise seule <span class="hint">— sur devis</span></h3>
-              <p>Vous avez déjà trouvé votre voiture ? Je me déplace pour l'inspecter et vous donner mon avis.</p>
-              <button type="button" class="btn btn-outline" data-goto-subtab="inspection">Découvrir l'inspection</button>
-            </div>
-          </div>
-          <div class="option-card">
-            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><rect x="1" y="7" width="14" height="10"/><path d="M15 10h4l3 3v4h-7z"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg></div>
-            <div>
-              <h3>Livraison seule <span class="hint">— sur devis</span></h3>
-              <p>Vous achetez seul(e) votre voiture ? Je vous la livre où vous voulez (convoyage).</p>
-              <button type="button" class="btn btn-outline" data-goto-tab="convoyage">Découvrir Dimz - Convoyage</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="section-head" data-reveal style="margin-top:64px;">
-          <span class="label">Comparatif</span>
-          <h2>Comparez les offres en un coup d'œil.</h2>
-        </div>
-        <div class="compare-table-wrap" data-reveal>
-          <table class="compare-table">
-            <thead>
-              <tr>
-                <th scope="col">Services inclus</th>
-                <th scope="col">Découverte</th>
-                <th scope="col">Copilote</th>
-                <th scope="col">Copilote Complète</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><th scope="row">Formulaire de briefing</th><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
-              <tr><th scope="row">Sélection de 3 annonces</th><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td></tr>
-              <tr><th scope="row">3 conseils personnalisés</th><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td></tr>
-              <tr><th scope="row">Recherche approfondie (5 à 7 annonces)</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
-              <tr><th scope="row">Analyse détaillée des annonces</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
-              <tr><th scope="row">Rapport écrit avec avis</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
-              <tr><th scope="row">Appel de synthèse (30 min)</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
-              <tr><th scope="row">Mise en relation avec le vendeur</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
-              <tr><th scope="row">Expertise physique du véhicule</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
-              <tr><th scope="row">Livraison (convoyage)</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
-              <tr><th scope="row">Mise en main</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
-              <tr><th scope="row">Frais administratifs offerts</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
-              <tr class="compare-price-row"><th scope="row">Tarif</th><td>Gratuit</td><td>99 € / 149 €</td><td>À partir de 749 €</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="offers-closing" data-reveal>
-          <p class="offers-closing-quote">Pas sûr de l'offre qui vous correspond ?<br>Pas de problème. Commencez par l'offre Découverte, gratuite, et on verra ensuite. Je suis là pour vous guider, pas pour vous vendre.</p>
-          <div class="offers-closing-cta">
-            <a href="#formulaire" class="btn btn-primary">Trouver votre projet</a>
-            <a href="#faq" class="btn btn-outline">J'ai une question</a>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <!-- ---------- Votre projet : Formulaire Accompagnement ---------- -->
     <section id="contact" class="tint">
@@ -1117,6 +996,196 @@
       </div>
     </section>
 
+  </div>
+  <!-- ---------- Page : À propos ---------- -->
+  <div id="subtab-apropos" role="tabpanel" aria-labelledby="subtab-btn-apropos" hidden>
+
+    <section id="apropos">
+      <div class="wrap">
+        <div class="section-head" data-reveal>
+          <span class="label">À propos de DIMZ</span>
+          <h2>Votre copilote automobile, du premier doute jusqu'à la remise des clés.</h2>
+        </div>
+        <div class="about-body" data-reveal>
+          <p>Acheter une voiture devrait être un moment de plaisir. Pourtant, entre les annonces trompeuses, les arnaques, les véhicules mal entretenus et les démarches administratives, cette expérience devient souvent une source de stress.</p>
+          <p>C'est de ce constat qu'est née <strong>DIMZ</strong>.</p>
+          <p>Après plusieurs années passées dans le monde de l'automobile et du convoyage de véhicules, j'ai accompagné des centaines de trajets et découvert les attentes, les inquiétudes et les erreurs que rencontrent les automobilistes. Une évidence s'est imposée : beaucoup de personnes ont besoin d'un professionnel de confiance, capable de les conseiller, de les protéger et de les accompagner à chaque étape de leur projet.</p>
+          <p>DIMZ a été créé avec une idée simple : <strong>vous offrir l'accompagnement que j'aimerais recevoir si j'achetais une voiture.</strong></p>
+          <p>Ici, il ne s'agit pas seulement de trouver un véhicule ou de le livrer. Mon rôle est d'être votre copilote : vous aider à faire le bon choix, vérifier que tout est conforme, vous éviter les mauvaises surprises et vous accompagner jusqu'à la remise des clés.</p>
+          <p>Que vous recherchiez votre première voiture, un véhicule familial, un modèle premium ou que vous ayez simplement besoin de faire transporter votre véhicule en toute sécurité, vous bénéficiez du même niveau d'exigence : transparence, disponibilité et professionnalisme.</p>
+          <p>Chez DIMZ, chaque projet est unique. C'est pourquoi l'accompagnement est personnalisé, avec un seul objectif : que vous puissiez prendre le volant en toute sérénité.</p>
+        </div>
+
+        <div class="section-head" data-reveal style="margin-top:64px;">
+          <span class="label">Nos valeurs</span>
+          <h2>Les valeurs qui nous guident</h2>
+        </div>
+        <div class="values-grid">
+          <div class="value-card" data-reveal>
+            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24" stroke-width="1.8"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-5-5"/></svg></div>
+            <h3>Trouver</h3>
+            <p>Parce que chaque conducteur mérite un véhicule qui correspond réellement à ses besoins, à son budget et à son mode de vie.</p>
+          </div>
+          <div class="value-card" data-reveal>
+            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24" stroke-width="1.8"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></div>
+            <h3>Sécuriser</h3>
+            <p>Chaque décision est prise avec rigueur afin de limiter les risques et d'éviter les mauvaises surprises.</p>
+          </div>
+          <div class="value-card" data-reveal>
+            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6.3 6-6.3s6 2.8 6 6.3"/><circle cx="17" cy="7" r="2.4"/><path d="M14.8 20c.2-3 2.2-5.4 4.7-6"/></svg></div>
+            <h3>Accompagner</h3>
+            <p>Vous n'êtes jamais seul. DIMZ reste à vos côtés du premier échange jusqu'à la fin de votre projet.</p>
+          </div>
+          <div class="value-card" data-reveal>
+            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24" stroke-width="1.8"><circle cx="7" cy="15" r="4"/><path d="M10 12l9-9"/><path d="M15 6l3 3"/><path d="M17 4l3 3"/></svg></div>
+            <h3>Livrer</h3>
+            <p>Parce qu'un accompagnement complet se termine par une remise de véhicule dans les meilleures conditions.</p>
+          </div>
+        </div>
+
+        <div class="about-closing" data-reveal>
+          <p class="about-closing-lead">Plus qu'un prestataire, un partenaire de confiance.</p>
+          <p>Mon ambition est simple : faire de DIMZ la référence de l'accompagnement automobile, en proposant un service humain, transparent et accessible à tous.</p>
+          <p>Bienvenue chez <strong>DIMZ</strong>. Votre projet automobile mérite un copilote.</p>
+          <a href="javascript:void(0)" class="btn btn-primary" data-goto-subtab="accueil" data-scroll-to="formulaire">Décrire mon projet</a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ---------- Page : Nos offres ---------- -->
+  <div id="subtab-offres" role="tabpanel" aria-labelledby="subtab-btn-offres" hidden>
+
+    <section id="offres" class="tint">
+      <div class="wrap">
+        <div class="section-head" data-reveal>
+          <span class="label">Nos offres</span>
+          <h2>Trois façons de rouler l'esprit tranquille.</h2>
+          <p>Que vous ayez juste besoin d'un avis ou que vous souhaitiez être accompagné de A à Z, il y a une offre faite pour vous.</p>
+        </div>
+
+        <div class="offers">
+          <div class="offer-card" data-reveal>
+            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-5-5"/></svg></div>
+            <h3>Découverte</h3>
+            <p class="offer-subtitle">Le premier coup d'œil</p>
+            <p class="offer-texte">Vous voulez découvrir le parcours ? Votre copilote vous guide.</p>
+            <div class="offer-price"><span class="free">Gratuit</span></div>
+            <ul>
+              <li>Un formulaire de briefing à remplir (budget, usage, délai)</li>
+              <li>3 annonces sélectionnées pour vous</li>
+              <li>3 conseils personnalisés sur les modèles repérés</li>
+              <li>Une première prise de contact sans engagement</li>
+            </ul>
+            <a href="javascript:void(0)" class="btn btn-outline preselect-need" data-need="conseil" data-goto-subtab="accueil" data-scroll-to="formulaire">Je commence gratuitement</a>
+          </div>
+
+          <div class="offer-card featured" data-reveal>
+            <span class="offer-tag">Le plus choisi</span>
+            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.3"/><path d="M12 3.5v6.2"/><path d="M6.4 15.2l5-3"/><path d="M17.6 15.2l-5-3"/></svg></div>
+            <h3>Copilote</h3>
+            <p class="offer-subtitle">Je cherche, vous choisissez</p>
+            <p class="offer-texte">Votre copilote vous accompagne sur un bout du parcours.</p>
+            <div class="price-toggle" role="tablist" aria-label="Type de recherche">
+              <button type="button" role="tab" aria-selected="true" data-price="99" data-sub="Pour une recherche courante, sur des véhicules classiques.">Recherche simple</button>
+              <button type="button" role="tab" aria-selected="false" data-price="149" data-sub="Concerne les véhicules rares, de collection, ou les recherches qui demandent plus de temps.">Recherche complexe</button>
+            </div>
+            <div class="offer-price"><span id="offer-price-value">99 €</span></div>
+            <div class="offer-sub" id="offer-sub-copilote">Pour une recherche courante, sur des véhicules classiques.</div>
+            <ul>
+              <li>Analyse approfondie de votre formulaire</li>
+              <li>Recherche et présélection de 5 à 7 véhicules</li>
+              <li>Analyse détaillée de chaque annonce (prix, kilométrage, historique, équipements)</li>
+              <li>Rapport écrit avec avis et recommandations</li>
+              <li>1 appel téléphonique de synthèse (30 min)</li>
+            </ul>
+            <a href="javascript:void(0)" class="btn btn-primary preselect-need" data-need="accompagnement" data-goto-subtab="accueil" data-scroll-to="formulaire">Je veux être accompagné</a>
+          </div>
+
+          <div class="offer-card" data-reveal>
+            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><circle cx="7" cy="15" r="4"/><path d="M10 12l9-9"/><path d="M15 6l3 3"/><path d="M17 4l3 3"/></svg></div>
+            <h3>Copilote Complète</h3>
+            <p class="offer-subtitle">Clé en main</p>
+            <p class="offer-texte">Faisons la route ensemble.</p>
+            <div class="offer-price"><span class="from-label">À partir de</span>749 €</div>
+            <ul>
+              <li>Tout le contenu de l'offre Copilote (recherche + analyse)</li>
+              <li>Mise en relation avec le vendeur</li>
+              <li>Expertise physique du véhicule : carrosserie, intérieur, pneus, moteur, historique, essai routier, avis clair « OK » ou « à éviter »</li>
+              <li>Livraison du véhicule jusqu'à votre domicile (convoyage)</li>
+              <li>Mise en main : fonctions principales et bons gestes d'entretien</li>
+              <li>Frais administratifs offerts (carte grise, certificat de cession)</li>
+              <li>Rapport d'inspection complet</li>
+            </ul>
+            <a href="javascript:void(0)" class="btn btn-outline preselect-need" data-need="complet" data-goto-subtab="accueil" data-scroll-to="formulaire">Je veux la solution clé en main</a>
+          </div>
+        </div>
+
+        <p class="offer-note" data-reveal>Le convoyage est proposé en option, sur devis. Et si vous avez déjà réglé une offre Copilote à <strong>99 €</strong> ou <strong>149 €</strong>, cette somme est intégralement déduite du prix de l'offre Copilote Complète.</p>
+
+        <div class="grid-2" style="margin-top:32px;" data-reveal>
+          <div class="option-card">
+            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></div>
+            <div>
+              <h3>Expertise seule <span class="hint">— sur devis</span></h3>
+              <p>Vous avez déjà trouvé votre voiture ? Je me déplace pour l'inspecter et vous donner mon avis.</p>
+              <button type="button" class="btn btn-outline" data-goto-subtab="inspection">Découvrir l'inspection</button>
+            </div>
+          </div>
+          <div class="option-card">
+            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><rect x="1" y="7" width="14" height="10"/><path d="M15 10h4l3 3v4h-7z"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg></div>
+            <div>
+              <h3>Livraison seule <span class="hint">— sur devis</span></h3>
+              <p>Vous achetez seul(e) votre voiture ? Je vous la livre où vous voulez (convoyage).</p>
+              <button type="button" class="btn btn-outline" data-goto-tab="convoyage">Découvrir Dimz - Convoyage</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-head" data-reveal style="margin-top:64px;">
+          <span class="label">Comparatif</span>
+          <h2>Comparez les offres en un coup d'œil.</h2>
+        </div>
+        <div class="compare-table-wrap" data-reveal>
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th scope="col">Services inclus</th>
+                <th scope="col">Découverte</th>
+                <th scope="col">Copilote</th>
+                <th scope="col">Copilote Complète</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Formulaire de briefing</th><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Sélection de 3 annonces</th><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td></tr>
+              <tr><th scope="row">3 conseils personnalisés</th><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td></tr>
+              <tr><th scope="row">Recherche approfondie (5 à 7 annonces)</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Analyse détaillée des annonces</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Rapport écrit avec avis</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Appel de synthèse (30 min)</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Mise en relation avec le vendeur</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Expertise physique du véhicule</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Livraison (convoyage)</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Mise en main</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Frais administratifs offerts</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr class="compare-price-row"><th scope="row">Tarif</th><td>Gratuit</td><td>99 € / 149 €</td><td>À partir de 749 €</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="offers-closing" data-reveal>
+          <p class="offers-closing-quote">Pas sûr de l'offre qui vous correspond ?<br>Pas de problème. Commencez par l'offre Découverte, gratuite, et on verra ensuite. Je suis là pour vous guider, pas pour vous vendre.</p>
+          <div class="offers-closing-cta">
+            <a href="javascript:void(0)" class="btn btn-primary" data-goto-subtab="accueil" data-scroll-to="formulaire">Trouver votre projet</a>
+            <a href="#faq" class="btn btn-outline">J'ai une question</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
     <section id="faq">
       <div class="wrap">
         <div class="section-head" data-reveal>
@@ -1235,7 +1304,7 @@
     <section class="dark intro-band">
       <div class="wrap" style="max-width:760px;">
         <span class="kicker"><span class="dot"></span>Avant de vous engager</span>
-        <h1>Le contrôle DIMZ, <em>expliqué étape par étape.</em></h1>
+        <h2>Le contrôle DIMZ, <em>expliqué étape par étape.</em></h2>
         <p class="lede">Votre copilote inspecte le véhicule que vous avez trouvé et vous dit clairement ce qui va, ce qui doit vous alerter, et si le prix demandé est juste.</p>
         <div class="cta-row">
           <button type="button" class="btn btn-primary" id="cta-demander-inspection">Demander une inspection</button>
@@ -1321,7 +1390,7 @@
     <div class="wrap hero-solo">
       <div class="hero-illustration" aria-hidden="true"></div>
       <span class="kicker"><span class="dot"></span>DIMZ - Convoyage</span>
-      <h1>Besoin de déplacer votre véhicule ? <em>Votre copilote prend le relais.</em></h1>
+      <h2>Besoin de déplacer votre véhicule ? <em>Votre copilote prend le relais.</em></h2>
       <p class="lede">Achat à distance, déménagement, manque de temps : confiez votre véhicule à un professionnel du convoyage, du point de départ jusqu'à la porte d'arrivée.</p>
       <div class="cta-row">
         <a href="#convoyage-formulaire" class="btn btn-primary">Demander un convoyage</a>
@@ -1479,7 +1548,7 @@
   <div class="wrap">
     <button type="button" class="legal-back" data-back-to-site><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/></svg>Retour au site</button>
     <div class="legal-doc">
-      <h1>Politique de confidentialité</h1>
+      <h2 class="legal-title">Politique de confidentialité</h2>
 
       <h2>1. Collecte des données personnelles</h2>
       <p>Dans le cadre de son activité, DIMZ peut être amené à collecter certaines données personnelles lorsque vous utilisez le site, notamment via les formulaires de contact ou de demande d'accompagnement.</p>
@@ -1532,7 +1601,7 @@
   <div class="wrap">
     <button type="button" class="legal-back" data-back-to-site><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/></svg>Retour au site</button>
     <div class="legal-doc">
-      <h1>Conditions Générales de Vente (CGV)</h1>
+      <h2 class="legal-title">Conditions Générales de Vente (CGV)</h2>
 
       <h2>1. Objet</h2>
       <p>Les présentes Conditions Générales de Vente définissent les modalités selon lesquelles DIMZ, entreprise individuelle sous le régime de la micro-entreprise, propose des prestations d'accompagnement automobile, de conseil, de recherche de véhicule, d'inspection et de convoyage automobile.</p>
@@ -1627,7 +1696,7 @@
   <div class="wrap">
     <button type="button" class="legal-back" data-back-to-site><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/></svg>Retour au site</button>
     <div class="legal-doc">
-      <h1>Mentions légales</h1>
+      <h2 class="legal-title">Mentions légales</h2>
 
       <h2>Éditeur du site</h2>
       <p>Le présent site est édité par DIMZ.</p>
@@ -1799,7 +1868,7 @@
 
   // ---------- CTA "Demander une inspection" depuis le sous-onglet Inspection ----------
   document.getElementById('cta-demander-inspection').addEventListener('click', function () {
-    showSubTab('offres');
+    showSubTab('accueil');
     presetBesoin('inspection');
     requestAnimationFrame(function () {
       document.getElementById('formulaire').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
