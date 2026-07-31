@@ -1780,6 +1780,11 @@
 </footer>
 
 <script>
+  // ---------- Connexion des formulaires à Google Sheets ----------
+  // Colle ici l'URL de ton déploiement Google Apps Script (Web App), ex :
+  // 'https://script.google.com/macros/s/XXXXXXXXXXXXXXXXXXXXXXXX/exec'
+  var SHEETS_ENDPOINT = '';
+
   // ---------- Hauteur de l'en-tête (pour caler la sidebar sticky) ----------
   function syncHeaderHeight() {
     var h = document.querySelector('header.topnav').offsetHeight;
@@ -2186,8 +2191,7 @@
     });
   }
   function recapRow(label, value) {
-    if (!value) return '';
-    return '<div class="recap-item"><dt>' + escapeHtml(label) + '</dt><dd>' + escapeHtml(value) + '</dd></div>';
+    return value ? [label, value] : null;
   }
   function inputVal(id) {
     var el = document.getElementById(id);
@@ -2213,8 +2217,10 @@
   function renderRecap(containerId, groups) {
     var container = document.getElementById(containerId);
     container.innerHTML = groups.map(function (g) {
-      var body = g.html && g.html.trim()
-        ? '<dl class="recap-list">' + g.html + '</dl>'
+      var body = g.rows.length
+        ? '<dl class="recap-list">' + g.rows.map(function (r) {
+            return '<div class="recap-item"><dt>' + escapeHtml(r[0]) + '</dt><dd>' + escapeHtml(r[1]) + '</dd></div>';
+          }).join('') + '</dl>'
         : '<p class="recap-empty">Non renseigné</p>';
       return '<div class="recap-group">' +
         '<div class="recap-group-head"><h4>' + escapeHtml(g.title) + '</h4><button type="button" class="recap-edit" data-goto-step="' + g.step + '">Modifier</button></div>' +
@@ -2222,11 +2228,20 @@
         '</div>';
     }).join('');
   }
+  function groupsToFlatObject(groups) {
+    var obj = {};
+    groups.forEach(function (g) {
+      g.rows.forEach(function (r) {
+        obj[g.title + ' — ' + r[0]] = r[1];
+      });
+    });
+    return obj;
+  }
 
   function buildRecapAccompagnement() {
     var groups = [];
 
-    groups.push({ title: 'Informations personnelles', step: 0, html: [
+    groups.push({ title: 'Informations personnelles', step: 0, rows: [
       recapRow('Civilité', selectText('a-civilite')),
       recapRow('Âge', inputVal('a-age')),
       recapRow('Nom', inputVal('a-nom')),
@@ -2234,23 +2249,23 @@
       recapRow('Téléphone', inputVal('a-tel')),
       recapRow('Email', inputVal('a-email')),
       recapRow('Consentement', isChecked('a-consentement') ? 'Accepté' : '')
-    ].join('') });
+    ].filter(Boolean) });
 
-    groups.push({ title: 'Votre quotidien', step: 1, html: [
+    groups.push({ title: 'Votre quotidien', step: 1, rows: [
       recapRow('Véhicule destiné à', selectText('a-pourqui')),
       recapRow('Usages principaux', recapCheckedList('#usages-choices input')),
       recapRow('Kilométrage annuel estimé', selectText('a-km')),
       recapRow('Type de parcours', selectText('a-parcours'))
-    ].join('') });
+    ].filter(Boolean) });
 
     var bubbles = document.querySelectorAll('#vehicule-bubbles .veh-bubble');
     var vehText = bubbles.length ? Array.prototype.map.call(bubbles, function (b) { return b.textContent.trim(); }).join(' · ') : '';
-    groups.push({ title: 'Véhicules souhaités', step: 2, html: [
+    groups.push({ title: 'Véhicules souhaités', step: 2, rows: [
       recapRow('Véhicules ciblés', vehText),
       recapRow('Véhicule non trouvé dans la liste', inputVal('a-veh-absente-desc')),
       recapRow('Carrosserie souhaitée', recapCheckedList('#carrosserie-choices input')),
       recapRow('Énergie souhaitée', recapCheckedList('#energie-choices input'))
-    ].join('') });
+    ].filter(Boolean) });
 
     var situationParts = [recapRow('Véhicule actuel', selectText('a-vehicule-actuel'))];
     if (document.getElementById('a-vehicule-actuel').value === 'oui') {
@@ -2270,51 +2285,51 @@
         situationParts.push(recapRow('Solde restant dû', solde ? solde + ' €' : ''));
       }
     }
-    groups.push({ title: 'Situation actuelle', step: 3, html: situationParts.join('') });
+    groups.push({ title: 'Situation actuelle', step: 3, rows: situationParts.filter(Boolean) });
 
-    groups.push({ title: 'Budget et financement', step: 4, html: [
+    groups.push({ title: 'Budget et financement', step: 4, rows: [
       recapRow('Budget total envisagé', selectText('a-budget')),
       recapRow('Mode de financement souhaité', recapCheckedList('input[name="financement"]'))
-    ].join('') });
+    ].filter(Boolean) });
 
     var besoinChecked = document.querySelector('#besoin-choices input:checked');
-    groups.push({ title: 'Projet et délai', step: 5, html: [
+    groups.push({ title: 'Projet et délai', step: 5, rows: [
       recapRow('Accompagnement recherché', besoinChecked ? besoinChecked.closest('label').textContent.trim() : ''),
       recapRow('Délai souhaité', selectText('a-delai')),
       recapRow('Comment vous avez connu Dimz', selectText('a-source')),
       recapRow('Inquiétudes principales', inputVal('a-inquietudes'))
-    ].join('') });
+    ].filter(Boolean) });
 
     return groups;
   }
 
   function buildRecapConvoyage() {
     var groups = [];
-    groups.push({ title: 'Le véhicule', step: 0, html: [
+    groups.push({ title: 'Le véhicule', step: 0, rows: [
       recapRow('Marque', inputVal('c-marque')),
       recapRow('Modèle', inputVal('c-modele')),
       recapRow('Immatriculation', isChecked('c-pas-immatricule') ? 'Pas encore immatriculé' : inputVal('c-immat')),
       recapRow('VIN', inputVal('c-vin')),
       recapRow('Année', inputVal('c-annee')),
       recapRow('Transmission', recapCheckedList('input[name="c-transmission"]'))
-    ].join('') });
+    ].filter(Boolean) });
 
-    groups.push({ title: 'Le trajet', step: 1, html: [
+    groups.push({ title: 'Le trajet', step: 1, rows: [
       recapRow('Départ', inputVal('c-depart')),
       recapRow('Arrivée', inputVal('c-arrivee')),
       recapRow('Date de prise en charge', inputVal('c-date-depart')),
       recapRow('Date de livraison souhaitée', inputVal('c-date-arrivee')),
       recapRow('Téléphone', inputVal('c-tel')),
       recapRow('Email', inputVal('c-email'))
-    ].join('') });
+    ].filter(Boolean) });
 
-    groups.push({ title: 'Prise en charge & options', step: 2, html: [
+    groups.push({ title: 'Prise en charge & options', step: 2, rows: [
       recapRow('Mise en main à la livraison', isChecked('c-mise-en-main') ? 'Oui' : ''),
       recapRow('Niveau de carburant actuel', recapCheckedList('input[name="c-carburant-niveau"]')),
       recapRow('Option carburant à la livraison', recapCheckedList('input[name="carburant-option"]')),
       recapRow('Option lavage', recapCheckedList('input[name="lavage-option"]')),
       recapRow('Instructions libres', inputVal('c-instructions'))
-    ].join('') });
+    ].filter(Boolean) });
 
     return groups;
   }
@@ -2366,20 +2381,35 @@
     immatInput.placeholder = this.checked ? 'Pas encore immatriculé' : 'AA-123-AA';
   });
 
-  // ---------- Soumission des formulaires (simulation front-end) ----------
-  function wireForm(formId, confirmId) {
+  // ---------- Envoi des réponses vers Google Sheets ----------
+  function sendToSheet(formType, groups) {
+    if (!SHEETS_ENDPOINT || SHEETS_ENDPOINT.indexOf('https://script.google.com') !== 0) return;
+    var data = groupsToFlatObject(groups);
+    data['Formulaire'] = formType;
+    data['Horodatage'] = new Date().toISOString();
+    fetch(SHEETS_ENDPOINT, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(data)
+    }).catch(function () { /* envoi silencieux : la confirmation ne dépend pas du réseau */ });
+  }
+
+  // ---------- Soumission des formulaires ----------
+  function wireForm(formId, confirmId, formType, buildGroups) {
     var form = document.getElementById(formId);
     var confirmPanel = document.getElementById(confirmId);
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       if (!form.reportValidity()) return;
+      sendToSheet(formType, buildGroups());
       form.hidden = true;
       confirmPanel.hidden = false;
       confirmPanel.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
     });
   }
-  wireForm('form-accompagnement', 'confirm-accompagnement');
-  wireForm('form-convoyage', 'confirm-convoyage');
+  wireForm('form-accompagnement', 'confirm-accompagnement', 'Accompagnement', buildRecapAccompagnement);
+  wireForm('form-convoyage', 'confirm-convoyage', 'Convoyage', buildRecapConvoyage);
 
   document.querySelectorAll('[data-reset]').forEach(function (btn) {
     btn.addEventListener('click', function () {
