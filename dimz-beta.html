@@ -983,7 +983,7 @@
                 <p class="hint" style="display:block; margin-bottom:20px;">Vérifiez vos informations avant l'envoi. Cliquez sur « Modifier » pour revenir à n'importe quelle étape.</p>
                 <div id="acc-recap"></div>
                 <div class="field full toggle-row" style="margin-top:22px;">
-                  <label><input type="checkbox" id="a-accept-legal" required> J'ai lu et j'accepte les <a href="javascript:void(0)" data-goto-legal="confidentialite">politiques</a> et les <a href="javascript:void(0)" data-goto-legal="cgv">CGV</a>.</label>
+                  <label><input type="checkbox" id="a-accept-legal" required> J'ai pris connaissance de la <a href="javascript:void(0)" data-goto-legal="confidentialite">politique de confidentialité</a> et j'accepte les <a href="javascript:void(0)" data-goto-legal="cgv">conditions générales de vente</a> de DIMZ.</label>
                 </div>
               </div>
 
@@ -999,7 +999,10 @@
               <div class="confirm-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
               <h3>Votre projet est transmis</h3>
               <p>Votre copilote revient vers vous sous 24 à 48h ouvrées avec une première réponse personnalisée.</p>
-              <button type="button" class="btn btn-outline" data-reset="form-accompagnement">Modifier ma demande</button>
+              <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                <button type="button" class="btn btn-outline" data-reset="form-accompagnement">Modifier ma demande</button>
+                <a href="javascript:void(0)" class="btn btn-primary" data-goto-subtab="accueil">Retour à l'accueil</a>
+              </div>
             </div>
           </div>
         </div>
