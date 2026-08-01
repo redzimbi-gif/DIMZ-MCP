@@ -1791,10 +1791,10 @@
   // backoffice/), ex : 'https://dimz-backoffice.vercel.app'
   var BACKOFFICE_URL = '';
 
-  // ---------- Connexion des formulaires à Google Sheets (facultatif) ----------
-  // Colle ici l'URL de ton déploiement Google Apps Script (Web App), ex :
-  // 'https://script.google.com/macros/s/XXXXXXXXXXXXXXXXXXXXXXXX/exec'
-  var SHEETS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbySNFGGHvuJPhrQrHXK82AZGFm8JSnWFT029uo311p2rxpgOvc8pQeAyLrgaHmMmPbR2Q/exec';
+  // ---------- Connexion des formulaires à Google Sheets, via un Google Form ----------
+  var GOOGLE_FORM_RESPONSE_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdnC-KcwOoDh7cGpsfS7Q3WuEr2yyWJR8T4LKffPqkXLhe_SQ/formResponse';
+  var GOOGLE_FORM_ENTRY_TYPE = 'entry.1708251386';    // champ "Formulaire"
+  var GOOGLE_FORM_ENTRY_DETAILS = 'entry.975568467';  // champ "Details"
 
   // ---------- Hauteur de l'en-tête (pour caler la sidebar sticky) ----------
   function syncHeaderHeight() {
@@ -2404,18 +2404,20 @@
     document.body.appendChild(sheetsFrame);
     return sheetsFrame;
   }
-  function postToSheets(url, payloadJson) {
+  function postFields(url, fields) {
     getSheetsFrame();
     var form = document.createElement('form');
     form.action = url;
     form.method = 'POST';
     form.target = 'dimz-sheets-frame';
     form.style.display = 'none';
-    var input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'payload';
-    input.value = payloadJson;
-    form.appendChild(input);
+    Object.keys(fields).forEach(function (name) {
+      var input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = name;
+      input.value = fields[name];
+      form.appendChild(input);
+    });
     document.body.appendChild(form);
     form.submit();
     setTimeout(function () { form.remove(); }, 1000);
@@ -2424,20 +2426,25 @@
   // ---------- Envoi des réponses vers le back-office et/ou Google Sheets ----------
   function sendToSheet(formType, groups) {
     var data = groupsToFlatObject(groups);
-    data['Formulaire'] = formType;
-    data['Horodatage'] = new Date().toISOString();
-    var body = JSON.stringify(data);
 
     if (BACKOFFICE_URL) {
+      var payload = Object.assign({}, data);
+      payload['Formulaire'] = formType;
+      payload['Horodatage'] = new Date().toISOString();
       fetch(BACKOFFICE_URL.replace(/\/$/, '') + '/api/public/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: body
+        body: JSON.stringify(payload)
       }).catch(function () { /* envoi silencieux : la confirmation ne dépend pas du réseau */ });
     }
 
-    if (SHEETS_ENDPOINT && SHEETS_ENDPOINT.indexOf('https://script.google.com') === 0) {
-      postToSheets(SHEETS_ENDPOINT, body);
+    if (GOOGLE_FORM_RESPONSE_URL) {
+      var lines = Object.keys(data).map(function (k) { return k + ' : ' + data[k]; });
+      lines.push('Horodatage : ' + new Date().toISOString());
+      var fields = {};
+      fields[GOOGLE_FORM_ENTRY_TYPE] = formType;
+      fields[GOOGLE_FORM_ENTRY_DETAILS] = lines.join('\n');
+      postFields(GOOGLE_FORM_RESPONSE_URL, fields);
     }
   }
 
