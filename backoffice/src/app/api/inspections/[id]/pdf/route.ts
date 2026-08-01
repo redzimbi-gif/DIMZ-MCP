@@ -17,7 +17,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
     })
   );
 
-  return new NextResponse(buffer, {
+  return new NextResponse(new Uint8Array(buffer), {
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `inline; filename="inspection-${params.id}.pdf"`,
