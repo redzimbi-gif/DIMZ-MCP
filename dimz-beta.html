@@ -519,6 +519,24 @@
   .footer-social a:focus-visible { outline: 2px solid var(--bleu-vif); outline-offset: 2px; }
   .footer-social svg { width: 17px; height: 17px; }
 
+  /* ---------------- Bandeau cookies ---------------- */
+  .cookie-banner {
+    position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 500;
+    max-width: 880px; margin: 0 auto;
+    background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--r-lg);
+    box-shadow: var(--shadow-lg); padding: 22px 26px;
+    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  }
+  .cookie-banner p { margin: 0; font-size: 0.86rem; line-height: 1.55; color: var(--ink-soft); flex: 1 1 320px; }
+  .cookie-banner p a { color: var(--bleu-vif); text-decoration: underline; }
+  .cookie-actions { display: flex; gap: 10px; flex-wrap: wrap; flex: 0 0 auto; }
+  .cookie-actions .btn { padding: 10px 18px; font-size: 0.86rem; }
+  @media (max-width: 640px) {
+    .cookie-banner { left: 10px; right: 10px; bottom: 10px; padding: 18px; }
+    .cookie-actions { width: 100%; }
+    .cookie-actions .btn { flex: 1; justify-content: center; }
+  }
+
   /* ---------------- Pages légales ---------------- */
   .legal-page { padding: 64px 0 96px; }
   .legal-back {
@@ -902,6 +920,10 @@
                     <div class="field">
                       <label for="a-solde-restant">Solde restant dû approximatif (€)</label>
                       <input type="number" id="a-solde-restant" min="1" max="9999">
+                    </div>
+                    <div class="field">
+                      <label for="a-apport-initial">Apport initial versé (€)</label>
+                      <input type="number" id="a-apport-initial" min="0" max="99999">
                     </div>
                   </div>
                 </div>
@@ -1782,10 +1804,47 @@
     <a href="javascript:void(0)" data-goto-legal="confidentialite">Politique de confidentialité (RGPD)</a>
     <a href="javascript:void(0)" data-goto-legal="mentions">Mentions légales</a>
     <a href="javascript:void(0)" data-goto-legal="cgv">CGV</a>
+    <a href="javascript:void(0)" id="cookie-settings-link">Gérer les cookies</a>
   </nav>
 </footer>
 
+<div class="cookie-banner" id="cookie-banner" role="dialog" aria-label="Préférences cookies" hidden>
+  <p>
+    DIMZ utilise des cookies pour assurer le bon fonctionnement du site et, si vous l'acceptez, mesurer son audience.
+    Vous pouvez accepter, refuser, ou en savoir plus dans notre
+    <a href="javascript:void(0)" data-goto-legal="confidentialite">politique de confidentialité</a>.
+  </p>
+  <div class="cookie-actions">
+    <button type="button" class="btn btn-outline" id="cookie-refuse">Refuser</button>
+    <button type="button" class="btn btn-primary" id="cookie-accept">Accepter</button>
+  </div>
+</div>
+
 <script>
+  // ---------- Bandeau cookies ----------
+  (function () {
+    var STORAGE_KEY = 'dimz-cookie-consent';
+    var banner = document.getElementById('cookie-banner');
+    var acceptBtn = document.getElementById('cookie-accept');
+    var refuseBtn = document.getElementById('cookie-refuse');
+    var settingsLink = document.getElementById('cookie-settings-link');
+
+    function getConsent() {
+      try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
+    }
+    function setConsent(value) {
+      try { localStorage.setItem(STORAGE_KEY, value); } catch (e) { /* stockage indisponible, on ignore */ }
+    }
+    function showBanner() { banner.hidden = false; }
+    function hideBanner() { banner.hidden = true; }
+
+    if (!getConsent()) showBanner();
+
+    acceptBtn.addEventListener('click', function () { setConsent('accepted'); hideBanner(); });
+    refuseBtn.addEventListener('click', function () { setConsent('refused'); hideBanner(); });
+    settingsLink.addEventListener('click', function () { showBanner(); });
+  })();
+
   // ---------- Connexion des formulaires au back-office DIMZ ----------
   // Colle ici l'URL de ton déploiement Vercel (l'app Next.js du dossier
   // backoffice/), ex : 'https://dimz-backoffice.vercel.app'
@@ -1926,7 +1985,7 @@
   // ---------- Cascade véhicules (Formulaire Accompagnement, étape 3) ----------
   var VEHICLE_DATA = {
     "Peugeot": {"107": ["I (2005–2014)"], "108": ["I (2014–2021)"], "206": ["I (1998–2012)"], "207": ["I (2006–2014)"], "208": ["I (2012–2019)", "II (2019–présent)"], "308": ["I (2007–2013)", "II (2013–2021)", "III (2021–présent)"], "407": ["I (2004–2011)"], "2008": ["I (2013–2019)", "II (2019–présent)"], "3008": ["I (2009–2016)", "II (2016–2023)", "III (2023–présent)"], "4008": ["I (2012–2017)"], "5008": ["I (2009–2017)", "II (2017–présent)"], "508": ["I (2010–2018)", "II (2018–présent)"], "RCZ": ["I (2010–2015)"]},
-    "Renault": {"Twingo": ["II (2007–2014)", "III (2014–présent)"], "Clio": ["III (2005–2012)", "IV (2012–2019)", "V (2019–présent)"], "Captur": ["I (2013–2019)", "II (2019–présent)"], "Mégane": ["III (2008–2016)", "IV (2016–2023)", "E-Tech (2022–présent)"], "Scénic": ["II (2003–2009)", "III (2009–2016)", "IV (2016–2023)"], "Kadjar": ["I (2015–2022)"], "Kangoo": ["II (2008–2021)"], "Espace": ["IV (2002–2015)", "V (2015–présent)"], "Laguna": ["II (2001–2007)", "III (2007–2015)"], "Talisman": ["I (2015–2022)"], "Zoe": ["I (2012–présent)"], "Koleos": ["I (2008–2016)", "II (2016–présent)"], "Vel Satis": ["I (2001–2009)"], "Avantime": ["I (2001–2003)"]},
+    "Renault": {"Twingo": ["II (2007–2014)", "III (2014–présent)"], "Clio": ["III (2005–2012)", "IV (2012–2019)", "V (2019–2024)", "VI (2024–présent)"], "Captur": ["I (2013–2019)", "II (2019–présent)"], "Mégane": ["III (2008–2016)", "IV (2016–2023)", "E-Tech (2022–présent)"], "Scénic": ["II (2003–2009)", "III (2009–2016)", "IV (2016–2023)"], "Kadjar": ["I (2015–2022)"], "Kangoo": ["II (2008–2021)"], "Espace": ["IV (2002–2015)", "V (2015–présent)"], "Laguna": ["II (2001–2007)", "III (2007–2015)"], "Talisman": ["I (2015–2022)"], "Zoe": ["I (2012–présent)"], "Koleos": ["I (2008–2016)", "II (2016–présent)"], "Vel Satis": ["I (2001–2009)"], "Avantime": ["I (2001–2003)"]},
     "Citroën": {"C1": ["I (2005–2014)", "II (2014–2022)"], "C2": ["I (2003–2009)"], "C3": ["I (2002–2009)", "II (2009–2016)", "III (2016–présent)"], "C3 Picasso": ["I (2009–2017)"], "C4": ["I (2004–2010)", "II (2010–2018)", "III (2020–présent)"], "C4 Picasso": ["I (2006–2013)", "II (2013–2018)"], "C5": ["I (2001–2008)", "II (2008–2017)"], "C5 Aircross": ["I (2018–présent)"], "C6": ["I (2005–2012)"], "C8": ["I (2002–2014)"], "Xsara Picasso": ["I (1999–2010)"], "Berlingo": ["II (2008–2018)", "III (2018–présent)"]},
     "DS Automobiles": {"DS3": ["I (2010–2019)", "Crossback (2019–présent)"], "DS4": ["I (2011–2018)", "II (2021–présent)"], "DS5": ["I (2011–2018)"], "DS7": ["I (2017–présent)"]},
     "Volkswagen": {"up!": ["I (2011–présent)"], "Polo": ["IV (2001–2009)", "V (2009–2017)", "VI (2017–présent)"], "Golf": ["V (2003–2008)", "VI (2008–2012)", "VII (2012–2019)", "VIII (2019–présent)"], "Jetta": ["V (2005–2011)", "VI (2011–2018)"], "Beetle": ["II (1997–2011)", "III (2011–2019)"], "Scirocco": ["III (2008–2017)"], "Eos": ["I (2006–2015)"], "T-Roc": ["I (2017–présent)"], "T-Cross": ["I (2019–présent)"], "Tiguan": ["I (2007–2016)", "II (2016–présent)"], "Touran": ["I (2003–2010)", "II (2010–2015)"], "Sharan": ["II (2010–présent)"], "Passat": ["B6 (2005–2010)", "B7 (2010–2014)", "B8 (2014–2023)"], "Arteon": ["I (2017–présent)"], "Caddy": ["III (2004–2015)", "IV (2015–2020)"]},
@@ -1956,7 +2015,9 @@
     "Porsche": {"Boxster": ["986 (1996–2004)", "987 (2004–2012)", "981 (2012–2016)"], "Cayman": ["987 (2005–2012)", "981 (2012–2016)"], "911": ["996 (1998–2004)", "997 (2004–2011)", "991 (2011–2019)", "992 (2019–présent)"], "Macan": ["I (2014–présent)"], "Cayenne": ["I (2002–2010)", "II (2010–2017)", "III (2017–présent)"], "Panamera": ["I (2009–2016)", "II (2016–présent)"]},
     "Alfa Romeo": {"156": ["I (1997–2007)"], "159": ["I (2005–2011)"], "MiTo": ["I (2008–2018)"], "Giulietta": ["I (2010–2020)"], "Giulia": ["I (2016–présent)"], "Stelvio": ["I (2016–présent)"]},
     "Smart": {"ForTwo": ["II (2007–2014)", "III (2014–présent)"], "ForFour": ["II (2014–présent)"]},
-    "Tesla": {"Model S": ["2012–présent"], "Model 3": ["2017–présent"], "Model X": ["2015–présent"], "Model Y": ["2020–présent"]}
+    "Tesla": {"Model S": ["2012–présent"], "Model 3": ["2017–présent"], "Model X": ["2015–présent"], "Model Y": ["2020–présent"]},
+    "MG": {"MG3": ["III (2024–présent)"], "MG4": ["I (2022–présent)"], "MG5": ["I (2020–présent)"], "ZS": ["II (2017–2021)", "III (2021–présent)"], "HS": ["I (2019–présent)"]},
+    "BYD": {"Dolphin": ["I (2023–présent)"], "Atto 3": ["I (2022–présent)"], "Seal": ["I (2023–présent)"], "Seal U": ["I (2024–présent)"], "Tang": ["III (2023–présent)"]}
   };
 
   var vehicleList = document.getElementById('vehicule-list');
@@ -1970,7 +2031,7 @@
   }
 
   // Estimation des motorisations disponibles selon le modèle et la génération
-  var VEH_ELECTRIC_ONLY = ['Model S', 'Model 3', 'Model X', 'Model Y', 'Zoe', 'Leaf', '500e', 'Born', 'Spring'];
+  var VEH_ELECTRIC_ONLY = ['Model S', 'Model 3', 'Model X', 'Model Y', 'Zoe', 'Leaf', '500e', 'Born', 'Spring', 'MG4', 'Dolphin', 'Atto 3', 'Seal', 'Seal U'];
   var VEH_NO_DIESEL = ['up!', 'Aygo', '107', '108', 'C1', 'Twingo', 'i10', 'ForTwo', 'ForFour', 'Ignis'];
 
   function getMotorisations(model, generation) {
@@ -2290,9 +2351,11 @@
         var duree = inputVal('a-financement-duree');
         var restant = inputVal('a-financement-restant');
         var solde = inputVal('a-solde-restant');
+        var apport = inputVal('a-apport-initial');
         situationParts.push(recapRow('Durée', duree ? duree + ' mois' : ''));
         situationParts.push(recapRow('Temps restant', restant ? restant + ' mois' : ''));
         situationParts.push(recapRow('Solde restant dû', solde ? solde + ' €' : ''));
+        situationParts.push(recapRow('Apport initial versé', apport ? apport + ' €' : ''));
       }
     }
     groups.push({ title: 'Situation actuelle', step: 3, rows: situationParts.filter(Boolean) });
