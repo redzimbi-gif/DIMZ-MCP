@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
-import { createElement } from "react";
 import { getInspection } from "@/lib/queries";
 import { InspectionReport } from "@/lib/pdf/InspectionReport";
 
@@ -11,7 +10,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
   }
 
   const buffer = await renderToBuffer(
-    createElement(InspectionReport, {
+    InspectionReport({
       inspection,
       dossierReference: inspection.dossiers?.reference ?? "",
       clientNom: `${inspection.dossiers?.clients?.prenom ?? ""} ${inspection.dossiers?.clients?.nom ?? ""}`.trim(),

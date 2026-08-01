@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
-import { createElement } from "react";
 import { getConvoyage } from "@/lib/queries";
 import { getSignedUrl } from "@/lib/storage";
 import { ConvoyageReport } from "@/lib/pdf/ConvoyageReport";
@@ -16,7 +15,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
     : null;
 
   const buffer = await renderToBuffer(
-    createElement(ConvoyageReport, {
+    ConvoyageReport({
       convoyage,
       dossierReference: convoyage.dossiers?.reference ?? "",
       clientNom: `${convoyage.dossiers?.clients?.prenom ?? ""} ${convoyage.dossiers?.clients?.nom ?? ""}`.trim(),
