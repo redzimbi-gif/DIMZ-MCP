@@ -183,6 +183,13 @@
   .acc-sidebar button:hover { background: var(--bg-tint); color: var(--ink); }
   .acc-sidebar button:focus-visible { outline: 2px solid var(--bleu-vif); outline-offset: 2px; }
   .acc-sidebar button[aria-selected="true"] { background: color-mix(in srgb, var(--bleu-vif) 10%, transparent); color: var(--bleu-vif); }
+  .acc-sidebar-submenu { position: relative; display: flex; flex-direction: column; }
+  .acc-submenu-toggle { width: 100%; justify-content: flex-start; }
+  .acc-submenu-toggle .chevron { margin-left: auto; width: 16px; height: 16px; transition: transform 0.18s ease; }
+  .acc-submenu-toggle[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+  .acc-submenu-toggle.has-active { background: color-mix(in srgb, var(--bleu-vif) 10%, transparent); color: var(--bleu-vif); }
+  .acc-submenu-panel { display: flex; flex-direction: column; gap: 2px; padding-left: 14px; margin-top: 2px; border-left: 2px solid var(--line); }
+  .acc-submenu-panel button { font-size: 0.86rem; padding: 9px 14px; }
   .acc-content { flex: 1; min-width: 0; }
   .acc-content > div > section.dark, .acc-content > div > div.wrap > section.dark { border-radius: var(--r-xl); margin: 28px 28px 0; overflow: hidden; }
 
@@ -220,6 +227,12 @@
       backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     }
     .acc-sidebar button { flex: none; white-space: nowrap; padding: 9px 14px; }
+    .acc-sidebar-submenu { flex: none; }
+    .acc-submenu-panel {
+      position: absolute; top: calc(100% + 6px); left: 0; z-index: 20; min-width: 200px;
+      background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--r-md);
+      box-shadow: var(--shadow-lg); padding: 6px; margin-top: 0; border-left: none;
+    }
     .acc-content > div > section.dark, .acc-content > div > div.wrap > section.dark { margin: 16px 16px 0; }
   }
 
@@ -401,6 +414,58 @@
   .reco-pill.ambre.active { background: color-mix(in srgb, var(--ambre) 18%, transparent); color: var(--ambre); }
   .reco-pill.rouge.active { background: color-mix(in srgb, var(--rouge) 16%, transparent); color: var(--rouge); }
 
+  /* ---------------- Rapport DIMZ : exemple complet ---------------- */
+  .sample-badge { display: inline-flex; align-items: center; gap: 7px; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ambre); background: color-mix(in srgb, var(--ambre) 14%, transparent); border: 1px solid color-mix(in srgb, var(--ambre) 32%, transparent); border-radius: 100px; padding: 5px 13px; }
+  .report-doc { background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--r-xl); box-shadow: var(--shadow-lg); overflow: hidden; }
+  .report-letterhead { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap; padding: 30px 36px; background: var(--bg-tint); border-bottom: 1px solid var(--line); }
+  .report-letterhead .report-mark { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.05rem; }
+  .report-letterhead .report-mark .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--bleu-vif); }
+  .report-meta { display: flex; flex-direction: column; gap: 3px; font-size: 0.82rem; color: var(--ink-soft); }
+  .report-meta strong { color: var(--ink); font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .report-meta-list { text-align: right; }
+  .report-doc-body { padding: 36px; display: flex; flex-direction: column; gap: 38px; }
+  @media (max-width: 620px) { .report-doc-body { padding: 26px 20px; } .report-letterhead { padding: 22px 20px; } }
+  .report-vehicle-row { display: grid; grid-template-columns: auto 1fr; gap: 32px; align-items: center; }
+  @media (max-width: 640px) { .report-vehicle-row { grid-template-columns: 1fr; text-align: center; } }
+  .report-vehicle-info h3 { font-size: 1.3rem; margin-bottom: 6px; }
+  .report-vehicle-info .tag-row { margin-top: 12px; }
+
+  .report-section-title { display: flex; align-items: center; gap: 10px; font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-soft); margin-bottom: 16px; }
+  .report-section-title::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+  .report-categories { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (max-width: 760px) { .report-categories { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 480px) { .report-categories { grid-template-columns: 1fr; } }
+  .report-cat-card { border: 1px solid var(--line); border-radius: var(--r-md); padding: 15px 16px; background: var(--bg); display: flex; flex-direction: column; gap: 9px; }
+  .report-cat-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .report-cat-top span:first-child { font-weight: 700; font-size: 0.85rem; }
+  .report-cat-top strong { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--bleu-vif); font-size: 0.9rem; }
+  .report-cat-bar { height: 6px; border-radius: 100px; background: var(--line); overflow: hidden; }
+  .report-cat-bar span { display: block; height: 100%; background: var(--bleu-vif); border-radius: 100px; }
+
+  .report-photos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  @media (max-width: 700px) { .report-photos { grid-template-columns: repeat(2, 1fr); } }
+  .report-photo { aspect-ratio: 4 / 3; border-radius: var(--r-sm); background: linear-gradient(135deg, var(--bg-tint), var(--line)); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--ink-soft); border: 1px solid var(--line); }
+  .report-photo svg { width: 26px; height: 26px; opacity: 0.55; }
+  .report-photo span { font-size: 0.72rem; font-weight: 700; }
+
+  .report-notes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  @media (max-width: 700px) { .report-notes-grid { grid-template-columns: 1fr; } }
+  .report-notes-grid h4 { display: flex; align-items: center; gap: 8px; font-size: 0.92rem; margin-bottom: 14px; }
+  .report-notes-grid h4 svg { width: 18px; height: 18px; flex: none; }
+  .report-notes-grid.positif h4 { color: var(--vert); }
+  .report-notes-grid .vigilance h4 { color: var(--ambre); }
+  .report-notes-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 11px; }
+  .report-notes-list li { display: flex; gap: 10px; align-items: flex-start; font-size: 0.88rem; color: var(--ink-soft); line-height: 1.55; }
+  .report-notes-list li svg { width: 16px; height: 16px; flex: none; margin-top: 3px; }
+
+  .report-verdict { border-radius: var(--r-lg); padding: 24px 26px; display: flex; flex-direction: column; gap: 10px; background: color-mix(in srgb, var(--ambre) 9%, var(--bg-tint)); border: 1px solid color-mix(in srgb, var(--ambre) 30%, var(--line)); }
+  .report-verdict p { color: var(--ink-soft); font-size: 0.92rem; line-height: 1.6; margin: 0; }
+  .report-quote { border-left: 3px solid var(--bleu-vif); padding-left: 18px; font-size: 0.95rem; color: var(--ink-soft); font-style: italic; line-height: 1.65; }
+  .report-quote cite { display: block; margin-top: 10px; font-style: normal; font-weight: 700; color: var(--ink); font-size: 0.82rem; }
+  .report-doc-footer { padding: 18px 36px 26px; font-size: 0.74rem; color: var(--ink-soft); border-top: 1px solid var(--line); }
+  @media (max-width: 620px) { .report-doc-footer { padding: 16px 20px 22px; } }
+
   /* ---------------- À propos ---------------- */
   .about-body { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; font-size: 1.02rem; color: var(--ink-soft); }
   .about-body strong { color: var(--ink); font-weight: 700; }
@@ -457,6 +522,7 @@
   .field.full { grid-column: 1 / -1; }
   .field label { font-size: 0.83rem; font-weight: 700; }
   .hint { font-weight: 400; color: var(--ink-soft); font-size: 0.8rem; }
+  .section-sublabel { display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--bleu-vif); padding-top: 4px; border-top: 1px dashed var(--line); }
   input, select, textarea {
     font: inherit; font-size: 0.95rem; padding: 11px 14px; border-radius: var(--r-sm); border: 1px solid var(--line);
     background: var(--bg); color: var(--ink); width: 100%; transition: border-color 0.15s ease;
@@ -581,10 +647,27 @@
         <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg>
         <span>Accueil</span>
       </button>
-      <button type="button" role="tab" id="subtab-btn-offres" aria-selected="false" data-subtab="offres">
-        <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9-9-9z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>
-        <span>Nos offres</span>
-      </button>
+      <div class="acc-sidebar-submenu">
+        <button type="button" class="acc-submenu-toggle" id="acc-submenu-toggle" aria-expanded="false" aria-controls="acc-submenu-panel">
+          <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9-9-9z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>
+          <span>Nos offres</span>
+          <svg class="icon-line chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="acc-submenu-panel" id="acc-submenu-panel" hidden>
+          <button type="button" role="tab" id="subtab-btn-offres" aria-selected="false" data-subtab="offres">
+            <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9-9-9z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>
+            <span>Nos offres</span>
+          </button>
+          <button type="button" role="tab" id="subtab-btn-inspection" aria-selected="false" data-subtab="inspection">
+            <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+            <span>Inspection</span>
+          </button>
+          <button type="button" role="tab" id="subtab-btn-rapport" aria-selected="false" data-subtab="rapport">
+            <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6"/><path d="M9 17h6"/></svg>
+            <span>Le Rapport DIMZ</span>
+          </button>
+        </div>
+      </div>
       <button type="button" role="tab" id="subtab-btn-apropos" aria-selected="false" data-subtab="apropos">
         <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><path d="M12 7h.01"/></svg>
         <span>À propos de nous</span>
@@ -592,10 +675,6 @@
       <button type="button" role="tab" id="subtab-btn-faq" aria-selected="false" data-subtab="faq">
         <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.5a2.8 2.8 0 0 1 5.4 1c0 1.8-2.6 2-2.6 3.7"/><path d="M12 17.2h.01"/></svg>
         <span>Questions fréquentes</span>
-      </button>
-      <button type="button" role="tab" id="subtab-btn-inspection" aria-selected="false" data-subtab="inspection">
-        <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
-        <span>Inspection</span>
       </button>
     </nav>
 
@@ -1108,7 +1187,7 @@
             <p class="offer-texte">Vous voulez découvrir le parcours ? Votre copilote vous guide.</p>
             <div class="offer-price"><span class="free">Gratuit</span></div>
             <ul>
-              <li>Un formulaire de briefing à remplir (budget, usage, délai)</li>
+              <li>Un formulaire de découverte à remplir (budget, usage, délai)</li>
               <li>3 annonces sélectionnées pour vous</li>
               <li>3 conseils personnalisés sur les modèles repérés</li>
               <li>Une première prise de contact sans engagement</li>
@@ -1150,7 +1229,7 @@
               <li>Expertise physique du véhicule : carrosserie, intérieur, pneus, moteur, historique, essai routier, avis clair « OK » ou « à éviter »</li>
               <li>Livraison du véhicule jusqu'à votre domicile (convoyage)</li>
               <li>Mise en main : fonctions principales et bons gestes d'entretien</li>
-              <li>Frais administratifs offerts (carte grise, certificat de cession)</li>
+              <li>Accompagnement aux démarches administratives (demande de carte grise, certificat de cession)</li>
               <li>Rapport d'inspection complet</li>
             </ul>
             <a href="javascript:void(0)" class="btn btn-outline preselect-need" data-need="complet" data-goto-subtab="accueil" data-scroll-to="formulaire">Je veux la formule complète</a>
@@ -1193,7 +1272,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr><th scope="row">Formulaire de briefing</th><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Formulaire de découverte</th><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
               <tr><th scope="row">Sélection de 3 annonces</th><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td></tr>
               <tr><th scope="row">3 conseils personnalisés</th><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td></tr>
               <tr><th scope="row">Recherche approfondie (5 à 7 annonces)</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
@@ -1204,7 +1283,7 @@
               <tr><th scope="row">Expertise physique du véhicule</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
               <tr><th scope="row">Livraison (convoyage)</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
               <tr><th scope="row">Mise en main</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
-              <tr><th scope="row">Frais administratifs offerts</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Accompagnement démarches admin.</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
               <tr class="compare-price-row"><th scope="row">Tarif</th><td>Gratuit</td><td>99 € / 149 €</td><td>À partir de 749 €</td></tr>
             </tbody>
           </table>
@@ -1347,7 +1426,7 @@
         <h2>Le contrôle DIMZ, <em>expliqué étape par étape.</em></h2>
         <p class="lede">Votre copilote inspecte le véhicule que vous avez trouvé et vous dit clairement ce qui va, ce qui doit vous alerter, et si le prix demandé est juste.</p>
         <div class="cta-row">
-          <button type="button" class="btn btn-primary" id="cta-demander-inspection">Demander une inspection</button>
+          <button type="button" class="btn btn-primary cta-demander-inspection">Demander une inspection</button>
         </div>
       </div>
     </section>
@@ -1384,39 +1463,145 @@
             <div class="tag-row"><span class="tag">Prix</span><span class="tag">Kilométrage</span><span class="tag">Valeur marché</span><span class="tag">Défauts connus</span><span class="tag">Potentiel de revente</span></div>
           </div>
         </div>
+
+        <div class="offers-closing" data-reveal style="margin-top:48px;">
+          <p class="offers-closing-quote">Vous avez trouvé une voiture qui vous plaît ?<br>C'est le bon moment pour faire vérifier ce qu'une annonce ne dit jamais.</p>
+          <div class="offers-closing-cta">
+            <button type="button" class="btn btn-primary cta-demander-inspection">Demander une inspection</button>
+            <button type="button" class="btn btn-outline" data-goto-subtab="rapport">Voir un exemple de rapport</button>
+          </div>
+        </div>
       </section>
     </div>
+  </div>
 
-    <section class="tint">
-      <div class="wrap">
-        <div class="section-head" data-reveal>
-          <span class="label">Le livrable</span>
-          <h2>Le Rapport DIMZ</h2>
-          <p>Un seul document, remis après chaque inspection, pour décider en connaissance de cause.</p>
-        </div>
-        <div class="report-mock" data-reveal>
-          <div>
-            <div class="score-ring"><div class="num">8,4<small>/ 10</small></div></div>
-            <div class="score-label">Score DIMZ (exemple)</div>
-          </div>
-          <div class="report-content">
-            <ul class="includes">
-              <li>Résumé général</li>
-              <li>Photos</li>
-              <li>Points positifs</li>
-              <li>Points de vigilance</li>
-              <li>Score DIMZ</li>
-              <li>Recommandation finale</li>
-            </ul>
-            <div class="reco-row">
-              <span class="reco-pill vert">🟢 Recommandé</span>
-              <span class="reco-pill ambre active">🟠 Envisageable</span>
-              <span class="reco-pill rouge">🔴 Déconseillé</span>
-            </div>
-          </div>
-        </div>
+  <!-- ---------- Page : Le Rapport DIMZ ---------- -->
+  <div id="subtab-rapport" role="tabpanel" aria-labelledby="subtab-btn-rapport" hidden>
+
+    <section class="dark intro-band">
+      <div class="wrap" style="max-width:760px;">
+        <span class="kicker"><span class="dot"></span>Le livrable</span>
+        <h2>Le Rapport DIMZ, <em>ce que vous recevez après chaque inspection.</em></h2>
+        <p class="lede">Un document unique, écrit en français clair, qui vous dit ce qui va, ce qui doit vous alerter, et si le prix demandé colle à la réalité du véhicule.</p>
       </div>
     </section>
+
+    <div class="wrap">
+      <section>
+        <div class="section-head" data-reveal>
+          <span class="sample-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>Exemple illustratif</span>
+          <h2 style="margin-top:14px;">Extrait d'un vrai Rapport DIMZ</h2>
+          <p>Voici, sur un cas fictif, la structure exacte du document que votre copilote vous remet après une expertise.</p>
+        </div>
+
+        <div class="report-doc" data-reveal>
+          <div class="report-letterhead">
+            <div>
+              <div class="report-mark"><span class="dot" aria-hidden="true"></span>Rapport DIMZ</div>
+              <div class="report-meta" style="margin-top:8px;">
+                <span>Expertise réalisée à Lyon (69)</span>
+                <span>Par un expert Dimz — copilote certifié</span>
+              </div>
+            </div>
+            <div class="report-meta report-meta-list">
+              <span>Référence <strong>DIMZ-RPT-2026-0341</strong></span>
+              <span>Date d'inspection <strong>28/07/2026</strong></span>
+              <span>Durée sur site <strong>1h50</strong></span>
+            </div>
+          </div>
+
+          <div class="report-doc-body">
+
+            <div class="report-vehicle-row">
+              <div>
+                <div class="score-ring" style="background: conic-gradient(var(--bleu-vif) 295deg, var(--line) 0deg);"><div class="num">8,2<small>/ 10</small></div></div>
+                <div class="score-label">Score DIMZ global</div>
+              </div>
+              <div class="report-vehicle-info">
+                <h3>Peugeot 308 SW 1.5 BlueHDi 130 — 2019</h3>
+                <p style="color:var(--ink-soft);">Annonce comparée : 14 800 € · 78 400 km · Diesel · Boîte manuelle · 1 propriétaire</p>
+                <div class="tag-row">
+                  <span class="tag">Carnet complet</span>
+                  <span class="tag">Contrôle technique OK</span>
+                  <span class="tag">Aucun choc structurel</span>
+                  <span class="tag">Prix à négocier</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="report-section-title">Score par étape du contrôle</div>
+              <div class="report-categories">
+                <div class="report-cat-card"><div class="report-cat-top"><span>Contrôle administratif</span><strong>9/10</strong></div><div class="report-cat-bar"><span style="width:90%;"></span></div></div>
+                <div class="report-cat-card"><div class="report-cat-top"><span>Inspection extérieure</span><strong>7/10</strong></div><div class="report-cat-bar"><span style="width:70%;"></span></div></div>
+                <div class="report-cat-card"><div class="report-cat-top"><span>Inspection intérieure</span><strong>9/10</strong></div><div class="report-cat-bar"><span style="width:90%;"></span></div></div>
+                <div class="report-cat-card"><div class="report-cat-top"><span>Contrôle mécanique</span><strong>8/10</strong></div><div class="report-cat-bar"><span style="width:80%;"></span></div></div>
+                <div class="report-cat-card"><div class="report-cat-top"><span>Essai routier</span><strong>8/10</strong></div><div class="report-cat-bar"><span style="width:80%;"></span></div></div>
+                <div class="report-cat-card"><div class="report-cat-top"><span>Analyse du marché</span><strong>8/10</strong></div><div class="report-cat-bar"><span style="width:80%;"></span></div></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="report-section-title">Photos jointes au rapport</div>
+              <div class="report-photos">
+                <div class="report-photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Face avant</span></div>
+                <div class="report-photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Compteur</span></div>
+                <div class="report-photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Compartiment moteur</span></div>
+                <div class="report-photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Intérieur</span></div>
+              </div>
+            </div>
+
+            <div class="report-notes-grid">
+              <div class="positif">
+                <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Points positifs</h4>
+                <ul class="report-notes-list">
+                  <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="color:var(--vert);"><path d="M20 6L9 17l-5-5"/></svg>Carnet d'entretien complet et cohérent avec le kilométrage affiché</li>
+                  <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="color:var(--vert);"><path d="M20 6L9 17l-5-5"/></svg>Carrosserie saine, aucune trace de choc ou de réparation</li>
+                  <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="color:var(--vert);"><path d="M20 6L9 17l-5-5"/></svg>Pneus avant récents (moins de 6 mois)</li>
+                  <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="color:var(--vert);"><path d="M20 6L9 17l-5-5"/></svg>Aucune fuite ni suintement constaté sur le moteur</li>
+                  <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="color:var(--vert);"><path d="M20 6L9 17l-5-5"/></svg>Essai routier sans bruit ni vibration suspecte</li>
+                </ul>
+              </div>
+              <div class="vigilance">
+                <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>Points de vigilance</h4>
+                <ul class="report-notes-list">
+                  <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ambre);"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>Léger jeu dans la direction, à faire contrôler sous 3 mois</li>
+                  <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ambre);"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>Plaquettes arrière à prévoir sous 10 000 km</li>
+                  <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ambre);"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>Petit éclat au pare-brise, hors champ de vision du conducteur</li>
+                  <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ambre);"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>Prix affiché environ 400 à 600 € au-dessus de la cote du marché</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="report-quote">
+              « Une belle 308 SW bien entretenue, avec un historique clair et sans mauvaise surprise mécanique. Les deux points à surveiller (direction, plaquettes) ne sont pas rédhibitoires, mais je m'en servirais pour négocier 400 à 600 € sur le prix affiché. »
+              <cite>— L'avis de votre copilote</cite>
+            </div>
+
+            <div class="report-verdict">
+              <div class="reco-row">
+                <span class="reco-pill vert">🟢 Recommandé</span>
+                <span class="reco-pill ambre active">🟠 Envisageable</span>
+                <span class="reco-pill rouge">🔴 Déconseillé</span>
+              </div>
+              <p><strong>Recommandation finale :</strong> véhicule envisageable, sous réserve d'une négociation sur le prix et de la prise en compte des plaquettes arrière dans les prochains mois. Aucun point bloquant identifié.</p>
+            </div>
+
+          </div>
+
+          <div class="report-doc-footer">
+            Rapport fictif fourni à titre d'exemple pour illustrer le format et le contenu du Rapport DIMZ. Chaque expertise réelle est réalisée sur site par un expert Dimz et donne lieu à un document individualisé, avec photos réelles du véhicule inspecté.
+          </div>
+        </div>
+
+        <div class="offers-closing" data-reveal style="margin-top:40px;">
+          <p class="offers-closing-quote">Vous voulez ce niveau de clarté sur la voiture que vous regardez ?</p>
+          <div class="offers-closing-cta">
+            <button type="button" class="btn btn-primary cta-demander-inspection">Demander une inspection</button>
+          </div>
+        </div>
+      </section>
+    </div>
   </div>
 
     </div>
@@ -1475,10 +1660,6 @@
                 <label for="c-vin">Numéro d'identification (VIN)</label>
                 <input type="text" id="c-vin" placeholder="17 caractères" maxlength="17">
               </div>
-              <div class="field">
-                <label for="c-annee">Année</label>
-                <input type="number" id="c-annee" min="1970" max="2026" required>
-              </div>
               <div class="field full">
                 <label>Transmission</label>
                 <div class="choice-grid">
@@ -1505,8 +1686,30 @@
                 <input type="date" id="c-date-depart">
               </div>
               <div class="field">
+                <label for="c-heure-depart">Heure de prise en charge souhaitée</label>
+                <input type="time" id="c-heure-depart">
+              </div>
+              <div class="field full toggle-row">
+                <label><input type="checkbox" id="c-creneau-strict"> Sélectionnez si vous souhaitez un créneau strict</label>
+              </div>
+              <div id="creneau-strict-detail" hidden>
+                <div class="field-grid">
+                  <div class="field">
+                    <label for="c-heure-depart-fin">Jusqu'à</label>
+                    <input type="time" id="c-heure-depart-fin">
+                  </div>
+                </div>
+              </div>
+              <div class="field">
                 <label for="c-date-arrivee">Date de livraison souhaitée</label>
                 <input type="date" id="c-date-arrivee">
+              </div>
+              <div class="field">
+                <label for="c-societe">Nom de la société <span class="hint">(optionnel)</span></label>
+                <input type="text" id="c-societe">
+              </div>
+              <div class="field full" style="margin-top:6px;">
+                <label class="section-sublabel">Contact au départ</label>
               </div>
               <div class="field">
                 <label for="c-tel">Téléphone</label>
@@ -1515,6 +1718,24 @@
               <div class="field">
                 <label for="c-email">Email</label>
                 <input type="email" id="c-email" required>
+              </div>
+              <div class="field full toggle-row">
+                <label><input type="checkbox" id="c-contact-arrivee-diff"> Sélectionnez si différent</label>
+              </div>
+              <div id="contact-arrivee-detail" hidden>
+                <div class="field-grid">
+                  <div class="field full" style="margin-top:0;">
+                    <label class="section-sublabel">Contact à l'arrivée</label>
+                  </div>
+                  <div class="field">
+                    <label for="c-tel-arrivee">Téléphone</label>
+                    <input type="tel" id="c-tel-arrivee">
+                  </div>
+                  <div class="field">
+                    <label for="c-email-arrivee">Email</label>
+                    <input type="email" id="c-email-arrivee">
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1555,6 +1776,10 @@
                 <label for="c-instructions">Instructions libres</label>
                 <textarea id="c-instructions" placeholder="Accès au parking, code portail, personne à contacter sur place…"></textarea>
               </div>
+              <div class="field full">
+                <label for="c-fichier-instructions">Si vous souhaitez ajouter un processus ou des instructions <span class="hint">— PDF ou image, &lt; 5 Mo</span></label>
+                <input type="file" id="c-fichier-instructions" accept=".pdf,image/*">
+              </div>
             </div>
           </div>
 
@@ -1576,7 +1801,10 @@
           <div class="confirm-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
           <h3>Votre demande de convoyage est transmise</h3>
           <p>Votre copilote revient vers vous sous 24 à 48h ouvrées avec un créneau et un tarif.</p>
-          <button type="button" class="btn btn-outline" data-reset="form-convoyage">Modifier ma demande</button>
+          <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+            <button type="button" class="btn btn-outline" data-reset="form-convoyage">Modifier ma demande</button>
+            <a href="javascript:void(0)" class="btn btn-primary" data-goto-tab="accompagnement">Retour à l'accueil</a>
+          </div>
         </div>
       </div>
     </div>
@@ -1918,18 +2146,37 @@
     el.addEventListener('click', function () { showMainTab(el.dataset.gotoTab, true); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); });
   });
 
-  // ---------- Navigation latérale Accompagnement : Accueil / Nos offres / À propos / Inspection ----------
-  var subTabButtons = document.querySelectorAll('.acc-sidebar button');
-  var ACC_PAGES = ['accueil', 'offres', 'apropos', 'faq', 'inspection'];
+  // ---------- Navigation latérale Accompagnement : Accueil / sous-menu Offres / À propos / FAQ ----------
+  var subTabButtons = document.querySelectorAll('.acc-sidebar button[data-subtab]');
+  var ACC_PAGES = ['accueil', 'offres', 'apropos', 'faq', 'inspection', 'rapport'];
+  var SUBMENU_PAGES = ['offres', 'inspection', 'rapport'];
+  var submenuToggle = document.getElementById('acc-submenu-toggle');
+  var submenuPanel = document.getElementById('acc-submenu-panel');
 
   function showSubTab(sub) {
     ACC_PAGES.forEach(function (p) { document.getElementById('subtab-' + p).hidden = p !== sub; });
     subTabButtons.forEach(function (b) { b.setAttribute('aria-selected', b.dataset.subtab === sub ? 'true' : 'false'); });
+    submenuToggle.classList.toggle('has-active', SUBMENU_PAGES.indexOf(sub) !== -1);
+    submenuPanel.hidden = true;
+    submenuToggle.setAttribute('aria-expanded', 'false');
     observeNewReveals();
   }
 
   subTabButtons.forEach(function (btn) {
     btn.addEventListener('click', function () { showSubTab(btn.dataset.subtab); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); });
+  });
+
+  submenuToggle.addEventListener('click', function () {
+    var expanded = submenuToggle.getAttribute('aria-expanded') === 'true';
+    submenuPanel.hidden = expanded;
+    submenuToggle.setAttribute('aria-expanded', String(!expanded));
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!submenuPanel.hidden && !e.target.closest('.acc-sidebar-submenu')) {
+      submenuPanel.hidden = true;
+      submenuToggle.setAttribute('aria-expanded', 'false');
+    }
   });
 
   document.querySelectorAll('[data-goto-subtab]').forEach(function (el) {
@@ -1954,11 +2201,13 @@
   }
 
   // ---------- CTA "Demander une inspection" depuis le sous-onglet Inspection ----------
-  document.getElementById('cta-demander-inspection').addEventListener('click', function () {
-    showSubTab('accueil');
-    presetBesoin('inspection');
-    requestAnimationFrame(function () {
-      document.getElementById('formulaire').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+  document.querySelectorAll('.cta-demander-inspection').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      showSubTab('accueil');
+      presetBesoin('inspection');
+      requestAnimationFrame(function () {
+        document.getElementById('formulaire').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+      });
     });
   });
 
@@ -2383,7 +2632,6 @@
       recapRow('Modèle', inputVal('c-modele')),
       recapRow('Immatriculation', isChecked('c-pas-immatricule') ? 'Pas encore immatriculé' : inputVal('c-immat')),
       recapRow('VIN', inputVal('c-vin')),
-      recapRow('Année', inputVal('c-annee')),
       recapRow('Transmission', recapCheckedList('input[name="c-transmission"]'))
     ].filter(Boolean) });
 
@@ -2391,9 +2639,14 @@
       recapRow('Départ', inputVal('c-depart')),
       recapRow('Arrivée', inputVal('c-arrivee')),
       recapRow('Date de prise en charge', inputVal('c-date-depart')),
+      recapRow('Heure de prise en charge', inputVal('c-heure-depart')),
+      recapRow('Créneau strict jusqu\'à', isChecked('c-creneau-strict') ? inputVal('c-heure-depart-fin') : ''),
       recapRow('Date de livraison souhaitée', inputVal('c-date-arrivee')),
-      recapRow('Téléphone', inputVal('c-tel')),
-      recapRow('Email', inputVal('c-email'))
+      recapRow('Nom de la société', inputVal('c-societe')),
+      recapRow('Téléphone (contact départ)', inputVal('c-tel')),
+      recapRow('Email (contact départ)', inputVal('c-email')),
+      recapRow('Téléphone (contact arrivée)', isChecked('c-contact-arrivee-diff') ? inputVal('c-tel-arrivee') : ''),
+      recapRow('Email (contact arrivée)', isChecked('c-contact-arrivee-diff') ? inputVal('c-email-arrivee') : '')
     ].filter(Boolean) });
 
     groups.push({ title: 'Prise en charge & options', step: 2, rows: [
@@ -2452,6 +2705,14 @@
     if (this.checked) immatInput.value = '';
     immatInput.disabled = this.checked;
     immatInput.placeholder = this.checked ? 'Pas encore immatriculé' : 'AA-123-AA';
+  });
+
+  // ---------- Convoyage : créneau strict / contact à l'arrivée ----------
+  document.getElementById('c-creneau-strict').addEventListener('change', function () {
+    document.getElementById('creneau-strict-detail').hidden = !this.checked;
+  });
+  document.getElementById('c-contact-arrivee-diff').addEventListener('change', function () {
+    document.getElementById('contact-arrivee-detail').hidden = !this.checked;
   });
 
   // ---------- Envoi vers Google Sheets via un formulaire caché + iframe ----------
@@ -2551,6 +2812,8 @@
         immatInput.required = true;
         immatInput.disabled = false;
         immatInput.placeholder = 'AA-123-AA';
+        document.getElementById('creneau-strict-detail').hidden = true;
+        document.getElementById('contact-arrivee-detail').hidden = true;
       }
       btn.closest('.confirm-panel').hidden = true;
       form.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
