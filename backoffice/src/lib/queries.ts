@@ -6,6 +6,7 @@ import type {
   Annonce,
   Client,
   Convoyage,
+  ConvoyageExterne,
   DocumentRow,
   Dossier,
   DossierStatutHistory,
@@ -309,4 +310,17 @@ export async function listNotifications() {
     .order("created_at", { ascending: false })
     .limit(30);
   return (data ?? []) as Notification[];
+}
+
+// ---------------------------------------------------------------------------
+// Comptabilité : convoyages réalisés hors plateforme DIMZ
+// ---------------------------------------------------------------------------
+export async function listConvoyagesExternes() {
+  const db = createAdminClient();
+  const { data } = await db
+    .from("convoyages_externes")
+    .select("*")
+    .order("date_convoyage", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false });
+  return (data ?? []) as ConvoyageExterne[];
 }

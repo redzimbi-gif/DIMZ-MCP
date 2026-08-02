@@ -252,3 +252,14 @@ export interface ActivityLogEntry {
   acteur: string | null;
   created_at: string;
 }
+
+export interface ConvoyageExterne {
+  id: string;
+  date_convoyage: string | null;
+  lieu_depart: string | null;
+  lieu_arrivee: string | null;
+  total_prestation: number;
+  frais: number;
+  notes: string | null;
+  created_at: string;
+}

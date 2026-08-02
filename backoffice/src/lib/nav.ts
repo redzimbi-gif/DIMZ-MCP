@@ -6,6 +6,7 @@ import {
   CalendarDays,
   FileStack,
   Receipt,
+  Calculator,
   MessagesSquare,
   type LucideIcon,
 } from "lucide-react";
@@ -24,5 +25,6 @@ export const NAV: NavItem[] = [
   { href: "/agenda", label: "Agenda", icon: CalendarDays },
   { href: "/documents", label: "Documents", icon: FileStack },
   { href: "/facturation", label: "Facturation", icon: Receipt },
+  { href: "/comptabilite", label: "Comptabilité", icon: Calculator },
   { href: "/messagerie", label: "Messagerie", icon: MessagesSquare },
 ];
