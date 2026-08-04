@@ -2089,9 +2089,9 @@
   })();
 
   // ---------- Connexion des formulaires au back-office DIMZ ----------
-  // Colle ici l'URL de ton déploiement Vercel (l'app Next.js du dossier
-  // backoffice/), ex : 'https://dimz-backoffice.vercel.app'
-  var BACKOFFICE_URL = 'https://dimz-dxjsx9ynb-dimz4.vercel.app';
+  // URL complète de la fonction Edge Supabase "lead-intake" (contourne la
+  // protection Vercel Authentication qui bloquait l'API Next.js directe).
+  var BACKOFFICE_URL = 'https://tlkstfmheprsmbxlmrgr.supabase.co/functions/v1/lead-intake';
 
   // ---------- Connexion des formulaires à Google Sheets, via un Google Form ----------
   var GOOGLE_FORM_RESPONSE_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdnC-KcwOoDh7cGpsfS7Q3WuEr2yyWJR8T4LKffPqkXLhe_SQ/formResponse';
@@ -2793,7 +2793,7 @@
       var payload = Object.assign({}, data);
       payload['Formulaire'] = formType;
       payload['Horodatage'] = new Date().toISOString();
-      fetch(BACKOFFICE_URL.replace(/\/$/, '') + '/api/public/lead', {
+      fetch(BACKOFFICE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
