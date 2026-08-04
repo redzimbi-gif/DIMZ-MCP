@@ -1,4 +1,5 @@
-import { Plus, Trash2, Calculator } from "lucide-react";
+import Link from "next/link";
+import { Plus, Pencil, Trash2, Calculator } from "lucide-react";
 import { listConvoyagesExternes } from "@/lib/queries";
 import { Card, PageHeader, StatCard, EmptyState, Field, inputClass, Button } from "@/components/ui";
 import { formatDate } from "@/lib/format";
@@ -89,8 +90,15 @@ export default async function ComptabilitePage() {
                       <td className="px-5 py-3.5 text-right tnum text-ink-soft">
                         {formatEUR(c.gain / URSSAF_DIVISEUR)}
                       </td>
-                      <td className="px-5 py-3.5 text-right">
-                        <form action={deleteConvoyageExterne.bind(null, c.id)}>
+                      <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                        <Link
+                          href={`/comptabilite/${c.id}`}
+                          className="inline-flex p-1.5 rounded-md text-ink-faint hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                          aria-label="Modifier"
+                        >
+                          <Pencil className="h-4 w-4" strokeWidth={1.8} />
+                        </Link>
+                        <form action={deleteConvoyageExterne.bind(null, c.id)} className="inline">
                           <button
                             type="submit"
                             className="p-1.5 rounded-md text-ink-faint hover:text-bad hover:bg-bad-bg transition-colors"

@@ -268,6 +268,17 @@ export async function listAgendaEvents(fromISO: string, toISO: string) {
   return (data ?? []) as (AgendaEvent & { dossiers: any; clients: any })[];
 }
 
+export async function listConvoyagesExternesAFaire() {
+  const db = createAdminClient();
+  const { data } = await db
+    .from("agenda_events")
+    .select("*")
+    .eq("type", "convoyage_externe")
+    .eq("termine", false)
+    .order("date_debut", { ascending: true });
+  return (data ?? []) as AgendaEvent[];
+}
+
 // ---------------------------------------------------------------------------
 // Documents (toutes entités)
 // ---------------------------------------------------------------------------
@@ -323,4 +334,10 @@ export async function listConvoyagesExternes() {
     .order("date_convoyage", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false });
   return (data ?? []) as ConvoyageExterne[];
+}
+
+export async function getConvoyageExterne(id: string) {
+  const db = createAdminClient();
+  const { data } = await db.from("convoyages_externes").select("*").eq("id", id).maybeSingle();
+  return data as ConvoyageExterne | null;
 }

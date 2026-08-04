@@ -1,5 +1,6 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { logActivity } from "@/lib/log";
@@ -41,4 +42,49 @@ export async function deleteAgendaEvent(id: string) {
   const db = createAdminClient();
   await db.from("agenda_events").delete().eq("id", id);
   revalidatePath("/agenda");
+}
+
+// Marque un événement "Convoyage (hors DIMZ)" comme terminé : crée la ligne
+// de comptabilité correspondante et redirige vers son édition pour saisir
+// les montants (total, frais, gain).
+export async function marquerConvoyageExterneTermine(id: string) {
+  const db = createAdminClient();
+
+  const { data: event } = await db.from("agenda_events").select("*").eq("id", id).maybeSingle();
+  if (!event) throw new Error("Événement introuvable.");
+
+  const [lieuDepart, lieuArrivee] = (event.lieu || "")
+    .split(/→|->/)
+    .map((s: string) => s.trim())
+    .filter(Boolean);
+
+  const { data: convoyage, error } = await db
+    .from("convoyages_externes")
+    .insert({
+      date_convoyage: event.date_debut ? event.date_debut.slice(0, 10) : null,
+      lieu_depart: lieuDepart || null,
+      lieu_arrivee: lieuArrivee || null,
+      notes: event.titre,
+      total_prestation: 0,
+      frais: 0,
+    })
+    .select("id")
+    .single();
+  if (error || !convoyage) throw new Error(error?.message || "Erreur lors de la création du convoyage.");
+
+  await db
+    .from("agenda_events")
+    .update({ termine: true, convoyage_externe_id: convoyage.id })
+    .eq("id", id);
+
+  await logActivity({
+    action: "agenda.convoyage_externe_termine",
+    entiteType: "convoyage_externe",
+    entiteId: convoyage.id,
+    description: `Convoyage hors DIMZ terminé depuis l'agenda : ${event.titre}`,
+  });
+
+  revalidatePath("/agenda");
+  revalidatePath("/comptabilite");
+  redirect(`/comptabilite/${convoyage.id}`);
 }

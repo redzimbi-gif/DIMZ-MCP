@@ -72,6 +72,7 @@ export const AGENDA_EVENT_TYPES = [
   "inspection",
   "convoyage",
   "livraison",
+  "convoyage_externe",
 ] as const;
 export type AgendaEventType = (typeof AGENDA_EVENT_TYPES)[number];
 
@@ -81,6 +82,7 @@ export const AGENDA_EVENT_TYPE_LABELS: Record<AgendaEventType, string> = {
   inspection: "Inspection",
   convoyage: "Convoyage",
   livraison: "Livraison",
+  convoyage_externe: "Convoyage (hors DIMZ)",
 };
 
 export const CONVOYAGE_STATUTS = ["planifie", "en_cours", "livre", "annule"] as const;
@@ -122,6 +124,7 @@ export interface Dossier {
   valeur_estimee: number | null;
   source: string;
   portal_token: string;
+  donnees_brutes: Record<string, unknown> | null;
   created_at: string;
   updated_at: string;
   clients?: Client;
@@ -209,6 +212,8 @@ export interface AgendaEvent {
   lieu: string | null;
   notes: string | null;
   rappel_envoye: boolean;
+  termine: boolean;
+  convoyage_externe_id: string | null;
   created_at: string;
 }
 

@@ -34,6 +34,26 @@ import { updateDossierInfos, updateDossierStatut, addDossierNote } from "../acti
 import { createAnnonce, toggleAnnonceSelection, deleteAnnonce } from "./annonces-actions";
 import { uploadDossierDocument } from "./documents-actions";
 
+const DONNEES_BRUTES_KEYS_MASQUEES = new Set(["Formulaire", "Horodatage"]);
+
+// Regroupe les réponses brutes du formulaire ("Section — Champ" : valeur)
+// par section, pour un affichage clair au lieu du bloc de texte brut
+// autrefois entassé dans "Commentaires".
+function groupDonneesBrutes(data: Record<string, unknown> | null) {
+  if (!data) return [];
+  const groups = new Map<string, { label: string; value: string }[]>();
+  for (const [key, rawValue] of Object.entries(data)) {
+    if (DONNEES_BRUTES_KEYS_MASQUEES.has(key)) continue;
+    if (typeof rawValue !== "string" || !rawValue.trim()) continue;
+    const separatorIndex = key.indexOf(" — ");
+    const section = separatorIndex === -1 ? "Autres informations" : key.slice(0, separatorIndex);
+    const label = separatorIndex === -1 ? key : key.slice(separatorIndex + 3);
+    if (!groups.has(section)) groups.set(section, []);
+    groups.get(section)!.push({ label, value: rawValue });
+  }
+  return Array.from(groups.entries());
+}
+
 export default async function DossierDetailPage({
   params,
   searchParams,
@@ -54,6 +74,7 @@ export default async function DossierDetailPage({
   const uploadDocAction = uploadDossierDocument.bind(null, dossier.id);
 
   const portalUrl = `/suivi/${dossier.portal_token}`;
+  const donneesGroups = groupDonneesBrutes(dossier.donnees_brutes);
 
   return (
     <div>
@@ -164,6 +185,30 @@ export default async function DossierDetailPage({
             </Field>
             <Button type="submit">Enregistrer</Button>
           </form>
+        </Card>
+      ) : null}
+
+      {tab === "infos" && donneesGroups.length > 0 ? (
+        <Card className="p-6 max-w-2xl mt-4">
+          <h2 className="text-sm font-semibold text-ink mb-1">Réponses du formulaire</h2>
+          <p className="text-xs text-ink-soft mb-4">
+            Tel que rempli par le client, pour référence — champ « Commentaires » ci-dessus pour tes propres notes.
+          </p>
+          <div className="space-y-5">
+            {donneesGroups.map(([section, rows]) => (
+              <div key={section}>
+                <h3 className="text-xs font-semibold text-ink-soft uppercase tracking-wide mb-2">{section}</h3>
+                <dl className="divide-y divide-line border-t border-line">
+                  {rows.map((row) => (
+                    <div key={row.label} className="flex items-start justify-between gap-4 py-2 text-sm">
+                      <dt className="text-ink-soft shrink-0">{row.label}</dt>
+                      <dd className="text-ink text-right">{row.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            ))}
+          </div>
         </Card>
       ) : null}
 

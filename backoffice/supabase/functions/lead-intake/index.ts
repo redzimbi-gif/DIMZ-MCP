@@ -97,21 +97,9 @@ Deno.serve(async (req: Request) => {
 
   const offreLabel = pick(data, "Projet et délai — Accompagnement recherché");
 
-  const usedKeys = new Set([
-    "Informations personnelles — Nom",
-    "Informations personnelles — Prénom",
-    "Informations personnelles — Téléphone",
-    "Informations personnelles — Email",
-    "Le trajet — Téléphone",
-    "Le trajet — Email",
-    "Formulaire",
-    "Horodatage",
-  ]);
-  const remaining = Object.entries(data)
-    .filter(([key, value]) => !usedKeys.has(key) && typeof value === "string" && (value as string).trim())
-    .map(([key, value]) => `${key} : ${value}`)
-    .join("\n");
-
+  // Le détail complet de la soumission est conservé dans donnees_brutes et
+  // affiché de façon structurée dans le back-office ; "commentaires" reste
+  // un champ de notes libres pour l'équipe, pas un déversoir des réponses.
   const payload = {
     client_id: clientId,
     offre: isConvoyage ? "convoyage_seul" : guessOffre(offreLabel),
@@ -119,7 +107,7 @@ Deno.serve(async (req: Request) => {
     vehicule_recherche: vehiculeRecherche,
     boite_vitesses: pick(data, "Le véhicule — Transmission"),
     km_max: pick(data, "Votre quotidien — Kilométrage annuel estimé"),
-    commentaires: remaining || null,
+    commentaires: null,
     source: "site",
     donnees_brutes: data,
   };

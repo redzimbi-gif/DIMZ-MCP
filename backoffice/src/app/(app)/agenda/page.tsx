@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, CheckCircle2 } from "lucide-react";
 import {
   startOfMonth,
   endOfMonth,
@@ -15,10 +15,10 @@ import {
 } from "date-fns";
 import { fr } from "date-fns/locale";
 import { clsx } from "clsx";
-import { listAgendaEvents, listDossiers } from "@/lib/queries";
-import { Card, PageHeader, Field, inputClass, Button, Badge } from "@/components/ui";
+import { listAgendaEvents, listConvoyagesExternesAFaire, listDossiers } from "@/lib/queries";
+import { Card, PageHeader, Field, inputClass, Button, Badge, EmptyState } from "@/components/ui";
 import { AGENDA_EVENT_TYPE_LABELS, type AgendaEventType } from "@/lib/types";
-import { createAgendaEvent } from "./actions";
+import { createAgendaEvent, marquerConvoyageExterneTermine } from "./actions";
 
 const TYPE_TONES: Record<AgendaEventType, "blue" | "warn" | "good"> = {
   rendez_vous: "blue",
@@ -26,6 +26,7 @@ const TYPE_TONES: Record<AgendaEventType, "blue" | "warn" | "good"> = {
   inspection: "warn",
   convoyage: "blue",
   livraison: "good",
+  convoyage_externe: "warn",
 };
 
 export default async function AgendaPage({ searchParams }: { searchParams: { month?: string } }) {
@@ -41,6 +42,7 @@ export default async function AgendaPage({ searchParams }: { searchParams: { mon
 
   const events = await listAgendaEvents(gridStart.toISOString(), gridEnd.toISOString());
   const dossiers = await listDossiers();
+  const convoyagesAFaire = await listConvoyagesExternesAFaire();
 
   const eventsByDay = new Map<string, typeof events>();
   events.forEach((e) => {
@@ -157,7 +159,7 @@ export default async function AgendaPage({ searchParams }: { searchParams: { mon
               </select>
             </Field>
             <Field label="Lieu">
-              <input name="lieu" className={inputClass} />
+              <input name="lieu" placeholder="Ex. Lyon → Marseille" className={inputClass} />
             </Field>
             <Field label="Notes">
               <textarea name="notes" rows={2} className={inputClass} />
@@ -179,6 +181,38 @@ export default async function AgendaPage({ searchParams }: { searchParams: { mon
           </div>
         </Card>
       </div>
+
+      <Card className="p-5 mt-4">
+        <div className="flex items-center gap-2 mb-4">
+          <CheckCircle2 className="h-4 w-4 text-blue-500" />
+          <h2 className="text-sm font-semibold text-ink">Convoyages hors DIMZ à traiter</h2>
+        </div>
+        {convoyagesAFaire.length === 0 ? (
+          <EmptyState
+            title="Aucun convoyage hors DIMZ en attente"
+            description="Ajoute-en un via « Ajouter un événement » avec le type Convoyage (hors DIMZ)."
+          />
+        ) : (
+          <ul className="divide-y divide-line">
+            {convoyagesAFaire.map((e) => (
+              <li key={e.id} className="flex items-center justify-between gap-4 py-3">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-ink truncate">{e.titre}</p>
+                  <p className="text-xs text-ink-soft mt-0.5">
+                    {e.lieu ? `${e.lieu} — ` : ""}
+                    {format(new Date(e.date_debut), "d MMM yyyy 'à' HH:mm", { locale: fr })}
+                  </p>
+                </div>
+                <form action={marquerConvoyageExterneTermine.bind(null, e.id)} className="shrink-0">
+                  <Button type="submit" variant="outline">
+                    <CheckCircle2 className="h-4 w-4" /> Marquer comme terminé
+                  </Button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
     </div>
   );
 }
