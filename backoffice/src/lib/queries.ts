@@ -332,11 +332,12 @@ export async function listNotifications() {
 // ---------------------------------------------------------------------------
 // Comptabilité : convoyages réalisés hors plateforme DIMZ
 // ---------------------------------------------------------------------------
-export async function listConvoyagesExternes() {
+export async function listConvoyagesExternes(from?: string, to?: string) {
   const db = createAdminClient();
-  const { data } = await db
-    .from("convoyages_externes")
-    .select("*")
+  let query = db.from("convoyages_externes").select("*");
+  if (from) query = query.gte("date_convoyage", from);
+  if (to) query = query.lte("date_convoyage", to);
+  const { data } = await query
     .order("date_convoyage", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false });
   return (data ?? []) as ConvoyageExterne[];

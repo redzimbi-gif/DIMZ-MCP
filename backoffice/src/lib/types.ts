@@ -266,5 +266,6 @@ export interface ConvoyageExterne {
   total_prestation: number;
   frais: number;
   notes: string | null;
+  justificatifs: string[];
   created_at: string;
 }

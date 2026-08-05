@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Download, X, Paperclip } from "lucide-react";
 import { getConvoyageExterne } from "@/lib/queries";
+import { getSignedUrls } from "@/lib/storage";
 import { Card, PageHeader, Field, inputClass, Button, LinkButton } from "@/components/ui";
-import { updateConvoyageExterne } from "../actions";
+import { updateConvoyageExterne, deleteJustificatif } from "../actions";
 
 export default async function EditConvoyageExternePage({ params }: { params: { id: string } }) {
   const convoyage = await getConvoyageExterne(params.id);
@@ -10,6 +11,7 @@ export default async function EditConvoyageExternePage({ params }: { params: { i
 
   const action = updateConvoyageExterne.bind(null, convoyage.id);
   const gain = convoyage.total_prestation - convoyage.frais;
+  const urls = await getSignedUrls(convoyage.justificatifs ?? []);
 
   return (
     <div className="max-w-lg">
@@ -23,7 +25,7 @@ export default async function EditConvoyageExternePage({ params }: { params: { i
         }
       />
       <Card className="p-6">
-        <form action={action} className="space-y-3">
+        <form action={action} className="space-y-3" encType="multipart/form-data">
           <Field label="Date">
             <input name="date_convoyage" type="date" defaultValue={convoyage.date_convoyage ?? ""} className={inputClass} />
           </Field>
@@ -61,10 +63,52 @@ export default async function EditConvoyageExternePage({ params }: { params: { i
           <Field label="Notes (optionnel)">
             <textarea name="notes" rows={2} defaultValue={convoyage.notes ?? ""} className={inputClass} />
           </Field>
+          <Field label="Ajouter des justificatifs (photos, factures)">
+            <input name="justificatifs" type="file" accept="image/*,application/pdf" multiple className={inputClass} />
+          </Field>
           <Button type="submit" className="w-full">
             Enregistrer les modifications
           </Button>
         </form>
+
+        {convoyage.justificatifs?.length > 0 ? (
+          <div className="mt-5 pt-4 border-t border-line">
+            <h3 className="text-xs font-semibold text-ink-soft uppercase tracking-wide mb-2 flex items-center gap-1.5">
+              <Paperclip className="h-3.5 w-3.5" /> Justificatifs joints
+            </h3>
+            <ul className="space-y-1.5">
+              {convoyage.justificatifs.map((path) => {
+                const fileName = path.split("/").pop() ?? path;
+                return (
+                  <li key={path} className="flex items-center justify-between gap-2 text-sm">
+                    {urls[path] ? (
+                      <a
+                        href={urls[path]}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 text-blue-600 hover:underline truncate"
+                      >
+                        <Download className="h-3.5 w-3.5 shrink-0" />
+                        <span className="truncate">{fileName}</span>
+                      </a>
+                    ) : (
+                      <span className="text-ink-soft truncate">{fileName}</span>
+                    )}
+                    <form action={deleteJustificatif.bind(null, convoyage.id, path)}>
+                      <button
+                        type="submit"
+                        className="p-1 rounded text-ink-faint hover:text-bad hover:bg-bad-bg transition-colors"
+                        aria-label="Supprimer ce justificatif"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </form>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ) : null}
       </Card>
     </div>
   );

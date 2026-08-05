@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Plus, Pencil, Trash2, Calculator } from "lucide-react";
+import { format, startOfMonth, endOfMonth, subMonths } from "date-fns";
+import { Plus, Pencil, Trash2, Calculator, Paperclip } from "lucide-react";
 import { listConvoyagesExternes } from "@/lib/queries";
 import { Card, PageHeader, StatCard, EmptyState, Field, inputClass, Button } from "@/components/ui";
 import { formatDate } from "@/lib/format";
@@ -18,8 +19,13 @@ function formatEUR(value: number) {
   }).format(value);
 }
 
-export default async function ComptabilitePage() {
-  const convoyages = await listConvoyagesExternes();
+export default async function ComptabilitePage({
+  searchParams,
+}: {
+  searchParams: { from?: string; to?: string };
+}) {
+  const { from, to } = searchParams;
+  const convoyages = await listConvoyagesExternes(from, to);
 
   const rows = convoyages.map((c) => ({
     ...c,
@@ -31,12 +37,53 @@ export default async function ComptabilitePage() {
   const totalGain = rows.reduce((sum, c) => sum + c.gain, 0);
   const totalUrssaf = totalGain / URSSAF_DIVISEUR;
 
+  const today = new Date();
+  const thisMonth = { from: format(startOfMonth(today), "yyyy-MM-dd"), to: format(endOfMonth(today), "yyyy-MM-dd") };
+  const lastMonthDate = subMonths(today, 1);
+  const lastMonth = { from: format(startOfMonth(lastMonthDate), "yyyy-MM-dd"), to: format(endOfMonth(lastMonthDate), "yyyy-MM-dd") };
+  const isActive = (preset: { from: string; to: string }) => from === preset.from && to === preset.to;
+
   return (
     <div>
       <PageHeader
         title="Comptabilité"
         description="Convoyages réalisés en dehors de la plateforme DIMZ : chiffre d'affaires, frais et part due à l'URSSAF."
       />
+
+      <Card className="p-4 mb-6">
+        <form className="flex flex-wrap items-end gap-3" method="GET">
+          <Field label="Du">
+            <input type="date" name="from" defaultValue={from ?? ""} className={inputClass} />
+          </Field>
+          <Field label="Au">
+            <input type="date" name="to" defaultValue={to ?? ""} className={inputClass} />
+          </Field>
+          <Button type="submit" variant="outline">
+            Filtrer
+          </Button>
+          <div className="flex-1 min-w-[8px]" />
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <Link
+              href="/comptabilite"
+              className={`text-xs font-medium rounded-full px-3 py-1.5 ${!from && !to ? "bg-blue-50 text-blue-700" : "text-ink-soft hover:bg-surface-sunken"}`}
+            >
+              Tout
+            </Link>
+            <Link
+              href={`/comptabilite?from=${thisMonth.from}&to=${thisMonth.to}`}
+              className={`text-xs font-medium rounded-full px-3 py-1.5 ${isActive(thisMonth) ? "bg-blue-50 text-blue-700" : "text-ink-soft hover:bg-surface-sunken"}`}
+            >
+              Ce mois-ci
+            </Link>
+            <Link
+              href={`/comptabilite?from=${lastMonth.from}&to=${lastMonth.to}`}
+              className={`text-xs font-medium rounded-full px-3 py-1.5 ${isActive(lastMonth) ? "bg-blue-50 text-blue-700" : "text-ink-soft hover:bg-surface-sunken"}`}
+            >
+              Mois dernier
+            </Link>
+          </div>
+        </form>
+      </Card>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard label="Total prestations" value={formatEUR(totalPrestation)} />
@@ -54,8 +101,8 @@ export default async function ComptabilitePage() {
         <Card>
           {rows.length === 0 ? (
             <EmptyState
-              title="Aucun convoyage enregistré"
-              description="Ajoute un convoyage réalisé hors DIMZ depuis le formulaire à droite."
+              title="Aucun convoyage sur cette période"
+              description="Ajoute un convoyage réalisé hors DIMZ depuis le formulaire à droite, ou change la période."
             />
           ) : (
             <div className="overflow-x-auto">
@@ -82,6 +129,11 @@ export default async function ComptabilitePage() {
                         {c.lieu_arrivee || "—"}
                         {c.notes ? (
                           <p className="text-xs text-ink-faint mt-0.5">{c.notes}</p>
+                        ) : null}
+                        {c.justificatifs?.length > 0 ? (
+                          <span className="inline-flex items-center gap-1 text-xs text-ink-faint mt-0.5">
+                            <Paperclip className="h-3 w-3" /> {c.justificatifs.length} justificatif{c.justificatifs.length > 1 ? "s" : ""}
+                          </span>
                         ) : null}
                       </td>
                       <td className="px-5 py-3.5 text-right tnum text-ink">{formatEUR(c.total_prestation)}</td>
@@ -130,7 +182,7 @@ export default async function ComptabilitePage() {
 
         <Card className="p-5 h-fit">
           <h2 className="text-sm font-semibold text-ink mb-4">Ajouter un convoyage</h2>
-          <form action={createConvoyageExterne} className="space-y-3">
+          <form action={createConvoyageExterne} className="space-y-3" encType="multipart/form-data">
             <Field label="Date">
               <input name="date_convoyage" type="date" className={inputClass} />
             </Field>
@@ -150,6 +202,9 @@ export default async function ComptabilitePage() {
             </div>
             <Field label="Notes (optionnel)">
               <textarea name="notes" rows={2} className={inputClass} />
+            </Field>
+            <Field label="Justificatifs (photos, factures)">
+              <input name="justificatifs" type="file" accept="image/*,application/pdf" multiple className={inputClass} />
             </Field>
             <Button type="submit" className="w-full">
               <Plus className="h-4 w-4" /> Ajouter

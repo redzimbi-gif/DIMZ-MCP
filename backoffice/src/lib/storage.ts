@@ -23,6 +23,12 @@ export async function uploadFiles(prefix: string, files: File[]): Promise<string
   return paths;
 }
 
+/** Supprime un fichier du bucket de stockage. */
+export async function deleteFile(path: string): Promise<void> {
+  const db = createAdminClient();
+  await db.storage.from(BUCKET).remove([path]);
+}
+
 /** Génère des URLs signées temporaires (1h) pour afficher des fichiers privés. */
 export async function getSignedUrls(paths: string[]): Promise<Record<string, string>> {
   if (paths.length === 0) return {};
