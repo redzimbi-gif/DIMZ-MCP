@@ -268,6 +268,12 @@ export async function listAgendaEvents(fromISO: string, toISO: string) {
   return (data ?? []) as (AgendaEvent & { dossiers: any; clients: any })[];
 }
 
+export async function getAgendaEvent(id: string) {
+  const db = createAdminClient();
+  const { data } = await db.from("agenda_events").select("*").eq("id", id).maybeSingle();
+  return data as AgendaEvent | null;
+}
+
 export async function listConvoyagesExternesAFaire() {
   const db = createAdminClient();
   const { data } = await db

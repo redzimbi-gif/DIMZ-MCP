@@ -29,10 +29,16 @@ const TYPE_TONES: Record<AgendaEventType, "blue" | "warn" | "good"> = {
   convoyage_externe: "warn",
 };
 
-export default async function AgendaPage({ searchParams }: { searchParams: { month?: string } }) {
+export default async function AgendaPage({
+  searchParams,
+}: {
+  searchParams: { month?: string; day?: string };
+}) {
   const monthParam = searchParams.month
     ? parse(searchParams.month, "yyyy-MM", new Date())
     : new Date();
+  const monthKey = format(monthParam, "yyyy-MM");
+  const selectedDay = searchParams.day ?? null;
 
   const monthStart = startOfMonth(monthParam);
   const monthEnd = endOfMonth(monthParam);
@@ -49,6 +55,8 @@ export default async function AgendaPage({ searchParams }: { searchParams: { mon
     const key = format(new Date(e.date_debut), "yyyy-MM-dd");
     eventsByDay.set(key, [...(eventsByDay.get(key) ?? []), e]);
   });
+
+  const selectedDayEvents = selectedDay ? eventsByDay.get(selectedDay) ?? [] : [];
 
   const prevMonth = format(subMonths(monthStart, 1), "yyyy-MM");
   const nextMonth = format(addMonths(monthStart, 1), "yyyy-MM");
@@ -93,35 +101,44 @@ export default async function AgendaPage({ searchParams }: { searchParams: { mon
             {days.map((day) => {
               const key = format(day, "yyyy-MM-dd");
               const dayEvents = eventsByDay.get(key) ?? [];
+              const isSelected = selectedDay === key;
               return (
                 <div
                   key={key}
                   className={clsx(
                     "min-h-[92px] rounded-md border p-1.5 text-left align-top",
                     isSameMonth(day, monthStart) ? "border-line bg-surface" : "border-line-soft bg-surface-sunken",
-                    isSameDay(day, today) && "ring-1 ring-blue-500"
+                    isSameDay(day, today) && "ring-1 ring-blue-500",
+                    isSelected && "border-blue-500 bg-blue-50"
                   )}
                 >
-                  <span
+                  <Link
+                    href={`/agenda?month=${monthKey}&day=${key}`}
                     className={clsx(
-                      "text-xs tnum",
-                      isSameMonth(day, monthStart) ? "text-ink-soft" : "text-ink-faint"
+                      "inline-flex items-center justify-center h-5 w-5 rounded-full text-xs tnum font-medium hover:bg-blue-100",
+                      isSelected ? "bg-blue-500 text-white hover:bg-blue-600" : isSameMonth(day, monthStart) ? "text-ink-soft" : "text-ink-faint"
                     )}
                   >
                     {format(day, "d")}
-                  </span>
+                  </Link>
                   <div className="mt-1 space-y-1">
                     {dayEvents.slice(0, 3).map((e) => (
-                      <div
+                      <Link
                         key={e.id}
-                        className="text-[11px] leading-tight rounded px-1.5 py-1 bg-blue-50 text-blue-700 truncate"
+                        href={`/agenda/${e.id}`}
+                        className="block text-[11px] leading-tight rounded px-1.5 py-1 bg-blue-50 text-blue-700 truncate hover:bg-blue-100"
                         title={e.titre}
                       >
                         {e.titre}
-                      </div>
+                      </Link>
                     ))}
                     {dayEvents.length > 3 ? (
-                      <div className="text-[10px] text-ink-faint px-1">+{dayEvents.length - 3}</div>
+                      <Link
+                        href={`/agenda?month=${monthKey}&day=${key}`}
+                        className="block text-[10px] text-ink-faint px-1 hover:text-blue-600"
+                      >
+                        +{dayEvents.length - 3}
+                      </Link>
                     ) : null}
                   </div>
                 </div>
@@ -129,6 +146,48 @@ export default async function AgendaPage({ searchParams }: { searchParams: { mon
             })}
           </div>
         </Card>
+
+        <div className="space-y-4">
+          {selectedDay ? (
+            <Card className="p-5 h-fit">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-sm font-semibold text-ink capitalize">
+                  {format(new Date(selectedDay + "T00:00:00"), "EEEE d MMMM", { locale: fr })}
+                </h2>
+                <Link href={`/agenda?month=${monthKey}`} className="text-xs text-ink-soft hover:text-ink">
+                  Fermer
+                </Link>
+              </div>
+              {selectedDayEvents.length === 0 ? (
+                <EmptyState title="Aucun événement ce jour-là" />
+              ) : (
+                <ul className="space-y-2">
+                  {selectedDayEvents.map((e) => (
+                    <li key={e.id} className="rounded-md border border-line p-2.5">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <Badge tone={TYPE_TONES[e.type]}>{AGENDA_EVENT_TYPE_LABELS[e.type]}</Badge>
+                            <span className="text-xs text-ink-faint tnum">
+                              {format(new Date(e.date_debut), "HH:mm")}
+                            </span>
+                          </div>
+                          <p className="text-sm font-medium text-ink mt-1 truncate">{e.titre}</p>
+                          {e.lieu ? <p className="text-xs text-ink-soft mt-0.5 truncate">{e.lieu}</p> : null}
+                        </div>
+                        <Link
+                          href={`/agenda/${e.id}`}
+                          className="shrink-0 text-xs font-medium text-blue-600 hover:underline"
+                        >
+                          Modifier
+                        </Link>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Card>
+          ) : null}
 
         <Card className="p-5 h-fit">
           <h2 className="text-sm font-semibold text-ink mb-4">Ajouter un événement</h2>
@@ -146,7 +205,13 @@ export default async function AgendaPage({ searchParams }: { searchParams: { mon
               </select>
             </Field>
             <Field label="Date et heure">
-              <input name="date_debut" type="datetime-local" required className={inputClass} />
+              <input
+                name="date_debut"
+                type="datetime-local"
+                required
+                defaultValue={selectedDay ? `${selectedDay}T09:00` : undefined}
+                className={inputClass}
+              />
             </Field>
             <Field label="Dossier lié (optionnel)">
               <select name="dossier_id" className={inputClass}>
@@ -180,6 +245,7 @@ export default async function AgendaPage({ searchParams }: { searchParams: { mon
             </div>
           </div>
         </Card>
+        </div>
       </div>
 
       <Card className="p-5 mt-4">
