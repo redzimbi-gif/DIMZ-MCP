@@ -17,7 +17,7 @@ export default async function ClientPortalPage({ params }: { params: { token: st
   const currentIndex = DOSSIER_STATUTS.indexOf(dossier.statut);
 
   return (
-    <div className="min-h-screen bg-surface-sunken py-12 px-4">
+    <div className="min-h-[100dvh] bg-surface-sunken py-12 px-4">
       <div className="max-w-lg mx-auto">
         <div className="mb-8 flex justify-center">
           <Logo className="text-xl" />

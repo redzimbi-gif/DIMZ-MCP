@@ -1714,7 +1714,7 @@
               <div class="field full toggle-row">
                 <label><input type="checkbox" id="c-creneau-strict"> Sélectionnez si vous souhaitez un créneau strict</label>
               </div>
-              <div id="creneau-strict-detail" hidden>
+              <div id="creneau-strict-detail" class="field full" hidden>
                 <div class="field-grid">
                   <div class="field">
                     <label for="c-heure-depart-fin">Jusqu'à</label>
@@ -1734,6 +1734,14 @@
                 <label class="section-sublabel">Contact au départ</label>
               </div>
               <div class="field">
+                <label for="c-contact-nom">Nom</label>
+                <input type="text" id="c-contact-nom" required>
+              </div>
+              <div class="field">
+                <label for="c-contact-prenom">Prénom</label>
+                <input type="text" id="c-contact-prenom" required>
+              </div>
+              <div class="field">
                 <label for="c-tel">Téléphone</label>
                 <input type="tel" id="c-tel" required>
               </div>
@@ -1744,10 +1752,18 @@
               <div class="field full toggle-row">
                 <label><input type="checkbox" id="c-contact-arrivee-diff"> Sélectionnez si différent</label>
               </div>
-              <div id="contact-arrivee-detail" hidden>
+              <div id="contact-arrivee-detail" class="field full" hidden>
                 <div class="field-grid">
                   <div class="field full" style="margin-top:0;">
                     <label class="section-sublabel">Contact à l'arrivée</label>
+                  </div>
+                  <div class="field">
+                    <label for="c-contact-arrivee-nom">Nom</label>
+                    <input type="text" id="c-contact-arrivee-nom">
+                  </div>
+                  <div class="field">
+                    <label for="c-contact-arrivee-prenom">Prénom</label>
+                    <input type="text" id="c-contact-arrivee-prenom">
                   </div>
                   <div class="field">
                     <label for="c-tel-arrivee">Téléphone</label>
@@ -2688,8 +2704,12 @@
       recapRow('Créneau strict jusqu\'à', isChecked('c-creneau-strict') ? inputVal('c-heure-depart-fin') : ''),
       recapRow('Date de livraison souhaitée', inputVal('c-date-arrivee')),
       recapRow('Nom de la société', inputVal('c-societe')),
+      recapRow('Nom (contact départ)', inputVal('c-contact-nom')),
+      recapRow('Prénom (contact départ)', inputVal('c-contact-prenom')),
       recapRow('Téléphone (contact départ)', inputVal('c-tel')),
       recapRow('Email (contact départ)', inputVal('c-email')),
+      recapRow('Nom (contact arrivée)', isChecked('c-contact-arrivee-diff') ? inputVal('c-contact-arrivee-nom') : ''),
+      recapRow('Prénom (contact arrivée)', isChecked('c-contact-arrivee-diff') ? inputVal('c-contact-arrivee-prenom') : ''),
       recapRow('Téléphone (contact arrivée)', isChecked('c-contact-arrivee-diff') ? inputVal('c-tel-arrivee') : ''),
       recapRow('Email (contact arrivée)', isChecked('c-contact-arrivee-diff') ? inputVal('c-email-arrivee') : '')
     ].filter(Boolean) });

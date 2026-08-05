@@ -56,11 +56,12 @@ Deno.serve(async (req: Request) => {
 
   const nom =
     pick(data, "Informations personnelles — Nom") ||
+    pick(data, "Le trajet — Nom (contact départ)") ||
     pick(data, "Le véhicule — Marque") ||
     "Nouveau contact";
-  const prenom = pick(data, "Informations personnelles — Prénom");
-  const telephone = pick(data, "Informations personnelles — Téléphone", "Le trajet — Téléphone");
-  const email = pick(data, "Informations personnelles — Email", "Le trajet — Email");
+  const prenom = pick(data, "Informations personnelles — Prénom", "Le trajet — Prénom (contact départ)");
+  const telephone = pick(data, "Informations personnelles — Téléphone", "Le trajet — Téléphone (contact départ)");
+  const email = pick(data, "Informations personnelles — Email", "Le trajet — Email (contact départ)");
 
   let clientId: string;
   if (email) {
