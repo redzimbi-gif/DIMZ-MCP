@@ -630,13 +630,19 @@
   .range-slider-track { position: relative; height: 4px; background: var(--line); border-radius: 100px; margin: 4px 11px 0; }
   .range-slider-fill { position: absolute; top: 0; bottom: 0; background: var(--bleu-vif); border-radius: 100px; }
   .range-slider-thumb {
-    position: absolute; top: 50%; left: 0; width: 22px; height: 22px; margin-left: -11px; margin-top: -11px;
-    background: var(--bg-raised); border: 3px solid var(--bleu-vif); border-radius: 50%; box-shadow: var(--shadow);
-    cursor: grab; touch-action: none; padding: 0; transition: transform 0.12s ease;
+    position: absolute; top: 50%; left: 0; width: 40px; height: 40px; margin-left: -20px; margin-top: -20px;
+    background: transparent; border: none; border-radius: 50%;
+    cursor: grab; touch-action: none; padding: 0;
   }
-  .range-slider-thumb:hover { transform: scale(1.12); }
-  .range-slider-thumb:active { cursor: grabbing; transform: scale(1.15); }
-  .range-slider-thumb:focus-visible { outline: 2px solid var(--bleu-vif); outline-offset: 3px; }
+  .range-slider-thumb::before {
+    content: ""; position: absolute; inset: 9px; border-radius: 50%;
+    background: var(--bg-raised); border: 3px solid var(--bleu-vif); box-shadow: var(--shadow);
+    transition: transform 0.12s ease, inset 0.12s ease;
+  }
+  .range-slider-thumb:hover::before { transform: scale(1.12); }
+  .range-slider-thumb:active { cursor: grabbing; }
+  .range-slider-thumb:active::before { transform: scale(1.15); }
+  .range-slider-thumb:focus-visible::before { outline: 2px solid var(--bleu-vif); outline-offset: 3px; }
   .range-slider-ticks { display: flex; justify-content: space-between; margin: 12px 6px 0; font-size: 0.74rem; color: var(--ink-soft); }
 
   .veh-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 12px; align-items: end; margin-bottom: 14px; }
@@ -2967,17 +2973,19 @@
     function bindThumb(thumb, isMin) {
       thumb.addEventListener('pointerdown', function (e) {
         e.preventDefault();
-        thumb.setPointerCapture(e.pointerId);
+        try { thumb.setPointerCapture(e.pointerId); } catch (err) {}
         thumb.focus();
         applyIndex(indexFromClientX(e.clientX));
         function onMove(ev) { applyIndex(indexFromClientX(ev.clientX)); }
         function onUp() {
-          thumb.releasePointerCapture(e.pointerId);
+          try { thumb.releasePointerCapture(e.pointerId); } catch (err) {}
           thumb.removeEventListener('pointermove', onMove);
           thumb.removeEventListener('pointerup', onUp);
+          thumb.removeEventListener('pointercancel', onUp);
         }
         thumb.addEventListener('pointermove', onMove);
         thumb.addEventListener('pointerup', onUp);
+        thumb.addEventListener('pointercancel', onUp);
       });
       function applyIndex(idx) {
         if (isMin) minIndex = Math.min(idx, maxIndex);
