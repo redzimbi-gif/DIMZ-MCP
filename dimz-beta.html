@@ -571,8 +571,26 @@
   .faq-answer strong { color: var(--ink); }
 
   /* ---------------- Formulaires (communs) ---------------- */
-  .form-card { background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--r-xl); padding: 42px; box-shadow: var(--shadow-lg); }
+  .form-card { background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--r-xl); padding: 42px; box-shadow: var(--shadow-lg); transition: opacity 0.3s ease; }
   @media (max-width: 640px) { .form-card { padding: 26px 20px; } }
+
+  /* À partir de l'étape 2, le formulaire prend toute la page (sous le bandeau du haut, qui reste accessible) */
+  .form-card.form-fullscreen {
+    position: fixed; top: var(--header-h, 65px); left: 0; right: 0; bottom: 0; z-index: 40;
+    margin: 0; border-radius: 0; border: none; box-shadow: none;
+    display: flex; flex-direction: column; align-items: center; overflow-y: auto;
+    padding: 48px 24px 64px;
+    animation: formFullscreenIn 0.35s ease;
+  }
+  .form-card.form-fullscreen > * { width: 100%; max-width: 640px; flex: none; }
+  @keyframes formFullscreenIn { from { opacity: 0; } to { opacity: 1; } }
+  @media (max-width: 640px) { .form-card.form-fullscreen { padding: 32px 20px 48px; } }
+  @media (prefers-reduced-motion: reduce) { .form-card.form-fullscreen { animation: none; } }
+
+  .form-step { transition: opacity 0.22s ease, transform 0.22s ease; }
+  .form-step.step-fade-out { opacity: 0; transform: translateY(-8px); }
+  .form-step.step-fade-in { opacity: 0; transform: translateY(8px); }
+  @media (prefers-reduced-motion: reduce) { .form-step { transition: none !important; } }
 
   .form-progress { margin-bottom: 32px; }
   .form-progress-bar { height: 5px; border-radius: 100px; background: var(--bg-tint); overflow: hidden; }
@@ -1219,7 +1237,7 @@
               <p>Votre copilote revient vers vous sous 24 à 48h ouvrées avec une première réponse personnalisée.</p>
               <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
                 <button type="button" class="btn btn-outline" data-reset="form-accompagnement">Modifier ma demande</button>
-                <a href="javascript:void(0)" class="btn btn-primary" data-goto-subtab="accueil">Retour à l'accueil</a>
+                <a href="javascript:void(0)" class="btn btn-primary" data-reset="form-accompagnement" data-goto-subtab="accueil">Retour à l'accueil</a>
               </div>
             </div>
           </div>
@@ -2619,6 +2637,9 @@
 
   function setupWizard(opts) {
     var form = document.getElementById(opts.formId);
+    var card = form.closest('.form-card');
+    var cardAnchor = document.createComment('wizard-card-anchor');
+    card.parentNode.insertBefore(cardAnchor, card);
     var steps = Array.prototype.slice.call(form.querySelectorAll('.form-step'));
     var total = steps.length;
     var current = 0;
@@ -2628,7 +2649,7 @@
     var nextBtn = document.getElementById(opts.nextId);
     var submitBtn = document.getElementById(opts.submitId);
 
-    function render() {
+    function applyVisibility() {
       steps.forEach(function (s, i) {
         s.hidden = i !== current;
         s.querySelectorAll('input, select, textarea').forEach(function (el) { el.disabled = i !== current; });
@@ -2640,30 +2661,64 @@
       nextBtn.hidden = isLast;
       submitBtn.hidden = !isLast;
       submitBtn.disabled = !isLast;
+      var fullscreen = current > 0;
+      if (fullscreen && card.parentNode !== document.body) {
+        document.body.appendChild(card);
+      } else if (!fullscreen && card.parentNode === document.body) {
+        cardAnchor.parentNode.insertBefore(card, cardAnchor);
+      }
+      card.classList.toggle('form-fullscreen', fullscreen);
       if (isLast && opts.onLast) opts.onLast();
     }
+    function render() { applyVisibility(); }
 
     function scrollTop() {
-      form.closest('.form-card').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+      if (current === 0) {
+        card.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+      } else {
+        card.scrollTop = 0;
+      }
+    }
+
+    function goToStep(newIndex) {
+      if (newIndex === current || newIndex < 0 || newIndex >= total) return;
+      var activeStep = steps[current];
+      var incomingStep = steps[newIndex];
+      if (reduceMotion) {
+        current = newIndex;
+        applyVisibility();
+        scrollTop();
+        return;
+      }
+      activeStep.classList.add('step-fade-out');
+      incomingStep.classList.add('step-fade-in');
+      setTimeout(function () {
+        current = newIndex;
+        applyVisibility();
+        scrollTop();
+        activeStep.classList.remove('step-fade-out');
+        incomingStep.offsetHeight;
+        requestAnimationFrame(function () {
+          incomingStep.classList.remove('step-fade-in');
+        });
+      }, 180);
     }
 
     backBtn.addEventListener('click', function () {
-      if (current > 0) { current--; render(); scrollTop(); }
+      if (current > 0) goToStep(current - 1);
     });
 
     nextBtn.addEventListener('click', function () {
       if (current < total - 1) {
         if (!form.reportValidity()) return;
-        current++;
-        render();
-        scrollTop();
+        goToStep(current + 1);
       }
     });
 
     render();
     return {
-      reset: function () { current = 0; render(); },
-      goTo: function (i) { if (i >= 0 && i < total && i !== current) { current = i; render(); scrollTop(); } }
+      reset: function () { current = 0; applyVisibility(); },
+      goTo: function (i) { goToStep(i); }
     };
   }
 
