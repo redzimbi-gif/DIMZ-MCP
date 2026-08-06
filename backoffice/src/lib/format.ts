@@ -26,3 +26,19 @@ export function initials(nom?: string | null, prenom?: string | null) {
   const b = (nom || "").trim().slice(0, 1);
   return (a + b).toUpperCase() || "?";
 }
+
+/** "un point par ligne" → liste, pour les champs texte libres qui alimentent des listes à puces. */
+export function splitLines(value: string | null | undefined): string[] {
+  return (value ?? "")
+    .split("\n")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+/** "tag a, tag b" → liste, pour le champ tags séparés par des virgules. */
+export function splitTags(value: string | null | undefined): string[] {
+  return (value ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}

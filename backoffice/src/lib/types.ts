@@ -159,11 +159,37 @@ export interface Annonce {
   updated_at: string;
 }
 
+export const INSPECTION_VERDICTS = ["recommande", "envisageable", "deconseille"] as const;
+export type InspectionVerdict = (typeof INSPECTION_VERDICTS)[number];
+export const INSPECTION_VERDICT_LABELS: Record<InspectionVerdict, string> = {
+  recommande: "Recommandé",
+  envisageable: "Envisageable",
+  deconseille: "Déconseillé",
+};
+
 export interface Inspection {
   id: string;
   dossier_id: string;
   annonce_id: string | null;
+  reference: string;
   date_inspection: string;
+  lieu: string | null;
+  expert_nom: string | null;
+  duree_sur_site: string | null;
+  vehicule_titre: string | null;
+  annonce_comparee: string | null;
+  tags: string | null;
+  score_administratif: number | null;
+  score_exterieur: number | null;
+  score_interieur: number | null;
+  score_mecanique: number | null;
+  score_essai_routier: number | null;
+  score_marche: number | null;
+  points_positifs: string | null;
+  points_vigilance: string | null;
+  avis_copilote: string | null;
+  verdict: InspectionVerdict | null;
+  recommandation_finale: string | null;
   etat_exterieur: string | null;
   etat_interieur: string | null;
   pneus: string | null;

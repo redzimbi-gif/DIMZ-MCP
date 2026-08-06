@@ -13,6 +13,10 @@ stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
    - `0001_init.sql`
    - `0002_storage.sql`
    - `0003_lead_intake.sql`
+   - `0004_convoyages_externes.sql`
+   - `0005_agenda_convoyage_externe.sql`
+   - `0006_comptabilite_justificatifs.sql`
+   - `0007_rapport_dimz.sql`
 3. Dans **Project Settings → API**, récupère :
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -114,8 +118,10 @@ l'email de confirmation si le client a renseigné son adresse.
   statut, infos projet complètes.
 - Recherche de véhicules : annonces avec photos, avis du copilote, points
   forts/faibles, score de confiance, sélection.
-- Inspection : formulaire complet + génération automatique d'un rapport PDF
-  avec le logo DIMZ.
+- Inspection = Rapport DIMZ : même contenu riche que l'exemple du site (score
+  global, score par étape du contrôle, tags, points positifs/vigilance, avis
+  du copilote, verdict), entièrement éditable depuis le back-office, avec
+  génération automatique d'un rapport PDF au même format.
 - Convoyage : trajet, photos avant/après, signature client (à l'écran), rapport
   de livraison PDF.
 - Agenda : calendrier mensuel (rendez-vous, visio, inspections, convoyages,

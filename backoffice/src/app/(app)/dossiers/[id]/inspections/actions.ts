@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { logActivity, getActorId } from "@/lib/log";
 import { uploadFiles } from "@/lib/storage";
+import { inspectionFieldsFromForm } from "@/lib/inspection-fields";
 
 export async function createInspection(dossierId: string, formData: FormData) {
   const db = createAdminClient();
@@ -17,21 +18,10 @@ export async function createInspection(dossierId: string, formData: FormData) {
     uploadFiles(`inspections/${dossierId}`, videos),
   ]);
 
-  const noteFinale = formData.get("note_finale") ? Number(formData.get("note_finale")) : null;
-
   const payload = {
     dossier_id: dossierId,
     date_inspection: String(formData.get("date_inspection") || new Date().toISOString().slice(0, 10)),
-    etat_exterieur: String(formData.get("etat_exterieur") || "").trim() || null,
-    etat_interieur: String(formData.get("etat_interieur") || "").trim() || null,
-    pneus: String(formData.get("pneus") || "").trim() || null,
-    freins: String(formData.get("freins") || "").trim() || null,
-    carrosserie: String(formData.get("carrosserie") || "").trim() || null,
-    mecanique: String(formData.get("mecanique") || "").trim() || null,
-    essai_routier: String(formData.get("essai_routier") || "").trim() || null,
-    defauts_constates: String(formData.get("defauts_constates") || "").trim() || null,
-    commentaires: String(formData.get("commentaires") || "").trim() || null,
-    note_finale: noteFinale,
+    ...inspectionFieldsFromForm(formData),
     photos: photoPaths,
     videos: videoPaths,
     created_by: await getActorId(),

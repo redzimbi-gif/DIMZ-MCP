@@ -1,12 +1,63 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { renderToBuffer } from "@react-pdf/renderer";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getInspection } from "@/lib/queries";
 import { InspectionReport } from "@/lib/pdf/InspectionReport";
 import { sendEmail, getAppUrl } from "@/lib/email";
 import { rapportDisponibleEmail } from "@/lib/email-templates";
 import { logActivity } from "@/lib/log";
+import { uploadFiles, deleteFile } from "@/lib/storage";
+import { inspectionFieldsFromForm } from "@/lib/inspection-fields";
+
+export async function updateInspection(dossierId: string, inspectionId: string, formData: FormData) {
+  const db = createAdminClient();
+  const existing = await getInspection(inspectionId);
+  if (!existing) throw new Error("Inspection introuvable.");
+
+  const photos = (formData.getAll("photos") as File[]).filter((f) => f.size > 0);
+  const videos = (formData.getAll("videos") as File[]).filter((f) => f.size > 0);
+  const [newPhotoPaths, newVideoPaths] = await Promise.all([
+    uploadFiles(`inspections/${dossierId}`, photos),
+    uploadFiles(`inspections/${dossierId}`, videos),
+  ]);
+
+  const payload = {
+    date_inspection: String(formData.get("date_inspection") || existing.date_inspection),
+    ...inspectionFieldsFromForm(formData),
+    photos: [...existing.photos, ...newPhotoPaths],
+    videos: [...existing.videos, ...newVideoPaths],
+  };
+
+  const { error } = await db.from("inspections").update(payload).eq("id", inspectionId);
+  if (error) throw new Error(error.message || "Erreur lors de la mise à jour de l'inspection.");
+
+  await logActivity({
+    action: "inspection.modifiee",
+    entiteType: "inspection",
+    entiteId: inspectionId,
+    description: `Rapport d'inspection mis à jour`,
+  });
+
+  revalidatePath(`/dossiers/${dossierId}/inspections/${inspectionId}`);
+  redirect(`/dossiers/${dossierId}/inspections/${inspectionId}`);
+}
+
+export async function deleteInspectionPhoto(dossierId: string, inspectionId: string, path: string) {
+  const db = createAdminClient();
+  const existing = await getInspection(inspectionId);
+  if (!existing) return;
+
+  await deleteFile(path);
+  await db
+    .from("inspections")
+    .update({ photos: existing.photos.filter((p) => p !== path) })
+    .eq("id", inspectionId);
+
+  revalidatePath(`/dossiers/${dossierId}/inspections/${inspectionId}/edit`);
+}
 
 export async function sendInspectionReportEmail(dossierId: string, inspectionId: string) {
   const inspection = await getInspection(inspectionId);
