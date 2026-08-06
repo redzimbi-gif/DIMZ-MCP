@@ -7,8 +7,8 @@ import { formatDate } from "@/lib/format";
 import { createConvoyageExterne, deleteConvoyageExterne } from "./actions";
 
 // Taux de cotisations URSSAF (auto-entrepreneur, prestations de services) :
-// la part due se calcule en divisant le gain de prestation par ce diviseur.
-const URSSAF_DIVISEUR = 21.2;
+// la part due se calcule en prenant ce pourcentage du gain de prestation.
+const URSSAF_TAUX = 0.21;
 
 function formatEUR(value: number) {
   return new Intl.NumberFormat("fr-FR", {
@@ -35,7 +35,7 @@ export default async function ComptabilitePage({
   const totalPrestation = rows.reduce((sum, c) => sum + c.total_prestation, 0);
   const totalFrais = rows.reduce((sum, c) => sum + c.frais, 0);
   const totalGain = rows.reduce((sum, c) => sum + c.gain, 0);
-  const totalUrssaf = totalGain / URSSAF_DIVISEUR;
+  const totalUrssaf = totalGain * URSSAF_TAUX;
 
   const today = new Date();
   const thisMonth = { from: format(startOfMonth(today), "yyyy-MM-dd"), to: format(endOfMonth(today), "yyyy-MM-dd") };
@@ -92,7 +92,6 @@ export default async function ComptabilitePage({
         <StatCard
           label="Part due à l'URSSAF"
           value={formatEUR(totalUrssaf)}
-          hint={`Gain prestation ÷ ${URSSAF_DIVISEUR}`}
           icon={<Calculator className="h-4 w-4" strokeWidth={1.8} />}
         />
       </div>
@@ -140,7 +139,7 @@ export default async function ComptabilitePage({
                       <td className="px-5 py-3.5 text-right tnum text-ink-soft">{formatEUR(c.frais)}</td>
                       <td className="px-5 py-3.5 text-right tnum font-medium text-blue-600">{formatEUR(c.gain)}</td>
                       <td className="px-5 py-3.5 text-right tnum text-ink-soft">
-                        {formatEUR(c.gain / URSSAF_DIVISEUR)}
+                        {formatEUR(c.gain * URSSAF_TAUX)}
                       </td>
                       <td className="px-5 py-3.5 text-right whitespace-nowrap">
                         <Link
