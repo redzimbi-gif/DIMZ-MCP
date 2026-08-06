@@ -26,7 +26,7 @@ export default async function NewInspectionPage({ params }: { params: { id: stri
             />
           </Field>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="État extérieur">
               <textarea name="etat_exterieur" rows={2} className={inputClass} />
             </Field>
@@ -35,7 +35,7 @@ export default async function NewInspectionPage({ params }: { params: { id: stri
             </Field>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Pneus">
               <textarea name="pneus" rows={2} className={inputClass} />
             </Field>
@@ -44,7 +44,7 @@ export default async function NewInspectionPage({ params }: { params: { id: stri
             </Field>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Carrosserie">
               <textarea name="carrosserie" rows={2} className={inputClass} />
             </Field>
@@ -69,7 +69,7 @@ export default async function NewInspectionPage({ params }: { params: { id: stri
             <input name="note_finale" type="number" min={0} max={10} step="0.5" className={inputClass} />
           </Field>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Photos">
               <input name="photos" type="file" accept="image/*" multiple className={inputClass} />
             </Field>

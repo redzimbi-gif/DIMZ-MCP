@@ -192,7 +192,7 @@ export default async function ComptabilitePage({
             <Field label="Lieu d'arrivée">
               <input name="lieu_arrivee" className={inputClass} />
             </Field>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field label="Total prestation (€)">
                 <input name="total_prestation" type="number" step="0.01" min="0" defaultValue="0" className={inputClass} />
               </Field>

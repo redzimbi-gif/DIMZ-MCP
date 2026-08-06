@@ -19,7 +19,7 @@ export default async function NewConvoyagePage({ params }: { params: { id: strin
       />
       <Card className="p-6">
         <form action={action} className="space-y-4" encType="multipart/form-data">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Adresse de départ">
               <input name="adresse_depart" className={inputClass} />
             </Field>
@@ -28,7 +28,7 @@ export default async function NewConvoyagePage({ params }: { params: { id: strin
             </Field>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Field label="Date">
               <input name="date_convoyage" type="date" className={inputClass} />
             </Field>
@@ -50,7 +50,7 @@ export default async function NewConvoyagePage({ params }: { params: { id: strin
             <input name="conducteur" className={inputClass} />
           </Field>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Field label="Kilométrage départ">
               <input name="km_depart" type="number" className={inputClass} />
             </Field>
@@ -62,7 +62,7 @@ export default async function NewConvoyagePage({ params }: { params: { id: strin
             </Field>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Photos avant convoyage">
               <input name="photos_avant" type="file" accept="image/*" multiple className={inputClass} />
             </Field>

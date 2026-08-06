@@ -37,7 +37,7 @@ export default async function ConvoyageDetailPage({
       />
 
       <Card className="p-6 space-y-4">
-        <div className="grid grid-cols-2 gap-4 text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
           <div>
             <p className="text-xs text-ink-soft">Date</p>
             <p className="text-ink font-medium">
@@ -70,7 +70,7 @@ export default async function ConvoyageDetailPage({
       {allPhotos.length > 0 ? (
         <Card className="p-6 mt-4">
           <h2 className="text-sm font-semibold text-ink mb-3">Photos avant / après</h2>
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {allPhotos.map((path) =>
               urls[path] ? (
                 <a key={path} href={urls[path]} target="_blank" rel="noreferrer" className="block aspect-square relative rounded-md overflow-hidden border border-line">

@@ -40,7 +40,7 @@ export default async function NewDossierPage() {
             </select>
           </Field>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Budget">
               <input name="budget" className={inputClass} />
             </Field>
@@ -53,7 +53,7 @@ export default async function NewDossierPage() {
             <input name="vehicule_recherche" className={inputClass} />
           </Field>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Marques souhaitées">
               <input name="marques_souhaitees" className={inputClass} />
             </Field>
@@ -62,7 +62,7 @@ export default async function NewDossierPage() {
             </Field>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Boîte de vitesses">
               <input name="boite_vitesses" className={inputClass} />
             </Field>

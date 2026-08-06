@@ -35,7 +35,7 @@ export default async function EditConvoyageExternePage({ params }: { params: { i
           <Field label="Lieu d'arrivée">
             <input name="lieu_arrivee" defaultValue={convoyage.lieu_arrivee ?? ""} className={inputClass} />
           </Field>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field label="Total prestation (€)">
               <input
                 name="total_prestation"

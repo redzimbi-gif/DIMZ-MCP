@@ -13,7 +13,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const userLabel = user?.email ?? "Équipe DIMZ";
 
   return (
-    <div className="flex min-h-[100dvh]">
+    <div className="flex min-h-viewport">
       <Sidebar userLabel={userLabel} />
       <div className="flex-1 min-w-0 flex flex-col">
         <TopBar unreadCount={unreadCount} />

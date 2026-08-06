@@ -131,7 +131,7 @@ export default async function DossierDetailPage({
                 ))}
               </select>
             </Field>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Budget">
                 <input name="budget" defaultValue={dossier.budget ?? ""} className={inputClass} />
               </Field>
@@ -152,7 +152,7 @@ export default async function DossierDetailPage({
                 className={inputClass}
               />
             </Field>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Marques souhaitées">
                 <input
                   name="marques_souhaitees"
@@ -164,7 +164,7 @@ export default async function DossierDetailPage({
                 <input name="motorisation" defaultValue={dossier.motorisation ?? ""} className={inputClass} />
               </Field>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Boîte de vitesses">
                 <input name="boite_vitesses" defaultValue={dossier.boite_vitesses ?? ""} className={inputClass} />
               </Field>
@@ -282,7 +282,7 @@ async function VehiculesTab({
                       « {a.avis_copilote} »
                     </p>
                   ) : null}
-                  <div className="grid grid-cols-2 gap-3 mt-2 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2 text-xs">
                     {a.points_forts ? (
                       <p className="text-good">+ {a.points_forts}</p>
                     ) : null}
@@ -336,7 +336,7 @@ async function VehiculesTab({
           <Field label="Lien de l'annonce">
             <input name="lien" type="url" className={inputClass} />
           </Field>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field label="Prix (€)">
               <input name="prix" type="number" step="0.01" className={inputClass} />
             </Field>
@@ -344,7 +344,7 @@ async function VehiculesTab({
               <input name="kilometrage" type="number" className={inputClass} />
             </Field>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field label="Année">
               <input name="annee" type="number" className={inputClass} />
             </Field>

@@ -7,7 +7,7 @@ export default function NewClientPage() {
       <PageHeader title="Nouveau client" />
       <Card className="p-6">
         <form action={createClientRecord} className="space-y-4">
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Field label="Civilité">
               <select name="civilite" className={inputClass}>
                 <option value="">—</option>
@@ -22,7 +22,7 @@ export default function NewClientPage() {
               <input name="prenom" className={inputClass} />
             </Field>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Téléphone">
               <input name="telephone" type="tel" className={inputClass} />
             </Field>

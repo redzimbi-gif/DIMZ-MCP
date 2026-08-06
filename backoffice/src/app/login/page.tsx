@@ -7,7 +7,7 @@ export default function LoginPage({
   searchParams: { error?: string };
 }) {
   return (
-    <div className="min-h-[100dvh] flex items-center justify-center px-4">
+    <div className="min-h-viewport flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex justify-center">
           <Logo className="text-xl" />
