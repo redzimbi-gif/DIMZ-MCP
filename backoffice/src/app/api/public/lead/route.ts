@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { notifyStaff } from "@/lib/log";
+import { sendEmail, getAppUrl } from "@/lib/email";
+import { confirmationDemandeEmail } from "@/lib/email-templates";
 import type { DossierOffre } from "@/lib/types";
 
 // Endpoint public appelé directement depuis le site vitrine DIMZ (autre
@@ -114,7 +116,7 @@ export async function POST(request: Request) {
   const { data: dossier, error: dossierError } = await db
     .from("dossiers")
     .insert(payload)
-    .select("id, reference")
+    .select("id, reference, portal_token")
     .single();
 
   if (dossierError || !dossier) {
@@ -132,6 +134,17 @@ export async function POST(request: Request) {
     type: "nouveau_dossier",
     lien: `/dossiers/${dossier.id}`,
   });
+
+  // Confirmation envoyée au client si on a son email ; un échec d'envoi ne
+  // doit jamais faire échouer la création du dossier.
+  if (email) {
+    const { subject, html } = confirmationDemandeEmail({
+      prenom,
+      reference: dossier.reference,
+      portalUrl: `${getAppUrl()}/suivi/${dossier.portal_token}`,
+    });
+    await sendEmail({ to: email, subject, html });
+  }
 
   return NextResponse.json(
     { status: "ok", dossier: dossier.reference },

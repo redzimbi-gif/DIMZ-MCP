@@ -1,10 +1,12 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { FileDown } from "lucide-react";
+import { FileDown, Mail } from "lucide-react";
 import { getInspection } from "@/lib/queries";
 import { getSignedUrls } from "@/lib/storage";
-import { Card, PageHeader, LinkButton } from "@/components/ui";
+import { Card, PageHeader, LinkButton, Button } from "@/components/ui";
+import { EmailStatusBanner } from "@/components/EmailStatusBanner";
 import { formatDate } from "@/lib/format";
+import { sendInspectionReportEmail } from "./actions";
 
 const SECTIONS: { key: string; label: string }[] = [
   { key: "etat_exterieur", label: "État extérieur" },
@@ -20,13 +22,16 @@ const SECTIONS: { key: string; label: string }[] = [
 
 export default async function InspectionDetailPage({
   params,
+  searchParams,
 }: {
   params: { id: string; inspectionId: string };
+  searchParams: { email?: string };
 }) {
   const inspection = await getInspection(params.inspectionId);
   if (!inspection || inspection.dossier_id !== params.id) notFound();
 
   const photoUrls = await getSignedUrls(inspection.photos);
+  const sendReportAction = sendInspectionReportEmail.bind(null, params.id, inspection.id);
 
   return (
     <div className="max-w-3xl">
@@ -34,11 +39,20 @@ export default async function InspectionDetailPage({
         title={`Inspection du ${formatDate(inspection.date_inspection)}`}
         description={`${inspection.dossiers?.reference} — ${inspection.dossiers?.clients?.prenom} ${inspection.dossiers?.clients?.nom}`}
         actions={
-          <LinkButton href={`/api/inspections/${inspection.id}/pdf`} variant="outline">
-            <FileDown className="h-4 w-4" /> Rapport PDF
-          </LinkButton>
+          <>
+            <LinkButton href={`/api/inspections/${inspection.id}/pdf`} variant="outline">
+              <FileDown className="h-4 w-4" /> Rapport PDF
+            </LinkButton>
+            <form action={sendReportAction}>
+              <Button type="submit" variant="outline">
+                <Mail className="h-4 w-4" /> Envoyer au client
+              </Button>
+            </form>
+          </>
         }
       />
+
+      <EmailStatusBanner status={searchParams.email} />
 
       {inspection.note_finale != null ? (
         <Card className="p-5 mb-4 flex items-center gap-3">

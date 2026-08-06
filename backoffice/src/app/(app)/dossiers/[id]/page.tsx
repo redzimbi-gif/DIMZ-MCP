@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Plus, Star, ExternalLink, Trash2 } from "lucide-react";
+import { Plus, Star, ExternalLink, Trash2, Mail } from "lucide-react";
 import {
   getDossier,
   getDossierHistory,
@@ -21,6 +21,7 @@ import {
   LinkButton,
   Badge,
 } from "@/components/ui";
+import { EmailStatusBanner } from "@/components/EmailStatusBanner";
 import { DossierTabs } from "@/components/DossierTabs";
 import {
   DOSSIER_STATUTS,
@@ -30,7 +31,7 @@ import {
   DOCUMENT_TYPE_LABELS,
 } from "@/lib/types";
 import { formatCurrency, formatDate, formatDateTime, formatRelative } from "@/lib/format";
-import { updateDossierInfos, updateDossierStatut, addDossierNote } from "../actions";
+import { updateDossierInfos, updateDossierStatut, addDossierNote, sendDossierStatusEmail } from "../actions";
 import { createAnnonce, toggleAnnonceSelection, deleteAnnonce } from "./annonces-actions";
 import { uploadDossierDocument } from "./documents-actions";
 
@@ -59,7 +60,7 @@ export default async function DossierDetailPage({
   searchParams,
 }: {
   params: { id: string };
-  searchParams: { tab?: string };
+  searchParams: { tab?: string; notif?: string };
 }) {
   const dossier = await getDossier(params.id);
   if (!dossier) notFound();
@@ -72,6 +73,7 @@ export default async function DossierDetailPage({
   const addNoteAction = addDossierNote.bind(null, dossier.id);
   const createAnnonceAction = createAnnonce.bind(null, dossier.id);
   const uploadDocAction = uploadDossierDocument.bind(null, dossier.id);
+  const sendStatusEmailAction = sendDossierStatusEmail.bind(null, dossier.id, tab);
 
   const portalUrl = `/suivi/${dossier.portal_token}`;
   const donneesGroups = groupDonneesBrutes(dossier.donnees_brutes);
@@ -98,6 +100,8 @@ export default async function DossierDetailPage({
         }
       />
 
+      <EmailStatusBanner status={searchParams.notif} />
+
       <Card className="p-4 mb-6">
         <form action={updateStatutAction} className="flex flex-wrap items-end gap-3">
           <Field label="Faire évoluer le statut">
@@ -114,6 +118,16 @@ export default async function DossierDetailPage({
           </Field>
           <Button type="submit">Mettre à jour</Button>
         </form>
+        <div className="flex items-center justify-between gap-3 mt-3 pt-3 border-t border-line">
+          <p className="text-xs text-ink-soft">
+            Prévient le client par email du statut actuel de son dossier, avec un lien vers son espace de suivi.
+          </p>
+          <form action={sendStatusEmailAction} className="shrink-0">
+            <Button type="submit" variant="outline">
+              <Mail className="h-4 w-4" /> Informer le client
+            </Button>
+          </form>
+        </div>
       </Card>
 
       <DossierTabs dossierId={dossier.id} active={tab} />

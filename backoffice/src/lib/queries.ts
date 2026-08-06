@@ -210,7 +210,11 @@ export async function getDossierInspections(dossierId: string) {
 
 export async function getInspection(id: string) {
   const db = createAdminClient();
-  const { data } = await db.from("inspections").select("*, dossiers(reference, clients(nom, prenom))").eq("id", id).maybeSingle();
+  const { data } = await db
+    .from("inspections")
+    .select("*, dossiers(reference, portal_token, clients(nom, prenom, email))")
+    .eq("id", id)
+    .maybeSingle();
   return data as (Inspection & { dossiers: any }) | null;
 }
 
@@ -228,7 +232,7 @@ export async function getConvoyage(id: string) {
   const db = createAdminClient();
   const { data } = await db
     .from("convoyages")
-    .select("*, dossiers(reference, clients(nom, prenom))")
+    .select("*, dossiers(reference, portal_token, clients(nom, prenom, email))")
     .eq("id", id)
     .maybeSingle();
   return data as (Convoyage & { dossiers: any }) | null;

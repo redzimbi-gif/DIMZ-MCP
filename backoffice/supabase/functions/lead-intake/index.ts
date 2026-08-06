@@ -34,6 +34,60 @@ function guessOffre(label: string | null): string | null {
   return null;
 }
 
+// Emails via l'API Resend en appel HTTP direct (pas de SDK, pour rester un
+// fichier autonome déployable tel quel comme Edge Function Deno).
+async function sendConfirmationEmail(params: { to: string; prenom: string | null; reference: string; portalUrl: string }) {
+  const apiKey = Deno.env.get("RESEND_API_KEY");
+  if (!apiKey) {
+    console.error("RESEND_API_KEY manquante : email de confirmation non envoyé.");
+    return;
+  }
+
+  const hello = params.prenom ? `Bonjour ${params.prenom},` : "Bonjour,";
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+  <body style="margin:0;padding:0;background:#f4f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f5f7;padding:32px 16px;">
+      <tr><td align="center">
+        <table role="presentation" width="100%" style="max-width:520px;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e6e8ee;">
+          <tr><td style="padding:26px 32px 18px;border-bottom:1px solid #e6e8ee;">
+            <span style="font-size:18px;font-weight:700;color:#0b0d12;letter-spacing:-0.02em;">DIMZ</span>
+            <span style="font-size:13px;color:#565c68;margin-left:8px;">Mon copilote auto</span>
+          </td></tr>
+          <tr><td style="padding:32px;color:#0b0d12;font-size:14px;line-height:1.6;">
+            <p style="margin:0 0 16px;">${hello}</p>
+            <p style="margin:0 0 16px;">On a bien reçu votre demande, merci ! Votre dossier <strong>${params.reference}</strong> est enregistré et on revient vers vous sous 24 à 48h pour la suite.</p>
+            <p style="margin:0 0 4px;">Vous pouvez suivre l'avancement de votre dossier à tout moment via ce lien :</p>
+            <a href="${params.portalUrl}" style="display:inline-block;background:#2f6fed;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;padding:12px 22px;border-radius:8px;margin-top:18px;">Suivre mon dossier</a>
+          </td></tr>
+          <tr><td style="padding:18px 32px;border-top:1px solid #e6e8ee;color:#565c68;font-size:12px;">
+            DIMZ — Mon copilote auto<br />Cet email vous a été envoyé suite à votre demande.
+          </td></tr>
+        </table>
+      </td></tr>
+    </table>
+  </body>
+</html>`;
+
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: Deno.env.get("EMAIL_FROM") || "DIMZ <onboarding@resend.dev>",
+        to: params.to,
+        subject: `Votre demande DIMZ est bien reçue — ${params.reference}`,
+        html,
+      }),
+    });
+    if (!res.ok) {
+      console.error("Échec envoi email Resend:", res.status, await res.text().catch(() => ""));
+    }
+  } catch (err) {
+    console.error("Échec envoi email de confirmation:", err);
+  }
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: CORS_HEADERS });
@@ -116,7 +170,7 @@ Deno.serve(async (req: Request) => {
   const { data: dossier, error: dossierError } = await db
     .from("dossiers")
     .insert(payload)
-    .select("id, reference")
+    .select("id, reference, portal_token")
     .single();
 
   if (dossierError || !dossier) return jsonResponse({ error: "Erreur dossier" }, 500);
@@ -132,6 +186,19 @@ Deno.serve(async (req: Request) => {
     type: "nouveau_dossier",
     lien: `/dossiers/${dossier.id}`,
   });
+
+  // Confirmation envoyée au client si on a son email ; un échec d'envoi ne
+  // doit jamais faire échouer la création du dossier (déjà géré en interne
+  // par sendConfirmationEmail, qui ne relance jamais d'exception).
+  if (email) {
+    const appUrl = (Deno.env.get("APP_URL") || "http://localhost:3000").replace(/\/$/, "");
+    await sendConfirmationEmail({
+      to: email,
+      prenom,
+      reference: dossier.reference,
+      portalUrl: `${appUrl}/suivi/${dossier.portal_token}`,
+    });
+  }
 
   return jsonResponse({ status: "ok", dossier: dossier.reference });
 });

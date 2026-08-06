@@ -25,15 +25,30 @@ avec ton email et un mot de passe. C'est ce compte qui te connecte au
 back-office (pas d'inscription libre : les comptes se créent uniquement
 depuis le dashboard Supabase pour l'instant).
 
-## 3. Configurer les variables d'environnement
+## 3. Créer ton compte Resend (envoi d'emails)
+
+1. Va sur [resend.com](https://resend.com) → crée un compte gratuit
+   (100 emails/jour offerts).
+2. **API Keys → Create API Key**, copie la clé → `RESEND_API_KEY`.
+3. Tant que tu n'as pas encore de nom de domaine à vérifier sur Resend,
+   laisse `EMAIL_FROM=DIMZ <onboarding@resend.dev>` : ça fonctionne tout de
+   suite, mais Resend n'autorisera l'envoi qu'à l'adresse email de ton propre
+   compte (utile pour tester). Le jour où tu as un domaine, ajoute-le dans
+   **Domains** sur Resend, suis les enregistrements DNS demandés, puis
+   change `EMAIL_FROM` pour une adresse de ce domaine (ex.
+   `DIMZ <contact@dimz.fr>`) — l'envoi à n'importe quel client se débloque
+   automatiquement, sans autre changement de code.
+
+## 4. Configurer les variables d'environnement
 
 ```bash
 cp .env.local.example .env.local
 ```
 
-Remplis les 3 valeurs récupérées à l'étape 1.
+Remplis les valeurs récupérées aux étapes 1 et 3. `NEXT_PUBLIC_APP_URL` peut
+rester tel quel en local ; mets l'URL Vercel une fois déployé (étape 6).
 
-## 4. Lancer en local
+## 5. Lancer en local
 
 ```bash
 npm install
@@ -43,24 +58,50 @@ npm run dev
 Ouvre [http://localhost:3000](http://localhost:3000), connecte-toi avec le
 compte créé à l'étape 2.
 
-## 5. Déployer sur Vercel
+## 6. Déployer sur Vercel
 
 1. Pousse ce dépôt sur GitHub (déjà fait si tu lis ce fichier depuis le repo).
 2. Sur [vercel.com](https://vercel.com) → **Add New Project** → importe le
    dépôt → **Root Directory : `backoffice`**.
-3. Ajoute les 3 variables d'environnement (mêmes valeurs que `.env.local`).
+3. Ajoute toutes les variables d'environnement (mêmes valeurs que `.env.local`)
+   — pense à mettre `NEXT_PUBLIC_APP_URL` sur l'URL Vercel une fois connue
+   (tu peux redéployer après coup pour la corriger).
 4. Déploie. Vercel te donne une URL du type `https://dimz-backoffice.vercel.app`.
 
-## 6. Connecter le site vitrine
+## 7. Connecter le site vitrine
 
-Dans `dimz-beta.html` (à la racine du dépôt), tout en haut du `<script>` :
+Le site vitrine (`dimz-beta.html`) n'appelle pas directement le back-office
+Vercel : il appelle une **Edge Function Supabase** (`supabase/functions/lead-intake`),
+pour contourner la protection par mot de passe de Vercel qui bloquerait un
+visiteur anonyme. C'est cette fonction qui crée le client + dossier, **et
+maintenant aussi qui envoie l'email de confirmation** — c'est donc elle qu'il
+faut redéployer (pas juste Vercel) à chaque changement de ce fichier.
+
+Dans `dimz-beta.html`, tout en haut du `<script>` :
 
 ```js
-var BACKOFFICE_URL = 'https://dimz-backoffice.vercel.app';
+var BACKOFFICE_URL = 'https://TON-PROJET.supabase.co/functions/v1/lead-intake';
+```
+
+Pour déployer/mettre à jour la fonction (CLI Supabase, `npx supabase login` puis) :
+
+```bash
+npx supabase functions deploy lead-intake --project-ref TON-PROJET --no-verify-jwt
+```
+
+Et donne-lui ses propres variables d'environnement (distinctes de celles de
+Vercel — les Edge Functions ne lisent pas `.env.local`) :
+
+```bash
+npx supabase secrets set --project-ref TON-PROJET \
+  RESEND_API_KEY=re_... \
+  EMAIL_FROM="DIMZ <onboarding@resend.dev>" \
+  APP_URL=https://dimz-backoffice.vercel.app
 ```
 
 Chaque soumission des formulaires « Accompagnement » et « Convoyage » du site
-créera automatiquement un client + un dossier dans le back-office.
+créera automatiquement un client + un dossier dans le back-office, et enverra
+l'email de confirmation si le client a renseigné son adresse.
 
 ## Ce qui est inclus (V1)
 
@@ -84,6 +125,12 @@ créera automatiquement un client + un dossier dans le back-office.
   lien à partager avec le client (`/dossiers/[id]` → bouton « Suivi client »).
 - Formulaire du site → dossier créé automatiquement (`/api/public/lead`).
 - Journal des actions (`activity_log`) et notifications internes.
+- Emails automatiques (via Resend) :
+  - confirmation envoyée au client dès qu'il soumet un formulaire du site ;
+  - bouton « Envoyer au client » sur une inspection ou un convoyage → email
+    avec le rapport PDF en pièce jointe ;
+  - bouton « Informer le client » sur un dossier → email avec le statut
+    actuel et un lien vers son espace de suivi.
 
 ## Ce qui n'est volontairement pas dans cette V1
 
@@ -91,8 +138,6 @@ Ces modules demandent tes propres comptes/clés API tiers (payants) — on les
 ajoute dès que tu es prêt :
 
 - **Facturation** (devis, factures, paiement en ligne) → nécessite Stripe.
-- **Emails automatiques** (confirmation client, rappels, demande d'avis) →
-  nécessite un service d'envoi (ex. Resend, Postmark).
 - **SMS** → nécessite Twilio ou équivalent.
 - **Signature électronique légale** (au-delà de la signature à l'écran déjà
   en place pour le convoyage) → nécessite un prestataire type Yousign/DocuSign.

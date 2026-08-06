@@ -4,6 +4,9 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { logActivity, getActorId } from "@/lib/log";
+import { getDossier } from "@/lib/queries";
+import { sendEmail, getAppUrl } from "@/lib/email";
+import { avancementDossierEmail } from "@/lib/email-templates";
 import { DOSSIER_STATUT_LABELS, type DossierStatut } from "@/lib/types";
 
 export async function createDossier(formData: FormData) {
@@ -100,6 +103,43 @@ export async function updateDossierStatut(dossierId: string, formData: FormData)
   revalidatePath(`/dossiers/${dossierId}`);
   revalidatePath("/dossiers");
   revalidatePath("/");
+}
+
+export async function sendDossierStatusEmail(dossierId: string, tab: string) {
+  const dossier = await getDossier(dossierId);
+  const email = dossier?.clients?.email;
+
+  let status: "sent" | "no-email" | "error" = "sent";
+
+  if (!dossier || !email) {
+    status = "no-email";
+  } else {
+    try {
+      const { subject, html } = avancementDossierEmail({
+        prenom: dossier.clients?.prenom ?? null,
+        reference: dossier.reference,
+        statutLabel: DOSSIER_STATUT_LABELS[dossier.statut],
+        portalUrl: `${getAppUrl()}/suivi/${dossier.portal_token}`,
+      });
+
+      const result = await sendEmail({ to: email, subject, html });
+      status = result.ok ? "sent" : "error";
+
+      if (result.ok) {
+        await logActivity({
+          action: "email.avancement_dossier",
+          entiteType: "dossier",
+          entiteId: dossierId,
+          description: `Email d'avancement (« ${DOSSIER_STATUT_LABELS[dossier.statut]} ») envoyé à ${email}`,
+        });
+      }
+    } catch (err) {
+      console.error("Échec envoi email d'avancement:", err);
+      status = "error";
+    }
+  }
+
+  redirect(`/dossiers/${dossierId}?tab=${tab}&notif=${status}`);
 }
 
 export async function addDossierNote(dossierId: string, formData: FormData) {

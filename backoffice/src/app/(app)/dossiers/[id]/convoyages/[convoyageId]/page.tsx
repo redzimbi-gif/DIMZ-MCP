@@ -1,16 +1,20 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { FileDown } from "lucide-react";
+import { FileDown, Mail } from "lucide-react";
 import { getConvoyage } from "@/lib/queries";
 import { getSignedUrls } from "@/lib/storage";
-import { Card, PageHeader, LinkButton, Badge } from "@/components/ui";
+import { Card, PageHeader, LinkButton, Badge, Button } from "@/components/ui";
+import { EmailStatusBanner } from "@/components/EmailStatusBanner";
 import { CONVOYAGE_STATUT_LABELS } from "@/lib/types";
 import { formatDate } from "@/lib/format";
+import { sendConvoyageReportEmail } from "./actions";
 
 export default async function ConvoyageDetailPage({
   params,
+  searchParams,
 }: {
   params: { id: string; convoyageId: string };
+  searchParams: { email?: string };
 }) {
   const convoyage = await getConvoyage(params.convoyageId);
   if (!convoyage || convoyage.dossier_id !== params.id) notFound();
@@ -18,6 +22,7 @@ export default async function ConvoyageDetailPage({
   const allPhotos = [...convoyage.photos_avant, ...convoyage.photos_apres];
   const signatureUrl = convoyage.signature_client ? [convoyage.signature_client] : [];
   const urls = await getSignedUrls([...allPhotos, ...signatureUrl]);
+  const sendReportAction = sendConvoyageReportEmail.bind(null, params.id, convoyage.id);
 
   return (
     <div className="max-w-3xl">
@@ -32,9 +37,16 @@ export default async function ConvoyageDetailPage({
             <LinkButton href={`/api/convoyages/${convoyage.id}/pdf`} variant="outline">
               <FileDown className="h-4 w-4" /> Rapport PDF
             </LinkButton>
+            <form action={sendReportAction}>
+              <Button type="submit" variant="outline">
+                <Mail className="h-4 w-4" /> Envoyer au client
+              </Button>
+            </form>
           </>
         }
       />
+
+      <EmailStatusBanner status={searchParams.email} />
 
       <Card className="p-6 space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">

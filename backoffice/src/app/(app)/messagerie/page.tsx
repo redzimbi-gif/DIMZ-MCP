@@ -48,8 +48,9 @@ export default async function MessageriePage() {
           <Mail className="h-7 w-7 text-blue-500 mx-auto mb-3" strokeWidth={1.5} />
           <h2 className="text-sm font-semibold text-ink mb-1.5">Emails & SMS</h2>
           <p className="text-sm text-ink-soft">
-            L'envoi et la réception d'emails et de SMS directement dans cet espace arrivent dans
-            une prochaine phase, une fois un service d'envoi (ex. Resend, Twilio) connecté.
+            Les emails au client (confirmation, rapport, avancement du dossier) s'envoient depuis
+            la fiche dossier concernée. Une boîte de réception unifiée ici, et l'envoi de SMS,
+            arrivent dans une prochaine phase.
           </p>
         </Card>
       </div>
