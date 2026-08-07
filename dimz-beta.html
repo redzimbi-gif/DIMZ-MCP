@@ -81,6 +81,11 @@
     --ink: #10141c;
     --ink-soft: #5b6472;
     --line: #e2e6ed;
+    /* Fond des bulles (info-bulles, curseur budget) : volontairement fixe,
+       pas lié à --ink qui s'inverse en mode sombre — sinon la bulle
+       devient presque blanche avec un texte blanc, illisible. */
+    --tooltip-bg: #1c2129;
+    --tooltip-ink: #ffffff;
     --vert: #1a7a44;
     --ambre: #b5720f;
     --rouge: #c0392b;
@@ -635,13 +640,13 @@
   [data-tooltip] { position: relative; }
   [data-tooltip]::after {
     content: attr(data-tooltip); position: absolute; bottom: calc(100% + 9px); left: 50%; transform: translateX(-50%) translateY(4px);
-    width: max-content; max-width: 220px; background: var(--ink); color: #fff; font-size: 0.76rem; font-weight: 500; line-height: 1.4;
+    width: max-content; max-width: 220px; background: var(--tooltip-bg); color: var(--tooltip-ink); font-size: 0.76rem; font-weight: 500; line-height: 1.4;
     padding: 8px 11px; border-radius: 8px; box-shadow: var(--shadow); opacity: 0; pointer-events: none; z-index: 20;
     transition: opacity 0.15s ease, transform 0.15s ease;
   }
   [data-tooltip]::before {
     content: ""; position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%);
-    border: 5px solid transparent; border-top-color: var(--ink); opacity: 0; pointer-events: none; transition: opacity 0.15s ease; z-index: 20;
+    border: 5px solid transparent; border-top-color: var(--tooltip-bg); opacity: 0; pointer-events: none; transition: opacity 0.15s ease; z-index: 20;
   }
   [data-tooltip]:hover::after, [data-tooltip]:focus-visible::after, [data-tooltip].tooltip-open::after { opacity: 1; transform: translateX(-50%) translateY(0); }
   [data-tooltip]:hover::before, [data-tooltip]:focus-visible::before, [data-tooltip].tooltip-open::before { opacity: 1; }
@@ -678,13 +683,13 @@
   .range-slider-ticks { display: flex; justify-content: space-between; margin: 12px 6px 0; font-size: 0.74rem; color: var(--ink-soft); }
   .range-slider-bubble {
     position: absolute; bottom: 100%; left: 0; transform: translate(-50%, -10px) scale(0.9);
-    background: var(--ink); color: #fff; font-size: 0.78rem; font-weight: 700; white-space: nowrap;
+    background: var(--tooltip-bg); color: var(--tooltip-ink); font-size: 0.78rem; font-weight: 700; white-space: nowrap;
     padding: 5px 11px; border-radius: 8px; opacity: 0; pointer-events: none;
     transition: opacity 0.12s ease, transform 0.12s ease, left 0.05s linear;
   }
   .range-slider-bubble::after {
     content: ""; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-    border: 5px solid transparent; border-top-color: var(--ink);
+    border: 5px solid transparent; border-top-color: var(--tooltip-bg);
   }
   .range-slider.is-active .range-slider-bubble { opacity: 1; transform: translate(-50%, -14px) scale(1); }
 
