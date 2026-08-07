@@ -643,9 +643,19 @@
     content: ""; position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%);
     border: 5px solid transparent; border-top-color: var(--ink); opacity: 0; pointer-events: none; transition: opacity 0.15s ease; z-index: 20;
   }
-  [data-tooltip]:hover::after, [data-tooltip]:focus-visible::after { opacity: 1; transform: translateX(-50%) translateY(0); }
-  [data-tooltip]:hover::before, [data-tooltip]:focus-visible::before { opacity: 1; }
-  @media (hover: none) { [data-tooltip]::after, [data-tooltip]::before { display: none; } }
+  [data-tooltip]:hover::after, [data-tooltip]:focus-visible::after, [data-tooltip].tooltip-open::after { opacity: 1; transform: translateX(-50%) translateY(0); }
+  [data-tooltip]:hover::before, [data-tooltip]:focus-visible::before, [data-tooltip].tooltip-open::before { opacity: 1; }
+  @media (hover: none) { [data-tooltip]:hover::after, [data-tooltip]:hover::before { opacity: 0; } }
+
+  /* Bouton "i" pour voir l'explication au clic/tap (le survol ne marche pas sur mobile). */
+  .tooltip-btn {
+    display: inline-flex; align-items: center; justify-content: center; flex: none;
+    width: 15px; height: 15px; border-radius: 50%; border: 1px solid currentColor;
+    font-size: 0.6rem; font-weight: 700; font-style: italic; line-height: 1; font-family: Georgia, serif;
+    background: transparent; color: inherit; opacity: 0.55; padding: 0; margin: 0; cursor: pointer;
+  }
+  .tooltip-btn:hover, .tooltip-btn:focus-visible { opacity: 1; }
+  .choice-grid label:has(input:checked) .tooltip-btn { border-color: #fff; }
 
   .range-slider { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-md); padding: 20px 18px 16px; }
   .range-slider-value { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
@@ -1280,6 +1290,7 @@
               <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
                 <button type="button" class="btn btn-outline" data-reset="form-accompagnement">Modifier ma demande</button>
                 <a href="javascript:void(0)" class="btn btn-primary" data-reset="form-accompagnement" data-goto-subtab="accueil">Retour à l'accueil</a>
+                <a href="javascript:void(0)" class="btn btn-outline" data-goto-tab="test">Donner mon avis sur le site (5 min)</a>
               </div>
             </div>
           </div>
@@ -1825,6 +1836,13 @@
           <div class="form-step">
             <h3>Le véhicule</h3>
             <div class="field-grid">
+              <div class="field full">
+                <label>Cette prestation est une…</label>
+                <div class="choice-grid">
+                  <label data-tooltip="Nous amenons ce véhicule jusqu'à vous."><input type="radio" name="c-type-prestation" value="livraison" checked> Livraison</label>
+                  <label data-tooltip="Nous récupérons ce véhicule chez vous."><input type="radio" name="c-type-prestation" value="reprise"> Reprise</label>
+                </div>
+              </div>
               <div class="field">
                 <label for="c-marque">Marque</label>
                 <input type="text" id="c-marque" required>
@@ -1843,6 +1861,36 @@
               <div class="field">
                 <label for="c-vin">Numéro d'identification (VIN)</label>
                 <input type="text" id="c-vin" placeholder="17 caractères" maxlength="17">
+              </div>
+              <div class="field full">
+                <label for="c-vehicule-reprise">Un véhicule est-il repris en échange dans le cadre de cet achat ?</label>
+                <select id="c-vehicule-reprise">
+                  <option value="non">Non</option>
+                  <option value="oui">Oui</option>
+                </select>
+              </div>
+              <div class="field full" id="vehicule-reprise-detail" hidden>
+                <div class="field-grid">
+                  <div class="field full" style="margin-top:0;">
+                    <label class="section-sublabel">Véhicule repris en échange</label>
+                  </div>
+                  <div class="field">
+                    <label for="c-reprise-marque">Marque</label>
+                    <input type="text" id="c-reprise-marque">
+                  </div>
+                  <div class="field">
+                    <label for="c-reprise-modele">Modèle</label>
+                    <input type="text" id="c-reprise-modele">
+                  </div>
+                  <div class="field">
+                    <label for="c-reprise-immat">Immatriculation</label>
+                    <input type="text" id="c-reprise-immat" placeholder="AA-123-AA">
+                  </div>
+                  <div class="field">
+                    <label for="c-reprise-vin">Numéro d'identification (VIN)</label>
+                    <input type="text" id="c-reprise-vin" placeholder="17 caractères" maxlength="17">
+                  </div>
+                </div>
               </div>
               <div class="field full">
                 <label>Transmission</label>
@@ -1937,14 +1985,61 @@
                   </div>
                 </div>
               </div>
+              <div id="trajet-reprise-detail" class="field full" hidden>
+                <div class="field-grid">
+                  <div class="field full" style="margin-top:0;">
+                    <label class="section-sublabel">Trajet du véhicule repris en échange</label>
+                  </div>
+                  <div class="field">
+                    <label for="c-reprise-depart">Lieu de départ</label>
+                    <input type="text" id="c-reprise-depart" placeholder="Ville, code postal">
+                  </div>
+                  <div class="field">
+                    <label for="c-reprise-arrivee">Lieu d'arrivée</label>
+                    <input type="text" id="c-reprise-arrivee" placeholder="Ville, code postal">
+                  </div>
+                  <div class="field">
+                    <label for="c-reprise-date">Date souhaitée</label>
+                    <input type="date" id="c-reprise-date">
+                  </div>
+                  <div class="field">
+                    <label for="c-reprise-heure">Heure souhaitée</label>
+                    <input type="time" id="c-reprise-heure">
+                  </div>
+                  <div class="field full" style="margin-top:6px;">
+                    <label class="section-sublabel">Contact pour cette reprise</label>
+                  </div>
+                  <div class="field">
+                    <label for="c-reprise-contact-nom">Nom</label>
+                    <input type="text" id="c-reprise-contact-nom">
+                  </div>
+                  <div class="field">
+                    <label for="c-reprise-contact-prenom">Prénom</label>
+                    <input type="text" id="c-reprise-contact-prenom">
+                  </div>
+                  <div class="field">
+                    <label for="c-reprise-contact-tel">Téléphone</label>
+                    <input type="tel" id="c-reprise-contact-tel">
+                  </div>
+                  <div class="field">
+                    <label for="c-reprise-contact-email">Email</label>
+                    <input type="email" id="c-reprise-contact-email">
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
           <div class="form-step">
             <h3>Prise en charge &amp; options</h3>
             <div class="field-grid">
-              <div class="field full toggle-row">
-                <label><input type="checkbox" id="c-mise-en-main"> Mise en main du véhicule souhaitée à la livraison</label>
+              <div class="field full">
+                <label>Mise en main du véhicule souhaitée à la livraison</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="c-mise-en-main" value="aucune"> Aucune</label>
+                  <label data-tooltip="Démarrage du véhicule et explications de base (commandes essentielles)."><input type="radio" name="c-mise-en-main" value="simple"> Mise en main simple</label>
+                  <label data-tooltip="Tour complet du véhicule : toutes les commandes et équipements expliqués en détail."><input type="radio" name="c-mise-en-main" value="complete"> Mise en main complète</label>
+                </div>
               </div>
               <div class="field full">
                 <label>Niveau de carburant actuel</label>
@@ -2195,10 +2290,6 @@
           <div class="form-step">
             <h3>Expérience du formulaire</h3>
             <div class="field-grid">
-              <div class="field full">
-                <label for="t-temps-declare">Combien de temps as-tu mis pour remplir ce questionnaire ? <span class="hint">Ton estimation, à l'instinct (ex. : 3 min 42 s)</span></label>
-                <input type="text" id="t-temps-declare" placeholder="ex. : 3 min 42 s">
-              </div>
               <div class="field full">
                 <label>Le questionnaire t'a-t-il semblé…</label>
                 <div class="choice-grid">
@@ -2710,6 +2801,27 @@
 
   // ---------- Lien direct vers le questionnaire de test (#test) ----------
   if (window.location.hash === '#test') showMainTab('test', true);
+
+  // ---------- Bouton "i" pour afficher les info-bulles au tap (mobile) ----------
+  document.querySelectorAll('.choice-grid [data-tooltip]').forEach(function (el) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'tooltip-btn';
+    btn.setAttribute('aria-label', "Voir l'explication");
+    btn.textContent = 'i';
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var wasOpen = el.classList.contains('tooltip-open');
+      document.querySelectorAll('.choice-grid [data-tooltip].tooltip-open').forEach(function (o) { o.classList.remove('tooltip-open'); });
+      if (!wasOpen) el.classList.add('tooltip-open');
+    });
+    el.appendChild(btn);
+  });
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('.tooltip-btn')) return;
+    document.querySelectorAll('.choice-grid [data-tooltip].tooltip-open').forEach(function (o) { o.classList.remove('tooltip-open'); });
+  });
 
   // ---------- Navigation latérale Accompagnement : Accueil / sous-menu Offres / À propos / FAQ ----------
   var subTabButtons = document.querySelectorAll('.acc-sidebar button[data-subtab]');
@@ -3270,11 +3382,18 @@
 
   function buildRecapConvoyage() {
     var groups = [];
+    var repriseOui = document.getElementById('c-vehicule-reprise').value === 'oui';
     groups.push({ title: 'Le véhicule', step: 0, rows: [
+      recapRow('Type de prestation', radioLabel('c-type-prestation')),
       recapRow('Marque', inputVal('c-marque')),
       recapRow('Modèle', inputVal('c-modele')),
       recapRow('Immatriculation', isChecked('c-pas-immatricule') ? 'Pas encore immatriculé' : inputVal('c-immat')),
       recapRow('VIN', inputVal('c-vin')),
+      recapRow('Véhicule repris en échange', selectText('c-vehicule-reprise')),
+      recapRow('Marque (véhicule repris)', repriseOui ? inputVal('c-reprise-marque') : ''),
+      recapRow('Modèle (véhicule repris)', repriseOui ? inputVal('c-reprise-modele') : ''),
+      recapRow('Immatriculation (véhicule repris)', repriseOui ? inputVal('c-reprise-immat') : ''),
+      recapRow('VIN (véhicule repris)', repriseOui ? inputVal('c-reprise-vin') : ''),
       recapRow('Transmission', recapCheckedList('input[name="c-transmission"]'))
     ].filter(Boolean) });
 
@@ -3293,11 +3412,19 @@
       recapRow('Nom (contact arrivée)', isChecked('c-contact-arrivee-diff') ? inputVal('c-contact-arrivee-nom') : ''),
       recapRow('Prénom (contact arrivée)', isChecked('c-contact-arrivee-diff') ? inputVal('c-contact-arrivee-prenom') : ''),
       recapRow('Téléphone (contact arrivée)', isChecked('c-contact-arrivee-diff') ? inputVal('c-tel-arrivee') : ''),
-      recapRow('Email (contact arrivée)', isChecked('c-contact-arrivee-diff') ? inputVal('c-email-arrivee') : '')
+      recapRow('Email (contact arrivée)', isChecked('c-contact-arrivee-diff') ? inputVal('c-email-arrivee') : ''),
+      recapRow('Départ (reprise)', repriseOui ? inputVal('c-reprise-depart') : ''),
+      recapRow('Arrivée (reprise)', repriseOui ? inputVal('c-reprise-arrivee') : ''),
+      recapRow('Date (reprise)', repriseOui ? inputVal('c-reprise-date') : ''),
+      recapRow('Heure (reprise)', repriseOui ? inputVal('c-reprise-heure') : ''),
+      recapRow('Nom (contact reprise)', repriseOui ? inputVal('c-reprise-contact-nom') : ''),
+      recapRow('Prénom (contact reprise)', repriseOui ? inputVal('c-reprise-contact-prenom') : ''),
+      recapRow('Téléphone (contact reprise)', repriseOui ? inputVal('c-reprise-contact-tel') : ''),
+      recapRow('Email (contact reprise)', repriseOui ? inputVal('c-reprise-contact-email') : '')
     ].filter(Boolean) });
 
     groups.push({ title: 'Prise en charge & options', step: 2, rows: [
-      recapRow('Mise en main à la livraison', isChecked('c-mise-en-main') ? 'Oui' : ''),
+      recapRow('Mise en main à la livraison', radioLabel('c-mise-en-main')),
       recapRow('Niveau de carburant actuel', recapCheckedList('input[name="c-carburant-niveau"]')),
       recapRow('Option carburant à la livraison', recapCheckedList('input[name="carburant-option"]')),
       recapRow('Option lavage', recapCheckedList('input[name="lavage-option"]')),
@@ -3340,7 +3467,6 @@
     ].filter(Boolean) });
 
     groups.push({ title: 'Expérience du formulaire', rows: [
-      recapRow('Temps déclaré par le participant', inputVal('t-temps-declare')),
       recapRow('Ressenti sur la durée', radioLabel('t-ressenti-duree')),
       recapRow('Questions inutiles/répétitives', radioLabel('t-questions-inutiles')),
       recapRow('Détail questions inutiles', inputVal('t-questions-inutiles-detail')),
@@ -3515,6 +3641,17 @@
     backId: 'acc-back', nextId: 'acc-next', submitId: 'acc-submit',
     onLast: function () { renderRecap('acc-recap', buildRecapAccompagnement()); }
   });
+
+  // ---------- Formulaire 1 : chronomètre déclenché à l'entrée dans l'étape 2 ----------
+  (function () {
+    var accStartTime = null;
+    document.getElementById('acc-next').addEventListener('click', function () {
+      if (accStartTime === null) accStartTime = Date.now();
+    });
+    window.getAccElapsedSeconds = function () {
+      return accStartTime === null ? null : Math.round((Date.now() - accStartTime) / 1000);
+    };
+  })();
   wizards['form-convoyage'] = setupWizard({
     formId: 'form-convoyage', fillId: 'cvg-progress-fill', currentId: 'cvg-step-current',
     backId: 'cvg-back', nextId: 'cvg-next', submitId: 'cvg-submit',
@@ -3608,6 +3745,10 @@
     document.getElementById('contact-arrivee-detail').hidden = !this.checked;
   });
 
+  // ---------- Convoyage : véhicule repris en échange ----------
+  toggleOnValue('c-vehicule-reprise', 'vehicule-reprise-detail', 'oui');
+  toggleOnValue('c-vehicule-reprise', 'trajet-reprise-detail', 'oui');
+
   // ---------- Envoi vers Google Sheets via un formulaire caché + iframe ----------
   // (plus fiable qu'un fetch en mode no-cors : évite complètement les
   // limitations CORS puisqu'on ne cherche jamais à lire la réponse)
@@ -3643,6 +3784,11 @@
   // ---------- Envoi des réponses vers le back-office et/ou Google Sheets ----------
   function sendToSheet(formType, groups) {
     var data = groupsToFlatObject(groups);
+
+    if (formType === 'Accompagnement' && window.getAccElapsedSeconds) {
+      var accElapsed = window.getAccElapsedSeconds();
+      if (accElapsed != null) data['Temps de remplissage (à partir de l\'étape 2, en secondes)'] = String(accElapsed);
+    }
 
     if (BACKOFFICE_URL) {
       var payload = Object.assign({}, data);
@@ -3713,7 +3859,6 @@
         recommanderait_dimz: radioValue('t-recommanderait'),
         note_globale: document.getElementById('t-note-globale').value,
         duree_secondes: elapsed,
-        duree_declaree: inputVal('t-temps-declare'),
         donnees_brutes: brut
       };
 
@@ -3757,6 +3902,8 @@
         immatInput.placeholder = 'AA-123-AA';
         document.getElementById('creneau-strict-detail').hidden = true;
         document.getElementById('contact-arrivee-detail').hidden = true;
+        document.getElementById('vehicule-reprise-detail').hidden = true;
+        document.getElementById('trajet-reprise-detail').hidden = true;
       }
       btn.closest('.confirm-panel').hidden = true;
       form.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
