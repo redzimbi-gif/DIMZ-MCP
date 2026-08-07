@@ -619,12 +619,33 @@
 
   .choice-grid { display: flex; flex-wrap: wrap; gap: 9px; }
   .choice-grid label {
+    position: relative;
     display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--line);
     padding: 9px 16px; border-radius: 100px; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: var(--ink);
-    transition: border-color 0.15s ease, background 0.15s ease;
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
   }
-  .choice-grid input { width: auto; padding: 0; accent-color: var(--bleu-vif); }
-  .choice-grid label:has(input:checked) { border-color: var(--bleu-vif); background: color-mix(in srgb, var(--bleu-vif) 10%, var(--bg)); }
+  /* Case à cocher/radio native masquée : la sélection se lit sur le style de la case elle-même. */
+  .choice-grid input {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+  .choice-grid label:has(input:checked) { border-color: var(--bleu-vif); background: var(--bleu-vif); color: #fff; }
+  .choice-grid label:has(input:focus-visible) { outline: 2px solid var(--bleu-vif); outline-offset: 2px; }
+
+  /* Info-bulle générique au survol/focus (data-tooltip="..."). */
+  [data-tooltip] { position: relative; }
+  [data-tooltip]::after {
+    content: attr(data-tooltip); position: absolute; bottom: calc(100% + 9px); left: 50%; transform: translateX(-50%) translateY(4px);
+    width: max-content; max-width: 220px; background: var(--ink); color: #fff; font-size: 0.76rem; font-weight: 500; line-height: 1.4;
+    padding: 8px 11px; border-radius: 8px; box-shadow: var(--shadow); opacity: 0; pointer-events: none; z-index: 20;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+  [data-tooltip]::before {
+    content: ""; position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%);
+    border: 5px solid transparent; border-top-color: var(--ink); opacity: 0; pointer-events: none; transition: opacity 0.15s ease; z-index: 20;
+  }
+  [data-tooltip]:hover::after, [data-tooltip]:focus-visible::after { opacity: 1; transform: translateX(-50%) translateY(0); }
+  [data-tooltip]:hover::before, [data-tooltip]:focus-visible::before { opacity: 1; }
+  @media (hover: none) { [data-tooltip]::after, [data-tooltip]::before { display: none; } }
 
   .range-slider { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-md); padding: 20px 18px 16px; }
   .range-slider-value { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
@@ -645,6 +666,24 @@
   .range-slider-thumb:active::before { transform: scale(1.15); }
   .range-slider-thumb:focus-visible::before { outline: 2px solid var(--bleu-vif); outline-offset: 3px; }
   .range-slider-ticks { display: flex; justify-content: space-between; margin: 12px 6px 0; font-size: 0.74rem; color: var(--ink-soft); }
+  .range-slider-bubble {
+    position: absolute; bottom: 100%; left: 0; transform: translate(-50%, -10px) scale(0.9);
+    background: var(--ink); color: #fff; font-size: 0.78rem; font-weight: 700; white-space: nowrap;
+    padding: 5px 11px; border-radius: 8px; opacity: 0; pointer-events: none;
+    transition: opacity 0.12s ease, transform 0.12s ease, left 0.05s linear;
+  }
+  .range-slider-bubble::after {
+    content: ""; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+    border: 5px solid transparent; border-top-color: var(--ink);
+  }
+  .range-slider.is-active .range-slider-bubble { opacity: 1; transform: translate(-50%, -14px) scale(1); }
+
+  .single-range-row { display: flex; align-items: center; gap: 16px; }
+  .single-range-row input[type="range"] { flex: 1; accent-color: var(--bleu-vif); height: 4px; padding: 0; }
+  .single-range-row output {
+    min-width: 38px; text-align: center; font-weight: 800; font-size: 1.05rem; color: var(--bleu-vif);
+    background: color-mix(in srgb, var(--bleu-vif) 10%, var(--bg)); border-radius: 8px; padding: 5px 0;
+  }
 
   .veh-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 12px; align-items: end; margin-bottom: 14px; }
   @media (max-width: 960px) { .veh-row { grid-template-columns: 1fr 1fr; } }
@@ -1027,14 +1066,14 @@
                   <div class="field full">
                     <label>Type de carrosserie souhaité</label>
                     <div class="choice-grid" id="carrosserie-choices">
-                      <label><input type="checkbox" value="citadine"> Citadine</label>
-                      <label><input type="checkbox" value="berline"> Berline</label>
-                      <label><input type="checkbox" value="break"> Break</label>
-                      <label><input type="checkbox" value="suv"> SUV</label>
-                      <label><input type="checkbox" value="monospace"> Monospace</label>
-                      <label><input type="checkbox" value="coupe"> Coupé</label>
-                      <label><input type="checkbox" value="cabriolet"> Cabriolet</label>
-                      <label><input type="checkbox" value="utilitaire"> Utilitaire</label>
+                      <label data-tooltip="Petite voiture compacte et maniable, parfaite en ville. Ex. : Renault Twingo, Citroën C1, Peugeot 108."><input type="checkbox" value="citadine"> Citadine</label>
+                      <label data-tooltip="4 portes avec un coffre séparé, confortable pour la route. Ex. : Peugeot 508, Toyota Corolla, Škoda Octavia."><input type="checkbox" value="berline"> Berline</label>
+                      <label data-tooltip="Comme une berline mais avec un grand coffre, idéale pour les familles ou les longs trajets. Ex. : Peugeot 308 SW, Renault Mégane Estate."><input type="checkbox" value="break"> Break</label>
+                      <label data-tooltip="Position de conduite haute, look robuste, bon compromis ville/route. Ex. : Peugeot 3008, Renault Captur, Dacia Duster."><input type="checkbox" value="suv"> SUV</label>
+                      <label data-tooltip="Habitacle spacieux et modulable, souvent 5 à 7 places, pensé pour les familles. Ex. : Renault Scénic, Citroën Berlingo, Peugeot 5008."><input type="checkbox" value="monospace"> Monospace</label>
+                      <label data-tooltip="2 portes, silhouette sportive, plus tournée vers le plaisir de conduite que la praticité. Ex. : Audi A5 Coupé, BMW Série 4."><input type="checkbox" value="coupe"> Coupé</label>
+                      <label data-tooltip="Toit décapotable, souvent 2 places, pour le plaisir en beaux jours. Ex. : Mini Cabriolet, Audi A3 Cabriolet."><input type="checkbox" value="cabriolet"> Cabriolet</label>
+                      <label data-tooltip="Véhicule pensé pour le transport de matériel ou marchandises. Ex. : Renault Kangoo, Citroën Berlingo utilitaire."><input type="checkbox" value="utilitaire"> Utilitaire</label>
                     </div>
                   </div>
                   <div class="field full">
@@ -1142,6 +1181,7 @@
                       <div class="range-slider-value"></div>
                       <div class="range-slider-track">
                         <div class="range-slider-fill"></div>
+                        <div class="range-slider-bubble" aria-hidden="true"></div>
                         <button type="button" class="range-slider-thumb" data-thumb="min" role="slider" aria-label="Budget minimum" tabindex="0"></button>
                         <button type="button" class="range-slider-thumb" data-thumb="max" role="slider" aria-label="Budget maximum" tabindex="0"></button>
                       </div>
@@ -1155,6 +1195,7 @@
                       <div class="range-slider-value"></div>
                       <div class="range-slider-track">
                         <div class="range-slider-fill"></div>
+                        <div class="range-slider-bubble" aria-hidden="true"></div>
                         <button type="button" class="range-slider-thumb" data-thumb="min" role="slider" aria-label="Budget mensuel minimum" tabindex="0"></button>
                         <button type="button" class="range-slider-thumb" data-thumb="max" role="slider" aria-label="Budget mensuel maximum" tabindex="0"></button>
                       </div>
@@ -1165,10 +1206,10 @@
                   <div class="field full">
                     <label>Mode de financement souhaité <span class="hint">(plusieurs choix possibles)</span></label>
                     <div class="choice-grid">
-                      <label><input type="checkbox" name="financement" value="comptant"> Comptant</label>
-                      <label><input type="checkbox" name="financement" value="credit"> Crédit classique</label>
-                      <label><input type="checkbox" name="financement" value="loa"> LOA</label>
-                      <label><input type="checkbox" name="financement" value="lld"> LLD</label>
+                      <label data-tooltip="Vous payez le véhicule en une fois, sans emprunt. Vous en êtes propriétaire immédiatement."><input type="checkbox" name="financement" value="comptant"> Comptant</label>
+                      <label data-tooltip="Vous empruntez auprès d'une banque et remboursez par mensualités. Vous êtes propriétaire dès l'achat."><input type="checkbox" name="financement" value="credit"> Crédit classique</label>
+                      <label data-tooltip="Location avec Option d'Achat : vous louez le véhicule et pouvez l'acheter à la fin du contrat pour un montant fixé à l'avance."><input type="checkbox" name="financement" value="loa"> LOA</label>
+                      <label data-tooltip="Location Longue Durée : vous louez le véhicule sur plusieurs années, entretien souvent inclus, sans devenir propriétaire."><input type="checkbox" name="financement" value="lld"> LLD</label>
                       <label><input type="checkbox" name="financement" value="indecis"> Je ne sais pas encore</label>
                     </div>
                   </div>
@@ -1971,6 +2012,364 @@
   </section>
 </div>
 
+<div id="tab-test" role="tabpanel" hidden>
+
+  <section class="dark hero">
+    <div class="wrap hero-solo">
+      <span class="kicker"><span class="dot"></span>Test utilisateur</span>
+      <h2>Aide-moi à améliorer <em>DIMZ – Mon Copilote Auto</em></h2>
+      <p class="lede">Un questionnaire rapide, environ 5 minutes, pour recueillir ton avis avant le lancement.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="form-card">
+        <div class="form-progress">
+          <div class="form-progress-bar"><div class="form-progress-fill" id="test-progress-fill" style="width:10%"></div></div>
+          <div class="form-progress-label">Étape <strong id="test-step-current">1</strong> sur <span id="test-step-total">10</span></div>
+        </div>
+        <form id="form-test" novalidate>
+
+          <div class="form-step">
+            <h3>Merci de tester DIMZ !</h3>
+            <p>Merci d'avoir pris quelques minutes pour tester mon site DIMZ – Mon Copilote Auto.</p>
+            <p>Merci de répondre le plus honnêtement possible. Il n'y a pas de bonne ou de mauvaise réponse : ton avis va m'aider à améliorer DIMZ – Mon Copilote Auto avant son lancement.</p>
+            <p class="hint" style="display:block; margin-top:10px;">Le temps de remplissage est mesuré automatiquement dès que tu cliques sur « Commencer », indépendamment du temps passé à découvrir le site avant.</p>
+          </div>
+
+          <div class="form-step">
+            <h3>Première impression</h3>
+            <div class="field-grid">
+              <div class="field full">
+                <label>En découvrant le site, as-tu immédiatement compris ce que propose DIMZ ?</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="t-comprehension" value="oui"> Oui</label>
+                  <label><input type="radio" name="t-comprehension" value="non"> Non</label>
+                </div>
+              </div>
+              <div class="field full">
+                <label for="t-premiere-impression">Quelle a été ta première impression ?</label>
+                <textarea id="t-premiere-impression"></textarea>
+              </div>
+              <div class="field full">
+                <label>Le site t'inspire-t-il confiance ? <span class="hint">(1 = pas du tout, 5 = tout à fait)</span></label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="t-confiance" value="1"> 1</label>
+                  <label><input type="radio" name="t-confiance" value="2"> 2</label>
+                  <label><input type="radio" name="t-confiance" value="3"> 3</label>
+                  <label><input type="radio" name="t-confiance" value="4"> 4</label>
+                  <label><input type="radio" name="t-confiance" value="5"> 5</label>
+                </div>
+              </div>
+              <div class="field full">
+                <label for="t-confiance-pourquoi">Pourquoi ?</label>
+                <textarea id="t-confiance-pourquoi"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-step">
+            <h3>Compréhension</h3>
+            <div class="field-grid">
+              <div class="field full">
+                <label for="t-service-percu">Selon toi, quel est le service proposé par DIMZ ?</label>
+                <textarea id="t-service-percu"></textarea>
+              </div>
+              <div class="field">
+                <label>Les trois offres sont-elles faciles à comprendre ?</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="t-offres-faciles" value="oui"> Oui</label>
+                  <label><input type="radio" name="t-offres-faciles" value="non"> Non</label>
+                </div>
+              </div>
+              <div class="field">
+                <label>Les tarifs sont-ils clairs ?</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="t-tarifs-clairs" value="oui"> Oui</label>
+                  <label><input type="radio" name="t-tarifs-clairs" value="non"> Non</label>
+                </div>
+              </div>
+              <div class="field full">
+                <label for="t-element-confus">Y a-t-il un élément qui t'a semblé confus ? <span class="hint">(optionnel)</span></label>
+                <textarea id="t-element-confus"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-step">
+            <h3>Navigation</h3>
+            <div class="field-grid">
+              <div class="field">
+                <label>As-tu trouvé facilement les informations que tu cherchais ?</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="t-info-trouvee" value="oui"> Oui</label>
+                  <label><input type="radio" name="t-info-trouvee" value="non"> Non</label>
+                </div>
+              </div>
+              <div class="field">
+                <label>La navigation est-elle simple ?</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="t-navigation-facile" value="oui"> Oui</label>
+                  <label><input type="radio" name="t-navigation-facile" value="non"> Non</label>
+                </div>
+              </div>
+              <div class="field full">
+                <label for="t-infos-manquantes">Y a-t-il des informations importantes qui manquent ? <span class="hint">(optionnel)</span></label>
+                <textarea id="t-infos-manquantes"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-step">
+            <h3>Design et identité visuelle</h3>
+            <p class="hint" style="display:block; margin-bottom:14px;">Note chaque critère de 1 (pas du tout) à 5 (excellent).</p>
+            <div class="field-grid">
+              <div class="field full">
+                <label>Design général</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="t-note-design" value="1"> 1</label>
+                  <label><input type="radio" name="t-note-design" value="2"> 2</label>
+                  <label><input type="radio" name="t-note-design" value="3"> 3</label>
+                  <label><input type="radio" name="t-note-design" value="4"> 4</label>
+                  <label><input type="radio" name="t-note-design" value="5"> 5</label>
+                </div>
+              </div>
+              <div class="field full">
+                <label>Professionnalisme</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="t-note-pro" value="1"> 1</label>
+                  <label><input type="radio" name="t-note-pro" value="2"> 2</label>
+                  <label><input type="radio" name="t-note-pro" value="3"> 3</label>
+                  <label><input type="radio" name="t-note-pro" value="4"> 4</label>
+                  <label><input type="radio" name="t-note-pro" value="5"> 5</label>
+                </div>
+              </div>
+              <div class="field full">
+                <label>Logo</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="t-note-logo" value="1"> 1</label>
+                  <label><input type="radio" name="t-note-logo" value="2"> 2</label>
+                  <label><input type="radio" name="t-note-logo" value="3"> 3</label>
+                  <label><input type="radio" name="t-note-logo" value="4"> 4</label>
+                  <label><input type="radio" name="t-note-logo" value="5"> 5</label>
+                </div>
+              </div>
+              <div class="field full">
+                <label>Couleurs</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="t-note-couleurs" value="1"> 1</label>
+                  <label><input type="radio" name="t-note-couleurs" value="2"> 2</label>
+                  <label><input type="radio" name="t-note-couleurs" value="3"> 3</label>
+                  <label><input type="radio" name="t-note-couleurs" value="4"> 4</label>
+                  <label><input type="radio" name="t-note-couleurs" value="5"> 5</label>
+                </div>
+              </div>
+              <div class="field full">
+                <label>Lisibilité</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="t-note-lisibilite" value="1"> 1</label>
+                  <label><input type="radio" name="t-note-lisibilite" value="2"> 2</label>
+                  <label><input type="radio" name="t-note-lisibilite" value="3"> 3</label>
+                  <label><input type="radio" name="t-note-lisibilite" value="4"> 4</label>
+                  <label><input type="radio" name="t-note-lisibilite" value="5"> 5</label>
+                </div>
+              </div>
+              <div class="field full">
+                <label>Modernité</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="t-note-modernite" value="1"> 1</label>
+                  <label><input type="radio" name="t-note-modernite" value="2"> 2</label>
+                  <label><input type="radio" name="t-note-modernite" value="3"> 3</label>
+                  <label><input type="radio" name="t-note-modernite" value="4"> 4</label>
+                  <label><input type="radio" name="t-note-modernite" value="5"> 5</label>
+                </div>
+              </div>
+              <div class="field full">
+                <label for="t-ameliorer-visuel">Qu'aimerais-tu améliorer visuellement ? <span class="hint">(optionnel)</span></label>
+                <textarea id="t-ameliorer-visuel"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-step">
+            <h3>Expérience du formulaire</h3>
+            <div class="field-grid">
+              <div class="field full">
+                <label for="t-temps-declare">Combien de temps as-tu mis pour remplir ce questionnaire ? <span class="hint">Ton estimation, à l'instinct (ex. : 3 min 42 s)</span></label>
+                <input type="text" id="t-temps-declare" placeholder="ex. : 3 min 42 s">
+              </div>
+              <div class="field full">
+                <label>Le questionnaire t'a-t-il semblé…</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="t-ressenti-duree" value="tres_rapide"> Très rapide</label>
+                  <label><input type="radio" name="t-ressenti-duree" value="assez_rapide"> Assez rapide</label>
+                  <label><input type="radio" name="t-ressenti-duree" value="un_peu_long"> Un peu trop long</label>
+                  <label><input type="radio" name="t-ressenti-duree" value="beaucoup_trop_long"> Beaucoup trop long</label>
+                </div>
+              </div>
+              <div class="field">
+                <label>Certaines questions t'ont-elles semblé inutiles ou répétitives ?</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="t-questions-inutiles" value="oui"> Oui</label>
+                  <label><input type="radio" name="t-questions-inutiles" value="non"> Non</label>
+                </div>
+              </div>
+              <div class="field">
+                <label>As-tu hésité à abandonner le questionnaire ?</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="t-hesite-abandon" value="oui"> Oui</label>
+                  <label><input type="radio" name="t-hesite-abandon" value="non"> Non</label>
+                </div>
+              </div>
+              <div class="field full" id="t-questions-inutiles-detail-wrap" hidden>
+                <label for="t-questions-inutiles-detail">Lesquelles ?</label>
+                <textarea id="t-questions-inutiles-detail"></textarea>
+              </div>
+              <div class="field full" id="t-hesite-abandon-detail-wrap" hidden>
+                <label for="t-hesite-abandon-detail">À quel moment et pourquoi ?</label>
+                <textarea id="t-hesite-abandon-detail"></textarea>
+              </div>
+              <div class="field full">
+                <label for="t-note-experience">Quelle note sur 10 donnes-tu à l'expérience du questionnaire ?</label>
+                <div class="single-range-row">
+                  <input type="range" id="t-note-experience" min="0" max="10" step="1" value="5">
+                  <output id="t-note-experience-out">5</output>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-step">
+            <h3>Les offres</h3>
+            <div class="field-grid">
+              <div class="field full">
+                <label>Quelle offre choisirais-tu personnellement ?</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="t-offre-choisie" value="decouverte"> Découverte</label>
+                  <label><input type="radio" name="t-offre-choisie" value="copilote"> Copilote</label>
+                  <label><input type="radio" name="t-offre-choisie" value="copilote_plus"> Copilote Plus</label>
+                  <label><input type="radio" name="t-offre-choisie" value="aucune"> Aucune</label>
+                </div>
+              </div>
+              <div class="field">
+                <label>Les prix te semblent-ils cohérents ?</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="t-prix-coherents" value="oui"> Oui</label>
+                  <label><input type="radio" name="t-prix-coherents" value="non"> Non</label>
+                </div>
+              </div>
+              <div class="field full">
+                <label>Quelle offre te paraît avoir le meilleur rapport valeur/prix ?</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="t-meilleur-rapport" value="decouverte"> Découverte</label>
+                  <label><input type="radio" name="t-meilleur-rapport" value="copilote"> Copilote</label>
+                  <label><input type="radio" name="t-meilleur-rapport" value="copilote_plus"> Copilote Plus</label>
+                  <label><input type="radio" name="t-meilleur-rapport" value="aucune"> Aucune</label>
+                </div>
+              </div>
+              <div class="field full">
+                <label for="t-hesitation-achat">Qu'est-ce qui pourrait te faire hésiter à acheter ? <span class="hint">(optionnel)</span></label>
+                <textarea id="t-hesitation-achat"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-step">
+            <h3>Confiance</h3>
+            <div class="field-grid">
+              <div class="field full">
+                <label>Quels éléments pourraient renforcer ta confiance envers DIMZ ? <span class="hint">(plusieurs choix possibles)</span></label>
+                <div class="choice-grid" id="t-confiance-elements-choices">
+                  <label><input type="checkbox" name="t-confiance-elements" value="Avis clients"> Avis clients</label>
+                  <label><input type="checkbox" name="t-confiance-elements" value="Témoignages"> Témoignages</label>
+                  <label><input type="checkbox" name="t-confiance-elements" value="Photos de véhicules"> Photos de véhicules</label>
+                  <label><input type="checkbox" name="t-confiance-elements" value="Présentation du fondateur"> Présentation du fondateur</label>
+                  <label><input type="checkbox" name="t-confiance-elements" value="Vidéo de présentation"> Vidéo de présentation</label>
+                  <label><input type="checkbox" name="t-confiance-elements" value="Garanties"> Garanties</label>
+                  <label><input type="checkbox" name="t-confiance-elements" value="Certifications / partenaires"> Certifications / partenaires</label>
+                  <label><input type="checkbox" id="t-confiance-autre-cb" name="t-confiance-elements" value="Autre"> Autre</label>
+                </div>
+              </div>
+              <div class="field full" id="t-confiance-autre-wrap" hidden>
+                <label for="t-confiance-autre">Précise</label>
+                <input type="text" id="t-confiance-autre">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-step">
+            <h3>Intention d'utilisation</h3>
+            <div class="field-grid">
+              <div class="field full">
+                <label>Si tu cherchais actuellement à acheter une voiture, utiliserais-tu DIMZ ?</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="t-utiliserait" value="oui"> Oui</label>
+                  <label><input type="radio" name="t-utiliserait" value="non"> Non</label>
+                  <label><input type="radio" name="t-utiliserait" value="peut-etre"> Peut-être</label>
+                </div>
+              </div>
+              <div class="field full">
+                <label>Recommanderais-tu DIMZ à un proche ?</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="t-recommanderait" value="oui"> Oui</label>
+                  <label><input type="radio" name="t-recommanderait" value="non"> Non</label>
+                  <label><input type="radio" name="t-recommanderait" value="peut-etre"> Peut-être</label>
+                </div>
+              </div>
+              <div class="field full">
+                <label for="t-intention-pourquoi">Pourquoi ?</label>
+                <textarea id="t-intention-pourquoi"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-step">
+            <h3>Avis général</h3>
+            <div class="field-grid">
+              <div class="field full">
+                <label for="t-points-forts">Quels sont les 3 principaux points forts du site ?</label>
+                <textarea id="t-points-forts"></textarea>
+              </div>
+              <div class="field full">
+                <label for="t-points-ameliorer">Quels sont les 3 principaux points à améliorer ?</label>
+                <textarea id="t-points-ameliorer"></textarea>
+              </div>
+              <div class="field full">
+                <label for="t-note-globale">Quelle note globale sur 10 donnes-tu à DIMZ – Mon Copilote Auto ?</label>
+                <div class="single-range-row">
+                  <input type="range" id="t-note-globale" min="0" max="10" step="1" value="5">
+                  <output id="t-note-globale-out">5</output>
+                </div>
+              </div>
+              <div class="field full">
+                <label for="t-dernier-commentaire">Dernier commentaire ou remarque ? <span class="hint">(optionnel)</span></label>
+                <textarea id="t-dernier-commentaire"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-nav">
+            <button type="button" class="btn btn-outline" id="test-back" hidden>Précédent</button>
+            <span class="spacer"></span>
+            <button type="button" class="btn btn-primary" id="test-next">Commencer le test</button>
+            <button type="submit" class="btn btn-primary" id="test-submit" hidden>Envoyer mes réponses</button>
+          </div>
+        </form>
+
+        <div class="confirm-panel" id="confirm-test" hidden>
+          <div class="confirm-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <h3>Merci beaucoup pour ton retour !</h3>
+          <p>Tes réponses sont bien enregistrées et vont directement aider à améliorer DIMZ avant son lancement.</p>
+          <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+            <a href="javascript:void(0)" class="btn btn-primary" data-goto-tab="accompagnement">Retour à l'accueil</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
 <!-- ===================== PAGES LÉGALES ===================== -->
 <div id="page-legal-confidentialite" class="legal-page" hidden>
   <div class="wrap">
@@ -2192,6 +2591,7 @@
     <a href="javascript:void(0)" data-goto-legal="mentions">Mentions légales</a>
     <a href="javascript:void(0)" data-goto-legal="cgv">CGV</a>
     <a href="javascript:void(0)" id="cookie-settings-link">Gérer les cookies</a>
+    <a href="javascript:void(0)" data-goto-tab="test">Tu testes le site ? Donne ton avis en 5 min</a>
   </nav>
 </footer>
 
@@ -2236,6 +2636,8 @@
   // URL complète de la fonction Edge Supabase "lead-intake" (contourne la
   // protection Vercel Authentication qui bloquait l'API Next.js directe).
   var BACKOFFICE_URL = 'https://tlkstfmheprsmbxlmrgr.supabase.co/functions/v1/lead-intake';
+  // URL de la fonction Edge Supabase "test-feedback" (questionnaire de test utilisateur).
+  var TEST_FEEDBACK_URL = 'https://tlkstfmheprsmbxlmrgr.supabase.co/functions/v1/test-feedback';
 
   // ---------- Connexion des formulaires à Google Sheets, via un Google Form ----------
   var GOOGLE_FORM_RESPONSE_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdnC-KcwOoDh7cGpsfS7Q3WuEr2yyWJR8T4LKffPqkXLhe_SQ/formResponse';
@@ -2276,6 +2678,7 @@
     mainTabButtons.forEach(function (b) { b.setAttribute('aria-selected', b.dataset.tab === tab ? 'true' : 'false'); });
     document.getElementById('tab-accompagnement').hidden = tab !== 'accompagnement';
     document.getElementById('tab-convoyage').hidden = tab !== 'convoyage';
+    document.getElementById('tab-test').hidden = tab !== 'test';
     if (tab === 'accompagnement' && resetSubtab) showSubTab('accueil');
     observeNewReveals();
   }
@@ -2304,6 +2707,9 @@
   document.querySelectorAll('[data-goto-tab]').forEach(function (el) {
     el.addEventListener('click', function () { showMainTab(el.dataset.gotoTab, true); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); });
   });
+
+  // ---------- Lien direct vers le questionnaire de test (#test) ----------
+  if (window.location.hash === '#test') showMainTab('test', true);
 
   // ---------- Navigation latérale Accompagnement : Accueil / sous-menu Offres / À propos / FAQ ----------
   var subTabButtons = document.querySelectorAll('.acc-sidebar button[data-subtab]');
@@ -2754,6 +3160,16 @@
       });
     return vals.join(', ');
   }
+  function radioValue(name) {
+    var el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : '';
+  }
+  function radioLabel(name) {
+    var el = document.querySelector('input[name="' + name + '"]:checked');
+    if (!el) return '';
+    var lbl = el.closest('label');
+    return lbl ? lbl.textContent.trim() : el.value;
+  }
   function renderRecap(containerId, groups) {
     var container = document.getElementById(containerId);
     container.innerHTML = groups.map(function (g) {
@@ -2834,9 +3250,16 @@
       recapRow('Mode de financement souhaité', recapCheckedList('input[name="financement"]'))
     ].filter(Boolean) });
 
+    var OFFRE_RAPPELS = {
+      conseil: 'Découverte — un formulaire, 3 annonces sélectionnées et des conseils personnalisés. Gratuit.',
+      accompagnement: 'Copilote — recherche et analyse de 5 à 7 véhicules, rapport écrit, un appel de synthèse.',
+      complet: 'Copilote Plus — recherche, expertise physique du véhicule, livraison à domicile et démarches administratives.',
+      inspection: 'Inspection — je me déplace pour expertiser le véhicule que vous avez trouvé et vous donne mon avis.'
+    };
     var besoinChecked = document.querySelector('#besoin-choices input:checked');
+    var besoinRappel = besoinChecked ? (OFFRE_RAPPELS[besoinChecked.value] || besoinChecked.closest('label').textContent.trim()) : '';
     groups.push({ title: 'Projet et délai', step: 5, rows: [
-      recapRow('Accompagnement recherché', besoinChecked ? besoinChecked.closest('label').textContent.trim() : ''),
+      recapRow('Accompagnement recherché', besoinRappel),
       recapRow('Délai souhaité', selectText('a-delai')),
       recapRow('Comment vous avez connu Dimz', selectText('a-source')),
       recapRow('Inquiétudes principales', inputVal('a-inquietudes'))
@@ -2884,6 +3307,76 @@
     return groups;
   }
 
+  function buildTestFeedbackGroups() {
+    var groups = [];
+    groups.push({ title: 'Première impression', rows: [
+      recapRow('Compréhension immédiate du concept', radioLabel('t-comprehension')),
+      recapRow('Première impression', inputVal('t-premiere-impression')),
+      recapRow('Confiance inspirée (1-5)', radioValue('t-confiance')),
+      recapRow('Pourquoi (confiance)', inputVal('t-confiance-pourquoi'))
+    ].filter(Boolean) });
+
+    groups.push({ title: 'Compréhension', rows: [
+      recapRow('Service perçu', inputVal('t-service-percu')),
+      recapRow('Offres faciles à comprendre', radioLabel('t-offres-faciles')),
+      recapRow('Tarifs clairs', radioLabel('t-tarifs-clairs')),
+      recapRow('Élément confus', inputVal('t-element-confus'))
+    ].filter(Boolean) });
+
+    groups.push({ title: 'Navigation', rows: [
+      recapRow('Informations trouvées facilement', radioLabel('t-info-trouvee')),
+      recapRow('Navigation simple', radioLabel('t-navigation-facile')),
+      recapRow('Informations manquantes', inputVal('t-infos-manquantes'))
+    ].filter(Boolean) });
+
+    groups.push({ title: 'Design et identité visuelle', rows: [
+      recapRow('Design général (1-5)', radioValue('t-note-design')),
+      recapRow('Professionnalisme (1-5)', radioValue('t-note-pro')),
+      recapRow('Logo (1-5)', radioValue('t-note-logo')),
+      recapRow('Couleurs (1-5)', radioValue('t-note-couleurs')),
+      recapRow('Lisibilité (1-5)', radioValue('t-note-lisibilite')),
+      recapRow('Modernité (1-5)', radioValue('t-note-modernite')),
+      recapRow('Amélioration visuelle souhaitée', inputVal('t-ameliorer-visuel'))
+    ].filter(Boolean) });
+
+    groups.push({ title: 'Expérience du formulaire', rows: [
+      recapRow('Temps déclaré par le participant', inputVal('t-temps-declare')),
+      recapRow('Ressenti sur la durée', radioLabel('t-ressenti-duree')),
+      recapRow('Questions inutiles/répétitives', radioLabel('t-questions-inutiles')),
+      recapRow('Détail questions inutiles', inputVal('t-questions-inutiles-detail')),
+      recapRow('A hésité à abandonner', radioLabel('t-hesite-abandon')),
+      recapRow('Détail hésitation à abandonner', inputVal('t-hesite-abandon-detail')),
+      recapRow('Note de l\'expérience (0-10)', document.getElementById('t-note-experience').value)
+    ].filter(Boolean) });
+
+    groups.push({ title: 'Les offres', rows: [
+      recapRow('Offre choisie', radioLabel('t-offre-choisie')),
+      recapRow('Prix cohérents', radioLabel('t-prix-coherents')),
+      recapRow('Meilleur rapport valeur/prix', radioLabel('t-meilleur-rapport')),
+      recapRow('Hésitation à l\'achat', inputVal('t-hesitation-achat'))
+    ].filter(Boolean) });
+
+    groups.push({ title: 'Confiance', rows: [
+      recapRow('Éléments de confiance', recapCheckedList('input[name="t-confiance-elements"]')),
+      recapRow('Précision « Autre »', inputVal('t-confiance-autre'))
+    ].filter(Boolean) });
+
+    groups.push({ title: 'Intention d\'utilisation', rows: [
+      recapRow('Utiliserait DIMZ', radioLabel('t-utiliserait')),
+      recapRow('Recommanderait DIMZ', radioLabel('t-recommanderait')),
+      recapRow('Pourquoi (intention)', inputVal('t-intention-pourquoi'))
+    ].filter(Boolean) });
+
+    groups.push({ title: 'Avis général', rows: [
+      recapRow('Points forts', inputVal('t-points-forts')),
+      recapRow('Points à améliorer', inputVal('t-points-ameliorer')),
+      recapRow('Note globale (0-10)', document.getElementById('t-note-globale').value),
+      recapRow('Dernier commentaire', inputVal('t-dernier-commentaire'))
+    ].filter(Boolean) });
+
+    return groups;
+  }
+
   // ---------- Curseur double (min/max) pour les champs de budget ----------
   function initRangeSlider(rootId, values, opts) {
     var root = document.getElementById(rootId);
@@ -2892,12 +3385,14 @@
     var track = root.querySelector('.range-slider-track');
     var fill = root.querySelector('.range-slider-fill');
     var valueEl = root.querySelector('.range-slider-value');
+    var bubble = root.querySelector('.range-slider-bubble');
     var minThumb = root.querySelector('[data-thumb="min"]');
     var maxThumb = root.querySelector('[data-thumb="max"]');
     var hiddenInput = opts.hiddenId ? document.getElementById(opts.hiddenId) : null;
     var lastIndex = values.length - 1;
     var minIndex = 0;
     var maxIndex = lastIndex;
+    var bubbleHideTimer = null;
 
     function fmt(v) { return v.toLocaleString('fr-FR') + ' ' + (opts.unit || '€'); }
     function soloLabel(index) {
@@ -2906,6 +3401,19 @@
       return fmt(values[index]);
     }
     function percentFor(index) { return lastIndex === 0 ? 0 : (index / lastIndex) * 100; }
+
+    function showBubble(index) {
+      if (!bubble) return;
+      clearTimeout(bubbleHideTimer);
+      bubble.textContent = soloLabel(index);
+      bubble.style.left = percentFor(index) + '%';
+      root.classList.add('is-active');
+    }
+    function scheduleHideBubble() {
+      if (!bubble) return;
+      clearTimeout(bubbleHideTimer);
+      bubbleHideTimer = setTimeout(function () { root.classList.remove('is-active'); }, 900);
+    }
 
     function render() {
       var minPct = percentFor(minIndex);
@@ -2954,6 +3462,7 @@
           thumb.removeEventListener('pointermove', onMove);
           thumb.removeEventListener('pointerup', onUp);
           thumb.removeEventListener('pointercancel', onUp);
+          scheduleHideBubble();
         }
         thumb.addEventListener('pointermove', onMove);
         thumb.addEventListener('pointerup', onUp);
@@ -2963,16 +3472,18 @@
         if (isMin) minIndex = Math.min(idx, maxIndex);
         else maxIndex = Math.max(idx, minIndex);
         render();
+        showBubble(isMin ? minIndex : maxIndex);
       }
       thumb.addEventListener('keydown', function (e) {
         var delta = 0;
         if (e.key === 'ArrowRight' || e.key === 'ArrowUp') delta = 1;
         else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') delta = -1;
-        else if (e.key === 'Home') { applyIndex(isMin ? 0 : minIndex); e.preventDefault(); return; }
-        else if (e.key === 'End') { applyIndex(isMin ? maxIndex : lastIndex); e.preventDefault(); return; }
+        else if (e.key === 'Home') { applyIndex(isMin ? 0 : minIndex); scheduleHideBubble(); e.preventDefault(); return; }
+        else if (e.key === 'End') { applyIndex(isMin ? maxIndex : lastIndex); scheduleHideBubble(); e.preventDefault(); return; }
         else return;
         e.preventDefault();
         applyIndex((isMin ? minIndex : maxIndex) + delta);
+        scheduleHideBubble();
       });
     }
     bindThumb(minThumb, true);
@@ -2981,9 +3492,12 @@
     track.addEventListener('pointerdown', function (e) {
       if (e.target === minThumb || e.target === maxThumb) return;
       var idx = indexFromClientX(e.clientX);
-      if (Math.abs(idx - minIndex) <= Math.abs(idx - maxIndex)) minIndex = Math.min(idx, maxIndex);
-      else maxIndex = Math.max(idx, minIndex);
+      var movedIsMin;
+      if (Math.abs(idx - minIndex) <= Math.abs(idx - maxIndex)) { minIndex = Math.min(idx, maxIndex); movedIsMin = true; }
+      else { maxIndex = Math.max(idx, minIndex); movedIsMin = false; }
       render();
+      showBubble(movedIsMin ? minIndex : maxIndex);
+      scheduleHideBubble();
     });
 
     render();
@@ -3005,6 +3519,49 @@
     formId: 'form-convoyage', fillId: 'cvg-progress-fill', currentId: 'cvg-step-current',
     backId: 'cvg-back', nextId: 'cvg-next', submitId: 'cvg-submit',
     onLast: function () { renderRecap('cvg-recap', buildRecapConvoyage()); }
+  });
+  wizards['form-test'] = setupWizard({
+    formId: 'form-test', fillId: 'test-progress-fill', currentId: 'test-step-current',
+    backId: 'test-back', nextId: 'test-next', submitId: 'test-submit'
+  });
+
+  // ---------- Questionnaire de test : chronomètre déclenché au premier "Commencer" ----------
+  (function () {
+    var testStartTime = null;
+    var testNextBtn = document.getElementById('test-next');
+    testNextBtn.addEventListener('click', function () {
+      if (testStartTime === null) {
+        testStartTime = Date.now();
+        testNextBtn.textContent = 'Continuer';
+      }
+    });
+    window.getTestElapsedSeconds = function () {
+      return testStartTime === null ? null : Math.round((Date.now() - testStartTime) / 1000);
+    };
+  })();
+
+  // ---------- Questionnaire de test : sorties live des curseurs de note /10 ----------
+  ['t-note-experience', 't-note-globale'].forEach(function (id) {
+    var input = document.getElementById(id);
+    var out = document.getElementById(id + '-out');
+    input.addEventListener('input', function () { out.textContent = input.value; });
+  });
+
+  // ---------- Questionnaire de test : champs conditionnels ----------
+  function toggleOnRadioValue(radioName, targetId, showValue) {
+    var target = document.getElementById(targetId);
+    var radios = document.querySelectorAll('input[name="' + radioName + '"]');
+    function sync() {
+      var checked = document.querySelector('input[name="' + radioName + '"]:checked');
+      target.hidden = !checked || checked.value !== showValue;
+    }
+    radios.forEach(function (r) { r.addEventListener('change', sync); });
+    sync();
+  }
+  toggleOnRadioValue('t-questions-inutiles', 't-questions-inutiles-detail-wrap', 'oui');
+  toggleOnRadioValue('t-hesite-abandon', 't-hesite-abandon-detail-wrap', 'oui');
+  document.getElementById('t-confiance-autre-cb').addEventListener('change', function () {
+    document.getElementById('t-confiance-autre-wrap').hidden = !this.checked;
   });
 
   document.getElementById('acc-recap').addEventListener('click', function (e) {
@@ -3123,6 +3680,56 @@
   }
   wireForm('form-accompagnement', 'confirm-accompagnement', 'Accompagnement', buildRecapAccompagnement);
   wireForm('form-convoyage', 'confirm-convoyage', 'Convoyage', buildRecapConvoyage);
+
+  // ---------- Questionnaire de test : envoi dédié (ne crée ni client ni dossier) ----------
+  (function () {
+    var form = document.getElementById('form-test');
+    var confirmPanel = document.getElementById('confirm-test');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!form.reportValidity()) return;
+
+      var brut = groupsToFlatObject(buildTestFeedbackGroups());
+      var elapsed = window.getTestElapsedSeconds ? window.getTestElapsedSeconds() : null;
+      var payload = {
+        comprehension_immediate: radioValue('t-comprehension'),
+        confiance_site: radioValue('t-confiance'),
+        offres_faciles: radioValue('t-offres-faciles'),
+        tarifs_clairs: radioValue('t-tarifs-clairs'),
+        navigation_facile: radioValue('t-navigation-facile'),
+        note_design_general: radioValue('t-note-design'),
+        note_professionnalisme: radioValue('t-note-pro'),
+        note_logo: radioValue('t-note-logo'),
+        note_couleurs: radioValue('t-note-couleurs'),
+        note_lisibilite: radioValue('t-note-lisibilite'),
+        note_modernite: radioValue('t-note-modernite'),
+        ressenti_duree: radioValue('t-ressenti-duree'),
+        hesite_abandonner: radioValue('t-hesite-abandon'),
+        note_experience_formulaire: document.getElementById('t-note-experience').value,
+        offre_choisie: radioValue('t-offre-choisie'),
+        prix_coherents: radioValue('t-prix-coherents'),
+        meilleur_rapport_qualite_prix: radioValue('t-meilleur-rapport'),
+        utiliserait_dimz: radioValue('t-utiliserait'),
+        recommanderait_dimz: radioValue('t-recommanderait'),
+        note_globale: document.getElementById('t-note-globale').value,
+        duree_secondes: elapsed,
+        duree_declaree: inputVal('t-temps-declare'),
+        donnees_brutes: brut
+      };
+
+      if (TEST_FEEDBACK_URL) {
+        fetch(TEST_FEEDBACK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(function () { /* envoi silencieux : la confirmation ne dépend pas du réseau */ });
+      }
+
+      form.hidden = true;
+      confirmPanel.hidden = false;
+      confirmPanel.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+    });
+  })();
 
   document.querySelectorAll('[data-reset]').forEach(function (btn) {
     btn.addEventListener('click', function () {

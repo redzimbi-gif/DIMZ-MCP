@@ -295,3 +295,46 @@ export interface ConvoyageExterne {
   justificatifs: string[];
   created_at: string;
 }
+
+export const RESSENTI_DUREE_LABELS: Record<string, string> = {
+  tres_rapide: "Très rapide",
+  assez_rapide: "Assez rapide",
+  un_peu_long: "Un peu trop long",
+  beaucoup_trop_long: "Beaucoup trop long",
+};
+
+export const OFFRE_TEST_LABELS: Record<string, string> = {
+  decouverte: "Découverte",
+  copilote: "Copilote",
+  copilote_plus: "Copilote Plus",
+  aucune: "Aucune",
+};
+
+export interface TestFeedback {
+  id: string;
+  reference: string;
+  comprehension_immediate: string | null;
+  confiance_site: number | null;
+  offres_faciles: string | null;
+  tarifs_clairs: string | null;
+  navigation_facile: string | null;
+  note_design_general: number | null;
+  note_professionnalisme: number | null;
+  note_logo: number | null;
+  note_couleurs: number | null;
+  note_lisibilite: number | null;
+  note_modernite: number | null;
+  ressenti_duree: string | null;
+  hesite_abandonner: string | null;
+  note_experience_formulaire: number | null;
+  offre_choisie: string | null;
+  prix_coherents: string | null;
+  meilleur_rapport_qualite_prix: string | null;
+  utiliserait_dimz: string | null;
+  recommanderait_dimz: string | null;
+  note_globale: number | null;
+  duree_secondes: number | null;
+  duree_declaree: string | null;
+  donnees_brutes: Record<string, unknown> | null;
+  created_at: string;
+}

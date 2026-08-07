@@ -13,6 +13,7 @@ import type {
   Inspection,
   NoteInterne,
   Notification,
+  TestFeedback,
 } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
@@ -351,4 +352,19 @@ export async function getConvoyageExterne(id: string) {
   const db = createAdminClient();
   const { data } = await db.from("convoyages_externes").select("*").eq("id", id).maybeSingle();
   return data as ConvoyageExterne | null;
+}
+
+// ---------------------------------------------------------------------------
+// Retours du questionnaire de test utilisateur
+// ---------------------------------------------------------------------------
+export async function listTestFeedback() {
+  const db = createAdminClient();
+  const { data } = await db.from("test_feedback").select("*").order("created_at", { ascending: false });
+  return (data ?? []) as TestFeedback[];
+}
+
+export async function getTestFeedback(id: string) {
+  const db = createAdminClient();
+  const { data } = await db.from("test_feedback").select("*").eq("id", id).maybeSingle();
+  return data as TestFeedback | null;
 }

@@ -8,6 +8,7 @@ import {
   Receipt,
   Calculator,
   MessagesSquare,
+  ClipboardCheck,
   type LucideIcon,
 } from "lucide-react";
 
@@ -27,4 +28,5 @@ export const NAV: NavItem[] = [
   { href: "/facturation", label: "Facturation", icon: Receipt },
   { href: "/comptabilite", label: "Comptabilité", icon: Calculator },
   { href: "/messagerie", label: "Messagerie", icon: MessagesSquare },
+  { href: "/retours-test", label: "Retours test", icon: ClipboardCheck },
 ];

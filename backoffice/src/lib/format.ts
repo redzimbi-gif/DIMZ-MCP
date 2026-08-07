@@ -42,3 +42,11 @@ export function splitTags(value: string | null | undefined): string[] {
     .map((s) => s.trim())
     .filter(Boolean);
 }
+
+/** Secondes → "3 min 42 s", pour le temps de remplissage mesuré du questionnaire de test. */
+export function formatDuration(seconds: number | null | undefined): string {
+  if (seconds == null) return "—";
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return m > 0 ? `${m} min ${s} s` : `${s} s`;
+}

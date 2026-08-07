@@ -17,6 +17,7 @@ stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
    - `0005_agenda_convoyage_externe.sql`
    - `0006_comptabilite_justificatifs.sql`
    - `0007_rapport_dimz.sql`
+   - `0008_test_feedback.sql`
 3. Dans **Project Settings → API**, récupère :
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -103,6 +104,18 @@ npx supabase secrets set --project-ref TON-PROJET \
   APP_URL=https://dimz-backoffice.vercel.app
 ```
 
+Le questionnaire de test utilisateur (page « Test » du site) appelle une
+seconde Edge Function, `test-feedback`, à déployer et pointer de la même
+façon (elle n'a pas besoin des secrets ci-dessus, elle n'envoie pas d'email) :
+
+```bash
+npx supabase functions deploy test-feedback --project-ref TON-PROJET --no-verify-jwt
+```
+
+```js
+var TEST_FEEDBACK_URL = 'https://TON-PROJET.supabase.co/functions/v1/test-feedback';
+```
+
 Chaque soumission des formulaires « Accompagnement » et « Convoyage » du site
 créera automatiquement un client + un dossier dans le back-office, et enverra
 l'email de confirmation si le client a renseigné son adresse.
@@ -137,6 +150,9 @@ l'email de confirmation si le client a renseigné son adresse.
     avec le rapport PDF en pièce jointe ;
   - bouton « Informer le client » sur un dossier → email avec le statut
     actuel et un lien vers son espace de suivi.
+- Retours test : questionnaire de test utilisateur sur le site (page « Test »),
+  résultats et durée de remplissage mesurée automatiquement, consultables
+  dans `/retours-test`.
 
 ## Ce qui n'est volontairement pas dans cette V1
 
