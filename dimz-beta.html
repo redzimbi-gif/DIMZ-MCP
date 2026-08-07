@@ -1839,8 +1839,8 @@
               <div class="field full">
                 <label>Cette prestation est une…</label>
                 <div class="choice-grid">
-                  <label data-tooltip="Nous amenons ce véhicule jusqu'à vous."><input type="radio" name="c-type-prestation" value="livraison" checked> Livraison</label>
-                  <label data-tooltip="Nous récupérons ce véhicule chez vous."><input type="radio" name="c-type-prestation" value="reprise"> Reprise</label>
+                  <label><input type="radio" name="c-type-prestation" value="livraison" checked> Livraison</label>
+                  <label><input type="radio" name="c-type-prestation" value="reprise"> Reprise</label>
                 </div>
               </div>
               <div class="field">
@@ -2736,11 +2736,15 @@
   var GOOGLE_FORM_ENTRY_DETAILS = 'entry.975568467';  // champ "Details"
 
   // ---------- Hauteur de l'en-tête (pour caler la sidebar sticky) ----------
+  // Repoussée au frame suivant : lire offsetHeight force un calcul de mise
+  // en page immédiat, coûteux sur une page volumineuse — autant laisser le
+  // premier rendu s'afficher d'abord (le fallback CSS --header-h:65px
+  // couvre l'écart, invisible en pratique).
   function syncHeaderHeight() {
     var h = document.querySelector('header.topnav').offsetHeight;
     document.documentElement.style.setProperty('--header-h', h + 'px');
   }
-  syncHeaderHeight();
+  requestAnimationFrame(syncHeaderHeight);
   window.addEventListener('resize', syncHeaderHeight);
 
   // ---------- Révélation au scroll ----------
