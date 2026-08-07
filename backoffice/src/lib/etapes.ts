@@ -33,7 +33,8 @@ export const ETAPES_OFFRE: Record<OffreAccompagnement, EtapeDef[]> = {
     REDACTION,
     { key: "mise_en_relation", label: "Mise en relation avec le vendeur" },
     { key: "inspection_vehicule", label: "Inspection du véhicule" },
-    { key: "processus_achat", label: "Processus d'achat" },
+    { key: "processus_achat", label: "Accompagnement à l'achat" },
+    { key: "demarches_administratives", label: "Démarches administratives" },
     { key: "livraison", label: "Livraison" },
   ],
   expertise_seule: [

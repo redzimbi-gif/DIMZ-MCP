@@ -23,7 +23,7 @@ function emailLayout(contentHtml: string): string {
             </tr>
             <tr>
               <td style="padding:18px 32px;border-top:1px solid #e6e8ee;color:${INK_SOFT};font-size:12px;">
-                DIMZ — Mon copilote auto<br />Cet email vous a été envoyé suite à votre demande.
+                DIMZ · Mon copilote auto<br />Cet email vous a été envoyé suite à votre demande.
               </td>
             </tr>
           </table>
@@ -49,12 +49,12 @@ export function confirmationDemandeEmail(params: {
 }): { subject: string; html: string } {
   const content = `
     <p style="margin:0 0 16px;">${greeting(params.prenom)}</p>
-    <p style="margin:0 0 16px;">On a bien reçu votre demande, merci ! Votre dossier <strong>${params.reference}</strong> est enregistré et on revient vers vous sous 24 à 48h pour la suite.</p>
+    <p style="margin:0 0 16px;">Votre demande est bien reçue, merci. Votre dossier <strong>${params.reference}</strong> est enregistré et nous revenons vers vous sous 24 à 48h pour la suite.</p>
     <p style="margin:0 0 4px;">Vous pouvez suivre l'avancement de votre dossier à tout moment via ce lien :</p>
     ${ctaButton(params.portalUrl, "Suivre mon dossier")}
   `;
   return {
-    subject: `Votre demande DIMZ est bien reçue — ${params.reference}`,
+    subject: `Votre demande DIMZ est bien reçue (${params.reference})`,
     html: emailLayout(content),
   };
 }
@@ -73,7 +73,7 @@ export function rapportDisponibleEmail(params: {
     ${ctaButton(params.portalUrl, "Voir mon dossier")}
   `;
   return {
-    subject: `Votre rapport ${label} est disponible — ${params.reference}`,
+    subject: `Votre rapport ${label} est disponible (${params.reference})`,
     html: emailLayout(content),
   };
 }
@@ -96,7 +96,7 @@ function etapeEmail(params: EtapeEmailParams, badgeLabel: string, bodyHtml: stri
     <p style="margin:0 0 4px;">Le détail est disponible sur votre espace de suivi :</p>
     ${ctaButton(params.portalUrl, "Suivre mon dossier")}
   `;
-  return { subject: `${subject} — ${params.reference}`, html: emailLayout(content) };
+  return { subject: `${subject} (${params.reference})`, html: emailLayout(content) };
 }
 
 // ---------------------------------------------------------------------------
@@ -116,6 +116,7 @@ export type EtapeAccompagnementKey =
   | "mise_en_relation"
   | "inspection_vehicule"
   | "processus_achat"
+  | "demarches_administratives"
   | "livraison"
   | "inspection_planifiee"
   | "inspection_realisee"
@@ -124,53 +125,58 @@ export type EtapeAccompagnementKey =
 const ETAPE_ACCOMPAGNEMENT_COPY: Record<EtapeAccompagnementKey, { badge: string; subject: string; body: string }> = {
   traitement_en_cours: {
     badge: "Votre copilote prend connaissance de votre dossier",
-    subject: "On planche déjà sur votre dossier",
-    body: "Votre demande vient d'atterrir sur le bureau (virtuel) de votre copilote. Café servi, dossier ouvert : on prend le temps de bien comprendre votre projet avant de foncer.",
+    subject: "Votre dossier est pris en charge",
+    body: "Votre copilote prend le temps d'étudier votre projet en détail avant de passer à l'étape suivante. Vous aurez de ses nouvelles très vite.",
   },
   exploration_projet: {
     badge: "Exploration de votre projet",
-    subject: "Exploration de votre projet en cours",
-    body: "Votre copilote a mis son casque d'exploration : budget, usage, petites manies au volant… on creuse chaque détail de votre projet pour viser juste du premier coup.",
+    subject: "Exploration de votre projet",
+    body: "Votre copilote passe en revue votre projet en détail : budget, usage, contraintes du quotidien. L'objectif est de cerner précisément ce qu'il vous faut avant de démarrer les recherches.",
   },
   reponse_envoyee: {
     badge: "Réponse envoyée",
-    subject: "Votre réponse DIMZ est arrivée",
-    body: "Après avoir exploré votre projet, votre copilote vous a préparé une première sélection et quelques conseils sur mesure. Direction votre espace de suivi pour découvrir tout ça !",
+    subject: "Votre réponse est disponible",
+    body: "Après avoir étudié votre projet, votre copilote vous a préparé une première sélection et des conseils personnalisés. Retrouvez-les dans votre espace de suivi.",
   },
   recherche_annonces: {
     badge: "Recherche d'annonces qualifiées",
-    subject: "La chasse aux bonnes annonces est lancée",
-    body: "Votre copilote épluche le marché à votre place : annonces trafiquées, prix gonflés, kilométrage douteux… rien ne lui échappe. Objectif : ne vous présenter que des véhicules qui en valent vraiment la peine.",
+    subject: "La recherche de votre véhicule est lancée",
+    body: "Votre copilote passe le marché au crible pour vous : annonces trafiquées, prix gonflés, kilométrage douteux, rien ne lui échappe. Seuls les véhicules qui en valent vraiment la peine vous seront présentés.",
   },
   redaction_rapport: {
     badge: "Rédaction de votre rapport",
     subject: "Votre rapport est en cours de rédaction",
-    body: "Les meilleures annonces sont sélectionnées, votre copilote rédige maintenant un rapport clair et sans jargon pour vous aider à choisir en toute confiance.",
+    body: "Les meilleures annonces sont sélectionnées. Votre copilote rédige maintenant un rapport clair et sans jargon pour vous aider à choisir en toute confiance.",
   },
   dossier_envoye: {
     badge: "Dossier envoyé",
-    subject: "Votre dossier complet est prêt !",
-    body: "Votre rapport et notre sélection de véhicules sont disponibles dans votre espace de suivi. À vous de jouer — et si besoin, l'appel de synthèse promis vous attend.",
+    subject: "Votre dossier complet est prêt",
+    body: "Votre rapport et notre sélection de véhicules sont disponibles dans votre espace de suivi. Un appel de synthèse avec votre copilote est prévu pour faire le point ensemble.",
   },
   mise_en_relation: {
     badge: "Mise en relation avec le vendeur",
-    subject: "On prend contact avec le vendeur",
-    body: "Véhicule choisi ? Votre copilote passe à la vitesse supérieure et entre en contact avec le vendeur pour caler les prochaines étapes.",
+    subject: "Prise de contact avec le vendeur",
+    body: "Le véhicule est choisi. Votre copilote prend contact avec le vendeur pour préparer la suite.",
   },
   inspection_vehicule: {
     badge: "Inspection du véhicule",
-    subject: "Le véhicule passe sous la loupe de votre copilote",
-    body: "Direction le véhicule choisi pour une inspection complète : carrosserie, mécanique, essai routier… rien n'est laissé au hasard avant de vous donner le feu vert.",
+    subject: "Inspection du véhicule en cours",
+    body: "Direction le véhicule choisi pour une inspection complète : carrosserie, mécanique, essai routier. Rien n'est laissé au hasard avant de vous donner le feu vert.",
   },
   processus_achat: {
-    badge: "Processus d'achat",
-    subject: "On s'occupe des démarches d'achat",
-    body: "Négociation, paperasse, formalités administratives : votre copilote gère tout ça pendant que vous, vous n'avez qu'à patienter (avec le sourire, on espère).",
+    badge: "Accompagnement à l'achat",
+    subject: "L'achat de votre véhicule avance",
+    body: "Le véhicule est à vous de l'acquérir : votre copilote vous accompagne dans la négociation avec le vendeur et reste à vos côtés jusqu'à la signature.",
+  },
+  demarches_administratives: {
+    badge: "Démarches administratives",
+    subject: "Vos démarches administratives sont prises en charge",
+    body: "Carte grise, certificat de cession, formalités liées à l'achat : votre copilote s'en occupe pour vous. Cette prestation est incluse dans votre offre.",
   },
   livraison: {
     badge: "Livraison",
-    subject: "Votre véhicule prend la route vers vous",
-    body: "Dernière ligne droite ! Votre véhicule est en cours de livraison. Votre copilote vous recontacte pour caler les derniers détails avant la remise des clés.",
+    subject: "Votre véhicule est en cours de livraison",
+    body: "Votre véhicule est en cours de livraison. Votre copilote vous recontacte pour caler les derniers détails avant la remise des clés.",
   },
   inspection_planifiee: {
     badge: "Inspection planifiée",
@@ -179,13 +185,13 @@ const ETAPE_ACCOMPAGNEMENT_COPY: Record<EtapeAccompagnementKey, { badge: string;
   },
   inspection_realisee: {
     badge: "Inspection réalisée",
-    subject: "Inspection terminée !",
-    body: "Votre copilote vient de terminer l'inspection du véhicule. Direction la rédaction de votre avis pour vous donner un retour honnête, sans filtre.",
+    subject: "Votre inspection est terminée",
+    body: "Votre copilote vient de terminer l'inspection du véhicule. La rédaction de votre avis, honnête et détaillé, est la prochaine étape.",
   },
   rapport_envoye: {
     badge: "Rapport envoyé",
     subject: "Votre rapport d'inspection est disponible",
-    body: "Votre avis de copilote est prêt : ce qui va, ce qui coince, et notre recommandation finale. Retrouvez-le dans votre espace de suivi.",
+    body: "Votre avis de copilote est prêt : les points positifs, les points de vigilance, et notre recommandation finale. Retrouvez-le dans votre espace de suivi.",
   },
 };
 
@@ -225,7 +231,7 @@ const ETAPE_CONVOYAGE_COPY: Record<EtapeConvoyageKey, { badge: string; subject: 
   },
   demande_refusee: {
     badge: "Demande non retenue",
-    subject: "Votre demande de convoyage — réponse de DIMZ",
+    subject: "Réponse de DIMZ à votre demande de convoyage",
     body: "Nous vous remercions pour votre demande de convoyage. Après étude, nous ne sommes malheureusement pas en mesure d'y donner suite pour le moment. Nous sommes sincèrement désolés pour la gêne occasionnée et restons à votre disposition pour toute question.",
   },
   livraison_en_cours: {

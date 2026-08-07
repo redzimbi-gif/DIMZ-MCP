@@ -57,12 +57,12 @@ async function sendConfirmationEmail(params: { to: string; prenom: string | null
           </td></tr>
           <tr><td style="padding:32px;color:#0b0d12;font-size:14px;line-height:1.6;">
             <p style="margin:0 0 16px;">${hello}</p>
-            <p style="margin:0 0 16px;">On a bien reçu votre demande, merci ! Votre dossier <strong>${params.reference}</strong> est enregistré et on revient vers vous sous 24 à 48h pour la suite.</p>
+            <p style="margin:0 0 16px;">Votre demande est bien reçue, merci. Votre dossier <strong>${params.reference}</strong> est enregistré et nous revenons vers vous sous 24 à 48h pour la suite.</p>
             <p style="margin:0 0 4px;">Vous pouvez suivre l'avancement de votre dossier à tout moment via ce lien :</p>
             <a href="${params.portalUrl}" style="display:inline-block;background:#2f6fed;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;padding:12px 22px;border-radius:8px;margin-top:18px;">Suivre mon dossier</a>
           </td></tr>
           <tr><td style="padding:18px 32px;border-top:1px solid #e6e8ee;color:#565c68;font-size:12px;">
-            DIMZ — Mon copilote auto<br />Cet email vous a été envoyé suite à votre demande.
+            DIMZ · Mon copilote auto<br />Cet email vous a été envoyé suite à votre demande.
           </td></tr>
         </table>
       </td></tr>
@@ -77,7 +77,7 @@ async function sendConfirmationEmail(params: { to: string; prenom: string | null
       body: JSON.stringify({
         from: Deno.env.get("EMAIL_FROM") || "DIMZ <onboarding@resend.dev>",
         to: params.to,
-        subject: `Votre demande DIMZ est bien reçue — ${params.reference}`,
+        subject: `Votre demande DIMZ est bien reçue (${params.reference})`,
         html,
       }),
     });
@@ -183,7 +183,7 @@ Deno.serve(async (req: Request) => {
 
   await db.from("notifications").insert({
     titre: `Nouvelle demande : ${formulaire}`,
-    message: `${prenom ?? ""} ${nom} — ${dossier.reference}`.trim(),
+    message: `${prenom ?? ""} ${nom} (${dossier.reference})`.trim(),
     type: "nouveau_dossier",
     lien: `/dossiers/${dossier.id}`,
   });
