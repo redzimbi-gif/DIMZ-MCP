@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { clsx } from "clsx";
 import { Plus, Star, ExternalLink, Trash2, Mail } from "lucide-react";
 import {
   getDossier,
   getDossierHistory,
+  getDossierEtapeHistory,
   getDossierAnnonces,
   getDossierInspections,
   getDossierConvoyages,
@@ -29,11 +31,23 @@ import {
   DOSSIER_OFFRES,
   DOSSIER_OFFRE_LABELS,
   DOCUMENT_TYPE_LABELS,
+  type DossierOffre,
 } from "@/lib/types";
+import { getEtapesOffre, getOffreAccompagnement, getEtapeLabel, ETAPES_CONVOYAGE } from "@/lib/etapes";
 import { formatCurrency, formatDate, formatDateTime, formatRelative } from "@/lib/format";
-import { updateDossierInfos, updateDossierStatut, addDossierNote, sendDossierStatusEmail } from "../actions";
+import {
+  updateDossierInfos,
+  updateDossierStatut,
+  addDossierNote,
+  updateDossierOffre,
+  updateDossierEtapeClient,
+  sendEtapeClientEmail,
+  decideConvoyageDemande,
+} from "../actions";
 import { createAnnonce, toggleAnnonceSelection, deleteAnnonce } from "./annonces-actions";
 import { uploadDossierDocument } from "./documents-actions";
+
+const OFFRES_ACCOMPAGNEMENT = ["decouverte", "copilote", "copilote_plus", "expertise_seule"] as const;
 
 const DONNEES_BRUTES_KEYS_MASQUEES = new Set(["Formulaire", "Horodatage"]);
 
@@ -67,16 +81,23 @@ export default async function DossierDetailPage({
 
   const tab = searchParams.tab || "infos";
   const history = await getDossierHistory(dossier.id);
+  const etapeHistory = await getDossierEtapeHistory(dossier.id);
 
   const updateInfosAction = updateDossierInfos.bind(null, dossier.id);
   const updateStatutAction = updateDossierStatut.bind(null, dossier.id);
   const addNoteAction = addDossierNote.bind(null, dossier.id);
   const createAnnonceAction = createAnnonce.bind(null, dossier.id);
   const uploadDocAction = uploadDossierDocument.bind(null, dossier.id);
-  const sendStatusEmailAction = sendDossierStatusEmail.bind(null, dossier.id, tab);
+  const updateEtapeAction = updateDossierEtapeClient.bind(null, dossier.id);
+  const sendEtapeEmailAction = sendEtapeClientEmail.bind(null, dossier.id, tab);
 
   const portalUrl = `/suivi/${dossier.portal_token}`;
   const donneesGroups = groupDonneesBrutes(dossier.donnees_brutes);
+
+  const isConvoyage = dossier.offre === "convoyage_seul";
+  const offreAccompagnement = getOffreAccompagnement(dossier.offre);
+  const etapesSuiviClient = isConvoyage ? ETAPES_CONVOYAGE : getEtapesOffre(dossier.offre);
+  const peutEnvoyerEmailEtape = dossier.etape_client !== "demande_recue";
 
   return (
     <div>
@@ -102,33 +123,111 @@ export default async function DossierDetailPage({
 
       <EmailStatusBanner status={searchParams.notif} />
 
-      <Card className="p-4 mb-6">
-        <form action={updateStatutAction} className="flex flex-wrap items-end gap-3">
-          <Field label="Faire évoluer le statut">
-            <select name="statut" defaultValue={dossier.statut} className={inputClass}>
-              {DOSSIER_STATUTS.map((s) => (
-                <option key={s} value={s}>
-                  {DOSSIER_STATUT_LABELS[s]}
-                </option>
+      <Card className="p-4 mb-4">
+        <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-3">
+          Suivi client — ce que voit le client sur son espace de suivi
+        </p>
+
+        {isConvoyage ? (
+          <>
+            {dossier.convoyage_decision === "en_attente" ? (
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                <span className="text-xs text-ink-soft mr-1">Décision sur la demande :</span>
+                <form action={decideConvoyageDemande.bind(null, dossier.id, "accepte")}>
+                  <Button type="submit">Dossier accepté</Button>
+                </form>
+                <form action={decideConvoyageDemande.bind(null, dossier.id, "refuse")}>
+                  <Button type="submit" variant="danger">
+                    Dossier refusé
+                  </Button>
+                </form>
+              </div>
+            ) : (
+              <div className="mb-4">
+                <Badge tone={dossier.convoyage_decision === "accepte" ? "good" : "bad"}>
+                  {dossier.convoyage_decision === "accepte" ? "Demande acceptée" : "Demande refusée"}
+                </Badge>
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <p className="text-xs text-ink-soft mb-2">Offre choisie</p>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {OFFRES_ACCOMPAGNEMENT.map((o) => (
+                <form key={o} action={updateDossierOffre.bind(null, dossier.id, o as DossierOffre)}>
+                  <button
+                    type="submit"
+                    className={clsx(
+                      "rounded-full px-3.5 py-1.5 text-sm font-medium border transition-colors",
+                      offreAccompagnement === o
+                        ? "bg-blue-500 text-white border-blue-500"
+                        : "border-line text-ink-soft hover:bg-surface-sunken"
+                    )}
+                  >
+                    {DOSSIER_OFFRE_LABELS[o]}
+                  </button>
+                </form>
               ))}
-            </select>
-          </Field>
-          <Field label="Note (optionnel)">
-            <input name="note" className={inputClass} placeholder="Précision sur ce changement…" />
-          </Field>
-          <Button type="submit">Mettre à jour</Button>
-        </form>
-        <div className="flex items-center justify-between gap-3 mt-3 pt-3 border-t border-line">
-          <p className="text-xs text-ink-soft">
-            Prévient le client par email du statut actuel de son dossier, avec un lien vers son espace de suivi.
-          </p>
-          <form action={sendStatusEmailAction} className="shrink-0">
-            <Button type="submit" variant="outline">
-              <Mail className="h-4 w-4" /> Informer le client
-            </Button>
+            </div>
+          </>
+        )}
+
+        {dossier.etape_client === "demande_refusee" ? null : (
+          <form action={updateEtapeAction} className="flex flex-wrap items-end gap-3">
+            <Field label="Étape visible par le client">
+              <select name="etape_client" defaultValue={dossier.etape_client} className={inputClass}>
+                {etapesSuiviClient.map((e) => (
+                  <option key={e.key} value={e.key}>
+                    {e.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Note (optionnel)">
+              <input name="note" className={inputClass} placeholder="Précision sur ce changement…" />
+            </Field>
+            <Button type="submit">Mettre à jour</Button>
           </form>
-        </div>
+        )}
+
+        {peutEnvoyerEmailEtape ? (
+          <div className="flex items-center justify-between gap-3 mt-3 pt-3 border-t border-line">
+            <p className="text-xs text-ink-soft">
+              Envoie au client l'email correspondant à l'étape actuelle
+              {isConvoyage ? " (ton professionnel)" : " (ton copilote, léger)"}.
+            </p>
+            <form action={sendEtapeEmailAction} className="shrink-0">
+              <Button type="submit" variant="outline">
+                <Mail className="h-4 w-4" /> Informer le client
+              </Button>
+            </form>
+          </div>
+        ) : null}
       </Card>
+
+      <details className="mb-6">
+        <summary className="cursor-pointer text-xs font-semibold text-ink-faint uppercase tracking-wide mb-2">
+          Pipeline interne (usage équipe, non visible par le client)
+        </summary>
+        <Card className="p-4 mt-2">
+          <form action={updateStatutAction} className="flex flex-wrap items-end gap-3">
+            <Field label="Faire évoluer le statut">
+              <select name="statut" defaultValue={dossier.statut} className={inputClass}>
+                {DOSSIER_STATUTS.map((s) => (
+                  <option key={s} value={s}>
+                    {DOSSIER_STATUT_LABELS[s]}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Note (optionnel)">
+              <input name="note" className={inputClass} placeholder="Précision sur ce changement…" />
+            </Field>
+            <Button type="submit">Mettre à jour</Button>
+          </form>
+        </Card>
+      </details>
 
       <DossierTabs dossierId={dossier.id} active={tab} />
 
@@ -237,7 +336,13 @@ export default async function DossierDetailPage({
       ) : null}
 
       {tab === "notes" ? (
-        <NotesTab dossierId={dossier.id} addNoteAction={addNoteAction} history={history} />
+        <NotesTab
+          dossierId={dossier.id}
+          addNoteAction={addNoteAction}
+          history={history}
+          etapeHistory={etapeHistory}
+          offre={dossier.offre}
+        />
       ) : null}
     </div>
   );
@@ -514,10 +619,14 @@ async function NotesTab({
   dossierId,
   addNoteAction,
   history,
+  etapeHistory,
+  offre,
 }: {
   dossierId: string;
   addNoteAction: (formData: FormData) => Promise<void>;
   history: Awaited<ReturnType<typeof getDossierHistory>>;
+  etapeHistory: Awaited<ReturnType<typeof getDossierEtapeHistory>>;
+  offre: DossierOffre | null;
 }) {
   const notes = await getDossierNotes(dossierId);
 
@@ -546,7 +655,30 @@ async function NotesTab({
       </Card>
 
       <Card className="p-5">
-        <h2 className="text-sm font-semibold text-ink mb-4">Historique des statuts</h2>
+        <h2 className="text-sm font-semibold text-ink mb-4">Historique du suivi client</h2>
+        {etapeHistory.length === 0 ? (
+          <EmptyState title="Aucun historique" />
+        ) : (
+          <ol className="space-y-4">
+            {etapeHistory
+              .slice()
+              .reverse()
+              .map((h) => (
+                <li key={h.id} className="text-sm flex items-start gap-3">
+                  <div className="h-1.5 w-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
+                  <div>
+                    <p className="text-ink font-medium">{getEtapeLabel(offre, h.etape_client)}</p>
+                    {h.note ? <p className="text-ink-soft">{h.note}</p> : null}
+                    <p className="text-xs text-ink-faint mt-0.5">{formatDateTime(h.created_at)}</p>
+                  </div>
+                </li>
+              ))}
+          </ol>
+        )}
+      </Card>
+
+      <Card className="p-5">
+        <h2 className="text-sm font-semibold text-ink mb-4">Historique du pipeline interne</h2>
         {history.length === 0 ? (
           <EmptyState title="Aucun historique" />
         ) : (
@@ -556,7 +688,7 @@ async function NotesTab({
               .reverse()
               .map((h) => (
                 <li key={h.id} className="text-sm flex items-start gap-3">
-                  <div className="h-1.5 w-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
+                  <div className="h-1.5 w-1.5 rounded-full bg-ink-faint mt-1.5 shrink-0" />
                   <div>
                     <p className="text-ink font-medium">{DOSSIER_STATUT_LABELS[h.statut]}</p>
                     {h.note ? <p className="text-ink-soft">{h.note}</p> : null}

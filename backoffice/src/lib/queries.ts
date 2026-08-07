@@ -9,6 +9,7 @@ import type {
   ConvoyageExterne,
   DocumentRow,
   Dossier,
+  DossierEtapeHistory,
   DossierStatutHistory,
   Inspection,
   NoteInterne,
@@ -172,6 +173,16 @@ export async function getDossierHistory(dossierId: string) {
     .eq("dossier_id", dossierId)
     .order("created_at", { ascending: true });
   return (data ?? []) as DossierStatutHistory[];
+}
+
+export async function getDossierEtapeHistory(dossierId: string) {
+  const db = createAdminClient();
+  const { data } = await db
+    .from("dossier_etape_history")
+    .select("*")
+    .eq("dossier_id", dossierId)
+    .order("created_at", { ascending: true });
+  return (data ?? []) as DossierEtapeHistory[];
 }
 
 export async function getDossierAnnonces(dossierId: string) {

@@ -18,6 +18,7 @@ stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
    - `0006_comptabilite_justificatifs.sql`
    - `0007_rapport_dimz.sql`
    - `0008_test_feedback.sql`
+   - `0009_suivi_client_par_offre.sql`
 3. Dans **Project Settings → API**, récupère :
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -140,16 +141,24 @@ l'email de confirmation si le client a renseigné son adresse.
 - Agenda : calendrier mensuel (rendez-vous, visio, inspections, convoyages,
   livraisons).
 - Documents : bibliothèque liée aux dossiers.
-- Suivi client : page publique `/suivi/[token]` avec la checklist d'avancement,
-  lien à partager avec le client (`/dossiers/[id]` → bouton « Suivi client »).
+- Suivi client (Accompagnement) : sur `/dossiers/[id]`, un bandeau à 4 offres
+  (Découverte / Copilote / Copilote Plus / Inspection — Découverte par défaut
+  à la création du dossier) pilote les étapes que le client voit sur
+  `/suivi/[token]` : communes (« Demande reçue » → étude du dossier) puis
+  spécifiques à l'offre choisie. Bouton « Informer le client » pour envoyer
+  l'email de l'étape en cours (ton copilote, léger). Distinct du pipeline
+  interne à 10 statuts (kanban), qui reste réservé à l'équipe.
+- Suivi client (Convoyage) : flux dédié — Demande reçue → Étude de la demande
+  → boutons Accepté/Refusé (email d'excuse si refusé) → Devis en cours →
+  Livraison en cours → Véhicule livré, avec un email pro à chaque étape.
 - Formulaire du site → dossier créé automatiquement (`/api/public/lead`).
 - Journal des actions (`activity_log`) et notifications internes.
 - Emails automatiques (via Resend) :
   - confirmation envoyée au client dès qu'il soumet un formulaire du site ;
   - bouton « Envoyer au client » sur une inspection ou un convoyage → email
     avec le rapport PDF en pièce jointe ;
-  - bouton « Informer le client » sur un dossier → email avec le statut
-    actuel et un lien vers son espace de suivi.
+  - un email dédié à chaque étape du suivi client (voir ci-dessus), envoyé à
+    la demande via « Informer le client ».
 - Retours test : questionnaire de test utilisateur sur le site (page « Test »),
   résultats et durée de remplissage mesurée automatiquement, consultables
   dans `/retours-test`.

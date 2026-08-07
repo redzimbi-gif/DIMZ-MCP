@@ -40,8 +40,11 @@ export const DOSSIER_OFFRE_LABELS: Record<DossierOffre, string> = {
   copilote: "Copilote",
   copilote_plus: "Copilote Plus",
   convoyage_seul: "Livraison seule",
-  expertise_seule: "Expertise seule",
+  expertise_seule: "Inspection",
 };
+
+export const CONVOYAGE_DECISIONS = ["en_attente", "accepte", "refuse"] as const;
+export type ConvoyageDecision = (typeof CONVOYAGE_DECISIONS)[number];
 
 export const DOCUMENT_TYPES = [
   "carte_grise",
@@ -121,6 +124,8 @@ export interface Dossier {
   region: string | null;
   commentaires: string | null;
   statut: DossierStatut;
+  etape_client: string;
+  convoyage_decision: ConvoyageDecision;
   valeur_estimee: number | null;
   source: string;
   portal_token: string;
@@ -134,6 +139,15 @@ export interface DossierStatutHistory {
   id: string;
   dossier_id: string;
   statut: DossierStatut;
+  note: string | null;
+  changed_by: string | null;
+  created_at: string;
+}
+
+export interface DossierEtapeHistory {
+  id: string;
+  dossier_id: string;
+  etape_client: string;
   note: string | null;
   changed_by: string | null;
   created_at: string;

@@ -25,13 +25,14 @@ function pick(data: Record<string, unknown>, ...keys: string[]): string | null {
   return null;
 }
 
-function guessOffre(label: string | null): string | null {
-  if (!label) return null;
+function guessOffre(label: string | null): string {
+  if (!label) return "decouverte";
   const lower = label.toLowerCase();
   if (lower.includes("découverte")) return "decouverte";
+  if (lower.includes("inspection")) return "expertise_seule";
   if (lower.includes("plus")) return "copilote_plus";
   if (lower.includes("copilote")) return "copilote";
-  return null;
+  return "decouverte";
 }
 
 // Emails via l'API Resend en appel HTTP direct (pas de SDK, pour rester un
