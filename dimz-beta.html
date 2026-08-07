@@ -2771,6 +2771,17 @@
   function showMainTab(tab, resetSubtab) {
     document.querySelectorAll('.legal-page').forEach(function (p) { p.hidden = true; });
     mainTabButtons.forEach(function (b) { b.setAttribute('aria-selected', b.dataset.tab === tab ? 'true' : 'false'); });
+    // Si un formulaire d'un autre onglet était resté en plein écran, sa carte
+    // a été déplacée dans <body> pour échapper au contexte d'empilement —
+    // masquer son onglet ne la cache plus. On la replie avant de changer
+    // d'onglet, sans perdre les réponses déjà saisies (reset() ne vide pas
+    // le formulaire, il ramène juste à l'étape 1 et sort du plein écran).
+    if (typeof wizards !== 'undefined' && wizards) {
+      var tabForWizard = { 'form-accompagnement': 'accompagnement', 'form-convoyage': 'convoyage', 'form-test': 'test' };
+      Object.keys(wizards).forEach(function (formId) {
+        if (tabForWizard[formId] !== tab && wizards[formId]) wizards[formId].reset();
+      });
+    }
     document.getElementById('tab-accompagnement').hidden = tab !== 'accompagnement';
     document.getElementById('tab-convoyage').hidden = tab !== 'convoyage';
     document.getElementById('tab-test').hidden = tab !== 'test';
@@ -2780,8 +2791,12 @@
 
   // ---------- Pages légales (RGPD, CGV, Mentions légales) ----------
   function showLegalPage(name) {
+    if (typeof wizards !== 'undefined' && wizards) {
+      Object.keys(wizards).forEach(function (formId) { if (wizards[formId]) wizards[formId].reset(); });
+    }
     document.getElementById('tab-accompagnement').hidden = true;
     document.getElementById('tab-convoyage').hidden = true;
+    document.getElementById('tab-test').hidden = true;
     document.querySelectorAll('.legal-page').forEach(function (p) { p.hidden = p.id !== 'page-legal-' + name; });
     window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
     observeNewReveals();
