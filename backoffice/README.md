@@ -19,6 +19,7 @@ stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
    - `0007_rapport_dimz.sql`
    - `0008_test_feedback.sql`
    - `0009_suivi_client_par_offre.sql`
+   - `0010_score_dimz_annonces.sql`
 3. Dans **Project Settings → API**, récupère :
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -131,7 +132,9 @@ l'email de confirmation si le client a renseigné son adresse.
 - Dossiers : pipeline en 10 statuts (kanban), historique des changements de
   statut, infos projet complètes.
 - Recherche de véhicules : annonces avec photos, avis du copilote, points
-  forts/faibles, score de confiance, sélection.
+  forts/faibles, sélection, et **Score DIMZ** par annonce (score global /10 +
+  4 critères détaillés : prix, historique, état, adéquation), noté via le
+  bouton crayon sur chaque annonce.
 - Inspection = Rapport DIMZ : même contenu riche que l'exemple du site (score
   global, score par étape du contrôle, tags, points positifs/vigilance, avis
   du copilote, verdict), entièrement éditable depuis le back-office, avec

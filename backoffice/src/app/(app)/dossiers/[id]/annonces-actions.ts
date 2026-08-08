@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { logActivity } from "@/lib/log";
 import { uploadFiles } from "@/lib/storage";
+import { annonceFieldsFromForm } from "@/lib/annonce-fields";
 
 export async function createAnnonce(dossierId: string, formData: FormData) {
   const db = createAdminClient();
@@ -17,15 +18,7 @@ export async function createAnnonce(dossierId: string, formData: FormData) {
   const payload = {
     dossier_id: dossierId,
     titre,
-    lien: String(formData.get("lien") || "").trim() || null,
-    prix: formData.get("prix") ? Number(formData.get("prix")) : null,
-    kilometrage: formData.get("kilometrage") ? Number(formData.get("kilometrage")) : null,
-    annee: formData.get("annee") ? Number(formData.get("annee")) : null,
-    localisation: String(formData.get("localisation") || "").trim() || null,
-    avis_copilote: String(formData.get("avis_copilote") || "").trim() || null,
-    points_forts: String(formData.get("points_forts") || "").trim() || null,
-    points_faibles: String(formData.get("points_faibles") || "").trim() || null,
-    score_confiance: formData.get("score_confiance") ? Number(formData.get("score_confiance")) : null,
+    ...annonceFieldsFromForm(formData),
     photos: photoPaths,
   };
 

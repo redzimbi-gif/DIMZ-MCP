@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { clsx } from "clsx";
-import { Plus, Star, ExternalLink, Trash2, Mail } from "lucide-react";
+import { Plus, Star, ExternalLink, Trash2, Mail, PenLine } from "lucide-react";
 import {
   getDossier,
   getDossierHistory,
@@ -394,7 +394,19 @@ async function VehiculesTab({
                     {a.prix_negocie ? ` → ${formatCurrency(a.prix_negocie)} négocié` : ""}
                   </p>
                   {a.score_confiance != null ? (
-                    <p className="text-xs text-ink-faint mt-1">Score de confiance : {a.score_confiance}/100</p>
+                    <p className="text-xs font-medium text-blue-600 mt-1 tnum">Score DIMZ : {a.score_confiance}/10</p>
+                  ) : null}
+                  {a.score_prix != null || a.score_historique != null || a.score_etat != null || a.score_adequation != null ? (
+                    <p className="text-xs text-ink-faint mt-0.5 tnum">
+                      {[
+                        a.score_prix != null ? `Prix ${a.score_prix}` : null,
+                        a.score_historique != null ? `Historique ${a.score_historique}` : null,
+                        a.score_etat != null ? `État ${a.score_etat}` : null,
+                        a.score_adequation != null ? `Adéquation ${a.score_adequation}` : null,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </p>
                   ) : null}
                   {a.avis_copilote ? (
                     <p className="text-sm text-ink mt-2 bg-surface-sunken rounded-md p-2">
@@ -421,6 +433,14 @@ async function VehiculesTab({
                   ) : null}
                 </div>
                 <div className="flex flex-col items-end gap-2 shrink-0">
+                  <Link
+                    href={`/dossiers/${dossier.id}/annonces/${a.id}/edit`}
+                    className="p-1.5 rounded-md text-ink-faint hover:text-blue-600 hover:bg-blue-50"
+                    aria-label="Noter cette annonce"
+                    title="Noter cette annonce"
+                  >
+                    <PenLine className="h-4 w-4" />
+                  </Link>
                   <form action={toggleAction.bind(null, a.id, !a.selectionnee)}>
                     <button
                       type="submit"
@@ -480,8 +500,8 @@ async function VehiculesTab({
           <Field label="Points faibles">
             <input name="points_faibles" className={inputClass} />
           </Field>
-          <Field label="Score de confiance (0-100)">
-            <input name="score_confiance" type="number" min={0} max={100} className={inputClass} />
+          <Field label="Score DIMZ global (/10)">
+            <input name="score_confiance" type="number" min={0} max={10} step="0.5" className={inputClass} />
           </Field>
           <Field label="Photos">
             <input name="photos" type="file" accept="image/*" multiple className={inputClass} />
@@ -490,6 +510,10 @@ async function VehiculesTab({
             <Plus className="h-4 w-4" /> Ajouter l'annonce
           </Button>
         </form>
+        <p className="text-xs text-ink-faint mt-3">
+          Le détail du Score DIMZ (prix, historique, état, adéquation) se complète ensuite via « Noter » sur
+          l'annonce.
+        </p>
       </Card>
     </div>
   );

@@ -167,6 +167,10 @@ export interface Annonce {
   points_forts: string | null;
   points_faibles: string | null;
   score_confiance: number | null;
+  score_prix: number | null;
+  score_historique: number | null;
+  score_etat: number | null;
+  score_adequation: number | null;
   selectionnee: boolean;
   photos: string[];
   created_at: string;
