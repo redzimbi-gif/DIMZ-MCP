@@ -1016,6 +1016,23 @@
                 <h3>Votre quotidien</h3>
                 <div class="field-grid">
                   <div class="field full">
+                    <label for="a-enfants">Un enfant fait-il partie de vos trajets, ou est-ce prévu prochainement ?</label>
+                    <select id="a-enfants">
+                      <option value="">Choisir…</option>
+                      <option value="non">Non</option>
+                      <option value="oui">Oui</option>
+                    </select>
+                  </div>
+                  <div class="field" id="a-enfants-nombre-wrap" hidden>
+                    <label for="a-enfants-nombre">Combien d'enfants ?</label>
+                    <select id="a-enfants-nombre">
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4 ou plus</option>
+                    </select>
+                  </div>
+                  <div class="field full">
                     <label for="a-pourqui">Le véhicule est destiné à…</label>
                     <select id="a-pourqui">
                       <option>Moi-même</option>
@@ -1027,10 +1044,10 @@
                   <div class="field full">
                     <label>Usages principaux</label>
                     <div class="choice-grid" id="usages-choices">
-                      <label><input type="checkbox" value="travail"> Trajets travail</label>
-                      <label><input type="checkbox" value="loisirs"> Loisirs</label>
-                      <label><input type="checkbox" value="quotidien"> Trajets quotidiens</label>
-                      <label><input type="checkbox" value="vacances"> Vacances / longs trajets</label>
+                      <label><input type="checkbox" value="domicile-travail"> Trajets domicile-travail</label>
+                      <label><input type="checkbox" value="quotidien"> Courses et trajets du quotidien</label>
+                      <label><input type="checkbox" value="loisirs"> Loisirs et sorties</label>
+                      <label><input type="checkbox" value="vacances"> Vacances et longs trajets</label>
                     </div>
                   </div>
                   <div class="field">
@@ -3342,7 +3359,10 @@
       recapRow('Email', inputVal('a-email'))
     ].filter(Boolean) });
 
+    var enfantsOui = document.getElementById('a-enfants').value === 'oui';
     groups.push({ title: 'Votre quotidien', step: 1, rows: [
+      recapRow('Enfants parmi les passagers', selectText('a-enfants')),
+      enfantsOui ? recapRow('Nombre d\'enfants', selectText('a-enfants-nombre')) : null,
       recapRow('Véhicule destiné à', selectText('a-pourqui')),
       recapRow('Usages principaux', recapCheckedList('#usages-choices input')),
       recapRow('Kilométrage annuel estimé', selectText('a-km')),
@@ -3748,6 +3768,7 @@
     if (!show) document.getElementById('financement-detail').hidden = true;
   });
   toggleOnValue('a-financement-cours', 'financement-detail', 'oui');
+  toggleOnValue('a-enfants', 'a-enfants-nombre-wrap', 'oui');
   document.getElementById('a-actuel-absent').addEventListener('change', function () {
     document.getElementById('actuel-absent-detail').hidden = !this.checked;
   });
