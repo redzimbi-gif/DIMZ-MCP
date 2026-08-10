@@ -107,6 +107,7 @@
       --bleu-vif: #6c93e8;
       --shadow: 0 1px 0 rgba(0,0,0,0.4), 0 22px 38px -22px rgba(0,0,0,0.65);
       --shadow-lg: 0 1px 0 rgba(0,0,0,0.4), 0 40px 66px -30px rgba(0,0,0,0.7);
+      --bg-photo: linear-gradient(rgba(9,12,18,0.88), rgba(9,12,18,0.94)), url('img/fond-sombre.jpg');
     }
   }
   :root[data-theme="dark"] {
@@ -115,8 +116,10 @@
     --bleu-vif: #6c93e8;
     --shadow: 0 1px 0 rgba(0,0,0,0.4), 0 22px 38px -22px rgba(0,0,0,0.65);
     --shadow-lg: 0 1px 0 rgba(0,0,0,0.4), 0 40px 66px -30px rgba(0,0,0,0.7);
+    --bg-photo: linear-gradient(rgba(9,12,18,0.88), rgba(9,12,18,0.94)), url('img/fond-sombre.jpg');
   }
   :root[data-theme="light"] {
+    --bg-photo: none;
     --bg: #f6f7fa; --bg-raised: #ffffff; --bg-tint: #eef1f7;
     --ink: #10141c; --ink-soft: #5b6472; --line: #e2e6ed;
     --bleu-vif: #2f6fed;
@@ -132,6 +135,14 @@
     margin: 0; background: var(--bg); color: var(--ink);
     font-family: var(--sans);
     font-size: 16px; line-height: 1.65; -webkit-font-smoothing: antialiased;
+  }
+  /* Fond photo en mode sombre uniquement : fixe et sous tout le contenu,
+     avec un voile pour garder le texte et les cartes lisibles. --bg-photo
+     est défini uniquement dans les blocs mode sombre plus bas, donc ce
+     pseudo-élément reste transparent (aucun visuel) en mode clair. */
+  body::before {
+    content: ""; position: fixed; inset: 0; z-index: -1;
+    background: var(--bg-photo, none) center / cover no-repeat;
   }
 
   h1, h2, h3, .display {
@@ -250,6 +261,10 @@
   .acc-collapse summary:hover .chevron { color: var(--bleu-vif); }
   .acc-collapse-body { padding: 0 36px 36px; }
   .acc-collapse-intro { color: var(--ink-soft); margin: 0 0 22px; line-height: 1.6; }
+  .feature-photo { border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow); margin: 22px 0 4px; line-height: 0; }
+  .feature-photo img { width: 100%; height: 260px; object-fit: cover; display: block; }
+  .feature-photo.tall img { height: 340px; }
+  .feature-photo.short img { height: 170px; }
   .offres-teaser-list { list-style: none; margin: 0 0 24px; padding: 0; display: flex; flex-direction: column; gap: 2px; border-top: 1px solid var(--line); }
   .offres-teaser-list li { display: flex; align-items: baseline; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
   .offres-teaser-name { font-weight: 700; color: var(--ink); }
@@ -339,6 +354,24 @@
   @keyframes heroCarIn { from { opacity: 0; transform: translateX(-26px); } to { opacity: 0.95; transform: translateX(0); } }
   @keyframes heroCarFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
   @media (prefers-reduced-motion: reduce) { .hero-illustration { animation: none; opacity: 0.95; } }
+
+  /* Variante photo : une vraie photo en fond à la place du dégradé uni,
+     avec le même voile bleu nuit par-dessus pour garder le texte lisible.
+     L'image se règle par section via --hero-photo (inline). */
+  .hero-photo { position: relative; }
+  .hero-photo::before {
+    content: ""; position: absolute; inset: 0; z-index: 0;
+    background: var(--hero-photo) center / cover no-repeat;
+  }
+  .hero-photo::after {
+    content: ""; position: absolute; inset: 0; z-index: 1;
+    background:
+      radial-gradient(1100px 520px at var(--glow-x, 82%) -10%, color-mix(in srgb, var(--bleu-vif) 30%, transparent), transparent 60%),
+      linear-gradient(165deg, color-mix(in srgb, var(--bleu-nuit) 85%, transparent) 6%, color-mix(in srgb, var(--noir) 92%, transparent) 94%);
+  }
+  .hero-photo.dark { background: none; }
+  .hero-photo .hero-illustration { display: none; }
+  .hero-photo > .wrap { position: relative; z-index: 2; }
   .hero-points { list-style: none; margin: 6px 0 26px; padding: 0 4px 6px; display: flex; flex-wrap: wrap; gap: 9px; justify-content: center; }
   .hero-points li { display: inline-flex; align-items: center; gap: 7px; flex: none; white-space: nowrap; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.16); border-radius: 100px; padding: 8px 15px; font-size: 0.84rem; font-weight: 600; color: rgba(255,255,255,0.92); }
   .hero-points svg { width: 13px; height: 13px; color: #9db9ec; flex: none; }
@@ -849,7 +882,7 @@
   <!-- ---------- Page : Accueil ---------- -->
   <div id="subtab-accueil" role="tabpanel" aria-labelledby="subtab-btn-accueil">
 
-    <section class="dark hero">
+    <section class="dark hero hero-photo" style="--hero-photo:url('img/hero-accueil.jpg')">
       <div class="wrap hero-solo">
         <div class="hero-illustration" aria-hidden="true"></div>
         <span class="kicker">Trouver · Sécuriser · Accompagner · Livrer</span>
@@ -1391,6 +1424,7 @@
 
         <div class="offers">
           <div class="offer-card" data-reveal>
+            <figure class="feature-photo short" style="margin:-34px -28px 20px;border-radius:0;"><img src="img/offre-decouverte.jpg" alt="Étude du dossier client autour d'un bureau" loading="lazy" width="1200" height="801"></figure>
             <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-5-5"/></svg></div>
             <h3>Découverte</h3>
             <p class="offer-subtitle">Le premier coup d'œil</p>
@@ -1630,7 +1664,7 @@
   <!-- ---------- Page : Inspection ---------- -->
   <div id="subtab-inspection" role="tabpanel" aria-labelledby="subtab-btn-inspection" hidden>
 
-    <section class="dark intro-band">
+    <section class="dark intro-band hero-photo" style="--hero-photo:url('img/inspection-moteur.jpg')">
       <div class="wrap" style="max-width:760px;">
         <span class="kicker"><span class="dot"></span>Avant de vous engager</span>
         <h2>Le contrôle DIMZ, <em>expliqué étape par étape.</em></h2>
@@ -1828,7 +1862,7 @@
 <!-- ===================== ONGLET CONVOYAGE ===================== -->
 <div id="tab-convoyage" role="tabpanel" aria-labelledby="tab-btn-convoyage" hidden>
 
-  <section class="dark hero">
+  <section class="dark hero hero-photo" style="--hero-photo:url('img/hero-convoyage.jpg')">
     <div class="wrap hero-solo">
       <div class="hero-illustration" aria-hidden="true"></div>
       <span class="kicker"><span class="dot"></span>Convoyage</span>
@@ -1847,6 +1881,8 @@
         <h2 id="convoyage-formulaire">Organisez votre convoyage</h2>
         <p>Renseignez le véhicule, le trajet et vos préférences : votre copilote revient vers vous avec un créneau et un tarif.</p>
       </div>
+
+      <figure class="feature-photo" style="max-width:640px;margin-left:auto;margin-right:auto;"><img src="img/livraison-cles.jpg" alt="Remise des clés du véhicule au client" loading="lazy" width="1287" height="1930"></figure>
 
       <div class="form-card">
         <div class="form-progress">
