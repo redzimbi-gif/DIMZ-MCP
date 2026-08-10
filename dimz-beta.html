@@ -1152,6 +1152,7 @@
                     <label>Type de carrosserie souhaité</label>
                     <div class="choice-grid" id="carrosserie-choices">
                       <label data-tooltip="Petite voiture compacte et maniable, parfaite en ville. Ex. : Renault Twingo, Citroën C1, Peugeot 108."><input type="checkbox" value="citadine"> Citadine</label>
+                      <label data-tooltip="Plus grande qu'une citadine mais plus courte qu'une berline, 5 portes polyvalentes pour la ville comme la route. Ex. : Renault Clio, Peugeot 208, Volkswagen Golf."><input type="checkbox" value="compacte"> Compacte</label>
                       <label data-tooltip="4 portes avec un coffre séparé, confortable pour la route. Ex. : Peugeot 508, Toyota Corolla, Škoda Octavia."><input type="checkbox" value="berline"> Berline</label>
                       <label data-tooltip="Comme une berline mais avec un grand coffre, idéale pour les familles ou les longs trajets. Ex. : Peugeot 308 SW, Renault Mégane Estate."><input type="checkbox" value="break"> Break</label>
                       <label data-tooltip="Position de conduite haute, look robuste, bon compromis ville/route. Ex. : Peugeot 3008, Renault Captur, Dacia Duster."><input type="checkbox" value="suv"> SUV</label>
@@ -3738,10 +3739,16 @@
     render();
   }
 
-  initRangeSlider('a-budget-slider', [5000, 10000, 15000, 20000, 25000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000], {
+  function stepRange(start, end, step) {
+    var arr = [];
+    for (var v = start; v <= end; v += step) arr.push(v);
+    return arr;
+  }
+
+  initRangeSlider('a-budget-slider', stepRange(5000, 100000, 100), {
     hiddenId: 'a-budget-text', minLabel: 'Moins de 5 000 €', maxLabel: 'Plus de 100 000 €'
   });
-  initRangeSlider('a-budget-mensuel-slider', [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000], {
+  initRangeSlider('a-budget-mensuel-slider', stepRange(100, 1000, 10), {
     hiddenId: 'a-budget-mensuel-text', minLabel: 'Moins de 100 €', maxLabel: 'Plus de 1 000 €'
   });
 
