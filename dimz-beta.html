@@ -250,15 +250,6 @@
   .acc-collapse summary:hover .chevron { color: var(--bleu-vif); }
   .acc-collapse-body { padding: 0 36px 36px; }
   .acc-collapse-intro { color: var(--ink-soft); margin: 0 0 22px; line-height: 1.6; }
-  .feature-photo { border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow); margin: 22px 0 4px; line-height: 0; }
-  .feature-photo img { width: 100%; height: 260px; object-fit: cover; display: block; }
-  .feature-photo.tall img { height: 340px; }
-  .feature-photo.short img { height: 180px; }
-  .feature-photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 28px 0 40px; }
-  .feature-photo-grid .feature-photo { margin: 0; }
-  .feature-photo-grid .feature-photo img { height: 190px; }
-  @media (max-width: 760px) { .feature-photo-grid { grid-template-columns: 1fr 1fr; } .feature-photo-grid .feature-photo:last-child { display: none; } }
-  @media (max-width: 480px) { .feature-photo-grid { grid-template-columns: 1fr; } .feature-photo-grid .feature-photo:nth-child(2) { display: none; } }
   .offres-teaser-list { list-style: none; margin: 0 0 24px; padding: 0; display: flex; flex-direction: column; gap: 2px; border-top: 1px solid var(--line); }
   .offres-teaser-list li { display: flex; align-items: baseline; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
   .offres-teaser-name { font-weight: 700; color: var(--ink); }
@@ -906,7 +897,6 @@
         <div class="acc-collapse-body">
           <p class="acc-collapse-intro">Acheter une voiture, ça devrait être excitant, pas un jeu de piste entre annonces trafiquées et vendeurs qui « ne se souviennent plus trop » de l'historique.</p>
           <p class="acc-collapse-intro">DIMZ est né de ce constat (et d'un bon paquet de kilomètres de convoyage). <strong>L'idée : vous offrir l'accompagnement que j'aurais aimé avoir pour mon premier achat.</strong></p>
-          <figure class="feature-photo"><img src="img/apropos-citadine.jpg" alt="Voiture garée sur un parking en fin de journée" loading="lazy" width="1200" height="1800"></figure>
           <a href="javascript:void(0)" class="btn btn-outline" data-goto-subtab="apropos">Découvrir notre histoire et nos valeurs</a>
         </div>
       </details>
@@ -1382,8 +1372,6 @@
           <p>Que vous ayez juste besoin d'un avis ou que vous souhaitiez être accompagné de A à Z, il y a une offre faite pour vous.</p>
         </div>
 
-        <figure class="feature-photo short" style="max-width:720px;margin-left:auto;margin-right:auto;"><img src="img/budget-calculatrice.jpg" alt="Calculatrice et billets sur une feuille de budget" loading="lazy" width="1470" height="980"></figure>
-
         <div class="offers">
           <div class="offer-card" data-reveal>
             <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-5-5"/></svg></div>
@@ -1841,12 +1829,6 @@
         <span class="label">Convoyage</span>
         <h2 id="convoyage-formulaire">Organisez votre convoyage</h2>
         <p>Renseignez le véhicule, le trajet et vos préférences : votre copilote revient vers vous avec un créneau et un tarif.</p>
-      </div>
-
-      <div class="feature-photo-grid">
-        <figure class="feature-photo"><img src="img/convoyage-break.jpg" alt="Break garé en bord de route" loading="lazy" width="1200" height="800"></figure>
-        <figure class="feature-photo"><img src="img/vehicules-electrique.jpg" alt="Recharge d'un véhicule électrique" loading="lazy" width="1200" height="798"></figure>
-        <figure class="feature-photo"><img src="img/offres-citadine.jpg" alt="Citadine livrée dans une ruelle" loading="lazy" width="1227" height="2180"></figure>
       </div>
 
       <div class="form-card">
