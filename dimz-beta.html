@@ -453,11 +453,13 @@
   .offer-note { margin-top: 26px; text-align: center; color: var(--ink-soft); font-size: 0.85rem; max-width: 60ch; margin-left: auto; margin-right: auto; }
   .offer-note strong { color: var(--ink); }
 
-  .option-card { background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 26px; box-shadow: var(--shadow); display: flex; gap: 18px; align-items: flex-start; transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease); }
+  .option-card { background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 26px; box-shadow: var(--shadow); display: flex; gap: 18px; align-items: flex-start; overflow: hidden; transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease); }
   .option-card:hover { transform: translateY(-6px) scale(1.015); box-shadow: var(--shadow-lg); }
   .option-card .value-icon { margin-bottom: 0; }
   .option-card h3 { font-size: var(--fs-card-title); margin-bottom: 6px; font-family: inherit; font-weight: 700; }
   .option-card p { margin: 0 0 16px; color: var(--ink-soft); font-size: 0.9rem; }
+  .option-card.option-card-photo { flex-direction: column; align-items: stretch; }
+  .option-card-row { display: flex; gap: 18px; align-items: flex-start; }
 
   /* ---------------- Tableau comparatif des offres ---------------- */
   .compare-table-wrap { overflow-x: auto; margin-top: 40px; width: 100%; max-width: 100%; }
@@ -1483,20 +1485,26 @@
         <p class="offer-note" data-reveal>Le convoyage est proposé en option, sur devis. Et si vous avez déjà réglé une offre Copilote à <strong>99 €</strong> ou <strong>149 €</strong>, cette somme est intégralement déduite du prix de l'offre Copilote Plus.</p>
 
         <div class="grid-2" style="margin-top:32px;" data-reveal>
-          <div class="option-card">
-            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></div>
-            <div>
-              <h3>Expertise seule <span class="hint">(sur devis)</span></h3>
-              <p>Vous avez déjà trouvé votre voiture ? Je me déplace pour l'inspecter et vous donner mon avis.</p>
-              <button type="button" class="btn btn-outline" data-goto-subtab="inspection">Découvrir l'inspection</button>
+          <div class="option-card option-card-photo">
+            <figure class="feature-photo short" style="margin:-26px -26px 20px;border-radius:0;"><img src="img/inspection-moteur.jpg" alt="Inspection du moteur par le copilote DIMZ" loading="lazy" width="1200" height="1799"></figure>
+            <div class="option-card-row">
+              <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></div>
+              <div>
+                <h3>Expertise seule <span class="hint">(sur devis)</span></h3>
+                <p>Vous avez déjà trouvé votre voiture ? Je me déplace pour l'inspecter et vous donner mon avis.</p>
+                <button type="button" class="btn btn-outline" data-goto-subtab="inspection">Découvrir l'inspection</button>
+              </div>
             </div>
           </div>
-          <div class="option-card">
-            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><rect x="1" y="7" width="14" height="10"/><path d="M15 10h4l3 3v4h-7z"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg></div>
-            <div>
-              <h3>Livraison seule <span class="hint">(sur devis)</span></h3>
-              <p>Vous achetez seul(e) votre voiture ? Je vous la livre où vous voulez (convoyage).</p>
-              <button type="button" class="btn btn-outline" data-goto-tab="convoyage">Découvrir le convoyage</button>
+          <div class="option-card option-card-photo">
+            <figure class="feature-photo short" style="margin:-26px -26px 20px;border-radius:0;"><img src="img/livraison-cles.jpg" alt="Remise des clés du véhicule au client" loading="lazy" width="1287" height="1930"></figure>
+            <div class="option-card-row">
+              <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><rect x="1" y="7" width="14" height="10"/><path d="M15 10h4l3 3v4h-7z"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg></div>
+              <div>
+                <h3>Livraison seule <span class="hint">(sur devis)</span></h3>
+                <p>Vous achetez seul(e) votre voiture ? Je vous la livre où vous voulez (convoyage).</p>
+                <button type="button" class="btn btn-outline" data-goto-tab="convoyage">Découvrir le convoyage</button>
+              </div>
             </div>
           </div>
         </div>
