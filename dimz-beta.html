@@ -432,7 +432,7 @@
   }
   @keyframes featuredSweep { 0% { background-position: 0% 0; } 50% { background-position: 100% 0; } 100% { background-position: 0% 0; } }
   @media (prefers-reduced-motion: reduce) { .offer-card.featured::before { animation: none; } }
-  .offer-tag { position: absolute; top: 20px; right: 20px; z-index: 1; background: color-mix(in srgb, var(--bleu-vif) 14%, transparent); color: var(--bleu-vif); font-size: 0.66rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 11px; border-radius: 100px; }
+  .offer-tag { position: absolute; top: 20px; right: 20px; z-index: 1; background: var(--bg-raised); color: var(--bleu-vif); font-size: 0.66rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 11px; border-radius: 100px; box-shadow: var(--shadow); }
   .offer-card .value-icon { margin-bottom: 16px; }
   .offer-card h3 { font-size: var(--fs-card-title); margin-bottom: 4px; }
   .offer-subtitle { margin: 0 0 12px; color: var(--ink-soft); font-size: 0.85rem; font-weight: 600; }
@@ -1442,6 +1442,7 @@
           </div>
 
           <div class="offer-card featured" data-reveal>
+            <figure class="feature-photo short" style="margin:-34px -28px 20px;border-radius:0;"><img src="img/echange-client.jpg" alt="Le copilote échange avec un client au sujet de son véhicule" loading="lazy" width="768" height="1152"></figure>
             <span class="offer-tag">Le plus choisi</span>
             <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.3"/><path d="M12 3.5v6.2"/><path d="M6.4 15.2l5-3"/><path d="M17.6 15.2l-5-3"/></svg></div>
             <h3>Copilote</h3>
@@ -1464,6 +1465,7 @@
           </div>
 
           <div class="offer-card" data-reveal>
+            <figure class="feature-photo short" style="margin:-34px -28px 20px;border-radius:0;"><img src="img/remise-cles-pro.png" alt="Remise des clés au client à la livraison du véhicule" loading="lazy" width="1536" height="1024"></figure>
             <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><circle cx="7" cy="15" r="4"/><path d="M10 12l9-9"/><path d="M15 6l3 3"/><path d="M17 4l3 3"/></svg></div>
             <h3>Copilote Plus</h3>
             <p class="offer-subtitle">Vous n'avez plus qu'à conduire</p>
@@ -2097,6 +2099,7 @@
           </div>
 
           <div class="form-step">
+            <figure class="feature-photo short" style="margin:0 0 20px;"><img src="img/vehicule-recharge.jpg" alt="Recharge du véhicule électrique avant la livraison" loading="lazy" width="1200" height="800"></figure>
             <h3>Prise en charge &amp; options</h3>
             <div class="field-grid">
               <div class="field full">
