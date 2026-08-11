@@ -298,3 +298,56 @@ export async function addDossierNote(dossierId: string, formData: FormData) {
 
   revalidatePath(`/dossiers/${dossierId}`);
 }
+
+// ---------------------------------------------------------------------------
+// Archivage / suppression
+// ---------------------------------------------------------------------------
+export async function archiveDossier(dossierId: string) {
+  const db = createAdminClient();
+  const dossier = await getDossier(dossierId);
+  await db.from("dossiers").update({ archive: true }).eq("id", dossierId);
+
+  await logActivity({
+    action: "dossier.archive",
+    entiteType: "dossier",
+    entiteId: dossierId,
+    description: `Dossier ${dossier?.reference ?? ""} archivé`,
+  });
+
+  revalidatePath(`/dossiers/${dossierId}`);
+  revalidatePath("/dossiers");
+  redirect("/dossiers");
+}
+
+export async function unarchiveDossier(dossierId: string) {
+  const db = createAdminClient();
+  const dossier = await getDossier(dossierId);
+  await db.from("dossiers").update({ archive: false }).eq("id", dossierId);
+
+  await logActivity({
+    action: "dossier.desarchive",
+    entiteType: "dossier",
+    entiteId: dossierId,
+    description: `Dossier ${dossier?.reference ?? ""} désarchivé`,
+  });
+
+  revalidatePath(`/dossiers/${dossierId}`);
+  revalidatePath("/dossiers");
+}
+
+export async function deleteDossier(dossierId: string) {
+  const db = createAdminClient();
+  const dossier = await getDossier(dossierId);
+
+  await logActivity({
+    action: "dossier.supprime",
+    entiteType: "dossier",
+    entiteId: dossierId,
+    description: `Dossier ${dossier?.reference ?? ""} supprimé définitivement`,
+  });
+
+  await db.from("dossiers").delete().eq("id", dossierId);
+
+  revalidatePath("/dossiers");
+  redirect("/dossiers");
+}

@@ -1,12 +1,17 @@
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, Archive } from "lucide-react";
 import { listDossiers } from "@/lib/queries";
 import { PageHeader, LinkButton, StatutBadge } from "@/components/ui";
 import { DOSSIER_STATUTS, DOSSIER_STATUT_LABELS } from "@/lib/types";
 import { formatCurrency, formatDate } from "@/lib/format";
 
-export default async function DossiersPage() {
-  const dossiers = await listDossiers();
+export default async function DossiersPage({
+  searchParams,
+}: {
+  searchParams: { archives?: string };
+}) {
+  const showArchives = searchParams.archives === "1";
+  const dossiers = await listDossiers({ archived: showArchives });
 
   const byStatut = Object.fromEntries(
     DOSSIER_STATUTS.map((s) => [s, dossiers.filter((d) => d.statut === s)])
@@ -15,12 +20,17 @@ export default async function DossiersPage() {
   return (
     <div>
       <PageHeader
-        title="Dossiers"
+        title={showArchives ? "Dossiers archivés" : "Dossiers"}
         description={`${dossiers.length} dossier${dossiers.length > 1 ? "s" : ""} au total`}
         actions={
-          <LinkButton href="/dossiers/new">
-            <Plus className="h-4 w-4" /> Nouveau dossier
-          </LinkButton>
+          <>
+            <LinkButton href={showArchives ? "/dossiers" : "/dossiers?archives=1"} variant="outline">
+              <Archive className="h-4 w-4" /> {showArchives ? "Retour au pipeline" : "Voir les archives"}
+            </LinkButton>
+            <LinkButton href="/dossiers/new">
+              <Plus className="h-4 w-4" /> Nouveau dossier
+            </LinkButton>
+          </>
         }
       />
 

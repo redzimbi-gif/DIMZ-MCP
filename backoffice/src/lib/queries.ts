@@ -137,11 +137,12 @@ export async function getClientNotes(clientId: string) {
 // ---------------------------------------------------------------------------
 // Dossiers
 // ---------------------------------------------------------------------------
-export async function listDossiers() {
+export async function listDossiers(options?: { archived?: boolean }) {
   const db = createAdminClient();
   const { data } = await db
     .from("dossiers")
     .select("*, clients(id, nom, prenom, email, telephone)")
+    .eq("archive", options?.archived ?? false)
     .order("created_at", { ascending: false });
   return (data ?? []) as Dossier[];
 }

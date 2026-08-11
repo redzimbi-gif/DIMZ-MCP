@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { clsx } from "clsx";
-import { Plus, Star, ExternalLink, Trash2, Mail, PenLine, FileDown } from "lucide-react";
+import { Plus, Star, ExternalLink, Trash2, Mail, PenLine, FileDown, Archive, ArchiveRestore } from "lucide-react";
 import {
   getDossier,
   getDossierHistory,
@@ -26,6 +26,7 @@ import {
 } from "@/components/ui";
 import { EmailStatusBanner } from "@/components/EmailStatusBanner";
 import { DossierTabs } from "@/components/DossierTabs";
+import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
 import {
   DOSSIER_STATUTS,
   DOSSIER_STATUT_LABELS,
@@ -45,6 +46,9 @@ import {
   updateDossierEtapeClient,
   sendEtapeClientEmail,
   decideConvoyageDemande,
+  archiveDossier,
+  unarchiveDossier,
+  deleteDossier,
 } from "../actions";
 import { createAnnonce, toggleAnnonceSelection, deleteAnnonce } from "./annonces-actions";
 import {
@@ -98,6 +102,9 @@ export default async function DossierDetailPage({
   const uploadDocAction = uploadDossierDocument.bind(null, dossier.id);
   const updateEtapeAction = updateDossierEtapeClient.bind(null, dossier.id);
   const sendEtapeEmailAction = sendEtapeClientEmail.bind(null, dossier.id, tab);
+  const archiveAction = archiveDossier.bind(null, dossier.id);
+  const unarchiveAction = unarchiveDossier.bind(null, dossier.id);
+  const deleteAction = deleteDossier.bind(null, dossier.id);
 
   const portalUrl = `/suivi/${dossier.portal_token}`;
   const donneesGroups = groupDonneesBrutes(dossier.donnees_brutes);
@@ -122,9 +129,31 @@ export default async function DossierDetailPage({
         actions={
           <>
             <StatutBadge statut={dossier.statut} />
+            {dossier.archive ? <Badge tone="neutral">Archivé</Badge> : null}
             <LinkButton href={portalUrl} variant="outline">
               <ExternalLink className="h-4 w-4" /> Suivi client
             </LinkButton>
+            {dossier.archive ? (
+              <form action={unarchiveAction}>
+                <Button type="submit" variant="outline">
+                  <ArchiveRestore className="h-4 w-4" /> Désarchiver
+                </Button>
+              </form>
+            ) : (
+              <form action={archiveAction}>
+                <Button type="submit" variant="outline">
+                  <Archive className="h-4 w-4" /> Archiver
+                </Button>
+              </form>
+            )}
+            <form action={deleteAction}>
+              <ConfirmSubmitButton
+                variant="danger"
+                confirmMessage={`Supprimer définitivement le dossier ${dossier.reference} ? Cette action est irréversible et supprimera aussi ses annonces, inspections, convoyages, documents et notes.`}
+              >
+                <Trash2 className="h-4 w-4" /> Supprimer
+              </ConfirmSubmitButton>
+            </form>
           </>
         }
       />

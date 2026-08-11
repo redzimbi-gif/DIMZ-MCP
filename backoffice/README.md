@@ -22,6 +22,7 @@ stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
    - `0010_score_dimz_annonces.sql`
    - `0011_fiche_decouverte.sql`
    - `0012_fiche_decouverte_intro.sql`
+   - `0013_dossiers_archive.sql`
 3. Dans **Project Settings → API**, récupère :
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -132,7 +133,9 @@ l'email de confirmation si le client a renseigné son adresse.
 - Clients : fiche complète, historique des dossiers, documents, notes privées,
   historique des échanges.
 - Dossiers : pipeline en 10 statuts (kanban), historique des changements de
-  statut, infos projet complètes.
+  statut, infos projet complètes. Archivage (sort du pipeline par défaut,
+  récupérable) et suppression définitive (avec confirmation) depuis la fiche
+  dossier.
 - Recherche de véhicules : annonces avec photos, avis du copilote, points
   forts/faibles, sélection, et **Score DIMZ** par annonce (score global /10 +
   4 critères détaillés : prix, historique, état, adéquation), noté via le
