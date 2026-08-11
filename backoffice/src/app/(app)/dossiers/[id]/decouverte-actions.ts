@@ -68,7 +68,7 @@ export async function sendFicheDecouverteEmail(dossierId: string) {
       const buffer = await renderToBuffer(
         FicheDecouverteReport({
           vehicules,
-          intro: dossier.fiche_decouverte_intro,
+          commentaire: dossier.fiche_decouverte_intro,
           dossierReference: dossier.reference,
           clientNom: `${dossier.clients?.prenom ?? ""} ${dossier.clients?.nom ?? ""}`.trim(),
         })

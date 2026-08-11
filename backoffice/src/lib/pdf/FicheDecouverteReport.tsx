@@ -5,7 +5,7 @@ import type { FicheDecouverteVehicule } from "@/lib/types";
 
 interface Props {
   vehicules: FicheDecouverteVehicule[];
-  intro?: string | null;
+  commentaire?: string | null;
   dossierReference: string;
   clientNom: string;
 }
@@ -15,7 +15,7 @@ const DEFAULT_INTRO =
   "note chiffrée à ce stade : juste un point fort et un point de vigilance par véhicule, pour vous aider " +
   "à y voir clair avant d'aller plus loin.";
 
-export function FicheDecouverteReport({ vehicules, intro, dossierReference, clientNom }: Props) {
+export function FicheDecouverteReport({ vehicules, commentaire, dossierReference, clientNom }: Props) {
   return (
     <Document title={`Fiche Découverte — ${dossierReference}`}>
       <Page size="A4" style={pdfStyles.page}>
@@ -29,9 +29,15 @@ export function FicheDecouverteReport({ vehicules, intro, dossierReference, clie
           {dossierReference} — {clientNom}
         </Text>
 
-        <View style={{ ...pdfStyles.section, borderLeft: "2px solid #2f6fed", paddingLeft: 12, marginBottom: 20 }}>
-          <Text style={{ fontSize: 9.5, lineHeight: 1.5, color: "#0b0d12" }}>{intro?.trim() || DEFAULT_INTRO}</Text>
+        <View style={{ ...pdfStyles.section, borderLeft: "2px solid #2f6fed", paddingLeft: 12, marginBottom: commentaire?.trim() ? 10 : 20 }}>
+          <Text style={{ fontSize: 9.5, lineHeight: 1.5, color: "#0b0d12" }}>{DEFAULT_INTRO}</Text>
         </View>
+
+        {commentaire?.trim() ? (
+          <View style={{ ...pdfStyles.section, marginBottom: 20 }}>
+            <Text style={{ fontSize: 9.5, lineHeight: 1.5, color: "#0b0d12" }}>{commentaire.trim()}</Text>
+          </View>
+        ) : null}
 
         {vehicules.map((v, i) => (
           <View

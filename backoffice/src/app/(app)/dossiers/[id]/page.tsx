@@ -585,12 +585,12 @@ async function DecouverteTab({ dossierId }: { dossierId: string }) {
 
         <Card className="p-4">
           <form action={introAction} className="space-y-2">
-            <Field label="Commentaire libre (en introduction de la fiche)">
+            <Field label="Commentaire libre (affiché après l'intro, avant les véhicules)">
               <textarea
                 name="fiche_decouverte_intro"
                 rows={3}
                 defaultValue={dossier?.fiche_decouverte_intro ?? ""}
-                placeholder="Votre copilote a fait le tour du marché pour vous — voici ce qu'il en retient, sans détour…"
+                placeholder="Un mot personnalisé sur ce dossier, en plus de l'intro par défaut…"
                 className={inputClass}
               />
             </Field>
