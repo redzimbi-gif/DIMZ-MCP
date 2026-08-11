@@ -3,13 +3,13 @@ import { listAllAnnonces } from "@/lib/queries";
 import { Card, PageHeader, EmptyState, Badge } from "@/components/ui";
 import { formatCurrency } from "@/lib/format";
 
-export default async function VehiculesPage() {
+export default async function AnnoncesPage() {
   const annonces = await listAllAnnonces();
 
   return (
     <div>
       <PageHeader
-        title="Véhicules"
+        title="Annonces"
         description="Toutes les annonces repérées, tous dossiers confondus. Ajoute-en depuis l'onglet « Véhicules » d'un dossier."
       />
 
