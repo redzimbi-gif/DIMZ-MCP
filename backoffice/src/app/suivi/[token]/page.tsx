@@ -1,7 +1,10 @@
 import { notFound } from "next/navigation";
-import { Check } from "lucide-react";
+import Image from "next/image";
+import { Check, ExternalLink } from "lucide-react";
 import { clsx } from "clsx";
-import { getDossierByToken } from "@/lib/queries";
+import { getDossierByToken, getDossierAnnonces } from "@/lib/queries";
+import { getSignedUrl } from "@/lib/storage";
+import { formatCurrency } from "@/lib/format";
 import { Logo } from "@/components/Logo";
 import { getEtapesOffre, ETAPES_CONVOYAGE } from "@/lib/etapes";
 
@@ -13,6 +16,11 @@ export const metadata = {
 export default async function ClientPortalPage({ params }: { params: { token: string } }) {
   const dossier = await getDossierByToken(params.token);
   if (!dossier) notFound();
+
+  const annonces = dossier.offre === "convoyage_seul" ? [] : await getDossierAnnonces(dossier.id);
+  const annoncesAvecPhoto = await Promise.all(
+    annonces.map(async (a) => ({ ...a, photoUrl: a.photos[0] ? await getSignedUrl(a.photos[0]) : null }))
+  );
 
   const isConvoyage = dossier.offre === "convoyage_seul";
   const refuse = isConvoyage && dossier.convoyage_decision === "refuse";
@@ -84,6 +92,75 @@ export default async function ClientPortalPage({ params }: { params: { token: st
             </ol>
           )}
         </div>
+
+        {annoncesAvecPhoto.length > 0 ? (
+          <div className="mt-6">
+            <h2 className="text-sm font-semibold text-ink px-1 mb-3">
+              Sélection de votre copilote ({annoncesAvecPhoto.length})
+            </h2>
+            <div className="space-y-4">
+              {annoncesAvecPhoto.map((a) => (
+                <div
+                  key={a.id}
+                  className="bg-surface border border-line rounded-lg2 shadow-card overflow-hidden"
+                >
+                  {a.photoUrl ? (
+                    <div className="relative w-full aspect-[16/9] bg-surface-sunken">
+                      <Image src={a.photoUrl} alt="" fill className="object-cover" unoptimized />
+                    </div>
+                  ) : null}
+                  <div className="p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-medium text-ink truncate">{a.titre}</p>
+                        <p className="text-sm text-ink-soft mt-0.5">
+                          {[a.annee, a.kilometrage ? `${a.kilometrage.toLocaleString("fr-FR")} km` : null, a.localisation]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </p>
+                      </div>
+                      {a.score_confiance != null ? (
+                        <div className="shrink-0 text-center bg-blue-50 text-blue-700 rounded-md px-2.5 py-1.5">
+                          <p className="text-base font-semibold tnum leading-none">{a.score_confiance}/10</p>
+                          <p className="text-[10px] font-medium uppercase tracking-wide mt-0.5">Score DIMZ</p>
+                        </div>
+                      ) : null}
+                    </div>
+
+                    <p className="text-sm font-medium text-blue-600 mt-2 tnum">
+                      {a.prix ? formatCurrency(a.prix) : "Prix non renseigné"}
+                      {a.prix_negocie ? ` → ${formatCurrency(a.prix_negocie)} négocié` : ""}
+                    </p>
+
+                    {a.avis_copilote ? (
+                      <p className="text-sm text-ink mt-3 bg-surface-sunken rounded-md p-3 leading-relaxed">
+                        « {a.avis_copilote} »
+                      </p>
+                    ) : null}
+
+                    {a.points_forts || a.points_faibles ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 text-xs">
+                        {a.points_forts ? <p className="text-good">+ {a.points_forts}</p> : null}
+                        {a.points_faibles ? <p className="text-bad">− {a.points_faibles}</p> : null}
+                      </div>
+                    ) : null}
+
+                    {a.lien ? (
+                      <a
+                        href={a.lien}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-3"
+                      >
+                        Voir l'annonce <ExternalLink className="h-3 w-3" />
+                      </a>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         <p className="text-center text-xs text-ink-faint mt-6">
           Une question sur votre dossier ? Votre copilote DIMZ vous répond.
