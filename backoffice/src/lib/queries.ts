@@ -11,6 +11,7 @@ import type {
   Dossier,
   DossierEtapeHistory,
   DossierStatutHistory,
+  FicheDecouverteVehicule,
   Inspection,
   NoteInterne,
   Notification,
@@ -208,6 +209,16 @@ export async function getAnnonce(id: string) {
   const db = createAdminClient();
   const { data } = await db.from("annonces").select("*").eq("id", id).maybeSingle();
   return data as Annonce | null;
+}
+
+export async function getFicheDecouverteVehicules(dossierId: string) {
+  const db = createAdminClient();
+  const { data } = await db
+    .from("fiche_decouverte_vehicules")
+    .select("*")
+    .eq("dossier_id", dossierId)
+    .order("ordre", { ascending: true });
+  return (data ?? []) as FicheDecouverteVehicule[];
 }
 
 export async function getDossierInspections(dossierId: string) {

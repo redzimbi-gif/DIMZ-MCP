@@ -177,6 +177,27 @@ export interface Annonce {
   updated_at: string;
 }
 
+export interface FicheDecouverteVehicule {
+  id: string;
+  dossier_id: string;
+  marque: string | null;
+  modele: string | null;
+  energie: string | null;
+  point_fort: string | null;
+  point_vigilance: string | null;
+  ordre: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export const FICHE_DECOUVERTE_ENERGIES = [
+  "Essence",
+  "Diesel",
+  "Hybride (MHEV)",
+  "Hybride rechargeable (PHEV)",
+  "Électrique",
+] as const;
+
 export const INSPECTION_VERDICTS = ["recommande", "envisageable", "deconseille"] as const;
 export type InspectionVerdict = (typeof INSPECTION_VERDICTS)[number];
 export const INSPECTION_VERDICT_LABELS: Record<InspectionVerdict, string> = {

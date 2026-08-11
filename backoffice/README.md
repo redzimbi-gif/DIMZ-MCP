@@ -20,6 +20,7 @@ stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
    - `0008_test_feedback.sql`
    - `0009_suivi_client_par_offre.sql`
    - `0010_score_dimz_annonces.sql`
+   - `0011_fiche_decouverte.sql`
 3. Dans **Project Settings → API**, récupère :
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -135,6 +136,10 @@ l'email de confirmation si le client a renseigné son adresse.
   forts/faibles, sélection, et **Score DIMZ** par annonce (score global /10 +
   4 critères détaillés : prix, historique, état, adéquation), noté via le
   bouton crayon sur chaque annonce.
+- Fiche Découverte : pour l'offre gratuite Découverte, une fiche plus légère
+  que le Rapport DIMZ — véhicules repérés (marque, modèle, énergie), un point
+  fort et un point de vigilance chacun, sans score. Générée en PDF et
+  envoyable au client par email depuis l'onglet dédié d'un dossier.
 - Inspection = Rapport DIMZ : même contenu riche que l'exemple du site (score
   global, score par étape du contrôle, tags, points positifs/vigilance, avis
   du copilote, verdict), entièrement éditable depuis le back-office, avec

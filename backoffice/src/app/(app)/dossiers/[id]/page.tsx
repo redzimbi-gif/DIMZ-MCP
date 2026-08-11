@@ -1,12 +1,13 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { clsx } from "clsx";
-import { Plus, Star, ExternalLink, Trash2, Mail, PenLine } from "lucide-react";
+import { Plus, Star, ExternalLink, Trash2, Mail, PenLine, FileDown } from "lucide-react";
 import {
   getDossier,
   getDossierHistory,
   getDossierEtapeHistory,
   getDossierAnnonces,
+  getFicheDecouverteVehicules,
   getDossierInspections,
   getDossierConvoyages,
   getDossierDocuments,
@@ -31,6 +32,7 @@ import {
   DOSSIER_OFFRES,
   DOSSIER_OFFRE_LABELS,
   DOCUMENT_TYPE_LABELS,
+  FICHE_DECOUVERTE_ENERGIES,
   type DossierOffre,
 } from "@/lib/types";
 import { getEtapesOffre, getOffreAccompagnement, getEtapeLabel, ETAPES_CONVOYAGE } from "@/lib/etapes";
@@ -45,6 +47,7 @@ import {
   decideConvoyageDemande,
 } from "../actions";
 import { createAnnonce, toggleAnnonceSelection, deleteAnnonce } from "./annonces-actions";
+import { addFicheDecouverteVehicule, deleteFicheDecouverteVehicule, sendFicheDecouverteEmail } from "./decouverte-actions";
 import { uploadDossierDocument } from "./documents-actions";
 
 const OFFRES_ACCOMPAGNEMENT = ["decouverte", "copilote", "copilote_plus", "expertise_seule"] as const;
@@ -327,6 +330,8 @@ export default async function DossierDetailPage({
 
       {tab === "vehicules" ? <VehiculesTab dossier={dossier} createAnnonceAction={createAnnonceAction} /> : null}
 
+      {tab === "decouverte" ? <DecouverteTab dossierId={dossier.id} /> : null}
+
       {tab === "inspection" ? <InspectionTab dossierId={dossier.id} /> : null}
 
       {tab === "convoyage" ? <ConvoyageTab dossierId={dossier.id} /> : null}
@@ -513,6 +518,101 @@ async function VehiculesTab({
         <p className="text-xs text-ink-faint mt-3">
           Le détail du Score DIMZ (prix, historique, état, adéquation) se complète ensuite via « Noter » sur
           l'annonce.
+        </p>
+      </Card>
+    </div>
+  );
+}
+
+async function DecouverteTab({ dossierId }: { dossierId: string }) {
+  const vehicules = await getFicheDecouverteVehicules(dossierId);
+  const addAction = addFicheDecouverteVehicule.bind(null, dossierId);
+  const sendAction = sendFicheDecouverteEmail.bind(null, dossierId);
+  const removeAction = async (vehiculeId: string) => {
+    "use server";
+    await deleteFicheDecouverteVehicule(dossierId, vehiculeId);
+  };
+
+  return (
+    <div className="grid lg:grid-cols-3 gap-4">
+      <div className="lg:col-span-2 space-y-3">
+        <div className="flex justify-end gap-2 mb-1">
+          <LinkButton href={`/api/dossiers/${dossierId}/fiche-decouverte/pdf`} variant="outline">
+            <FileDown className="h-4 w-4" /> Fiche PDF
+          </LinkButton>
+          <form action={sendAction}>
+            <Button type="submit" variant="outline" disabled={vehicules.length === 0}>
+              <Mail className="h-4 w-4" /> Envoyer au client
+            </Button>
+          </form>
+        </div>
+
+        {vehicules.length === 0 ? (
+          <Card>
+            <EmptyState title="Aucun véhicule ajouté à la fiche Découverte" />
+          </Card>
+        ) : (
+          vehicules.map((v) => (
+            <Card key={v.id} className="p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-ink truncate">
+                      {[v.marque, v.modele].filter(Boolean).join(" ") || "Véhicule"}
+                    </p>
+                    {v.energie ? <Badge tone="blue">{v.energie}</Badge> : null}
+                  </div>
+                  {v.point_fort ? <p className="text-sm text-good mt-2">+ {v.point_fort}</p> : null}
+                  {v.point_vigilance ? <p className="text-sm text-warn mt-1">! {v.point_vigilance}</p> : null}
+                </div>
+                <form action={removeAction.bind(null, v.id)}>
+                  <button
+                    type="submit"
+                    className="p-1.5 rounded-md text-ink-faint hover:text-bad hover:bg-bad-bg shrink-0"
+                    aria-label="Retirer ce véhicule"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </form>
+              </div>
+            </Card>
+          ))
+        )}
+      </div>
+
+      <Card className="p-5 h-fit">
+        <h2 className="text-sm font-semibold text-ink mb-4">Ajouter un véhicule</h2>
+        <form action={addAction} className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Marque">
+              <input name="marque" className={inputClass} />
+            </Field>
+            <Field label="Modèle">
+              <input name="modele" className={inputClass} />
+            </Field>
+          </div>
+          <Field label="Énergie">
+            <select name="energie" defaultValue="" className={inputClass}>
+              <option value="">—</option>
+              {FICHE_DECOUVERTE_ENERGIES.map((e) => (
+                <option key={e} value={e}>
+                  {e}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Point fort">
+            <input name="point_fort" className={inputClass} />
+          </Field>
+          <Field label="Point de vigilance">
+            <input name="point_vigilance" className={inputClass} />
+          </Field>
+          <Button type="submit" className="w-full">
+            <Plus className="h-4 w-4" /> Ajouter le véhicule
+          </Button>
+        </form>
+        <p className="text-xs text-ink-faint mt-3">
+          Pas de score sur cette fiche — c'est un premier aperçu avant une éventuelle offre Copilote.
         </p>
       </Card>
     </div>

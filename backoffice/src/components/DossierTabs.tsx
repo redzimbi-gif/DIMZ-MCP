@@ -4,6 +4,7 @@ import { clsx } from "clsx";
 const TABS = [
   { key: "infos", label: "Infos" },
   { key: "vehicules", label: "Véhicules" },
+  { key: "decouverte", label: "Fiche Découverte" },
   { key: "inspection", label: "Inspection" },
   { key: "convoyage", label: "Convoyage" },
   { key: "documents", label: "Documents" },
