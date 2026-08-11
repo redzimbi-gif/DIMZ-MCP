@@ -276,8 +276,8 @@
   .acc-collapse-body { padding: 0 36px 36px; }
   .acc-collapse-intro { color: var(--ink-soft); margin: 0 0 22px; line-height: 1.6; }
   .feature-photo { border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow); margin: 22px 0 4px; line-height: 0; }
-  .feature-photo img { width: 100%; height: auto; max-height: 420px; object-fit: contain; background: var(--bg-tint); display: block; }
-  .feature-photo-crop img { height: 200px; max-height: none; object-fit: cover; background: none; }
+  .feature-photo img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; object-position: center; display: block; }
+  .feature-photo-crop img { aspect-ratio: auto; height: 200px; object-fit: cover; }
   .offres-teaser-list { list-style: none; margin: 0 0 24px; padding: 0; display: flex; flex-direction: column; gap: 2px; border-top: 1px solid var(--line); }
   .offres-teaser-list li { display: flex; align-items: baseline; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
   .offres-teaser-name { font-weight: 700; color: var(--ink); }
@@ -1064,7 +1064,7 @@
               </div>
 
               <div class="form-step">
-                <figure class="feature-photo" style="margin:0 0 20px;"><img src="img/quotidien-vitre.jpg" alt="Passagère profitant de la route, fenêtre ouverte" loading="lazy" width="1287" height="1930"></figure>
+                <figure class="feature-photo" style="margin:0 0 20px;"><img src="img/quotidien-vitre.jpg" alt="Passagère profitant de la route, fenêtre ouverte" loading="lazy" width="1287" height="1930" style="object-position:35% 78%;"></figure>
                 <h3>Votre quotidien</h3>
                 <div class="field-grid">
                   <div class="field full">
@@ -1177,7 +1177,7 @@
               </div>
 
               <div class="form-step">
-                <figure class="feature-photo" style="margin:0 0 20px;"><img src="img/fiat-ruelle.jpg" alt="Petite citadine garée dans une ruelle" loading="lazy" width="1227" height="2180"></figure>
+                <figure class="feature-photo" style="margin:0 0 20px;"><img src="img/fiat-ruelle.jpg" alt="Petite citadine garée dans une ruelle" loading="lazy" width="1227" height="2180" style="object-position:50% 88%;"></figure>
                 <h3>Situation actuelle</h3>
                 <div class="field-grid">
                   <div class="field">
