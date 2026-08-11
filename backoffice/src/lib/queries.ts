@@ -9,8 +9,10 @@ import type {
   ConvoyageExterne,
   DocumentRow,
   Dossier,
+  DossierContrat,
   DossierEtapeHistory,
   DossierStatutHistory,
+  EntrepriseInfo,
   FicheDecouverteVehicule,
   Inspection,
   NoteInterne,
@@ -270,6 +272,18 @@ export async function getDossierDocuments(dossierId: string) {
     .eq("dossier_id", dossierId)
     .order("created_at", { ascending: false });
   return (data ?? []) as DocumentRow[];
+}
+
+export async function getDossierContrats(dossierId: string) {
+  const db = createAdminClient();
+  const { data } = await db.from("dossier_contrats").select("*").eq("dossier_id", dossierId);
+  return (data ?? []) as DossierContrat[];
+}
+
+export async function getEntrepriseInfo() {
+  const db = createAdminClient();
+  const { data } = await db.from("entreprise_info").select("*").eq("id", 1).maybeSingle();
+  return data as EntrepriseInfo | null;
 }
 
 export async function getDossierNotes(dossierId: string) {

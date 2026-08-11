@@ -23,6 +23,7 @@ stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
    - `0011_fiche_decouverte.sql`
    - `0012_fiche_decouverte_intro.sql`
    - `0013_dossiers_archive.sql`
+   - `0014_documents_contrats.sql`
 3. Dans **Project Settings → API**, récupère :
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -174,6 +175,14 @@ l'email de confirmation si le client a renseigné son adresse.
 - Retours test : questionnaire de test utilisateur sur le site (page « Test »),
   résultats et durée de remplissage mesurée automatiquement, consultables
   dans `/retours-test`.
+- Documents & contrats : onglet dédié sur chaque dossier avec les 8 documents
+  légaux DIMZ (CGV, contrats Convoyage/Copilote/Copilote Plus/Inspection,
+  état du véhicule, demande de commencement anticipé, formulaire de
+  rétractation) — génération PDF avec les infos du dossier/client déjà
+  remplies, statut À signer → Signé → Archivé, dates de génération et de
+  signature. Les informations légales de l'entreprise (SIRET, adresse,
+  médiateur…) se règlent une fois dans **Paramètres** et alimentent
+  automatiquement tous les documents générés.
 
 ## Ce qui n'est volontairement pas dans cette V1
 

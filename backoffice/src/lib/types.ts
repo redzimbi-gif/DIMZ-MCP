@@ -296,6 +296,63 @@ export interface DocumentRow {
   created_at: string;
 }
 
+export const CONTRAT_TYPES = [
+  "cgv",
+  "contrat_convoyage",
+  "contrat_copilote",
+  "contrat_copilote_plus",
+  "contrat_inspection",
+  "etat_vehicule",
+  "commencement_anticipe",
+  "retractation",
+] as const;
+export type ContratType = (typeof CONTRAT_TYPES)[number];
+
+export const CONTRAT_TYPE_LABELS: Record<ContratType, string> = {
+  cgv: "📄 CGV",
+  contrat_convoyage: "🚗 Contrat Convoyage",
+  contrat_copilote: "🤝 Contrat Copilote",
+  contrat_copilote_plus: "⭐ Contrat Copilote Plus",
+  contrat_inspection: "🔍 Contrat Inspection",
+  etat_vehicule: "📸 État du véhicule",
+  commencement_anticipe: "✍️ Demande de commencement anticipé",
+  retractation: "↩️ Formulaire de rétractation",
+};
+
+export const CONTRAT_STATUTS = ["a_signer", "signe", "archive"] as const;
+export type ContratStatut = (typeof CONTRAT_STATUTS)[number];
+export const CONTRAT_STATUT_LABELS: Record<ContratStatut, string> = {
+  a_signer: "À signer",
+  signe: "Signé",
+  archive: "Archivé",
+};
+
+export interface DossierContrat {
+  id: string;
+  dossier_id: string;
+  type: ContratType;
+  statut: ContratStatut;
+  champs: Record<string, string>;
+  date_generation: string | null;
+  date_signature: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EntrepriseInfo {
+  id: number;
+  nom_dirigeant: string | null;
+  siret: string | null;
+  adresse: string | null;
+  ville: string | null;
+  email: string | null;
+  telephone: string | null;
+  mediateur_nom: string | null;
+  mediateur_adresse: string | null;
+  mediateur_site: string | null;
+  updated_at: string;
+}
+
 export interface NoteInterne {
   id: string;
   dossier_id: string | null;

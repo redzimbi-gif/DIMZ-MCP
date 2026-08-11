@@ -8,6 +8,7 @@ const TABS = [
   { key: "inspection", label: "Inspection" },
   { key: "convoyage", label: "Convoyage" },
   { key: "documents", label: "Documents" },
+  { key: "contrats", label: "Documents & contrats" },
   { key: "notes", label: "Notes & historique" },
 ];
 

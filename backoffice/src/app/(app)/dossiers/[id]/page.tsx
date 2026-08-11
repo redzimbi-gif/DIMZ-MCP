@@ -11,6 +11,7 @@ import {
   getDossierInspections,
   getDossierConvoyages,
   getDossierDocuments,
+  getDossierContrats,
   getDossierNotes,
 } from "@/lib/queries";
 import {
@@ -34,8 +35,12 @@ import {
   DOSSIER_OFFRE_LABELS,
   DOCUMENT_TYPE_LABELS,
   FICHE_DECOUVERTE_ENERGIES,
+  CONTRAT_TYPES,
+  CONTRAT_TYPE_LABELS,
+  CONTRAT_STATUT_LABELS,
   type DossierOffre,
 } from "@/lib/types";
+import { CONTRAT_CHAMPS } from "@/lib/contrats";
 import { getEtapesOffre, getOffreAccompagnement, getEtapeLabel, ETAPES_CONVOYAGE } from "@/lib/etapes";
 import { formatCurrency, formatDate, formatDateTime, formatRelative } from "@/lib/format";
 import {
@@ -58,6 +63,7 @@ import {
   updateFicheDecouverteIntro,
 } from "./decouverte-actions";
 import { uploadDossierDocument } from "./documents-actions";
+import { generateContrat, marquerContratSigne, archiverContrat, reactiverContrat } from "./contrats-actions";
 
 const OFFRES_ACCOMPAGNEMENT = ["decouverte", "copilote", "copilote_plus", "expertise_seule"] as const;
 
@@ -373,6 +379,8 @@ export default async function DossierDetailPage({
       {tab === "documents" ? (
         <DocumentsTab dossierId={dossier.id} uploadDocAction={uploadDocAction} />
       ) : null}
+
+      {tab === "contrats" ? <ContratsTab dossierId={dossier.id} /> : null}
 
       {tab === "notes" ? (
         <NotesTab
@@ -788,6 +796,132 @@ async function DocumentsTab({
           </Button>
         </form>
       </Card>
+    </div>
+  );
+}
+
+const CONTRAT_STATUT_TONE: Record<string, "warn" | "good" | "neutral"> = {
+  a_signer: "warn",
+  signe: "good",
+  archive: "neutral",
+};
+
+async function ContratsTab({ dossierId }: { dossierId: string }) {
+  const contrats = await getDossierContrats(dossierId);
+
+  return (
+    <div className="space-y-3 max-w-2xl">
+      {CONTRAT_TYPES.map((type) => {
+        const contrat = contrats.find((c) => c.type === type);
+        const champsDefs = CONTRAT_CHAMPS[type];
+        const generateAction = generateContrat.bind(null, dossierId, type);
+        const marquerSigneAction = marquerContratSigne.bind(null, dossierId, type);
+        const archiverAction = archiverContrat.bind(null, dossierId, type);
+        const reactiverAction = reactiverContrat.bind(null, dossierId, type);
+
+        return (
+          <Card key={type} className="p-4">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div>
+                <p className="text-sm font-medium text-ink">{CONTRAT_TYPE_LABELS[type]}</p>
+                {contrat ? (
+                  <p className="text-xs text-ink-soft mt-0.5">
+                    Généré le {formatDate(contrat.date_generation ?? contrat.created_at)}
+                    {contrat.date_signature ? ` · Signé le ${formatDate(contrat.date_signature)}` : ""}
+                  </p>
+                ) : (
+                  <p className="text-xs text-ink-faint mt-0.5">Pas encore généré</p>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge tone={contrat ? CONTRAT_STATUT_TONE[contrat.statut] : "neutral"}>
+                  {contrat ? CONTRAT_STATUT_LABELS[contrat.statut] : "—"}
+                </Badge>
+                {contrat ? (
+                  <a
+                    href={`/api/dossiers/${dossierId}/contrats/${type}/pdf`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs font-medium text-blue-600 hover:underline whitespace-nowrap"
+                  >
+                    Voir le PDF
+                  </a>
+                ) : null}
+              </div>
+            </div>
+
+            {contrat ? (
+              <div className="flex items-center gap-2 mt-3">
+                {contrat.statut === "a_signer" ? (
+                  <form action={marquerSigneAction}>
+                    <Button type="submit" variant="outline" className="text-xs px-2.5 py-1.5">
+                      Marquer signé
+                    </Button>
+                  </form>
+                ) : null}
+                {contrat.statut !== "archive" ? (
+                  <form action={archiverAction}>
+                    <Button type="submit" variant="ghost" className="text-xs px-2.5 py-1.5">
+                      Archiver
+                    </Button>
+                  </form>
+                ) : (
+                  <form action={reactiverAction}>
+                    <Button type="submit" variant="ghost" className="text-xs px-2.5 py-1.5">
+                      Désarchiver
+                    </Button>
+                  </form>
+                )}
+              </div>
+            ) : null}
+
+            <details className="mt-3">
+              <summary className="text-xs font-medium text-blue-600 cursor-pointer select-none">
+                {contrat ? "Régénérer" : "Générer ce document"}
+              </summary>
+              <form action={generateAction} className="space-y-3 mt-3">
+                {champsDefs.map((def) => (
+                  <Field key={def.key} label={def.label}>
+                    {def.type === "textarea" ? (
+                      <textarea
+                        name={def.key}
+                        rows={2}
+                        defaultValue={contrat?.champs?.[def.key] ?? ""}
+                        placeholder={def.placeholder}
+                        className={inputClass}
+                      />
+                    ) : def.type === "select" ? (
+                      <select
+                        name={def.key}
+                        defaultValue={contrat?.champs?.[def.key] ?? ""}
+                        className={inputClass}
+                      >
+                        <option value="">—</option>
+                        {def.options?.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        name={def.key}
+                        type={def.type}
+                        defaultValue={contrat?.champs?.[def.key] ?? ""}
+                        placeholder={def.placeholder}
+                        className={inputClass}
+                      />
+                    )}
+                  </Field>
+                ))}
+                <Button type="submit" className="text-xs px-3 py-1.5">
+                  {contrat ? "Régénérer" : "Générer"}
+                </Button>
+              </form>
+            </details>
+          </Card>
+        );
+      })}
     </div>
   );
 }
