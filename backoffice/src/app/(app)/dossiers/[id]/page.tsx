@@ -47,7 +47,12 @@ import {
   decideConvoyageDemande,
 } from "../actions";
 import { createAnnonce, toggleAnnonceSelection, deleteAnnonce } from "./annonces-actions";
-import { addFicheDecouverteVehicule, deleteFicheDecouverteVehicule, sendFicheDecouverteEmail } from "./decouverte-actions";
+import {
+  addFicheDecouverteVehicule,
+  deleteFicheDecouverteVehicule,
+  sendFicheDecouverteEmail,
+  updateFicheDecouverteIntro,
+} from "./decouverte-actions";
 import { uploadDossierDocument } from "./documents-actions";
 
 const OFFRES_ACCOMPAGNEMENT = ["decouverte", "copilote", "copilote_plus", "expertise_seule"] as const;
@@ -525,9 +530,11 @@ async function VehiculesTab({
 }
 
 async function DecouverteTab({ dossierId }: { dossierId: string }) {
+  const dossier = await getDossier(dossierId);
   const vehicules = await getFicheDecouverteVehicules(dossierId);
   const addAction = addFicheDecouverteVehicule.bind(null, dossierId);
   const sendAction = sendFicheDecouverteEmail.bind(null, dossierId);
+  const introAction = updateFicheDecouverteIntro.bind(null, dossierId);
   const removeAction = async (vehiculeId: string) => {
     "use server";
     await deleteFicheDecouverteVehicule(dossierId, vehiculeId);
@@ -546,6 +553,23 @@ async function DecouverteTab({ dossierId }: { dossierId: string }) {
             </Button>
           </form>
         </div>
+
+        <Card className="p-4">
+          <form action={introAction} className="space-y-2">
+            <Field label="Commentaire libre (en introduction de la fiche)">
+              <textarea
+                name="fiche_decouverte_intro"
+                rows={3}
+                defaultValue={dossier?.fiche_decouverte_intro ?? ""}
+                placeholder="Votre copilote a fait le tour du marché pour vous — voici ce qu'il en retient, sans détour…"
+                className={inputClass}
+              />
+            </Field>
+            <Button type="submit" variant="outline">
+              Enregistrer le commentaire
+            </Button>
+          </form>
+        </Card>
 
         {vehicules.length === 0 ? (
           <Card>

@@ -130,6 +130,7 @@ export interface Dossier {
   source: string;
   portal_token: string;
   donnees_brutes: Record<string, unknown> | null;
+  fiche_decouverte_intro: string | null;
   created_at: string;
   updated_at: string;
   clients?: Client;

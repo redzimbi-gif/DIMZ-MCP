@@ -14,6 +14,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
   const buffer = await renderToBuffer(
     FicheDecouverteReport({
       vehicules,
+      intro: dossier.fiche_decouverte_intro,
       dossierReference: dossier.reference,
       clientNom: `${dossier.clients?.prenom ?? ""} ${dossier.clients?.nom ?? ""}`.trim(),
     })

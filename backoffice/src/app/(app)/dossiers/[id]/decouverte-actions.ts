@@ -47,6 +47,13 @@ export async function deleteFicheDecouverteVehicule(dossierId: string, vehiculeI
   revalidatePath(`/dossiers/${dossierId}`);
 }
 
+export async function updateFicheDecouverteIntro(dossierId: string, formData: FormData) {
+  const db = createAdminClient();
+  const intro = text(formData, "fiche_decouverte_intro");
+  await db.from("dossiers").update({ fiche_decouverte_intro: intro }).eq("id", dossierId);
+  revalidatePath(`/dossiers/${dossierId}`);
+}
+
 export async function sendFicheDecouverteEmail(dossierId: string) {
   const dossier = await getDossier(dossierId);
   const email = dossier?.clients?.email;
@@ -61,6 +68,7 @@ export async function sendFicheDecouverteEmail(dossierId: string) {
       const buffer = await renderToBuffer(
         FicheDecouverteReport({
           vehicules,
+          intro: dossier.fiche_decouverte_intro,
           dossierReference: dossier.reference,
           clientNom: `${dossier.clients?.prenom ?? ""} ${dossier.clients?.nom ?? ""}`.trim(),
         })

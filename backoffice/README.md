@@ -21,6 +21,7 @@ stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
    - `0009_suivi_client_par_offre.sql`
    - `0010_score_dimz_annonces.sql`
    - `0011_fiche_decouverte.sql`
+   - `0012_fiche_decouverte_intro.sql`
 3. Dans **Project Settings → API**, récupère :
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`

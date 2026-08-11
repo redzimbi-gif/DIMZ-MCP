@@ -5,11 +5,17 @@ import type { FicheDecouverteVehicule } from "@/lib/types";
 
 interface Props {
   vehicules: FicheDecouverteVehicule[];
+  intro?: string | null;
   dossierReference: string;
   clientNom: string;
 }
 
-export function FicheDecouverteReport({ vehicules, dossierReference, clientNom }: Props) {
+const DEFAULT_INTRO =
+  "Votre copilote a fait le tour du marché pour vous — voici ce qu'il en retient, sans détour. Pas de " +
+  "note chiffrée à ce stade : juste un point fort et un point de vigilance par véhicule, pour vous aider " +
+  "à y voir clair avant d'aller plus loin.";
+
+export function FicheDecouverteReport({ vehicules, intro, dossierReference, clientNom }: Props) {
   return (
     <Document title={`Fiche Découverte — ${dossierReference}`}>
       <Page size="A4" style={pdfStyles.page}>
@@ -24,11 +30,7 @@ export function FicheDecouverteReport({ vehicules, dossierReference, clientNom }
         </Text>
 
         <View style={{ ...pdfStyles.section, borderLeft: "2px solid #2f6fed", paddingLeft: 12, marginBottom: 20 }}>
-          <Text style={{ fontSize: 9.5, lineHeight: 1.5, color: "#0b0d12" }}>
-            Votre copilote a fait le tour du marché pour vous — voici ce qu'il en retient, sans détour. Pas de
-            note chiffrée à ce stade : juste un point fort et un point de vigilance par véhicule, pour vous aider
-            à y voir clair avant d'aller plus loin.
-          </Text>
+          <Text style={{ fontSize: 9.5, lineHeight: 1.5, color: "#0b0d12" }}>{intro?.trim() || DEFAULT_INTRO}</Text>
         </View>
 
         {vehicules.map((v, i) => (
