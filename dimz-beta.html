@@ -711,6 +711,11 @@
   .tooltip-btn:hover, .tooltip-btn:focus-visible { opacity: 1; }
   .choice-grid label:has(input:checked) .tooltip-btn { border-color: #fff; }
 
+  .budget-range { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .budget-range-word { font-size: 0.9rem; color: var(--ink-soft); font-weight: 700; flex: none; }
+  .budget-range-input { position: relative; flex: 1; min-width: 120px; }
+  .budget-range-input input { padding-right: 34px; font-variant-numeric: tabular-nums; }
+  .budget-range-input span { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--ink-soft); font-size: 0.9rem; pointer-events: none; }
   .range-slider { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-md); padding: 20px 18px 16px; }
   .range-slider-value { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
   .range-slider-track { position: relative; height: 4px; background: var(--line); border-radius: 100px; margin: 4px 11px 0; }
@@ -1265,15 +1270,17 @@
                 <div class="field-grid">
                   <div class="field full">
                     <label id="a-budget-label">Budget total envisagé</label>
-                    <div class="range-slider" id="a-budget-slider" role="group" aria-labelledby="a-budget-label">
-                      <div class="range-slider-value"></div>
-                      <div class="range-slider-track">
-                        <div class="range-slider-fill"></div>
-                        <div class="range-slider-bubble" aria-hidden="true"></div>
-                        <button type="button" class="range-slider-thumb" data-thumb="min" role="slider" aria-label="Budget minimum" tabindex="0"></button>
-                        <button type="button" class="range-slider-thumb" data-thumb="max" role="slider" aria-label="Budget maximum" tabindex="0"></button>
+                    <div class="budget-range" role="group" aria-labelledby="a-budget-label">
+                      <span class="budget-range-word">Entre</span>
+                      <div class="budget-range-input">
+                        <input type="text" inputmode="numeric" id="a-budget-min" placeholder="5 000" aria-label="Budget minimum">
+                        <span aria-hidden="true">€</span>
                       </div>
-                      <div class="range-slider-ticks"><span>5 000 €</span><span>100 000 € et +</span></div>
+                      <span class="budget-range-word">et</span>
+                      <div class="budget-range-input">
+                        <input type="text" inputmode="numeric" id="a-budget-max" placeholder="30 000" aria-label="Budget maximum">
+                        <span aria-hidden="true">€</span>
+                      </div>
                     </div>
                     <input type="hidden" id="a-budget-text">
                   </div>
@@ -1510,7 +1517,7 @@
 
         <div class="grid-2" style="margin-top:32px;" data-reveal>
           <div class="option-card option-card-photo">
-            <figure class="feature-photo feature-photo-crop" style="margin:-26px -26px 20px;border-radius:0;"><img src="img/inspection-moteur.jpg" alt="Inspection du moteur par le copilote DIMZ" loading="lazy" width="1200" height="1799"></figure>
+            <figure class="feature-photo feature-photo-crop" style="margin:-26px -26px 20px;border-radius:0;"><img src="img/inspection-moteur.jpg" alt="Inspection du moteur par le copilote DIMZ" loading="lazy" width="1200" height="1799" style="object-position:50% 24%;"></figure>
             <div class="option-card-row">
               <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></div>
               <div>
@@ -3745,9 +3752,33 @@
     return arr;
   }
 
-  initRangeSlider('a-budget-slider', stepRange(5000, 100000, 100), {
-    hiddenId: 'a-budget-text', minLabel: 'Moins de 5 000 €', maxLabel: 'Plus de 100 000 €'
-  });
+  // ---------- Budget total : deux champs "Entre X € et Y €" avec espace tous les 3 chiffres ----------
+  function formatThousands(digits) {
+    return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  }
+  function setupBudgetMinMax(minId, maxId, hiddenId) {
+    var minEl = document.getElementById(minId);
+    var maxEl = document.getElementById(maxId);
+    var hidden = document.getElementById(hiddenId);
+    function formatField(el) {
+      var digits = el.value.replace(/\D/g, '');
+      el.value = digits ? formatThousands(digits) : '';
+    }
+    function update() {
+      var minDigits = minEl.value.replace(/\D/g, '');
+      var maxDigits = maxEl.value.replace(/\D/g, '');
+      var text = '';
+      if (minDigits && maxDigits) text = 'Entre ' + formatThousands(minDigits) + ' € et ' + formatThousands(maxDigits) + ' €';
+      else if (minDigits) text = 'À partir de ' + formatThousands(minDigits) + ' €';
+      else if (maxDigits) text = "Jusqu'à " + formatThousands(maxDigits) + ' €';
+      hidden.value = text;
+    }
+    [minEl, maxEl].forEach(function (el) {
+      el.addEventListener('input', function () { formatField(el); update(); });
+    });
+  }
+  setupBudgetMinMax('a-budget-min', 'a-budget-max', 'a-budget-text');
+
   initRangeSlider('a-budget-mensuel-slider', stepRange(100, 1000, 10), {
     hiddenId: 'a-budget-mensuel-text', minLabel: 'Moins de 100 €', maxLabel: 'Plus de 1 000 €'
   });
