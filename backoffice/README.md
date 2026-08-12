@@ -31,6 +31,7 @@ stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
    - `0019_entreprise_info_update.sql`
    - `0020_entreprise_info_email.sql`
    - `0021_entreprise_info_siret.sql`
+   - `0022_entreprise_info_rattrapage.sql`
 3. Dans **Project Settings → API**, récupère :
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
