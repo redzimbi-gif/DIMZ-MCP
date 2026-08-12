@@ -398,6 +398,18 @@ export interface ConvoyageExterne {
   created_at: string;
 }
 
+export interface Facture {
+  id: string;
+  client_id: string | null;
+  numero: string | null;
+  date_facture: string | null;
+  montant_total: number;
+  montant_frais: number;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export const RESSENTI_DUREE_LABELS: Record<string, string> = {
   tres_rapide: "Très rapide",
   assez_rapide: "Assez rapide",

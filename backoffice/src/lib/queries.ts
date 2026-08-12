@@ -13,6 +13,7 @@ import type {
   DossierEtapeHistory,
   DossierStatutHistory,
   EntrepriseInfo,
+  Facture,
   FicheDecouverteVehicule,
   Inspection,
   NoteInterne,
@@ -404,6 +405,22 @@ export async function listConvoyagesExternes(from?: string, to?: string) {
     .order("date_convoyage", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false });
   return (data ?? []) as ConvoyageExterne[];
+}
+
+export async function listFactures() {
+  const db = createAdminClient();
+  const { data } = await db
+    .from("factures")
+    .select("*, clients(nom, prenom)")
+    .order("date_facture", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false });
+  return (data ?? []) as (Facture & { clients: any })[];
+}
+
+export async function getFacture(id: string) {
+  const db = createAdminClient();
+  const { data } = await db.from("factures").select("*").eq("id", id).maybeSingle();
+  return data as Facture | null;
 }
 
 export async function getConvoyageExterne(id: string) {

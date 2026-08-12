@@ -27,6 +27,7 @@ stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
    - `0015_fiche_decouverte_prix.sql`
    - `0016_market_commentaire.sql`
    - `0017_market_commentaire_par_offre.sql`
+   - `0018_factures.sql`
 3. Dans **Project Settings → API**, récupère :
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -201,13 +202,18 @@ l'email de confirmation si le client a renseigné son adresse.
   signature. Les informations légales de l'entreprise (SIRET, adresse,
   médiateur…) se règlent une fois dans **Paramètres** et alimentent
   automatiquement tous les documents générés.
+- Facturation (V1 manuelle) : journal des factures déjà émises par DIMZ —
+  client, numéro, date, montant total, montant des frais, notes. Pas encore
+  de génération/envoi de facture ni de paiement en ligne (voir plus bas).
 
 ## Ce qui n'est volontairement pas dans cette V1
 
 Ces modules demandent tes propres comptes/clés API tiers (payants) — on les
 ajoute dès que tu es prêt :
 
-- **Facturation** (devis, factures, paiement en ligne) → nécessite Stripe.
+- **Facturation avancée** (devis, génération/envoi de factures, paiement en
+  ligne) → nécessite Stripe. En attendant, `/facturation` sert de journal
+  manuel pour retrouver les factures déjà émises ailleurs (voir plus haut).
 - **SMS** → nécessite Twilio ou équivalent.
 - **Signature électronique légale** (au-delà de la signature à l'écran déjà
   en place pour le convoyage) → nécessite un prestataire type Yousign/DocuSign.
