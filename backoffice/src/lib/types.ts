@@ -97,6 +97,13 @@ export const CONVOYAGE_STATUT_LABELS: Record<ConvoyageStatut, string> = {
   annule: "Annulé",
 };
 
+export const CLIENT_TYPES = ["particulier", "professionnel"] as const;
+export type ClientType = (typeof CLIENT_TYPES)[number];
+export const CLIENT_TYPE_LABELS: Record<ClientType, string> = {
+  particulier: "Particulier",
+  professionnel: "Professionnel",
+};
+
 export interface Client {
   id: string;
   civilite: string | null;
@@ -106,6 +113,9 @@ export interface Client {
   email: string | null;
   adresse: string | null;
   notes_privees: string | null;
+  type_client: ClientType;
+  raison_sociale: string | null;
+  siret: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -406,6 +416,7 @@ export interface Facture {
   montant_total: number;
   montant_frais: number;
   notes: string | null;
+  pdf_path: string | null;
   created_at: string;
   updated_at: string;
 }

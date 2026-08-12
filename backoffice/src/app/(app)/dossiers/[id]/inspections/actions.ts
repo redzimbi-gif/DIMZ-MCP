@@ -38,5 +38,6 @@ export async function createInspection(dossierId: string, formData: FormData) {
   });
 
   revalidatePath(`/dossiers/${dossierId}`);
+  revalidatePath("/inspections");
   redirect(`/dossiers/${dossierId}/inspections/${data.id}`);
 }

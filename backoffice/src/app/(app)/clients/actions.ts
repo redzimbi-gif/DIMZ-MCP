@@ -4,10 +4,12 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { logActivity, getActorId } from "@/lib/log";
+import type { ClientType } from "@/lib/types";
 
 export async function createClientRecord(formData: FormData) {
   const db = createAdminClient();
 
+  const typeClient = (String(formData.get("type_client") || "particulier") as ClientType);
   const payload = {
     civilite: String(formData.get("civilite") || "") || null,
     nom: String(formData.get("nom") || "").trim(),
@@ -15,6 +17,9 @@ export async function createClientRecord(formData: FormData) {
     telephone: String(formData.get("telephone") || "").trim() || null,
     email: String(formData.get("email") || "").trim() || null,
     adresse: String(formData.get("adresse") || "").trim() || null,
+    type_client: typeClient,
+    raison_sociale: typeClient === "professionnel" ? String(formData.get("raison_sociale") || "").trim() || null : null,
+    siret: typeClient === "professionnel" ? String(formData.get("siret") || "").trim() || null : null,
   };
 
   if (!payload.nom) {
@@ -38,6 +43,7 @@ export async function createClientRecord(formData: FormData) {
 export async function updateClient(id: string, formData: FormData) {
   const db = createAdminClient();
 
+  const typeClient = (String(formData.get("type_client") || "particulier") as ClientType);
   const payload = {
     civilite: String(formData.get("civilite") || "") || null,
     nom: String(formData.get("nom") || "").trim(),
@@ -46,6 +52,9 @@ export async function updateClient(id: string, formData: FormData) {
     email: String(formData.get("email") || "").trim() || null,
     adresse: String(formData.get("adresse") || "").trim() || null,
     notes_privees: String(formData.get("notes_privees") || "").trim() || null,
+    type_client: typeClient,
+    raison_sociale: typeClient === "professionnel" ? String(formData.get("raison_sociale") || "").trim() || null : null,
+    siret: typeClient === "professionnel" ? String(formData.get("siret") || "").trim() || null : null,
   };
 
   await db.from("clients").update(payload).eq("id", id);

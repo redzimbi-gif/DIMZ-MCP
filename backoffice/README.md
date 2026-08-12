@@ -32,6 +32,8 @@ stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
    - `0020_entreprise_info_email.sql`
    - `0021_entreprise_info_siret.sql`
    - `0022_entreprise_info_rattrapage.sql`
+   - `0023_clients_pro.sql`
+   - `0024_factures_pdf.sql`
 3. Dans **Project Settings → API**, récupère :
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -142,6 +144,8 @@ l'email de confirmation si le client a renseigné son adresse.
 - Clients : fiche complète, historique des dossiers, documents, notes privées,
   historique des échanges. Suppression définitive (avec confirmation) — supprime
   aussi, par cascade, tous les dossiers du client et tout ce qui leur est lié.
+  Type de client Particulier / Professionnel (raison sociale, SIRET), repris
+  automatiquement sur ses factures dans Facturation.
 - Dossiers : pipeline en 10 statuts (kanban), historique des changements de
   statut, infos projet complètes. Archivage (sort du pipeline par défaut,
   récupérable) et suppression définitive (avec confirmation) depuis la fiche
@@ -165,9 +169,12 @@ l'email de confirmation si le client a renseigné son adresse.
   du copilote, verdict), entièrement éditable depuis le back-office, avec
   génération automatique d'un rapport PDF au même format. Pour un dossier en
   offre Copilote Plus, le PDF ajoute en pied de page les étapes suivantes
-  (mise en relation avec le vendeur, accompagnement à l'achat, convoyage).
+  (mise en relation avec le vendeur, accompagnement à l'achat, convoyage). Vue
+  globale de toutes les inspections, tous dossiers confondus, sur `/inspections`.
 - Convoyage : trajet, photos avant/après, signature client (à l'écran), rapport
-  de livraison PDF.
+  de livraison PDF. Vue globale sur `/convoyages` : convoyages DIMZ (tous
+  dossiers confondus) et convoyages hors plateforme, avec formulaire d'ajout
+  d'un convoyage hors plateforme directement depuis cette page.
 - Agenda : calendrier mensuel (rendez-vous, visio, inspections, convoyages,
   livraisons).
 - Documents : bibliothèque liée aux dossiers, avec deux listes — les fichiers
@@ -207,8 +214,10 @@ l'email de confirmation si le client a renseigné son adresse.
   médiateur…) se règlent une fois dans **Paramètres** et alimentent
   automatiquement tous les documents générés.
 - Facturation (V1 manuelle) : journal des factures déjà émises par DIMZ —
-  client, numéro, date, montant total, montant des frais, notes. Pas encore
-  de génération/envoi de facture ni de paiement en ligne (voir plus bas).
+  client, numéro, date, montant total, montant des frais, notes, PDF de la
+  facture en pièce jointe. Pour un client professionnel, sa raison sociale et
+  son SIRET s'affichent automatiquement sur ses factures. Pas encore de
+  génération/envoi de facture ni de paiement en ligne (voir plus bas).
 
 ## Ce qui n'est volontairement pas dans cette V1
 

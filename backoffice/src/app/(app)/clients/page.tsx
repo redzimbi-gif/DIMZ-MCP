@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Plus, Search } from "lucide-react";
 import { listClients } from "@/lib/queries";
-import { Card, PageHeader, LinkButton, EmptyState } from "@/components/ui";
+import { Card, PageHeader, LinkButton, EmptyState, Badge } from "@/components/ui";
 import { initials } from "@/lib/format";
 
 export default async function ClientsPage({
@@ -52,9 +52,14 @@ export default async function ClientsPage({
                     {initials(c.nom, c.prenom)}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-ink truncate">
-                      {c.civilite ? `${c.civilite} ` : ""}
-                      {c.prenom} {c.nom}
+                    <p className="text-sm font-medium text-ink truncate flex items-center gap-2">
+                      <span className="truncate">
+                        {c.civilite ? `${c.civilite} ` : ""}
+                        {c.prenom} {c.nom}
+                      </span>
+                      {c.type_client === "professionnel" ? (
+                        <Badge tone="blue">{c.raison_sociale || "Pro"}</Badge>
+                      ) : null}
                     </p>
                     <p className="text-xs text-ink-soft truncate">
                       {[c.email, c.telephone].filter(Boolean).join(" · ") || "—"}

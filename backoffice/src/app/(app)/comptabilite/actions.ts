@@ -41,6 +41,7 @@ export async function createConvoyageExterne(formData: FormData) {
   });
 
   revalidatePath("/comptabilite");
+  revalidatePath("/convoyages");
 }
 
 export async function updateConvoyageExterne(id: string, formData: FormData) {
@@ -80,6 +81,7 @@ export async function updateConvoyageExterne(id: string, formData: FormData) {
   });
 
   revalidatePath("/comptabilite");
+  revalidatePath("/convoyages");
   redirect("/comptabilite");
 }
 
@@ -103,4 +105,5 @@ export async function deleteConvoyageExterne(id: string) {
   const db = createAdminClient();
   await db.from("convoyages_externes").delete().eq("id", id);
   revalidatePath("/comptabilite");
+  revalidatePath("/convoyages");
 }

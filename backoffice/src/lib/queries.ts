@@ -236,6 +236,15 @@ export async function getFicheDecouverteVehicules(dossierId: string) {
   return (data ?? []) as FicheDecouverteVehicule[];
 }
 
+export async function listAllInspections() {
+  const db = createAdminClient();
+  const { data } = await db
+    .from("inspections")
+    .select("*, dossiers(reference, clients(nom, prenom))")
+    .order("date_inspection", { ascending: false });
+  return (data ?? []) as (Inspection & { dossiers: any })[];
+}
+
 export async function getDossierInspections(dossierId: string) {
   const db = createAdminClient();
   const { data } = await db
@@ -254,6 +263,16 @@ export async function getInspection(id: string) {
     .eq("id", id)
     .maybeSingle();
   return data as (Inspection & { dossiers: any }) | null;
+}
+
+export async function listAllConvoyages() {
+  const db = createAdminClient();
+  const { data } = await db
+    .from("convoyages")
+    .select("*, dossiers(reference, clients(nom, prenom))")
+    .order("date_convoyage", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false });
+  return (data ?? []) as (Convoyage & { dossiers: any })[];
 }
 
 export async function getDossierConvoyages(dossierId: string) {
@@ -411,7 +430,7 @@ export async function listFactures() {
   const db = createAdminClient();
   const { data } = await db
     .from("factures")
-    .select("*, clients(nom, prenom)")
+    .select("*, clients(nom, prenom, type_client, raison_sociale, siret)")
     .order("date_facture", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false });
   return (data ?? []) as (Facture & { clients: any })[];

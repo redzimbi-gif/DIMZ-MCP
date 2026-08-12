@@ -51,5 +51,6 @@ export async function createConvoyage(dossierId: string, formData: FormData) {
   });
 
   revalidatePath(`/dossiers/${dossierId}`);
+  revalidatePath("/convoyages");
   redirect(`/dossiers/${dossierId}/convoyages/${data.id}`);
 }

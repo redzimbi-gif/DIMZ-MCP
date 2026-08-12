@@ -48,8 +48,8 @@ export const NAV: NavGroup[] = [
     label: "Opérations",
     items: [
       { href: "/agenda", label: "Agenda", icon: CalendarDays },
-      { href: "/dossiers?vue=inspections", label: "Inspections", icon: ClipboardCheck },
-      { href: "/dossiers?vue=convoyages", label: "Convoyages", icon: Truck },
+      { href: "/inspections", label: "Inspections", icon: ClipboardCheck },
+      { href: "/convoyages", label: "Convoyages", icon: Truck },
       { href: "/retours-test", label: "Retours test", icon: ClipboardList },
     ],
   },

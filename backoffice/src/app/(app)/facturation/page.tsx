@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, FileText } from "lucide-react";
 import { listFactures, listClients } from "@/lib/queries";
+import { getSignedUrls } from "@/lib/storage";
 import { Card, PageHeader, StatCard, EmptyState, Field, inputClass, Button } from "@/components/ui";
 import { AutoResetForm } from "@/components/AutoResetForm";
 import { formatDate } from "@/lib/format";
@@ -17,6 +18,7 @@ function formatEUR(value: number) {
 
 export default async function FacturationPage() {
   const [factures, clients] = await Promise.all([listFactures(), listClients()]);
+  const pdfUrls = await getSignedUrls(factures.map((f) => f.pdf_path).filter((p): p is string => !!p));
 
   const totalFacture = factures.reduce((sum, f) => sum + f.montant_total, 0);
   const totalFrais = factures.reduce((sum, f) => sum + f.montant_frais, 0);
@@ -52,6 +54,13 @@ export default async function FacturationPage() {
                       {f.clients ? `${f.clients.prenom ?? ""} ${f.clients.nom ?? ""}`.trim() : "Client non lié"}
                       {f.date_facture ? ` · ${formatDate(f.date_facture)}` : ""}
                     </p>
+                    {f.clients?.type_client === "professionnel" ? (
+                      <p className="text-xs text-ink-faint mt-0.5">
+                        {[f.clients.raison_sociale, f.clients.siret ? `SIRET ${f.clients.siret}` : null]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </p>
+                    ) : null}
                     {f.notes ? <p className="text-xs text-ink-faint mt-1">{f.notes}</p> : null}
                   </div>
                   <div className="text-right shrink-0">
@@ -60,6 +69,17 @@ export default async function FacturationPage() {
                       <p className="text-xs text-ink-faint tnum mt-0.5">Frais : {formatEUR(f.montant_frais)}</p>
                     ) : null}
                     <div className="flex items-center justify-end gap-1 mt-1.5">
+                      {f.pdf_path && pdfUrls[f.pdf_path] ? (
+                        <a
+                          href={pdfUrls[f.pdf_path]}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="p-1.5 rounded-md text-ink-faint hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                          aria-label="Voir le PDF"
+                        >
+                          <FileText className="h-4 w-4" strokeWidth={1.8} />
+                        </a>
+                      ) : null}
                       <Link
                         href={`/facturation/${f.id}`}
                         className="p-1.5 rounded-md text-ink-faint hover:text-blue-600 hover:bg-blue-50 transition-colors"
@@ -86,13 +106,14 @@ export default async function FacturationPage() {
 
         <Card className="p-5 h-fit">
           <h2 className="text-sm font-semibold text-ink mb-4">Ajouter une facture</h2>
-          <AutoResetForm action={createFacture} className="space-y-3">
+          <AutoResetForm action={createFacture} className="space-y-3" encType="multipart/form-data">
             <Field label="Client">
               <select name="client_id" defaultValue="" className={inputClass}>
                 <option value="">—</option>
                 {clients.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.prenom} {c.nom}
+                    {c.type_client === "professionnel" && c.raison_sociale ? ` — ${c.raison_sociale}` : ""}
                   </option>
                 ))}
               </select>
@@ -113,6 +134,9 @@ export default async function FacturationPage() {
             </div>
             <Field label="Notes (optionnel)">
               <textarea name="notes" rows={2} className={inputClass} />
+            </Field>
+            <Field label="PDF de la facture (optionnel)">
+              <input name="pdf" type="file" accept="application/pdf" className={inputClass} />
             </Field>
             <Button type="submit" className="w-full">
               <Plus className="h-4 w-4" /> Ajouter

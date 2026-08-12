@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getClient, getClientDossiers, getClientDocuments, getClientNotes } from "@/lib/queries";
 import { Card, PageHeader, StatutBadge, EmptyState, Field, inputClass, Button } from "@/components/ui";
 import { formatDateTime, formatRelative, initials } from "@/lib/format";
-import { DOCUMENT_TYPE_LABELS } from "@/lib/types";
+import { DOCUMENT_TYPE_LABELS, CLIENT_TYPES, CLIENT_TYPE_LABELS } from "@/lib/types";
 import { AutoResetForm } from "@/components/AutoResetForm";
 import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
 import { Trash2 } from "lucide-react";
@@ -56,6 +56,15 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
             </div>
 
             <form action={updateAction} className="space-y-4">
+              <Field label="Type de client">
+                <select name="type_client" defaultValue={client.type_client} className={inputClass}>
+                  {CLIENT_TYPES.map((t) => (
+                    <option key={t} value={t}>
+                      {CLIENT_TYPE_LABELS[t]}
+                    </option>
+                  ))}
+                </select>
+              </Field>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <Field label="Civilité">
                   <select name="civilite" defaultValue={client.civilite ?? ""} className={inputClass}>
@@ -80,6 +89,14 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
               <Field label="Adresse">
                 <textarea name="adresse" defaultValue={client.adresse ?? ""} rows={2} className={inputClass} />
               </Field>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Field label="Raison sociale (si professionnel)">
+                  <input name="raison_sociale" defaultValue={client.raison_sociale ?? ""} className={inputClass} />
+                </Field>
+                <Field label="SIRET (si professionnel)">
+                  <input name="siret" defaultValue={client.siret ?? ""} className={inputClass} />
+                </Field>
+              </div>
               <Field label="Notes privées">
                 <textarea
                   name="notes_privees"
