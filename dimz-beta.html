@@ -3205,6 +3205,54 @@
     return options;
   }
 
+  // Appellations moteur réelles par constructeur (gamme essence/diesel/hybride), pour proposer des motorisations plausibles
+  var MOTOR_FAMILIES = {
+    "Peugeot": { "Essence": "PureTech", "Diesel": "BlueHDi", "Hybride": "Hybrid", "Hybride rechargeable": "Hybrid4" },
+    "Citroën": { "Essence": "PureTech", "Diesel": "BlueHDi", "Hybride": "Hybrid", "Hybride rechargeable": "Hybrid" },
+    "DS Automobiles": { "Essence": "PureTech", "Diesel": "BlueHDi", "Hybride": "E-Tense", "Hybride rechargeable": "E-Tense" },
+    "Renault": { "Essence": "TCe", "Diesel": "dCi", "Hybride": "E-Tech Hybrid", "Hybride rechargeable": "E-Tech Plug-in" },
+    "Dacia": { "Essence": "TCe", "Diesel": "Blue dCi", "Hybride": "Hybrid", "Hybride rechargeable": "Hybrid" },
+    "Volkswagen": { "Essence": "TSI", "Diesel": "TDI", "Hybride": "eHybrid", "Hybride rechargeable": "eHybrid" },
+    "Audi": { "Essence": "TFSI", "Diesel": "TDI", "Hybride": "TFSI mild-hybrid", "Hybride rechargeable": "TFSI e" },
+    "Seat": { "Essence": "TSI", "Diesel": "TDI", "Hybride": "eHybrid", "Hybride rechargeable": "eHybrid" },
+    "Cupra": { "Essence": "TSI", "Diesel": "TDI", "Hybride": "eHybrid", "Hybride rechargeable": "eHybrid" },
+    "Škoda": { "Essence": "TSI", "Diesel": "TDI", "Hybride": "iV", "Hybride rechargeable": "iV" },
+    "Ford": { "Essence": "EcoBoost", "Diesel": "EcoBlue", "Hybride": "Hybrid", "Hybride rechargeable": "Plug-In Hybrid" },
+    "Fiat": { "Essence": "FireFly", "Diesel": "MultiJet", "Hybride": "Hybrid", "Hybride rechargeable": "Hybrid" },
+    "Toyota": { "Essence": "Valvematic", "Diesel": "D-4D", "Hybride": "Hybrid", "Hybride rechargeable": "Plug-in Hybrid" },
+    "Nissan": { "Essence": "DIG-T", "Diesel": "dCi", "Hybride": "e-Power", "Hybride rechargeable": "e-Power" },
+    "Hyundai": { "Essence": "T-GDi", "Diesel": "CRDi", "Hybride": "Hybrid", "Hybride rechargeable": "Plug-in Hybrid" },
+    "Kia": { "Essence": "T-GDi", "Diesel": "CRDi", "Hybride": "Hybrid", "Hybride rechargeable": "Plug-in Hybrid" },
+    "Mazda": { "Essence": "Skyactiv-G", "Diesel": "Skyactiv-D", "Hybride": "e-Skyactiv Hybrid", "Hybride rechargeable": "e-Skyactiv PHEV" },
+    "Honda": { "Essence": "i-VTEC", "Diesel": "i-DTEC", "Hybride": "e:HEV", "Hybride rechargeable": "e:HEV" },
+    "Suzuki": { "Essence": "Boosterjet", "Diesel": "DDiS", "Hybride": "Hybrid", "Hybride rechargeable": "Hybrid" },
+    "Land Rover": { "Essence": "Ingenium", "Diesel": "Ingenium", "Hybride": "Ingenium Hybrid", "Hybride rechargeable": "P400e" },
+    "Jaguar": { "Essence": "Ingenium", "Diesel": "Ingenium", "Hybride": "Ingenium Hybrid", "Hybride rechargeable": "P400e" },
+    "Alfa Romeo": { "Essence": "MultiAir", "Diesel": "MultiJet", "Hybride": "Hybrid", "Hybride rechargeable": "Q4 Plug-in" }
+  };
+
+  // Cylindrées / puissances usuelles par énergie, utilisées quand aucune appellation constructeur n'est connue
+  var MOTOR_POWERS = {
+    "Essence": [["1.0", "65-75"], ["1.2", "100"], ["1.2", "130"], ["1.6", "150"], ["2.0", "180-200"]],
+    "Diesel": [["1.5", "100-115"], ["1.6", "120"], ["2.0", "150"], ["2.0", "180-200"]],
+    "Hybride": [["1.6", "140"], ["1.8", "140"], ["2.0", "180-200"]],
+    "Hybride rechargeable": [["1.6", "180-225"], ["2.0", "250-300"]]
+  };
+
+  function motorisationOptions(brand, energie) {
+    if (energie === 'Peu importe / Je ne sais pas') return ['Peu importe / Je ne sais pas'];
+    if (energie === 'Électrique') {
+      return ['Moteur unique (propulsion ou traction)', 'Double moteur (transmission intégrale, plus puissant)', 'Peu importe / Je ne sais pas'];
+    }
+    var family = MOTOR_FAMILIES[brand] && MOTOR_FAMILIES[brand][energie];
+    var powers = MOTOR_POWERS[energie] || MOTOR_POWERS.Essence;
+    var options = powers.map(function (p) {
+      return family ? (p[0] + ' ' + family + ' ' + p[1] + 'ch') : (p[0] + ' (' + p[1] + ' ch)');
+    });
+    options.push('Peu importe / Je ne sais pas');
+    return options;
+  }
+
   function addVehicleRow() {
     if (vehicleCount >= MAX_VEHICLES) return;
     vehicleCount++;
@@ -3215,7 +3263,7 @@
       '<div class="field"><label>Modèle</label><select class="veh-modele" disabled><option value="">Choisir la marque d\'abord</option></select></div>' +
       '<div class="field"><label>Génération</label><select class="veh-generation" disabled><option value="">—</option></select></div>' +
       '<div class="field"><label>Énergie</label><select class="veh-energie" disabled><option value="">—</option></select></div>' +
-      '<div class="field"><label>Motorisation</label><input type="text" class="veh-motorisation" disabled placeholder="Ex. : 1.0i 60ch, 1.2 PureTech 130ch…"></div>' +
+      '<div class="field"><label>Motorisation</label><select class="veh-motorisation" disabled><option value="">—</option></select></div>' +
       '<button type="button" class="veh-remove" aria-label="Retirer ce véhicule">✕</button>';
     vehicleList.appendChild(row);
     updateAddButton();
@@ -3257,7 +3305,7 @@
       var brand = e.target.value;
       energieSelect.innerHTML = '<option value="">—</option>';
       energieSelect.disabled = true;
-      moteurInput.value = '';
+      moteurInput.innerHTML = '<option value="">—</option>';
       moteurInput.disabled = true;
       if (!brand) {
         modeleSelect.innerHTML = '<option value="">Choisir la marque d\'abord</option>';
@@ -3283,7 +3331,7 @@
       var model = e.target.value;
       energieSelect2.innerHTML = '<option value="">—</option>';
       energieSelect2.disabled = true;
-      moteurInput2.value = '';
+      moteurInput2.innerHTML = '<option value="">—</option>';
       moteurInput2.disabled = true;
       if (!model) {
         genSelect2.innerHTML = '<option value="">—</option>';
@@ -3302,7 +3350,7 @@
       var energieSelect3 = row3.querySelector('.veh-energie');
       var moteurInput3 = row3.querySelector('.veh-motorisation');
       var generation = e.target.value;
-      moteurInput3.value = '';
+      moteurInput3.innerHTML = '<option value="">—</option>';
       moteurInput3.disabled = true;
       if (!generation) {
         energieSelect3.innerHTML = '<option value="">—</option>';
@@ -3318,8 +3366,18 @@
     if (e.target.classList.contains('veh-energie')) {
       var row4 = e.target.closest('.veh-row');
       var moteurInput4 = row4.querySelector('.veh-motorisation');
-      moteurInput4.disabled = !e.target.value;
-      if (!e.target.value) moteurInput4.value = '';
+      var brand4 = row4.querySelector('.veh-marque').value;
+      var energie4 = e.target.value;
+      if (!energie4) {
+        moteurInput4.innerHTML = '<option value="">—</option>';
+        moteurInput4.disabled = true;
+      } else {
+        var motorisations = motorisationOptions(brand4, energie4);
+        moteurInput4.innerHTML = '<option value="">Motorisation…</option>' + motorisations.map(function (mo) {
+          return '<option value="' + mo + '">' + mo + '</option>';
+        }).join('');
+        moteurInput4.disabled = false;
+      }
     }
     renderVehicleBubbles();
   });
