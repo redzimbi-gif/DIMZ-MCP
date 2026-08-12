@@ -1145,11 +1145,10 @@
                 <div id="vehicule-bubbles" class="veh-bubbles"></div>
                 <button type="button" class="add-vehicle" id="add-vehicle">+ Ajouter un véhicule</button>
 
-                <div class="field full toggle-row" style="margin-top:26px;">
-                  <label><input type="checkbox" id="a-veh-absente"> Votre recherche ne figure pas dans la liste ? Décrivez-nous le véhicule souhaité</label>
-                </div>
-                <div class="field full" id="veh-absente-detail" hidden style="margin-top:10px;">
-                  <textarea id="a-veh-absente-desc" placeholder="Marque, modèle, année approximative…"></textarea>
+                <div class="field full" style="margin-top:26px;">
+                  <label for="a-veh-absente-desc">Un modèle précis en tête, absent de la liste ?</label>
+                  <div class="field hint" style="margin:-6px 0 8px;">Décrivez-nous le véhicule de vos rêves — marque, modèle, ce qui compte pour vous — et votre copilote partira à sa recherche.</div>
+                  <textarea id="a-veh-absente-desc" placeholder="Ex. : une Golf GTI récente, boîte manuelle, en bon état…"></textarea>
                 </div>
 
                 <div class="field-grid" style="margin-top:26px;">
@@ -3287,10 +3286,6 @@
     }
   });
 
-  document.getElementById('a-veh-absente').addEventListener('change', function () {
-    document.getElementById('veh-absente-detail').hidden = !this.checked;
-  });
-
   document.getElementById('add-vehicle').addEventListener('click', addVehicleRow);
   addVehicleRow();
 
@@ -4100,7 +4095,6 @@
       if (btn.dataset.reset === 'form-accompagnement') {
         document.getElementById('veh-actuel-detail').hidden = true;
         document.getElementById('financement-detail').hidden = true;
-        document.getElementById('veh-absente-detail').hidden = true;
         document.getElementById('actuel-absent-detail').hidden = true;
         actuelModele.innerHTML = '<option value="">Choisir la marque d\'abord</option>';
         actuelModele.disabled = true;
