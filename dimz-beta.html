@@ -1043,10 +1043,6 @@
                     </select>
                   </div>
                   <div class="field">
-                    <label for="a-age">Âge <span class="hint">(optionnel)</span></label>
-                    <input type="number" id="a-age" min="18" max="99">
-                  </div>
-                  <div class="field">
                     <label for="a-nom">Nom</label>
                     <input type="text" id="a-nom" required>
                   </div>
@@ -1208,10 +1204,9 @@
                     <div class="field"><label>Génération</label><select id="a-actuel-generation" disabled><option value="">—</option></select></div>
                   </div>
 
-                  <div class="field full toggle-row" style="margin-top:14px;">
-                    <label><input type="checkbox" id="a-actuel-absent"> Vous ne trouvez pas votre véhicule ? Décrivez-le-nous</label>
-                  </div>
-                  <div class="field full" id="actuel-absent-detail" hidden style="margin-top:6px;">
+                  <div class="field full" style="margin-top:14px;">
+                    <label for="a-actuel-absent-desc">Votre véhicule actuel n'est pas dans la liste ?</label>
+                    <div class="field hint" style="margin:-6px 0 8px;">Décrivez-le-nous — marque, modèle, année approximative — ça nous aide à mieux cerner votre situation.</div>
                     <textarea id="a-actuel-absent-desc" placeholder="Marque, modèle, année approximative…"></textarea>
                   </div>
 
@@ -1261,7 +1256,7 @@
                     </div>
                     <div class="field">
                       <label for="a-solde-restant">Solde restant dû approximatif (€)</label>
-                      <input type="number" id="a-solde-restant" min="1" max="9999">
+                      <input type="number" id="a-solde-restant" min="1" max="99999">
                     </div>
                     <div class="field">
                       <label for="a-apport-initial">Apport initial versé (€)</label>
@@ -1350,6 +1345,10 @@
                       <option>Recommandation</option>
                       <option>Autre</option>
                     </select>
+                  </div>
+                  <div class="field">
+                    <label for="a-age">Âge <span class="hint">(optionnel)</span></label>
+                    <input type="number" id="a-age" min="18" max="99">
                   </div>
                   <div class="field full">
                     <label for="a-inquietudes">Vos principales inquiétudes concernant cet achat</label>
@@ -3495,7 +3494,6 @@
 
     groups.push({ title: 'Informations personnelles', step: 0, rows: [
       recapRow('Civilité', selectText('a-civilite')),
-      recapRow('Âge', inputVal('a-age')),
       recapRow('Nom', inputVal('a-nom')),
       recapRow('Prénom', inputVal('a-prenom')),
       recapRow('Téléphone', inputVal('a-tel')),
@@ -3562,6 +3560,7 @@
       recapRow('Accompagnement recherché', besoinRappel),
       recapRow('Délai souhaité', selectText('a-delai')),
       recapRow('Comment vous avez connu Dimz', selectText('a-source')),
+      recapRow('Âge', inputVal('a-age')),
       recapRow('Inquiétudes principales', inputVal('a-inquietudes'))
     ].filter(Boolean) });
 
@@ -3943,9 +3942,6 @@
   });
   toggleOnValue('a-financement-cours', 'financement-detail', 'oui');
   toggleOnValue('a-enfants', 'a-enfants-nombre-wrap', 'oui');
-  document.getElementById('a-actuel-absent').addEventListener('change', function () {
-    document.getElementById('actuel-absent-detail').hidden = !this.checked;
-  });
 
   // ---------- Convoyage : véhicule pas encore immatriculé ----------
   var immatInput = document.getElementById('c-immat');
@@ -4104,7 +4100,6 @@
       if (btn.dataset.reset === 'form-accompagnement') {
         document.getElementById('veh-actuel-detail').hidden = true;
         document.getElementById('financement-detail').hidden = true;
-        document.getElementById('actuel-absent-detail').hidden = true;
         actuelModele.innerHTML = '<option value="">Choisir la marque d\'abord</option>';
         actuelModele.disabled = true;
         actuelGeneration.innerHTML = '<option value="">—</option>';
