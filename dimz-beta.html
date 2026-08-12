@@ -775,7 +775,7 @@
     background: color-mix(in srgb, var(--bleu-vif) 10%, var(--bg)); border-radius: 8px; padding: 5px 0;
   }
 
-  .veh-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 12px; align-items: end; margin-bottom: 14px; }
+  .veh-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto; gap: 12px; align-items: end; margin-bottom: 14px; }
   @media (max-width: 960px) { .veh-row { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 560px) { .veh-row { grid-template-columns: 1fr; } }
   .veh-row .field { margin: 0; }
@@ -3193,8 +3193,8 @@
   var VEH_ELECTRIC_ONLY = ['Model S', 'Model 3', 'Model X', 'Model Y', 'Zoe', 'Leaf', '500e', 'Born', 'Spring', 'MG4', 'Dolphin', 'Atto 3', 'Seal', 'Seal U'];
   var VEH_NO_DIESEL = ['up!', 'Aygo', '107', '108', 'C1', 'Twingo', 'i10', 'ForTwo', 'ForFour', 'Ignis'];
 
-  function getMotorisations(model, generation) {
-    if (VEH_ELECTRIC_ONLY.indexOf(model) !== -1) return ['Électrique'];
+  function getEnergies(model, generation) {
+    if (VEH_ELECTRIC_ONLY.indexOf(model) !== -1) return ['Électrique', 'Peu importe / Je ne sais pas'];
     var options = ['Essence'];
     if (VEH_NO_DIESEL.indexOf(model) === -1) options.push('Diesel');
     var m = generation.match(/(\d{4})[–-](\d{4}|présent)/);
@@ -3202,6 +3202,7 @@
     if (endYear >= 2015) options.push('Hybride');
     if (endYear >= 2019) options.push('Hybride rechargeable');
     if (endYear >= 2021) options.push('Électrique');
+    options.push('Peu importe / Je ne sais pas');
     return options;
   }
 
@@ -3214,7 +3215,8 @@
       '<div class="field"><label>Marque</label><select class="veh-marque">' + brandOptions() + '</select></div>' +
       '<div class="field"><label>Modèle</label><select class="veh-modele" disabled><option value="">Choisir la marque d\'abord</option></select></div>' +
       '<div class="field"><label>Génération</label><select class="veh-generation" disabled><option value="">—</option></select></div>' +
-      '<div class="field"><label>Motorisation</label><select class="veh-motorisation" disabled><option value="">—</option></select></div>' +
+      '<div class="field"><label>Énergie</label><select class="veh-energie" disabled><option value="">—</option></select></div>' +
+      '<div class="field"><label>Motorisation</label><input type="text" class="veh-motorisation" disabled placeholder="Ex. : 1.0i 60ch, 1.2 PureTech 130ch…"></div>' +
       '<button type="button" class="veh-remove" aria-label="Retirer ce véhicule">✕</button>';
     vehicleList.appendChild(row);
     updateAddButton();
@@ -3233,11 +3235,12 @@
       var marque = row.querySelector('.veh-marque').value;
       var modele = row.querySelector('.veh-modele').value;
       var gen = row.querySelector('.veh-generation').value;
-      var moteur = row.querySelector('.veh-motorisation').value;
+      var energie = row.querySelector('.veh-energie').value;
+      var moteur = row.querySelector('.veh-motorisation').value.trim();
       if (marque && modele && gen) {
         var bubble = document.createElement('span');
         bubble.className = 'veh-bubble';
-        var label = marque + ' ' + modele + ' · ' + gen + (moteur ? ' · ' + moteur : '');
+        var label = marque + ' ' + modele + ' · ' + gen + (energie ? ' · ' + energie : '') + (moteur ? ' · ' + moteur : '');
         bubble.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>' + label;
         container.appendChild(bubble);
       }
@@ -3250,10 +3253,13 @@
     if (e.target.classList.contains('veh-marque')) {
       var modeleSelect = row.querySelector('.veh-modele');
       var genSelect = row.querySelector('.veh-generation');
-      var moteurSelect = row.querySelector('.veh-motorisation');
+      var energieSelect = row.querySelector('.veh-energie');
+      var moteurInput = row.querySelector('.veh-motorisation');
       var brand = e.target.value;
-      moteurSelect.innerHTML = '<option value="">—</option>';
-      moteurSelect.disabled = true;
+      energieSelect.innerHTML = '<option value="">—</option>';
+      energieSelect.disabled = true;
+      moteurInput.value = '';
+      moteurInput.disabled = true;
       if (!brand) {
         modeleSelect.innerHTML = '<option value="">Choisir la marque d\'abord</option>';
         modeleSelect.disabled = true;
@@ -3273,10 +3279,13 @@
       var row2 = e.target.closest('.veh-row');
       var brand2 = row2.querySelector('.veh-marque').value;
       var genSelect2 = row2.querySelector('.veh-generation');
-      var moteurSelect2 = row2.querySelector('.veh-motorisation');
+      var energieSelect2 = row2.querySelector('.veh-energie');
+      var moteurInput2 = row2.querySelector('.veh-motorisation');
       var model = e.target.value;
-      moteurSelect2.innerHTML = '<option value="">—</option>';
-      moteurSelect2.disabled = true;
+      energieSelect2.innerHTML = '<option value="">—</option>';
+      energieSelect2.disabled = true;
+      moteurInput2.value = '';
+      moteurInput2.disabled = true;
       if (!model) {
         genSelect2.innerHTML = '<option value="">—</option>';
         genSelect2.disabled = true;
@@ -3291,18 +3300,27 @@
     if (e.target.classList.contains('veh-generation')) {
       var row3 = e.target.closest('.veh-row');
       var model3 = row3.querySelector('.veh-modele').value;
-      var moteurSelect3 = row3.querySelector('.veh-motorisation');
+      var energieSelect3 = row3.querySelector('.veh-energie');
+      var moteurInput3 = row3.querySelector('.veh-motorisation');
       var generation = e.target.value;
+      moteurInput3.value = '';
+      moteurInput3.disabled = true;
       if (!generation) {
-        moteurSelect3.innerHTML = '<option value="">—</option>';
-        moteurSelect3.disabled = true;
+        energieSelect3.innerHTML = '<option value="">—</option>';
+        energieSelect3.disabled = true;
       } else {
-        var motos = getMotorisations(model3, generation);
-        moteurSelect3.innerHTML = '<option value="">Motorisation…</option>' + motos.map(function (mo) {
-          return '<option value="' + mo + '">' + mo + '</option>';
+        var energies = getEnergies(model3, generation);
+        energieSelect3.innerHTML = '<option value="">Énergie…</option>' + energies.map(function (en) {
+          return '<option value="' + en + '">' + en + '</option>';
         }).join('');
-        moteurSelect3.disabled = false;
+        energieSelect3.disabled = false;
       }
+    }
+    if (e.target.classList.contains('veh-energie')) {
+      var row4 = e.target.closest('.veh-row');
+      var moteurInput4 = row4.querySelector('.veh-motorisation');
+      moteurInput4.disabled = !e.target.value;
+      if (!e.target.value) moteurInput4.value = '';
     }
     renderVehicleBubbles();
   });
