@@ -1,6 +1,7 @@
 import { Document, Page, Text, View } from "@react-pdf/renderer";
 import { pdfStyles } from "./theme";
 import { PdfLogo, PdfFooter } from "./PdfHeader";
+import { formatCurrency } from "@/lib/format";
 import type { FicheDecouverteVehicule } from "@/lib/types";
 
 interface Props {
@@ -69,6 +70,15 @@ export function FicheDecouverteReport({ vehicules, commentaire, dossierReference
                 </Text>
               ) : null}
             </View>
+            {v.prix_min && v.prix_max ? (
+              <Text style={{ fontSize: 9.5, fontFamily: "Helvetica-Bold", color: "#2f6fed", marginBottom: 6 }}>
+                Entre {formatCurrency(v.prix_min)} et {formatCurrency(v.prix_max)}
+              </Text>
+            ) : v.prix_min || v.prix_max ? (
+              <Text style={{ fontSize: 9.5, fontFamily: "Helvetica-Bold", color: "#2f6fed", marginBottom: 6 }}>
+                Environ {formatCurrency((v.prix_min ?? v.prix_max)!)}
+              </Text>
+            ) : null}
             {v.point_fort ? (
               <Text style={{ fontSize: 9, lineHeight: 1.5, color: "#1a9e6b", marginBottom: 3 }}>
                 + {v.point_fort}
@@ -80,6 +90,8 @@ export function FicheDecouverteReport({ vehicules, commentaire, dossierReference
           </View>
         ))}
 
+        <View style={{ flexGrow: 1 }} />
+
         <View
           style={{
             marginTop: 20,
@@ -87,6 +99,7 @@ export function FicheDecouverteReport({ vehicules, commentaire, dossierReference
             backgroundColor: "#eef3ff",
             borderRadius: 8,
           }}
+          wrap={false}
         >
           <Text style={{ fontSize: 9.5, fontFamily: "Helvetica-Bold", color: "#1a44a6", marginBottom: 4 }}>
             Envie d'aller plus loin ?

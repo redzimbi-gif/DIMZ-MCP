@@ -187,6 +187,8 @@ export interface FicheDecouverteVehicule {
   energie: string | null;
   point_fort: string | null;
   point_vigilance: string | null;
+  prix_min: number | null;
+  prix_max: number | null;
   ordre: number;
   created_at: string;
   updated_at: string;

@@ -14,6 +14,13 @@ function text(formData: FormData, name: string): string | null {
   return String(formData.get(name) || "").trim() || null;
 }
 
+function num(formData: FormData, name: string): number | null {
+  const raw = String(formData.get(name) || "").trim();
+  if (!raw) return null;
+  const value = Number(raw);
+  return Number.isFinite(value) ? value : null;
+}
+
 export async function addFicheDecouverteVehicule(dossierId: string, formData: FormData) {
   const db = createAdminClient();
 
@@ -25,6 +32,8 @@ export async function addFicheDecouverteVehicule(dossierId: string, formData: Fo
     energie: text(formData, "energie"),
     point_fort: text(formData, "point_fort"),
     point_vigilance: text(formData, "point_vigilance"),
+    prix_min: num(formData, "prix_min"),
+    prix_max: num(formData, "prix_max"),
     ordre: existing.length,
   };
 

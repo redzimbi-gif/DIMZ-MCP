@@ -623,6 +623,15 @@ async function DecouverteTab({ dossierId }: { dossierId: string }) {
                     </p>
                     {v.energie ? <Badge tone="blue">{v.energie}</Badge> : null}
                   </div>
+                  {v.prix_min && v.prix_max ? (
+                    <p className="text-sm text-ink-soft mt-1 tnum">
+                      Entre {formatCurrency(v.prix_min)} et {formatCurrency(v.prix_max)}
+                    </p>
+                  ) : v.prix_min || v.prix_max ? (
+                    <p className="text-sm text-ink-soft mt-1 tnum">
+                      Environ {formatCurrency((v.prix_min ?? v.prix_max)!)}
+                    </p>
+                  ) : null}
                   {v.point_fort ? <p className="text-sm text-good mt-2">+ {v.point_fort}</p> : null}
                   {v.point_vigilance ? <p className="text-sm text-warn mt-1">! {v.point_vigilance}</p> : null}
                 </div>
@@ -662,6 +671,14 @@ async function DecouverteTab({ dossierId }: { dossierId: string }) {
               ))}
             </select>
           </Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Prix min (€)">
+              <input name="prix_min" type="number" step="1" min="0" className={inputClass} />
+            </Field>
+            <Field label="Prix max (€)">
+              <input name="prix_max" type="number" step="1" min="0" className={inputClass} />
+            </Field>
+          </div>
           <Field label="Point fort">
             <input name="point_fort" className={inputClass} />
           </Field>
