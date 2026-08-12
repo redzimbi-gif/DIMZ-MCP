@@ -2835,12 +2835,26 @@
   // en page immédiat, coûteux sur une page volumineuse — autant laisser le
   // premier rendu s'afficher d'abord (le fallback CSS --header-h:65px
   // couvre l'écart, invisible en pratique).
+  //
+  // Sur iOS Safari, la barre d'adresse dynamique (qui se replie au scroll)
+  // change la hauteur du viewport sans déclencher de façon fiable
+  // l'événement 'resize' sur window — ça peut laisser --header-h désynchro
+  // pendant un instant, décalant les éléments sticky (.acc-mobile-toggle,
+  // .acc-sidebar) par rapport à leur zone tactile réelle. On observe donc
+  // directement l'en-tête (ResizeObserver) et, quand l'API existe, le
+  // viewport visuel plutôt que window seul.
+  var headerEl = document.querySelector('header.topnav');
   function syncHeaderHeight() {
-    var h = document.querySelector('header.topnav').offsetHeight;
-    document.documentElement.style.setProperty('--header-h', h + 'px');
+    document.documentElement.style.setProperty('--header-h', headerEl.offsetHeight + 'px');
   }
   requestAnimationFrame(syncHeaderHeight);
   window.addEventListener('resize', syncHeaderHeight);
+  if (window.ResizeObserver) {
+    new ResizeObserver(syncHeaderHeight).observe(headerEl);
+  }
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', syncHeaderHeight);
+  }
 
   // ---------- Révélation au scroll ----------
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
