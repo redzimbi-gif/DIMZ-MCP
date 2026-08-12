@@ -1088,126 +1088,6 @@
               </div>
 
               <div class="form-step">
-                <figure class="feature-photo" style="margin:0 0 20px;"><img src="img/quotidien-vitre.jpg" alt="Passagère profitant de la route, fenêtre ouverte" loading="lazy" width="1287" height="1930" style="object-position:35% 78%;"></figure>
-                <h3>Votre quotidien</h3>
-                <div class="field-grid">
-                  <div class="field full">
-                    <label for="a-enfants">Un enfant fait-il partie de vos trajets, ou est-ce prévu prochainement ?</label>
-                    <select id="a-enfants">
-                      <option value="">Choisir…</option>
-                      <option value="non">Non</option>
-                      <option value="oui">Oui</option>
-                    </select>
-                  </div>
-                  <div class="field" id="a-enfants-nombre-wrap" hidden>
-                    <label for="a-enfants-nombre">Combien d'enfants ?</label>
-                    <select id="a-enfants-nombre">
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3">3</option>
-                      <option value="4">4 ou plus</option>
-                    </select>
-                  </div>
-                  <div class="field full">
-                    <label for="a-pourqui">Le véhicule est destiné à…</label>
-                    <select id="a-pourqui">
-                      <option>Moi-même</option>
-                      <option>Mon foyer / ma famille</option>
-                      <option>Un usage professionnel</option>
-                      <option>Un proche</option>
-                    </select>
-                  </div>
-                  <div class="field full">
-                    <label>Usages principaux</label>
-                    <div class="choice-grid" id="usages-choices">
-                      <label><input type="checkbox" value="domicile-travail"> Trajets domicile-travail</label>
-                      <label><input type="checkbox" value="quotidien"> Courses et trajets du quotidien</label>
-                      <label><input type="checkbox" value="loisirs"> Loisirs et sorties</label>
-                      <label><input type="checkbox" value="vacances"> Vacances et longs trajets</label>
-                    </div>
-                  </div>
-                  <div class="field">
-                    <label for="a-km">Kilométrage annuel estimé</label>
-                    <select id="a-km">
-                      <option value="">Choisir…</option>
-                      <option>Moins de 5 000 km</option>
-                      <option>5 000 – 10 000 km</option>
-                      <option>10 000 – 15 000 km</option>
-                      <option>15 000 – 20 000 km</option>
-                      <option>20 000 – 25 000 km</option>
-                      <option>25 000 – 30 000 km</option>
-                      <option>30 000 – 35 000 km</option>
-                      <option>35 000 – 40 000 km</option>
-                      <option>40 000 – 45 000 km</option>
-                      <option>45 000 – 50 000 km</option>
-                      <option>Plus de 50 000 km</option>
-                    </select>
-                    <span class="hint">En moyenne, un Français parcourt 13 000 km/an.</span>
-                  </div>
-                  <div class="field">
-                    <label for="a-parcours">Type de parcours dominant</label>
-                    <select id="a-parcours">
-                      <option>Ville</option>
-                      <option>Route / national</option>
-                      <option>Autoroute</option>
-                      <option>Mixte</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-step">
-                <figure class="feature-photo" style="margin:0 0 20px;"><img src="img/vehicule-recharge.jpg" alt="Recharge d'un véhicule électrique" loading="lazy" width="1200" height="798"></figure>
-                <h3>Véhicules souhaités</h3>
-                <div class="field hint" style="margin-bottom:14px;">Choisissez une ou plusieurs pistes : marque, modèle, puis génération, parmi une trentaine de marques.</div>
-                <div id="vehicule-list"></div>
-                <div id="vehicule-bubbles" class="veh-bubbles"></div>
-                <button type="button" class="add-vehicle" id="add-vehicle">+ Ajouter un véhicule</button>
-
-                <div class="field full" style="margin-top:26px;">
-                  <label for="a-veh-absente-desc">Vous ne trouvez pas votre bonheur, ou vous ne savez pas encore ce que vous voulez ?</label>
-                  <div class="field hint" style="margin:-6px 0 8px;">Décrivez-nous ce que vous avez en tête, même une idée floue — usage, budget, style — et votre copilote vous aide à trouver la bonne piste.</div>
-                  <textarea id="a-veh-absente-desc" placeholder="Ex. : une Golf GTI récente, boîte manuelle… ou simplement votre usage et votre budget si vous hésitez encore."></textarea>
-                </div>
-
-                <div class="field-grid" style="margin-top:26px;">
-                  <div class="field full">
-                    <label>Type de carrosserie souhaité</label>
-                    <div class="choice-grid" id="carrosserie-choices">
-                      <label data-tooltip="Petite voiture compacte et maniable, parfaite en ville. Ex. : Renault Twingo, Citroën C1, Peugeot 108."><input type="checkbox" value="citadine"> Citadine</label>
-                      <label data-tooltip="Plus grande qu'une citadine mais plus courte qu'une berline, 5 portes polyvalentes pour la ville comme la route. Ex. : Renault Clio, Peugeot 208, Volkswagen Golf."><input type="checkbox" value="compacte"> Compacte</label>
-                      <label data-tooltip="4 portes avec un coffre séparé, confortable pour la route. Ex. : Peugeot 508, Toyota Corolla, Škoda Octavia."><input type="checkbox" value="berline"> Berline</label>
-                      <label data-tooltip="Comme une berline mais avec un grand coffre, idéale pour les familles ou les longs trajets. Ex. : Peugeot 308 SW, Renault Mégane Estate."><input type="checkbox" value="break"> Break</label>
-                      <label data-tooltip="Position de conduite haute, look robuste, bon compromis ville/route. Ex. : Peugeot 3008, Renault Captur, Dacia Duster."><input type="checkbox" value="suv"> SUV</label>
-                      <label data-tooltip="Habitacle spacieux et modulable, souvent 5 à 7 places, pensé pour les familles. Ex. : Renault Scénic, Citroën Berlingo, Peugeot 5008."><input type="checkbox" value="monospace"> Monospace</label>
-                      <label data-tooltip="2 portes, silhouette sportive, plus tournée vers le plaisir de conduite que la praticité. Ex. : Audi A5 Coupé, BMW Série 4."><input type="checkbox" value="coupe"> Coupé</label>
-                      <label data-tooltip="Toit décapotable, souvent 2 places, pour le plaisir en beaux jours. Ex. : Mini Cabriolet, Audi A3 Cabriolet."><input type="checkbox" value="cabriolet"> Cabriolet</label>
-                      <label data-tooltip="Véhicule pensé pour le transport de matériel ou marchandises. Ex. : Renault Kangoo, Citroën Berlingo utilitaire."><input type="checkbox" value="utilitaire"> Utilitaire</label>
-                    </div>
-                  </div>
-                  <div class="field full">
-                    <label>Énergie du véhicule</label>
-                    <div class="choice-grid" id="energie-choices">
-                      <label><input type="checkbox" value="essence"> Essence</label>
-                      <label><input type="checkbox" value="diesel"> Diesel</label>
-                      <label data-tooltip="Le moteur électrique assiste le moteur thermique (accélération, redémarrages) mais ne roule jamais seul. Pas de prise à brancher, autonomie illimitée."><input type="checkbox" value="hybride"> Hybride (MHEV)</label>
-                      <label data-tooltip="Se branche sur une prise et roule plusieurs dizaines de km en 100 % électrique, puis bascule sur le moteur thermique pour les longs trajets."><input type="checkbox" value="hybride-rechargeable"> Hybride rechargeable (PHEV)</label>
-                      <label><input type="checkbox" value="electrique"> Électrique</label>
-                      <label><input type="checkbox" value="peu-importe"> Peu importe</label>
-                    </div>
-                  </div>
-                  <div class="field full">
-                    <label>Boîte de vitesses souhaitée</label>
-                    <div class="choice-grid" id="transmission-choices">
-                      <label><input type="checkbox" value="automatique"> Automatique</label>
-                      <label><input type="checkbox" value="manuelle"> Manuelle</label>
-                      <label><input type="checkbox" value="peu-importe"> Peu importe</label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-step">
                 <figure class="feature-photo" style="margin:0 0 20px;"><img src="img/fiat-ruelle.jpg" alt="Petite citadine garée dans une ruelle" loading="lazy" width="1227" height="2180" style="object-position:50% 88%;"></figure>
                 <h3>Situation actuelle</h3>
                 <div class="field-grid">
@@ -1290,6 +1170,75 @@
               </div>
 
               <div class="form-step">
+                <figure class="feature-photo" style="margin:0 0 20px;"><img src="img/quotidien-vitre.jpg" alt="Passagère profitant de la route, fenêtre ouverte" loading="lazy" width="1287" height="1930" style="object-position:35% 78%;"></figure>
+                <h3>Votre quotidien</h3>
+                <div class="field-grid">
+                  <div class="field full">
+                    <label for="a-enfants">Un enfant fait-il partie de vos trajets, ou est-ce prévu prochainement ?</label>
+                    <select id="a-enfants">
+                      <option value="">Choisir…</option>
+                      <option value="non">Non</option>
+                      <option value="oui">Oui</option>
+                    </select>
+                  </div>
+                  <div class="field" id="a-enfants-nombre-wrap" hidden>
+                    <label for="a-enfants-nombre">Combien d'enfants ?</label>
+                    <select id="a-enfants-nombre">
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4 ou plus</option>
+                    </select>
+                  </div>
+                  <div class="field full">
+                    <label for="a-pourqui">Le véhicule est destiné à…</label>
+                    <select id="a-pourqui">
+                      <option>Moi-même</option>
+                      <option>Mon foyer / ma famille</option>
+                      <option>Un usage professionnel</option>
+                      <option>Un proche</option>
+                    </select>
+                  </div>
+                  <div class="field full">
+                    <label>Usages principaux</label>
+                    <div class="choice-grid" id="usages-choices">
+                      <label><input type="checkbox" value="domicile-travail"> Trajets domicile-travail</label>
+                      <label><input type="checkbox" value="quotidien"> Courses et trajets du quotidien</label>
+                      <label><input type="checkbox" value="loisirs"> Loisirs et sorties</label>
+                      <label><input type="checkbox" value="vacances"> Vacances et longs trajets</label>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="a-km">Kilométrage annuel estimé</label>
+                    <select id="a-km">
+                      <option value="">Choisir…</option>
+                      <option>Moins de 5 000 km</option>
+                      <option>5 000 – 10 000 km</option>
+                      <option>10 000 – 15 000 km</option>
+                      <option>15 000 – 20 000 km</option>
+                      <option>20 000 – 25 000 km</option>
+                      <option>25 000 – 30 000 km</option>
+                      <option>30 000 – 35 000 km</option>
+                      <option>35 000 – 40 000 km</option>
+                      <option>40 000 – 45 000 km</option>
+                      <option>45 000 – 50 000 km</option>
+                      <option>Plus de 50 000 km</option>
+                    </select>
+                    <span class="hint">En moyenne, un Français parcourt 13 000 km/an.</span>
+                  </div>
+                  <div class="field">
+                    <label for="a-parcours">Type de parcours dominant</label>
+                    <select id="a-parcours">
+                      <option>Ville</option>
+                      <option>Route / national</option>
+                      <option>Autoroute</option>
+                      <option>Mixte</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-step">
                 <figure class="feature-photo" style="margin:0 0 20px;"><img src="img/budget-calculatrice.jpg" alt="Calculatrice et billets pour préparer son budget" loading="lazy" width="1470" height="980"></figure>
                 <h3>Budget et financement</h3>
                 <div class="field-grid">
@@ -1331,6 +1280,57 @@
                       <label data-tooltip="Location avec Option d'Achat : vous louez le véhicule et pouvez l'acheter à la fin du contrat pour un montant fixé à l'avance."><input type="checkbox" name="financement" value="loa"> LOA</label>
                       <label data-tooltip="Location Longue Durée : vous louez le véhicule sur plusieurs années, entretien souvent inclus, sans devenir propriétaire."><input type="checkbox" name="financement" value="lld"> LLD</label>
                       <label><input type="checkbox" name="financement" value="indecis"> Je ne sais pas encore</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-step">
+                <figure class="feature-photo" style="margin:0 0 20px;"><img src="img/vehicule-recharge.jpg" alt="Recharge d'un véhicule électrique" loading="lazy" width="1200" height="798"></figure>
+                <h3>Véhicules souhaités</h3>
+                <div class="field hint" style="margin-bottom:14px;">Choisissez une ou plusieurs pistes : marque, modèle, puis génération, parmi une trentaine de marques.</div>
+                <div id="vehicule-list"></div>
+                <div id="vehicule-bubbles" class="veh-bubbles"></div>
+                <button type="button" class="add-vehicle" id="add-vehicle">+ Ajouter un véhicule</button>
+
+                <div class="field full" style="margin-top:26px;">
+                  <label for="a-veh-absente-desc">Vous ne trouvez pas votre bonheur, ou vous ne savez pas encore ce que vous voulez ?</label>
+                  <div class="field hint" style="margin:-6px 0 8px;">Décrivez-nous ce que vous avez en tête, même une idée floue — usage, budget, style — et votre copilote vous aide à trouver la bonne piste.</div>
+                  <textarea id="a-veh-absente-desc" placeholder="Ex. : une Golf GTI récente, boîte manuelle… ou simplement votre usage et votre budget si vous hésitez encore."></textarea>
+                </div>
+
+                <div class="field-grid" style="margin-top:26px;">
+                  <div class="field full">
+                    <label>Type de carrosserie souhaité</label>
+                    <div class="choice-grid" id="carrosserie-choices">
+                      <label data-tooltip="Petite voiture compacte et maniable, parfaite en ville. Ex. : Renault Twingo, Citroën C1, Peugeot 108."><input type="checkbox" value="citadine"> Citadine</label>
+                      <label data-tooltip="Plus grande qu'une citadine mais plus courte qu'une berline, 5 portes polyvalentes pour la ville comme la route. Ex. : Renault Clio, Peugeot 208, Volkswagen Golf."><input type="checkbox" value="compacte"> Compacte</label>
+                      <label data-tooltip="4 portes avec un coffre séparé, confortable pour la route. Ex. : Peugeot 508, Toyota Corolla, Škoda Octavia."><input type="checkbox" value="berline"> Berline</label>
+                      <label data-tooltip="Comme une berline mais avec un grand coffre, idéale pour les familles ou les longs trajets. Ex. : Peugeot 308 SW, Renault Mégane Estate."><input type="checkbox" value="break"> Break</label>
+                      <label data-tooltip="Position de conduite haute, look robuste, bon compromis ville/route. Ex. : Peugeot 3008, Renault Captur, Dacia Duster."><input type="checkbox" value="suv"> SUV</label>
+                      <label data-tooltip="Habitacle spacieux et modulable, souvent 5 à 7 places, pensé pour les familles. Ex. : Renault Scénic, Citroën Berlingo, Peugeot 5008."><input type="checkbox" value="monospace"> Monospace</label>
+                      <label data-tooltip="2 portes, silhouette sportive, plus tournée vers le plaisir de conduite que la praticité. Ex. : Audi A5 Coupé, BMW Série 4."><input type="checkbox" value="coupe"> Coupé</label>
+                      <label data-tooltip="Toit décapotable, souvent 2 places, pour le plaisir en beaux jours. Ex. : Mini Cabriolet, Audi A3 Cabriolet."><input type="checkbox" value="cabriolet"> Cabriolet</label>
+                      <label data-tooltip="Véhicule pensé pour le transport de matériel ou marchandises. Ex. : Renault Kangoo, Citroën Berlingo utilitaire."><input type="checkbox" value="utilitaire"> Utilitaire</label>
+                    </div>
+                  </div>
+                  <div class="field full">
+                    <label>Énergie du véhicule</label>
+                    <div class="choice-grid" id="energie-choices">
+                      <label><input type="checkbox" value="essence"> Essence</label>
+                      <label><input type="checkbox" value="diesel"> Diesel</label>
+                      <label data-tooltip="Le moteur électrique assiste le moteur thermique (accélération, redémarrages) mais ne roule jamais seul. Pas de prise à brancher, autonomie illimitée."><input type="checkbox" value="hybride"> Hybride (MHEV)</label>
+                      <label data-tooltip="Se branche sur une prise et roule plusieurs dizaines de km en 100 % électrique, puis bascule sur le moteur thermique pour les longs trajets."><input type="checkbox" value="hybride-rechargeable"> Hybride rechargeable (PHEV)</label>
+                      <label><input type="checkbox" value="electrique"> Électrique</label>
+                      <label><input type="checkbox" value="peu-importe"> Peu importe</label>
+                    </div>
+                  </div>
+                  <div class="field full">
+                    <label>Boîte de vitesses souhaitée</label>
+                    <div class="choice-grid" id="transmission-choices">
+                      <label><input type="checkbox" value="automatique"> Automatique</label>
+                      <label><input type="checkbox" value="manuelle"> Manuelle</label>
+                      <label><input type="checkbox" value="peu-importe"> Peu importe</label>
                     </div>
                   </div>
                 </div>
@@ -3523,26 +3523,6 @@
       recapRow('Email', inputVal('a-email'))
     ].filter(Boolean) });
 
-    var enfantsOui = document.getElementById('a-enfants').value === 'oui';
-    groups.push({ title: 'Votre quotidien', step: 1, rows: [
-      recapRow('Enfants parmi les passagers', selectText('a-enfants')),
-      enfantsOui ? recapRow('Nombre d\'enfants', selectText('a-enfants-nombre')) : null,
-      recapRow('Véhicule destiné à', selectText('a-pourqui')),
-      recapRow('Usages principaux', recapCheckedList('#usages-choices input')),
-      recapRow('Kilométrage annuel estimé', selectText('a-km')),
-      recapRow('Type de parcours', selectText('a-parcours'))
-    ].filter(Boolean) });
-
-    var bubbles = document.querySelectorAll('#vehicule-bubbles .veh-bubble');
-    var vehText = bubbles.length ? Array.prototype.map.call(bubbles, function (b) { return b.textContent.trim(); }).join(' · ') : '';
-    groups.push({ title: 'Véhicules souhaités', step: 2, rows: [
-      recapRow('Véhicules ciblés', vehText),
-      recapRow('Véhicule non trouvé dans la liste', inputVal('a-veh-absente-desc')),
-      recapRow('Carrosserie souhaitée', recapCheckedList('#carrosserie-choices input')),
-      recapRow('Énergie souhaitée', recapCheckedList('#energie-choices input')),
-      recapRow('Boîte de vitesses souhaitée', recapCheckedList('#transmission-choices input'))
-    ].filter(Boolean) });
-
     var situationParts = [recapRow('Véhicule actuel', selectText('a-vehicule-actuel'))];
     if (document.getElementById('a-vehicule-actuel').value === 'oui') {
       var actuelVeh = [inputVal('a-actuel-marque'), inputVal('a-actuel-modele'), inputVal('a-actuel-generation')].filter(Boolean).join(' ');
@@ -3563,12 +3543,32 @@
         situationParts.push(recapRow('Apport initial versé', apport ? apport + ' €' : ''));
       }
     }
-    groups.push({ title: 'Situation actuelle', step: 3, rows: situationParts.filter(Boolean) });
+    groups.push({ title: 'Situation actuelle', step: 1, rows: situationParts.filter(Boolean) });
 
-    groups.push({ title: 'Budget et financement', step: 4, rows: [
+    var enfantsOui = document.getElementById('a-enfants').value === 'oui';
+    groups.push({ title: 'Votre quotidien', step: 2, rows: [
+      recapRow('Enfants parmi les passagers', selectText('a-enfants')),
+      enfantsOui ? recapRow('Nombre d\'enfants', selectText('a-enfants-nombre')) : null,
+      recapRow('Véhicule destiné à', selectText('a-pourqui')),
+      recapRow('Usages principaux', recapCheckedList('#usages-choices input')),
+      recapRow('Kilométrage annuel estimé', selectText('a-km')),
+      recapRow('Type de parcours', selectText('a-parcours'))
+    ].filter(Boolean) });
+
+    groups.push({ title: 'Budget et financement', step: 3, rows: [
       recapRow('Budget total envisagé', inputVal('a-budget-text')),
       recapRow('Budget mensuel envisagé (si financement)', inputVal('a-budget-mensuel-text')),
       recapRow('Mode de financement souhaité', recapCheckedList('input[name="financement"]'))
+    ].filter(Boolean) });
+
+    var bubbles = document.querySelectorAll('#vehicule-bubbles .veh-bubble');
+    var vehText = bubbles.length ? Array.prototype.map.call(bubbles, function (b) { return b.textContent.trim(); }).join(' · ') : '';
+    groups.push({ title: 'Véhicules souhaités', step: 4, rows: [
+      recapRow('Véhicules ciblés', vehText),
+      recapRow('Véhicule non trouvé dans la liste', inputVal('a-veh-absente-desc')),
+      recapRow('Carrosserie souhaitée', recapCheckedList('#carrosserie-choices input')),
+      recapRow('Énergie souhaitée', recapCheckedList('#energie-choices input')),
+      recapRow('Boîte de vitesses souhaitée', recapCheckedList('#transmission-choices input'))
     ].filter(Boolean) });
 
     var OFFRE_RAPPELS = {
