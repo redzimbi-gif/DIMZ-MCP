@@ -1293,12 +1293,6 @@
                 <div id="vehicule-bubbles" class="veh-bubbles"></div>
                 <button type="button" class="add-vehicle" id="add-vehicle">+ Ajouter un véhicule</button>
 
-                <div class="field full" style="margin-top:26px;">
-                  <label for="a-veh-absente-desc">Vous ne trouvez pas votre bonheur, ou vous ne savez pas encore ce que vous voulez ?</label>
-                  <div class="field hint" style="margin:-6px 0 8px;">Décrivez-nous ce que vous avez en tête, même une idée floue — usage, budget, style — et votre copilote vous aide à trouver la bonne piste.</div>
-                  <textarea id="a-veh-absente-desc" placeholder="Ex. : une Golf GTI récente, boîte manuelle… ou simplement votre usage et votre budget si vous hésitez encore."></textarea>
-                </div>
-
                 <div class="field-grid" style="margin-top:26px;">
                   <div class="field full">
                     <label>Type de carrosserie souhaité</label>
@@ -1332,6 +1326,11 @@
                       <label><input type="checkbox" value="manuelle"> Manuelle</label>
                       <label><input type="checkbox" value="peu-importe"> Peu importe</label>
                     </div>
+                  </div>
+                  <div class="field full">
+                    <label for="a-veh-absente-desc">Vous ne trouvez pas votre bonheur, ou vous ne savez pas encore ce que vous voulez ?</label>
+                    <div class="field hint" style="margin:-6px 0 8px;">Décrivez-nous ce que vous avez en tête, même une idée floue — usage, budget, style — et votre copilote vous aide à trouver la bonne piste.</div>
+                    <textarea id="a-veh-absente-desc" placeholder="Ex. : une Golf GTI récente, boîte manuelle… ou simplement votre usage et votre budget si vous hésitez encore."></textarea>
                   </div>
                 </div>
               </div>
@@ -3583,10 +3582,10 @@
     var vehText = bubbles.length ? Array.prototype.map.call(bubbles, function (b) { return b.textContent.trim(); }).join(' · ') : '';
     groups.push({ title: 'Véhicules souhaités', step: 4, rows: [
       recapRow('Véhicules ciblés', vehText),
-      recapRow('Véhicule non trouvé dans la liste', inputVal('a-veh-absente-desc')),
       recapRow('Carrosserie souhaitée', recapCheckedList('#carrosserie-choices input')),
       recapRow('Énergie souhaitée', recapCheckedList('#energie-choices input')),
-      recapRow('Boîte de vitesses souhaitée', recapCheckedList('#transmission-choices input'))
+      recapRow('Boîte de vitesses souhaitée', recapCheckedList('#transmission-choices input')),
+      recapRow('Véhicule non trouvé dans la liste', inputVal('a-veh-absente-desc'))
     ].filter(Boolean) });
 
     var OFFRE_RAPPELS = {
