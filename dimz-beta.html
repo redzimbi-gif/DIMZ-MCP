@@ -2896,6 +2896,7 @@
     document.getElementById('tab-test').hidden = tab !== 'test';
     if (tab === 'accompagnement' && resetSubtab) showSubTab('accueil');
     observeNewReveals();
+    updateHash();
   }
 
   // ---------- Pages légales (RGPD, CGV, Mentions légales) ----------
@@ -2927,8 +2928,6 @@
     el.addEventListener('click', function () { showMainTab(el.dataset.gotoTab, true); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); });
   });
 
-  // ---------- Lien direct vers le questionnaire de test (#test) ----------
-  if (window.location.hash === '#test') showMainTab('test', true);
 
   // ---------- Bouton "i" pour afficher les info-bulles au tap (mobile) ----------
   document.querySelectorAll('.choice-grid [data-tooltip]').forEach(function (el) {
@@ -2979,6 +2978,7 @@
     mobileCurrent.textContent = ACC_PAGE_LABELS[sub] || 'Menu';
     closeMobileSidebar();
     observeNewReveals();
+    updateHash();
   }
 
   subTabButtons.forEach(function (btn) {
@@ -3020,6 +3020,59 @@
       }
     });
   });
+
+  // ---------- Une adresse par grande section (Accueil / Découverte /
+  // Accompagnement / Convoyage / Test) : chaque changement d'onglet ou de
+  // sous-onglet met à jour l'URL (#hash), au lieu que tout reste sur la
+  // même adresse quelle que soit la vue affichée. Ça rend chaque section
+  // partageable en lien direct et compatible avec le bouton précédent du
+  // navigateur. ----------
+  var HASH_ROUTES = {
+    accueil: { tab: 'accompagnement', subtab: 'accueil' },
+    decouverte: { tab: 'accompagnement', subtab: 'offres' },
+    accompagnement: { tab: 'accompagnement', subtab: 'accueil' },
+    convoyage: { tab: 'convoyage' },
+    test: { tab: 'test' },
+  };
+  var SUBTAB_TO_HASH = { accueil: 'accueil', offres: 'decouverte' };
+  var suppressHashSync = false;
+
+  function currentHash() {
+    return window.location.hash.replace(/^#/, '');
+  }
+
+  function updateHash() {
+    if (suppressHashSync) return;
+    var tab = !document.getElementById('tab-accompagnement').hidden ? 'accompagnement'
+      : !document.getElementById('tab-convoyage').hidden ? 'convoyage'
+      : !document.getElementById('tab-test').hidden ? 'test' : null;
+    if (!tab) return;
+    var value = tab;
+    if (tab === 'accompagnement') {
+      var activeSub = ACC_PAGES.filter(function (p) { return !document.getElementById('subtab-' + p).hidden; })[0];
+      value = (activeSub && SUBTAB_TO_HASH[activeSub]) || 'accompagnement';
+    }
+    if (currentHash() === value) return;
+    history.pushState(null, '', '#' + value);
+  }
+
+  function applyHashRoute(isInitialLoad) {
+    var route = HASH_ROUTES[currentHash()];
+    if (!route) {
+      // Chargement normal sans hash : on laisse l'état HTML par défaut tel
+      // quel. Mais un retour arrière du navigateur vers l'URL sans hash
+      // doit, lui, ramener explicitement sur l'accueil.
+      if (isInitialLoad) return;
+      route = HASH_ROUTES.accueil;
+    }
+    suppressHashSync = true;
+    showMainTab(route.tab, !route.subtab);
+    if (route.subtab) showSubTab(route.subtab);
+    suppressHashSync = false;
+  }
+
+  applyHashRoute(true);
+  window.addEventListener('hashchange', function () { applyHashRoute(false); });
 
   // ---------- Nav CTA (dynamique selon l'onglet actif) ----------
 // ---------- Présélection du besoin (radio #besoin-choices) ----------
