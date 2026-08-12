@@ -3,6 +3,7 @@ import { format, startOfMonth, endOfMonth, subMonths } from "date-fns";
 import { Plus, Pencil, Trash2, Calculator, Paperclip } from "lucide-react";
 import { listConvoyagesExternes } from "@/lib/queries";
 import { Card, PageHeader, StatCard, EmptyState, Field, inputClass, Button } from "@/components/ui";
+import { AutoResetForm } from "@/components/AutoResetForm";
 import { formatDate } from "@/lib/format";
 import { createConvoyageExterne, deleteConvoyageExterne } from "./actions";
 
@@ -181,7 +182,7 @@ export default async function ComptabilitePage({
 
         <Card className="p-5 h-fit">
           <h2 className="text-sm font-semibold text-ink mb-4">Ajouter un convoyage</h2>
-          <form action={createConvoyageExterne} className="space-y-3" encType="multipart/form-data">
+          <AutoResetForm action={createConvoyageExterne} className="space-y-3" encType="multipart/form-data">
             <Field label="Date">
               <input name="date_convoyage" type="date" className={inputClass} />
             </Field>
@@ -208,7 +209,7 @@ export default async function ComptabilitePage({
             <Button type="submit" className="w-full">
               <Plus className="h-4 w-4" /> Ajouter
             </Button>
-          </form>
+          </AutoResetForm>
         </Card>
       </div>
     </div>

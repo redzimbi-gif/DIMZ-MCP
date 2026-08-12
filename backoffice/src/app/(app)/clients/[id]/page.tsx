@@ -4,7 +4,10 @@ import { getClient, getClientDossiers, getClientDocuments, getClientNotes } from
 import { Card, PageHeader, StatutBadge, EmptyState, Field, inputClass, Button } from "@/components/ui";
 import { formatDateTime, formatRelative, initials } from "@/lib/format";
 import { DOCUMENT_TYPE_LABELS } from "@/lib/types";
-import { updateClient, addClientNote } from "../actions";
+import { AutoResetForm } from "@/components/AutoResetForm";
+import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
+import { Trash2 } from "lucide-react";
+import { updateClient, addClientNote, deleteClient } from "../actions";
 
 export default async function ClientDetailPage({ params }: { params: { id: string } }) {
   const client = await getClient(params.id);
@@ -18,12 +21,23 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
 
   const updateAction = updateClient.bind(null, client.id);
   const addNoteAction = addClientNote.bind(null, client.id);
+  const deleteAction = deleteClient.bind(null, client.id);
 
   return (
     <div>
       <PageHeader
         title={`${client.prenom ?? ""} ${client.nom}`.trim()}
         description={`Client depuis le ${formatDateTime(client.created_at)}`}
+        actions={
+          <form action={deleteAction}>
+            <ConfirmSubmitButton
+              variant="danger"
+              confirmMessage={`Supprimer définitivement ${client.prenom ?? ""} ${client.nom} ? Cette action est irréversible et supprimera aussi tous ses dossiers (${dossiers.length}) et tout ce qui leur est lié (annonces, inspections, convoyages, documents, notes).`}
+            >
+              <Trash2 className="h-4 w-4" /> Supprimer
+            </ConfirmSubmitButton>
+          </form>
+        }
       />
 
       <div className="grid lg:grid-cols-3 gap-4">
@@ -127,7 +141,7 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
 
           <Card className="p-5">
             <h2 className="text-sm font-semibold text-ink mb-4">Historique des échanges</h2>
-            <form action={addNoteAction} className="flex gap-2 mb-5">
+            <AutoResetForm action={addNoteAction} className="flex gap-2 mb-5">
               <input
                 name="contenu"
                 placeholder="Ajouter une note sur un échange (appel, email, RDV…)"
@@ -136,7 +150,7 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
               <Button type="submit" variant="outline" className="shrink-0">
                 Ajouter
               </Button>
-            </form>
+            </AutoResetForm>
             {notes.length === 0 ? (
               <EmptyState title="Aucun échange enregistré" />
             ) : (

@@ -17,6 +17,7 @@ import { fr } from "date-fns/locale";
 import { clsx } from "clsx";
 import { listAgendaEvents, listConvoyagesExternesAFaire, listDossiers } from "@/lib/queries";
 import { Card, PageHeader, Field, inputClass, Button, Badge, EmptyState } from "@/components/ui";
+import { AutoResetForm } from "@/components/AutoResetForm";
 import { AGENDA_EVENT_TYPE_LABELS, type AgendaEventType } from "@/lib/types";
 import { createAgendaEvent, marquerConvoyageExterneTermine } from "./actions";
 
@@ -191,7 +192,7 @@ export default async function AgendaPage({
 
         <Card className="p-5 h-fit">
           <h2 className="text-sm font-semibold text-ink mb-4">Ajouter un événement</h2>
-          <form action={createAgendaEvent} className="space-y-3">
+          <AutoResetForm action={createAgendaEvent} className="space-y-3">
             <Field label="Titre">
               <input name="titre" required className={inputClass} />
             </Field>
@@ -232,7 +233,7 @@ export default async function AgendaPage({
             <Button type="submit" className="w-full">
               <Plus className="h-4 w-4" /> Ajouter
             </Button>
-          </form>
+          </AutoResetForm>
 
           <div className="mt-6 pt-4 border-t border-line">
             <h3 className="text-xs font-semibold text-ink-soft uppercase tracking-wide mb-2">Légende</h3>

@@ -28,6 +28,7 @@ import {
 import { EmailStatusBanner } from "@/components/EmailStatusBanner";
 import { DossierTabs } from "@/components/DossierTabs";
 import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
+import { AutoResetForm } from "@/components/AutoResetForm";
 import {
   DOSSIER_STATUTS,
   DOSSIER_STATUT_LABELS,
@@ -574,7 +575,7 @@ async function VehiculesTab({
 
       <Card className="p-5 h-fit">
         <h2 className="text-sm font-semibold text-ink mb-4">Ajouter une annonce</h2>
-        <form action={createAnnonceAction} className="space-y-3" encType="multipart/form-data">
+        <AutoResetForm action={createAnnonceAction} className="space-y-3" encType="multipart/form-data">
           <Field label="Titre">
             <input name="titre" required className={inputClass} />
           </Field>
@@ -615,7 +616,7 @@ async function VehiculesTab({
           <Button type="submit" className="w-full">
             <Plus className="h-4 w-4" /> Ajouter l'annonce
           </Button>
-        </form>
+        </AutoResetForm>
         <p className="text-xs text-ink-faint mt-3">
           Le détail du Score DIMZ (prix, historique, état, adéquation) se complète ensuite via « Noter » sur
           l'annonce.
@@ -711,7 +712,7 @@ async function DecouverteTab({ dossierId }: { dossierId: string }) {
 
       <Card className="p-5 h-fit">
         <h2 className="text-sm font-semibold text-ink mb-4">Ajouter un véhicule</h2>
-        <form action={addAction} className="space-y-3">
+        <AutoResetForm action={addAction} className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <Field label="Marque">
               <input name="marque" className={inputClass} />
@@ -747,7 +748,7 @@ async function DecouverteTab({ dossierId }: { dossierId: string }) {
           <Button type="submit" className="w-full">
             <Plus className="h-4 w-4" /> Ajouter le véhicule
           </Button>
-        </form>
+        </AutoResetForm>
         <p className="text-xs text-ink-faint mt-3">
           Pas de score sur cette fiche — c'est un premier aperçu avant une éventuelle offre Copilote.
         </p>
@@ -854,7 +855,7 @@ async function DocumentsTab({
       </div>
       <Card className="p-5 h-fit">
         <h2 className="text-sm font-semibold text-ink mb-4">Ajouter un document</h2>
-        <form action={uploadDocAction} className="space-y-3" encType="multipart/form-data">
+        <AutoResetForm action={uploadDocAction} className="space-y-3" encType="multipart/form-data">
           <Field label="Type">
             <select name="type" className={inputClass}>
               {Object.entries(DOCUMENT_TYPE_LABELS).map(([value, label]) => (
@@ -870,7 +871,7 @@ async function DocumentsTab({
           <Button type="submit" className="w-full">
             Ajouter
           </Button>
-        </form>
+        </AutoResetForm>
       </Card>
     </div>
   );
@@ -1021,12 +1022,12 @@ async function NotesTab({
     <div className="grid lg:grid-cols-2 gap-4">
       <Card className="p-5">
         <h2 className="text-sm font-semibold text-ink mb-4">Notes internes</h2>
-        <form action={addNoteAction} className="flex gap-2 mb-5">
+        <AutoResetForm action={addNoteAction} className="flex gap-2 mb-5">
           <input name="contenu" placeholder="Ajouter une note…" className={inputClass} />
           <Button type="submit" variant="outline" className="shrink-0">
             Ajouter
           </Button>
-        </form>
+        </AutoResetForm>
         {notes.length === 0 ? (
           <EmptyState title="Aucune note" />
         ) : (

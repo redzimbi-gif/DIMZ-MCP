@@ -341,6 +341,16 @@ export async function listConvoyagesExternesAFaire() {
 // ---------------------------------------------------------------------------
 // Documents (toutes entités)
 // ---------------------------------------------------------------------------
+export async function listAllDossierContrats() {
+  const db = createAdminClient();
+  const { data } = await db
+    .from("dossier_contrats")
+    .select("*, dossiers(reference, clients(nom, prenom))")
+    .not("date_generation", "is", null)
+    .order("date_generation", { ascending: false });
+  return (data ?? []) as (DossierContrat & { dossiers: any })[];
+}
+
 export async function listAllDocuments() {
   const db = createAdminClient();
   const { data } = await db

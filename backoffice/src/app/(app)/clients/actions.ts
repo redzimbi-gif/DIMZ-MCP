@@ -60,6 +60,23 @@ export async function updateClient(id: string, formData: FormData) {
   revalidatePath("/clients");
 }
 
+export async function deleteClient(clientId: string) {
+  const db = createAdminClient();
+  const { data: client } = await db.from("clients").select("nom, prenom").eq("id", clientId).maybeSingle();
+
+  await logActivity({
+    action: "client.supprime",
+    entiteType: "client",
+    entiteId: clientId,
+    description: `Client supprimé définitivement : ${client?.prenom ?? ""} ${client?.nom ?? ""}`.trim(),
+  });
+
+  await db.from("clients").delete().eq("id", clientId);
+
+  revalidatePath("/clients");
+  redirect("/clients");
+}
+
 export async function addClientNote(clientId: string, formData: FormData) {
   const db = createAdminClient();
   const contenu = String(formData.get("contenu") || "").trim();

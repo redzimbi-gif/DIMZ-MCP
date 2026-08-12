@@ -135,7 +135,8 @@ l'email de confirmation si le client a renseigné son adresse.
 - Tableau de bord : dossiers nouveaux/en cours/terminés, CA, convoyages à
   venir, livraisons du jour, notifications, dernières activités.
 - Clients : fiche complète, historique des dossiers, documents, notes privées,
-  historique des échanges.
+  historique des échanges. Suppression définitive (avec confirmation) — supprime
+  aussi, par cascade, tous les dossiers du client et tout ce qui leur est lié.
 - Dossiers : pipeline en 10 statuts (kanban), historique des changements de
   statut, infos projet complètes. Archivage (sort du pipeline par défaut,
   récupérable) et suppression définitive (avec confirmation) depuis la fiche
@@ -164,7 +165,9 @@ l'email de confirmation si le client a renseigné son adresse.
   de livraison PDF.
 - Agenda : calendrier mensuel (rendez-vous, visio, inspections, convoyages,
   livraisons).
-- Documents : bibliothèque liée aux dossiers.
+- Documents : bibliothèque liée aux dossiers, avec deux listes — les fichiers
+  uploadés et, séparément, tous les documents & contrats générés (CGV,
+  contrats, Copilote Market...) à travers tous les dossiers.
 - Suivi client (Accompagnement) : sur `/dossiers/[id]`, un bandeau à 4 offres
   (Découverte / Copilote / Copilote Plus / Inspection — Découverte par défaut
   à la création du dossier) pilote les étapes que le client voit sur
