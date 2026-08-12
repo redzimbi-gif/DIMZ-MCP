@@ -25,6 +25,7 @@ stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
    - `0013_dossiers_archive.sql`
    - `0014_documents_contrats.sql`
    - `0015_fiche_decouverte_prix.sql`
+   - `0016_market_commentaire.sql`
 3. Dans **Project Settings → API**, récupère :
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -141,7 +142,13 @@ l'email de confirmation si le client a renseigné son adresse.
 - Recherche de véhicules : annonces avec photos, avis du copilote, points
   forts/faibles, sélection, et **Score DIMZ** par annonce (score global /10 +
   4 critères détaillés : prix, historique, état, adéquation), noté via le
-  bouton crayon sur chaque annonce.
+  bouton crayon sur chaque annonce. Pour les offres Copilote / Copilote Plus,
+  les annonces marquées « sélectionnée » (étoile) alimentent le PDF
+  **Copilote Market** / **Copilote + Market** — intro, commentaire libre du
+  copilote, puis les annonces sélectionnées avec leur Score DIMZ, et en pied
+  de page soit une invitation à passer à Copilote Plus (offre Copilote), soit
+  l'annonce de l'étape suivante (inspection, offre Copilote Plus) — généré et
+  envoyable par email depuis l'onglet Annonces.
 - Fiche Découverte : pour l'offre gratuite Découverte, une fiche plus légère
   que le Rapport DIMZ — véhicules repérés (marque, modèle, énergie), un point
   fort et un point de vigilance chacun, sans score. Générée en PDF et
@@ -149,7 +156,9 @@ l'email de confirmation si le client a renseigné son adresse.
 - Inspection = Rapport DIMZ : même contenu riche que l'exemple du site (score
   global, score par étape du contrôle, tags, points positifs/vigilance, avis
   du copilote, verdict), entièrement éditable depuis le back-office, avec
-  génération automatique d'un rapport PDF au même format.
+  génération automatique d'un rapport PDF au même format. Pour un dossier en
+  offre Copilote Plus, le PDF ajoute en pied de page les étapes suivantes
+  (mise en relation avec le vendeur, accompagnement à l'achat, convoyage).
 - Convoyage : trajet, photos avant/après, signature client (à l'écran), rapport
   de livraison PDF.
 - Agenda : calendrier mensuel (rendez-vous, visio, inspections, convoyages,
@@ -161,7 +170,11 @@ l'email de confirmation si le client a renseigné son adresse.
   `/suivi/[token]` : communes (« Demande reçue » → étude du dossier) puis
   spécifiques à l'offre choisie. Bouton « Informer le client » pour envoyer
   l'email de l'étape en cours (ton copilote, léger). Distinct du pipeline
-  interne à 10 statuts (kanban), qui reste réservé à l'équipe.
+  interne à 10 statuts (kanban), qui reste réservé à l'équipe. Pour l'offre
+  Copilote Plus, dès que l'étape client atteint « Livraison », `/suivi/[token]`
+  affiche une invitation à remplir le questionnaire de satisfaction — pour
+  l'instant, un lien vers le questionnaire de retour déjà présent sur le site
+  (page « Test »).
 - Suivi client (Convoyage) : flux dédié — Demande reçue → Étude de la demande
   → boutons Accepté/Refusé (email d'excuse si refusé) → Devis en cours →
   Livraison en cours → Véhicule livré, avec un email pro à chaque étape.

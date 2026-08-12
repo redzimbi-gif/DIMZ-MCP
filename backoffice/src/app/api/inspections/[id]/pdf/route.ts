@@ -14,6 +14,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
       inspection,
       dossierReference: inspection.dossiers?.reference ?? "",
       clientNom: `${inspection.dossiers?.clients?.prenom ?? ""} ${inspection.dossiers?.clients?.nom ?? ""}`.trim(),
+      offre: inspection.dossiers?.offre ?? null,
     })
   );
 

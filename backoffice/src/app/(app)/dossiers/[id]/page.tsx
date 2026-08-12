@@ -56,6 +56,7 @@ import {
   deleteDossier,
 } from "../actions";
 import { createAnnonce, toggleAnnonceSelection, deleteAnnonce } from "./annonces-actions";
+import { updateMarketCommentaire, sendMarketEmail } from "./market-actions";
 import {
   addFicheDecouverteVehicule,
   deleteFicheDecouverteVehicule,
@@ -105,6 +106,8 @@ export default async function DossierDetailPage({
   const updateStatutAction = updateDossierStatut.bind(null, dossier.id);
   const addNoteAction = addDossierNote.bind(null, dossier.id);
   const createAnnonceAction = createAnnonce.bind(null, dossier.id);
+  const marketCommentaireAction = updateMarketCommentaire.bind(null, dossier.id);
+  const sendMarketAction = sendMarketEmail.bind(null, dossier.id);
   const uploadDocAction = uploadDossierDocument.bind(null, dossier.id);
   const updateEtapeAction = updateDossierEtapeClient.bind(null, dossier.id);
   const sendEtapeEmailAction = sendEtapeClientEmail.bind(null, dossier.id, tab);
@@ -368,7 +371,14 @@ export default async function DossierDetailPage({
         </Card>
       ) : null}
 
-      {tab === "vehicules" ? <VehiculesTab dossier={dossier} createAnnonceAction={createAnnonceAction} /> : null}
+      {tab === "vehicules" ? (
+        <VehiculesTab
+          dossier={dossier}
+          createAnnonceAction={createAnnonceAction}
+          marketCommentaireAction={marketCommentaireAction}
+          sendMarketAction={sendMarketAction}
+        />
+      ) : null}
 
       {tab === "decouverte" ? <DecouverteTab dossierId={dossier.id} /> : null}
 
@@ -398,11 +408,18 @@ export default async function DossierDetailPage({
 async function VehiculesTab({
   dossier,
   createAnnonceAction,
+  marketCommentaireAction,
+  sendMarketAction,
 }: {
   dossier: NonNullable<Awaited<ReturnType<typeof getDossier>>>;
   createAnnonceAction: (formData: FormData) => Promise<void>;
+  marketCommentaireAction: (formData: FormData) => Promise<void>;
+  sendMarketAction: () => Promise<void>;
 }) {
   const annonces = await getDossierAnnonces(dossier.id);
+  const isMarketOffre = dossier.offre === "copilote" || dossier.offre === "copilote_plus";
+  const selectionneesCount = annonces.filter((a) => a.selectionnee).length;
+  const marketTitle = dossier.offre === "copilote_plus" ? "Copilote + Market" : "Copilote Market";
   const toggleAction = async (annonceId: string, next: boolean) => {
     "use server";
     await toggleAnnonceSelection(dossier.id, annonceId, next);
@@ -415,6 +432,44 @@ async function VehiculesTab({
   return (
     <div className="grid lg:grid-cols-3 gap-4">
       <div className="lg:col-span-2 space-y-3">
+        {isMarketOffre ? (
+          <Card className="p-4">
+            <div className="flex items-center justify-between gap-3 flex-wrap mb-3">
+              <div>
+                <p className="text-sm font-medium text-ink">{marketTitle}</p>
+                <p className="text-xs text-ink-soft mt-0.5">
+                  {selectionneesCount} annonce{selectionneesCount > 1 ? "s" : ""} sélectionnée
+                  {selectionneesCount > 1 ? "s" : ""} (avec l'étoile ci-contre)
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <LinkButton href={`/api/dossiers/${dossier.id}/market/pdf`} variant="outline">
+                  <FileDown className="h-4 w-4" /> Voir le PDF
+                </LinkButton>
+                <form action={sendMarketAction}>
+                  <Button type="submit" variant="outline" disabled={selectionneesCount === 0}>
+                    <Mail className="h-4 w-4" /> Envoyer au client
+                  </Button>
+                </form>
+              </div>
+            </div>
+            <form action={marketCommentaireAction} className="space-y-2">
+              <Field label="Commentaire libre (affiché après l'intro, avant les annonces)">
+                <textarea
+                  name="market_commentaire"
+                  rows={3}
+                  defaultValue={dossier.market_commentaire ?? ""}
+                  placeholder="Un mot personnalisé sur cette sélection…"
+                  className={inputClass}
+                />
+              </Field>
+              <Button type="submit" variant="outline">
+                Enregistrer le commentaire
+              </Button>
+            </form>
+          </Card>
+        ) : null}
+
         {annonces.length === 0 ? (
           <Card>
             <EmptyState

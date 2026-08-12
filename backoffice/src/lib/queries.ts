@@ -199,6 +199,17 @@ export async function getDossierAnnonces(dossierId: string) {
   return (data ?? []) as Annonce[];
 }
 
+export async function getDossierAnnoncesSelectionnees(dossierId: string) {
+  const db = createAdminClient();
+  const { data } = await db
+    .from("annonces")
+    .select("*")
+    .eq("dossier_id", dossierId)
+    .eq("selectionnee", true)
+    .order("created_at", { ascending: false });
+  return (data ?? []) as Annonce[];
+}
+
 export async function listAllAnnonces() {
   const db = createAdminClient();
   const { data } = await db
@@ -238,7 +249,7 @@ export async function getInspection(id: string) {
   const db = createAdminClient();
   const { data } = await db
     .from("inspections")
-    .select("*, dossiers(reference, portal_token, clients(nom, prenom, email))")
+    .select("*, dossiers(reference, portal_token, offre, clients(nom, prenom, email))")
     .eq("id", id)
     .maybeSingle();
   return data as (Inspection & { dossiers: any }) | null;

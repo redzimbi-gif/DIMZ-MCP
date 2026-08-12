@@ -76,6 +76,7 @@ export async function sendInspectionReportEmail(dossierId: string, inspectionId:
           inspection,
           dossierReference: reference ?? "",
           clientNom: `${inspection.dossiers?.clients?.prenom ?? ""} ${inspection.dossiers?.clients?.nom ?? ""}`.trim(),
+          offre: inspection.dossiers?.offre ?? null,
         })
       );
 

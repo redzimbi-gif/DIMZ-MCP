@@ -162,6 +162,23 @@ export default async function ClientPortalPage({ params }: { params: { token: st
           </div>
         ) : null}
 
+        {dossier.offre === "copilote_plus" && dossier.etape_client === "livraison" ? (
+          <div className="mt-6 bg-blue-50 border border-blue-100 rounded-lg2 p-6 text-center">
+            <p className="text-sm font-semibold text-blue-700 mb-1">Votre véhicule vous a été livré 🎉</p>
+            <p className="text-sm text-ink-soft mb-4">
+              Un dernier mot : votre avis nous aide à améliorer l'accompagnement DIMZ pour les prochains clients.
+            </p>
+            <a
+              href="https://dimz-copilote.com/dimz-beta.html#test"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center justify-center rounded-md bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2.5"
+            >
+              Donner mon avis (5 min)
+            </a>
+          </div>
+        ) : null}
+
         <p className="text-center text-xs text-ink-faint mt-6">
           Une question sur votre dossier ? Votre copilote DIMZ vous répond.
         </p>

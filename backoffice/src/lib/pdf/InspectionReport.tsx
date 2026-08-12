@@ -1,13 +1,14 @@
 import { Document, Page, Text, View, Svg, Circle } from "@react-pdf/renderer";
 import { pdfStyles } from "./theme";
 import { PdfLogo, PdfFooter } from "./PdfHeader";
-import { INSPECTION_VERDICT_LABELS, type Inspection } from "@/lib/types";
+import { INSPECTION_VERDICT_LABELS, type Inspection, type DossierOffre } from "@/lib/types";
 import { formatDate, splitLines, splitTags } from "@/lib/format";
 
 interface Props {
   inspection: Inspection;
   dossierReference: string;
   clientNom: string;
+  offre?: DossierOffre | null;
 }
 
 const CATEGORY_SCORES: { key: keyof Inspection; label: string }[] = [
@@ -49,7 +50,7 @@ function ScoreRing({ value }: { value: number }) {
   );
 }
 
-export function InspectionReport({ inspection, dossierReference, clientNom }: Props) {
+export function InspectionReport({ inspection, dossierReference, clientNom, offre }: Props) {
   const tags = splitTags(inspection.tags);
   const pointsPositifs = splitLines(inspection.points_positifs);
   const pointsVigilance = splitLines(inspection.points_vigilance);
@@ -205,6 +206,22 @@ export function InspectionReport({ inspection, dossierReference, clientNom }: Pr
             {inspection.recommandation_finale ? (
               <Text style={{ fontSize: 9.5, lineHeight: 1.5 }}>{inspection.recommandation_finale}</Text>
             ) : null}
+          </View>
+        ) : null}
+
+        {offre === "copilote_plus" ? (
+          <View
+            style={{ marginTop: 20, padding: 14, backgroundColor: "#eef3ff", borderRadius: 8 }}
+            wrap={false}
+          >
+            <Text style={{ fontSize: 9.5, fontFamily: "Helvetica-Bold", color: "#1a44a6", marginBottom: 4 }}>
+              Et après ?
+            </Text>
+            <Text style={{ fontSize: 9, lineHeight: 1.5, color: "#0b0d12" }}>
+              Votre copilote va maintenant se mettre en relation avec le vendeur pour finaliser l'achat, avec
+              un accompagnement à chaque étape. Une fois tout validé, un convoyage sera organisé pour vous
+              livrer le véhicule.
+            </Text>
           </View>
         ) : null}
 

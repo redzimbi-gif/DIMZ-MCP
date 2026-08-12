@@ -95,6 +95,24 @@ export function ficheDecouverteEmail(params: {
   };
 }
 
+export function marketDisponibleEmail(params: {
+  prenom: string | null;
+  reference: string;
+  titre: string;
+  portalUrl: string;
+}): { subject: string; html: string } {
+  const content = `
+    <p style="margin:0 0 16px;">${greeting(params.prenom)}</p>
+    <p style="margin:0 0 16px;">Votre ${params.titre} pour le dossier <strong>${params.reference}</strong> est prêt, vous le trouverez en pièce jointe de cet email : la sélection d'annonces de votre copilote, avec le Score DIMZ pour chacune.</p>
+    <p style="margin:0 0 4px;">Vous pouvez aussi la retrouver à tout moment depuis votre espace de suivi :</p>
+    ${ctaButton(params.portalUrl, "Voir mon dossier")}
+  `;
+  return {
+    subject: `Votre ${params.titre} est disponible (${params.reference})`,
+    html: emailLayout(content),
+  };
+}
+
 function etapeBadge(label: string): string {
   return `<span style="display:inline-block;background:#eef3ff;color:${BLUE};font-weight:600;font-size:13px;padding:6px 14px;border-radius:999px;">${label}</span>`;
 }
