@@ -1177,6 +1177,14 @@
                       <label><input type="checkbox" value="peu-importe"> Peu importe</label>
                     </div>
                   </div>
+                  <div class="field full">
+                    <label>Boîte de vitesses souhaitée</label>
+                    <div class="choice-grid" id="transmission-choices">
+                      <label><input type="checkbox" value="automatique"> Automatique</label>
+                      <label><input type="checkbox" value="manuelle"> Manuelle</label>
+                      <label><input type="checkbox" value="peu-importe"> Peu importe</label>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -3510,7 +3518,8 @@
       recapRow('Véhicules ciblés', vehText),
       recapRow('Véhicule non trouvé dans la liste', inputVal('a-veh-absente-desc')),
       recapRow('Carrosserie souhaitée', recapCheckedList('#carrosserie-choices input')),
-      recapRow('Énergie souhaitée', recapCheckedList('#energie-choices input'))
+      recapRow('Énergie souhaitée', recapCheckedList('#energie-choices input')),
+      recapRow('Boîte de vitesses souhaitée', recapCheckedList('#transmission-choices input'))
     ].filter(Boolean) });
 
     var situationParts = [recapRow('Véhicule actuel', selectText('a-vehicule-actuel'))];
