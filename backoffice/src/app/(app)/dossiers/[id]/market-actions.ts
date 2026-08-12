@@ -10,11 +10,20 @@ import { MarketReport } from "@/lib/pdf/MarketReport";
 import { sendEmail, getAppUrl } from "@/lib/email";
 import { marketDisponibleEmail } from "@/lib/email-templates";
 import { logActivity } from "@/lib/log";
+import type { DossierOffre } from "@/lib/types";
+
+function marketCommentaireField(offre: DossierOffre | null) {
+  return offre === "copilote_plus" ? "market_commentaire_copilote_plus" : "market_commentaire_copilote";
+}
 
 export async function updateMarketCommentaire(dossierId: string, formData: FormData) {
   const db = createAdminClient();
+  const dossier = await getDossier(dossierId);
   const commentaire = String(formData.get("market_commentaire") || "").trim() || null;
-  await db.from("dossiers").update({ market_commentaire: commentaire }).eq("id", dossierId);
+  await db
+    .from("dossiers")
+    .update({ [marketCommentaireField(dossier?.offre ?? null)]: commentaire })
+    .eq("id", dossierId);
   revalidatePath(`/dossiers/${dossierId}`);
 }
 
@@ -37,7 +46,10 @@ export async function sendMarketEmail(dossierId: string) {
         MarketReport({
           offre: dossier.offre,
           vehicules,
-          commentaire: dossier.market_commentaire,
+          commentaire:
+            dossier.offre === "copilote_plus"
+              ? dossier.market_commentaire_copilote_plus
+              : dossier.market_commentaire_copilote,
           dossierReference: dossier.reference,
           clientNom: `${dossier.clients?.prenom ?? ""} ${dossier.clients?.nom ?? ""}`.trim(),
         })

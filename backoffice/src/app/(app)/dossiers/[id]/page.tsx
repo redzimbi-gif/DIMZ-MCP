@@ -458,7 +458,11 @@ async function VehiculesTab({
                 <textarea
                   name="market_commentaire"
                   rows={3}
-                  defaultValue={dossier.market_commentaire ?? ""}
+                  defaultValue={
+                    (dossier.offre === "copilote_plus"
+                      ? dossier.market_commentaire_copilote_plus
+                      : dossier.market_commentaire_copilote) ?? ""
+                  }
                   placeholder="Un mot personnalisé sur cette sélection…"
                   className={inputClass}
                 />

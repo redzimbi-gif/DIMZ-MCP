@@ -22,7 +22,10 @@ export async function GET(_request: Request, { params }: { params: { id: string 
     MarketReport({
       offre: dossier.offre,
       vehicules,
-      commentaire: dossier.market_commentaire,
+      commentaire:
+        dossier.offre === "copilote_plus"
+          ? dossier.market_commentaire_copilote_plus
+          : dossier.market_commentaire_copilote,
       dossierReference: dossier.reference,
       clientNom: `${dossier.clients?.prenom ?? ""} ${dossier.clients?.nom ?? ""}`.trim(),
     })

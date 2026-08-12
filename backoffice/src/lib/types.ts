@@ -131,7 +131,8 @@ export interface Dossier {
   portal_token: string;
   donnees_brutes: Record<string, unknown> | null;
   fiche_decouverte_intro: string | null;
-  market_commentaire: string | null;
+  market_commentaire_copilote: string | null;
+  market_commentaire_copilote_plus: string | null;
   archive: boolean;
   created_at: string;
   updated_at: string;
