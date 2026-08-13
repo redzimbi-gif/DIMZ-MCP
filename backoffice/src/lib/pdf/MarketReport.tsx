@@ -51,7 +51,13 @@ export function MarketReport({ offre, vehicules, commentaire, dossierReference, 
           <Text style={{ fontSize: 8, color: "#565c68" }}>Référence {dossierReference}</Text>
         </View>
 
-        <Text style={pdfStyles.title}>{title}</Text>
+        {isPlus ? (
+          <Text style={pdfStyles.title}>
+            Copilote <Text style={{ color: "#2f6fed", fontSize: 21 }}>+</Text> Market
+          </Text>
+        ) : (
+          <Text style={pdfStyles.title}>{title}</Text>
+        )}
         <Text style={pdfStyles.subtitle}>
           {dossierReference} — {clientNom}
         </Text>
