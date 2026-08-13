@@ -7,6 +7,7 @@ import { getSignedUrl } from "@/lib/storage";
 import { formatCurrency } from "@/lib/format";
 import { Logo } from "@/components/Logo";
 import { getEtapesOffre, ETAPES_CONVOYAGE } from "@/lib/etapes";
+import { upgradeOffreDepuisSuivi } from "./actions";
 
 export const metadata = {
   title: "Suivi de votre dossier — Dimz",
@@ -92,6 +93,33 @@ export default async function ClientPortalPage({ params }: { params: { token: st
             </ol>
           )}
         </div>
+
+        {dossier.offre === "decouverte" && dossier.etape_client === "reponse_envoyee" ? (
+          <div className="mt-6 bg-blue-50 border border-blue-100 rounded-lg2 p-6 text-center">
+            <p className="text-sm font-semibold text-blue-700 mb-1">Envie d'aller plus loin ?</p>
+            <p className="text-sm text-ink-soft mb-4">
+              Votre copilote peut prendre le relais : de la recherche approfondie jusqu'à la remise des clés.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <form action={upgradeOffreDepuisSuivi.bind(null, params.token, "copilote")}>
+                <button
+                  type="submit"
+                  className="w-full sm:w-auto inline-flex items-center justify-center rounded-md border border-blue-500 text-blue-600 hover:bg-blue-100 text-sm font-medium px-4 py-2.5 transition-colors"
+                >
+                  Passer à l'offre Copilote
+                </button>
+              </form>
+              <form action={upgradeOffreDepuisSuivi.bind(null, params.token, "copilote_plus")}>
+                <button
+                  type="submit"
+                  className="w-full sm:w-auto inline-flex items-center justify-center rounded-md bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2.5 transition-colors"
+                >
+                  Passer à l'offre Copilote Plus
+                </button>
+              </form>
+            </div>
+          </div>
+        ) : null}
 
         {annoncesAvecPhoto.length > 0 ? (
           <div className="mt-6">
