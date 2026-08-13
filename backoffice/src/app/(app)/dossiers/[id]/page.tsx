@@ -94,7 +94,7 @@ export default async function DossierDetailPage({
   searchParams,
 }: {
   params: { id: string };
-  searchParams: { tab?: string; notif?: string };
+  searchParams: { tab?: string; notif?: string; error?: string };
 }) {
   const dossier = await getDossier(params.id);
   if (!dossier) notFound();
@@ -169,6 +169,12 @@ export default async function DossierDetailPage({
       />
 
       <EmailStatusBanner status={searchParams.notif} />
+
+      {searchParams.error ? (
+        <div className="mb-4 text-sm text-bad bg-bad-bg border border-bad/20 rounded-md px-3 py-2">
+          {searchParams.error}
+        </div>
+      ) : null}
 
       <Card className="p-4 mb-4">
         <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-3">

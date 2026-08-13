@@ -18,66 +18,72 @@ export async function GET(_request: Request, { params }: { params: { id: string;
   }
   const type = params.type as ContratType;
 
-  const dossier = await getDossier(params.id);
-  if (!dossier) return new NextResponse("Dossier introuvable", { status: 404 });
+  try {
+    const dossier = await getDossier(params.id);
+    if (!dossier) return new NextResponse("Dossier introuvable", { status: 404 });
 
-  const [contrats, entreprise] = await Promise.all([getDossierContrats(params.id), getEntrepriseInfo()]);
-  const contrat = contrats.find((c) => c.type === type);
-  const champs = contrat?.champs ?? {};
-  const dateGeneration = formatDate(contrat?.date_generation ?? new Date());
-  const dateSignature = contrat?.date_signature ? formatDate(contrat.date_signature) : dateGeneration;
+    const [contrats, entreprise] = await Promise.all([getDossierContrats(params.id), getEntrepriseInfo()]);
+    const contrat = contrats.find((c) => c.type === type);
+    const champs = contrat?.champs ?? {};
+    const dateGeneration = formatDate(contrat?.date_generation ?? new Date());
+    const dateSignature = contrat?.date_signature ? formatDate(contrat.date_signature) : dateGeneration;
 
-  const common = {
-    dossierReference: dossier.reference,
-    client: dossier.clients,
-    entreprise,
-    champs,
-  };
+    const common = {
+      dossierReference: dossier.reference,
+      client: dossier.clients,
+      entreprise,
+      champs,
+    };
 
-  let buffer: Buffer;
-  switch (type) {
-    case "cgv":
-      buffer = await renderToBuffer(
-        CgvDocument({ dossierReference: dossier.reference, entreprise, dateGeneration })
-      );
-      break;
-    case "contrat_convoyage":
-      buffer = await renderToBuffer(ContratConvoyageDocument({ ...common, dateSignature }));
-      break;
-    case "contrat_copilote":
-      buffer = await renderToBuffer(ContratCopiloteDocument({ ...common, dateSignature }));
-      break;
-    case "contrat_copilote_plus":
-      buffer = await renderToBuffer(ContratCopilotePlusDocument({ ...common, dateSignature }));
-      break;
-    case "contrat_inspection":
-      buffer = await renderToBuffer(ContratInspectionDocument({ ...common, dateSignature }));
-      break;
-    case "etat_vehicule":
-      buffer = await renderToBuffer(
-        EtatVehiculeDocument({
-          dossierReference: dossier.reference,
-          client: dossier.clients,
-          champs,
-          date: dateGeneration,
-        })
-      );
-      break;
-    case "commencement_anticipe":
-      buffer = await renderToBuffer(CommencementAnticipeDocument({ ...common, date: dateGeneration }));
-      break;
-    case "retractation":
-      buffer = await renderToBuffer(RetractationDocument(common));
-      break;
-    default:
-      return new NextResponse("Type de document inconnu", { status: 404 });
+    let buffer: Buffer;
+    switch (type) {
+      case "cgv":
+        buffer = await renderToBuffer(
+          CgvDocument({ dossierReference: dossier.reference, entreprise, dateGeneration })
+        );
+        break;
+      case "contrat_convoyage":
+        buffer = await renderToBuffer(ContratConvoyageDocument({ ...common, dateSignature }));
+        break;
+      case "contrat_copilote":
+        buffer = await renderToBuffer(ContratCopiloteDocument({ ...common, dateSignature }));
+        break;
+      case "contrat_copilote_plus":
+        buffer = await renderToBuffer(ContratCopilotePlusDocument({ ...common, dateSignature }));
+        break;
+      case "contrat_inspection":
+        buffer = await renderToBuffer(ContratInspectionDocument({ ...common, dateSignature }));
+        break;
+      case "etat_vehicule":
+        buffer = await renderToBuffer(
+          EtatVehiculeDocument({
+            dossierReference: dossier.reference,
+            client: dossier.clients,
+            champs,
+            date: dateGeneration,
+          })
+        );
+        break;
+      case "commencement_anticipe":
+        buffer = await renderToBuffer(CommencementAnticipeDocument({ ...common, date: dateGeneration }));
+        break;
+      case "retractation":
+        buffer = await renderToBuffer(RetractationDocument(common));
+        break;
+      default:
+        return new NextResponse("Type de document inconnu", { status: 404 });
+    }
+
+    const filename = `${type}-${dossier.reference}.pdf`;
+    return new NextResponse(new Uint8Array(buffer), {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `inline; filename="${filename}"`,
+      },
+    });
+  } catch (error) {
+    console.error("Erreur génération PDF contrat", error);
+    const message = error instanceof Error ? error.message : "Erreur inconnue";
+    return new NextResponse(`Erreur lors de la génération du PDF : ${message}`, { status: 500 });
   }
-
-  const filename = `${type}-${dossier.reference}.pdf`;
-  return new NextResponse(new Uint8Array(buffer), {
-    headers: {
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename="${filename}"`,
-    },
-  });
 }
