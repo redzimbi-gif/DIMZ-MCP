@@ -34,6 +34,8 @@ stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
    - `0022_entreprise_info_rattrapage.sql`
    - `0023_clients_pro.sql`
    - `0024_factures_pdf.sql`
+   - `0025_documents_archive.sql`
+   - `0026_dossier_reference_numerotation.sql`
 3. Dans **Project Settings → API**, récupère :
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -149,7 +151,11 @@ l'email de confirmation si le client a renseigné son adresse.
 - Dossiers : pipeline en 10 statuts (kanban), historique des changements de
   statut, infos projet complètes. Archivage (sort du pipeline par défaut,
   récupérable) et suppression définitive (avec confirmation) depuis la fiche
-  dossier.
+  dossier. Référence auto-générée au format `OO-AAMM-0000` (offre sur 2
+  chiffres — 01 Découverte, 02 Copilote, 03 Copilote Plus, 04 Inspection,
+  05 Convoyage — puis année/mois, puis un compteur qui repart à 0001 chaque
+  mois, partagé entre toutes les offres), assignée une fois à la création et
+  jamais modifiée ensuite même si l'offre du dossier change.
 - Recherche de véhicules : annonces avec photos, avis du copilote, points
   forts/faibles, sélection, et **Score DIMZ** par annonce (score global /10 +
   4 critères détaillés : prix, historique, état, adéquation), noté via le
