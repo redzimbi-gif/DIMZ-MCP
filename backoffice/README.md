@@ -52,13 +52,13 @@ depuis le dashboard Supabase pour l'instant).
    (100 emails/jour offerts).
 2. **API Keys → Create API Key**, copie la clé → `RESEND_API_KEY`.
 3. Tant que tu n'as pas encore de nom de domaine à vérifier sur Resend,
-   laisse `EMAIL_FROM=DIMZ <onboarding@resend.dev>` : ça fonctionne tout de
-   suite, mais Resend n'autorisera l'envoi qu'à l'adresse email de ton propre
-   compte (utile pour tester). Le jour où tu as un domaine, ajoute-le dans
-   **Domains** sur Resend, suis les enregistrements DNS demandés, puis
-   change `EMAIL_FROM` pour une adresse de ce domaine (ex.
-   `DIMZ <contact@dimz.fr>`) — l'envoi à n'importe quel client se débloque
-   automatiquement, sans autre changement de code.
+   laisse `EMAIL_FROM=DIMZ - Mon Copilote Auto <onboarding@resend.dev>` : ça
+   fonctionne tout de suite, mais Resend n'autorisera l'envoi qu'à l'adresse
+   email de ton propre compte (utile pour tester). Le jour où tu as un
+   domaine, ajoute-le dans **Domains** sur Resend, suis les enregistrements
+   DNS demandés, puis change `EMAIL_FROM` pour une adresse de ce domaine (ex.
+   `DIMZ - Mon Copilote Auto <contact@dimz.fr>`) — l'envoi à n'importe quel
+   client se débloque automatiquement, sans autre changement de code.
 
 ## 4. Configurer les variables d'environnement
 
@@ -116,7 +116,7 @@ Vercel — les Edge Functions ne lisent pas `.env.local`) :
 ```bash
 npx supabase secrets set --project-ref TON-PROJET \
   RESEND_API_KEY=re_... \
-  EMAIL_FROM="DIMZ <onboarding@resend.dev>" \
+  EMAIL_FROM="DIMZ - Mon Copilote Auto <onboarding@resend.dev>" \
   APP_URL=https://dimz-backoffice.vercel.app
 ```
 
