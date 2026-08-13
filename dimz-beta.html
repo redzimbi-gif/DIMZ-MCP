@@ -694,6 +694,7 @@
   textarea { resize: vertical; min-height: 90px; }
 
   .choice-grid { display: flex; flex-wrap: wrap; gap: 9px; }
+  .choice-grid-scroll { max-height: 220px; overflow-y: auto; padding: 4px 4px 4px 0; align-content: flex-start; }
   .choice-grid label {
     position: relative;
     display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--line);
@@ -1292,52 +1293,81 @@
 
               <div class="form-step">
                 <figure class="feature-photo" style="margin:0 0 20px;"><img src="img/vehicule-recharge.jpg" alt="Recharge d'un véhicule électrique" loading="lazy" width="1200" height="798"></figure>
-                <h3>Véhicules souhaités</h3>
-                <div class="field hint" style="margin-bottom:14px;">Choisissez une ou plusieurs pistes : marque, modèle, puis génération, parmi une trentaine de marques.</div>
-                <div id="vehicule-list"></div>
-                <div id="vehicule-bubbles" class="veh-bubbles"></div>
-                <button type="button" class="add-vehicle" id="add-vehicle">+ Ajouter un véhicule</button>
+                <h3>La voiture de vos rêves</h3>
 
-                <div class="field-grid" style="margin-top:26px;">
-                  <div class="field hint full">Décrivez le véhicule que vous recherchez :</div>
-                  <div class="field full">
-                    <label>Type de carrosserie souhaité</label>
-                    <div class="choice-grid" id="carrosserie-choices">
-                      <label data-tooltip="Petite voiture compacte et maniable, parfaite en ville. Ex. : Renault Twingo, Citroën C1, Peugeot 108."><input type="checkbox" value="citadine"> Citadine</label>
-                      <label data-tooltip="Plus grande qu'une citadine mais plus courte qu'une berline, 5 portes polyvalentes pour la ville comme la route. Ex. : Renault Clio, Peugeot 208, Volkswagen Golf."><input type="checkbox" value="compacte"> Compacte</label>
-                      <label data-tooltip="4 portes avec un coffre séparé, confortable pour la route. Ex. : Peugeot 508, Toyota Corolla, Škoda Octavia."><input type="checkbox" value="berline"> Berline</label>
-                      <label data-tooltip="Comme une berline mais avec un grand coffre, idéale pour les familles ou les longs trajets. Ex. : Peugeot 308 SW, Renault Mégane Estate."><input type="checkbox" value="break"> Break</label>
-                      <label data-tooltip="Position de conduite haute, look robuste, bon compromis ville/route. Ex. : Peugeot 3008, Renault Captur, Dacia Duster."><input type="checkbox" value="suv"> SUV</label>
-                      <label data-tooltip="Habitacle spacieux et modulable, souvent 5 à 7 places, pensé pour les familles. Ex. : Renault Scénic, Citroën Berlingo, Peugeot 5008."><input type="checkbox" value="monospace"> Monospace</label>
-                      <label data-tooltip="2 portes, silhouette sportive, plus tournée vers le plaisir de conduite que la praticité. Ex. : Audi A5 Coupé, BMW Série 4."><input type="checkbox" value="coupe"> Coupé</label>
-                      <label data-tooltip="Toit décapotable, souvent 2 places, pour le plaisir en beaux jours. Ex. : Mini Cabriolet, Audi A3 Cabriolet."><input type="checkbox" value="cabriolet"> Cabriolet</label>
-                      <label data-tooltip="Véhicule pensé pour le transport de matériel ou marchandises. Ex. : Renault Kangoo, Citroën Berlingo utilitaire."><input type="checkbox" value="utilitaire"> Utilitaire</label>
+                <div class="field full">
+                  <label>Avez-vous déjà une ou plusieurs voitures précises en tête ?</label>
+                  <div class="choice-grid" id="modele-connu-choices">
+                    <label><input type="radio" name="a-modele-connu" value="oui"> Oui, j'ai des pistes précises</label>
+                    <label><input type="radio" name="a-modele-connu" value="non"> Non, pas encore</label>
+                  </div>
+                </div>
+
+                <div id="modele-oui-block" hidden style="margin-top:22px;">
+                  <div class="field hint" style="margin-bottom:14px;">Choisissez une ou plusieurs pistes : marque, modèle, puis génération, parmi une trentaine de marques.</div>
+                  <div id="vehicule-list"></div>
+                  <div id="vehicule-bubbles" class="veh-bubbles"></div>
+                  <button type="button" class="add-vehicle" id="add-vehicle">+ Ajouter un véhicule</button>
+
+                  <div class="field-grid" style="margin-top:26px;">
+                    <div class="field full">
+                      <label>Boîte de vitesses souhaitée</label>
+                      <div class="choice-grid" id="transmission-choices-oui">
+                        <label><input type="checkbox" value="automatique"> Automatique</label>
+                        <label><input type="checkbox" value="manuelle"> Manuelle</label>
+                        <label><input type="checkbox" value="peu-importe"> Peu importe</label>
+                      </div>
                     </div>
                   </div>
-                  <div class="field full">
-                    <label>Énergie du véhicule</label>
-                    <div class="choice-grid" id="energie-choices">
-                      <label><input type="checkbox" value="essence"> Essence</label>
-                      <label><input type="checkbox" value="diesel"> Diesel</label>
-                      <label data-tooltip="Le moteur électrique assiste le moteur thermique (accélération, redémarrages) mais ne roule jamais seul. Pas de prise à brancher, autonomie illimitée."><input type="checkbox" value="hybride"> Hybride (MHEV)</label>
-                      <label data-tooltip="Se branche sur une prise et roule plusieurs dizaines de km en 100 % électrique, puis bascule sur le moteur thermique pour les longs trajets."><input type="checkbox" value="hybride-rechargeable"> Hybride rechargeable (PHEV)</label>
-                      <label><input type="checkbox" value="electrique"> Électrique</label>
-                      <label><input type="checkbox" value="peu-importe"> Peu importe</label>
+                </div>
+
+                <div id="modele-non-block" hidden style="margin-top:22px;">
+                  <div class="field hint" style="margin-bottom:14px;">Décrivez-nous le véhicule de vos rêves :</div>
+                  <div class="field-grid">
+                    <div class="field full">
+                      <label>Type de carrosserie souhaité</label>
+                      <div class="choice-grid" id="carrosserie-choices">
+                        <label data-tooltip="Petite voiture compacte et maniable, parfaite en ville. Ex. : Renault Twingo, Citroën C1, Peugeot 108."><input type="checkbox" value="citadine"> Citadine</label>
+                        <label data-tooltip="Plus grande qu'une citadine mais plus courte qu'une berline, 5 portes polyvalentes pour la ville comme la route. Ex. : Renault Clio, Peugeot 208, Volkswagen Golf."><input type="checkbox" value="compacte"> Compacte</label>
+                        <label data-tooltip="4 portes avec un coffre séparé, confortable pour la route. Ex. : Peugeot 508, Toyota Corolla, Škoda Octavia."><input type="checkbox" value="berline"> Berline</label>
+                        <label data-tooltip="Comme une berline mais avec un grand coffre, idéale pour les familles ou les longs trajets. Ex. : Peugeot 308 SW, Renault Mégane Estate."><input type="checkbox" value="break"> Break</label>
+                        <label data-tooltip="Position de conduite haute, look robuste, bon compromis ville/route. Ex. : Peugeot 3008, Renault Captur, Dacia Duster."><input type="checkbox" value="suv"> SUV</label>
+                        <label data-tooltip="Habitacle spacieux et modulable, souvent 5 à 7 places, pensé pour les familles. Ex. : Renault Scénic, Citroën Berlingo, Peugeot 5008."><input type="checkbox" value="monospace"> Monospace</label>
+                        <label data-tooltip="2 portes, silhouette sportive, plus tournée vers le plaisir de conduite que la praticité. Ex. : Audi A5 Coupé, BMW Série 4."><input type="checkbox" value="coupe"> Coupé</label>
+                        <label data-tooltip="Toit décapotable, souvent 2 places, pour le plaisir en beaux jours. Ex. : Mini Cabriolet, Audi A3 Cabriolet."><input type="checkbox" value="cabriolet"> Cabriolet</label>
+                        <label data-tooltip="Véhicule pensé pour le transport de matériel ou marchandises. Ex. : Renault Kangoo, Citroën Berlingo utilitaire."><input type="checkbox" value="utilitaire"> Utilitaire</label>
+                      </div>
+                    </div>
+                    <div class="field full">
+                      <label>Énergie du véhicule</label>
+                      <div class="choice-grid" id="energie-choices">
+                        <label><input type="checkbox" value="essence"> Essence</label>
+                        <label><input type="checkbox" value="diesel"> Diesel</label>
+                        <label data-tooltip="Le moteur électrique assiste le moteur thermique (accélération, redémarrages) mais ne roule jamais seul. Pas de prise à brancher, autonomie illimitée."><input type="checkbox" value="hybride"> Hybride (MHEV)</label>
+                        <label data-tooltip="Se branche sur une prise et roule plusieurs dizaines de km en 100 % électrique, puis bascule sur le moteur thermique pour les longs trajets."><input type="checkbox" value="hybride-rechargeable"> Hybride rechargeable (PHEV)</label>
+                        <label><input type="checkbox" value="electrique"> Électrique</label>
+                        <label><input type="checkbox" value="peu-importe"> Peu importe</label>
+                      </div>
+                    </div>
+                    <div class="field full">
+                      <label>Boîte de vitesses souhaitée</label>
+                      <div class="choice-grid" id="transmission-choices-non">
+                        <label><input type="checkbox" value="automatique"> Automatique</label>
+                        <label><input type="checkbox" value="manuelle"> Manuelle</label>
+                        <label><input type="checkbox" value="peu-importe"> Peu importe</label>
+                      </div>
+                    </div>
+                    <div class="field full">
+                      <label>Marque préférée <span class="hint">(plusieurs choix possibles)</span></label>
+                      <div class="choice-grid choice-grid-scroll" id="marque-preferee-choices"></div>
                     </div>
                   </div>
-                  <div class="field full">
-                    <label>Boîte de vitesses souhaitée</label>
-                    <div class="choice-grid" id="transmission-choices">
-                      <label><input type="checkbox" value="automatique"> Automatique</label>
-                      <label><input type="checkbox" value="manuelle"> Manuelle</label>
-                      <label><input type="checkbox" value="peu-importe"> Peu importe</label>
-                    </div>
-                  </div>
-                  <div class="field full">
-                    <label for="a-veh-absente-desc">Vous ne trouvez pas votre bonheur, ou vous ne savez pas encore ce que vous voulez ?</label>
-                    <div class="field hint" style="margin:-6px 0 8px;">Décrivez-nous ce que vous avez en tête, même une idée floue — usage, budget, style — et votre copilote vous aide à trouver la bonne piste.</div>
-                    <textarea id="a-veh-absente-desc" placeholder="Ex. : une Golf GTI récente, boîte manuelle… ou simplement votre usage et votre budget si vous hésitez encore."></textarea>
-                  </div>
+                </div>
+
+                <div class="field full" style="margin-top:26px;">
+                  <label for="a-veh-remarques">Une remarque, une envie particulière à nous glisser ?</label>
+                  <div class="field hint" style="margin:-6px 0 8px;">Un détail qui compte pour vous, une contrainte, un coup de cœur… tout ce qui peut aider votre copilote à viser juste.</div>
+                  <textarea id="a-veh-remarques" placeholder="Ex. : un grand coffre pour la poussette, une couleur en particulier, un modèle à éviter…"></textarea>
                 </div>
               </div>
 
@@ -3327,6 +3357,35 @@
   document.getElementById('add-vehicle').addEventListener('click', addVehicleRow);
   addVehicleRow();
 
+  // ---------- Marque préférée (étape "La voiture de vos rêves", bloc "Non") ----------
+  var marquePrefereeChoices = document.getElementById('marque-preferee-choices');
+  marquePrefereeChoices.innerHTML = Object.keys(VEHICLE_DATA).map(function (b) {
+    return '<label><input type="checkbox" value="' + b + '"> ' + b + '</label>';
+  }).join('');
+
+  // ---------- Bascule "Avez-vous déjà une ou plusieurs voitures précises en tête ?" ----------
+  var modeleOuiBlock = document.getElementById('modele-oui-block');
+  var modeleNonBlock = document.getElementById('modele-non-block');
+  function resetModeleOuiBlock() {
+    document.querySelectorAll('#vehicule-list .veh-row').forEach(function (row) { row.remove(); });
+    vehicleCount = 0;
+    addVehicleRow();
+    document.querySelectorAll('#transmission-choices-oui input').forEach(function (el) { el.checked = false; });
+    renderVehicleBubbles();
+  }
+  function resetModeleNonBlock() {
+    document.querySelectorAll('#carrosserie-choices input, #energie-choices input, #transmission-choices-non input, #marque-preferee-choices input')
+      .forEach(function (el) { el.checked = false; });
+  }
+  document.querySelectorAll('input[name="a-modele-connu"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      var showOui = this.value === 'oui';
+      modeleOuiBlock.hidden = !showOui;
+      modeleNonBlock.hidden = showOui;
+      if (showOui) resetModeleNonBlock(); else resetModeleOuiBlock();
+    });
+  });
+
   // ---------- Sélecteur du véhicule actuel (étape "Situation actuelle") ----------
   var actuelMarque = document.getElementById('a-actuel-marque');
   var actuelModele = document.getElementById('a-actuel-modele');
@@ -3584,13 +3643,19 @@
 
     var bubbles = document.querySelectorAll('#vehicule-bubbles .veh-bubble');
     var vehText = bubbles.length ? Array.prototype.map.call(bubbles, function (b) { return b.textContent.trim(); }).join(' · ') : '';
-    groups.push({ title: 'Véhicules souhaités', step: 4, rows: [
-      recapRow('Véhicules ciblés', vehText),
-      recapRow('Carrosserie souhaitée', recapCheckedList('#carrosserie-choices input')),
+    var modeleConnu = radioValue('a-modele-connu');
+    var vehiculesRows = modeleConnu === 'non' ? [
+      recapRow('Type de carrosserie souhaité', recapCheckedList('#carrosserie-choices input')),
       recapRow('Énergie souhaitée', recapCheckedList('#energie-choices input')),
-      recapRow('Boîte de vitesses souhaitée', recapCheckedList('#transmission-choices input')),
-      recapRow('Véhicule non trouvé dans la liste', inputVal('a-veh-absente-desc'))
-    ].filter(Boolean) });
+      recapRow('Boîte de vitesses souhaitée', recapCheckedList('#transmission-choices-non input')),
+      recapRow('Marque préférée', recapCheckedList('#marque-preferee-choices input'))
+    ] : [
+      recapRow('Véhicules ciblés', vehText),
+      recapRow('Boîte de vitesses souhaitée', recapCheckedList('#transmission-choices-oui input'))
+    ];
+    groups.push({ title: 'La voiture de vos rêves', step: 4, rows: vehiculesRows.concat([
+      recapRow('Remarques', inputVal('a-veh-remarques'))
+    ]).filter(Boolean) });
 
     var OFFRE_RAPPELS = {
       conseil: 'Découverte — un formulaire, au moins 3 véhicules proposés et des conseils personnalisés. Gratuit.',
@@ -4161,6 +4226,8 @@
         vehicleCount = 0;
         addVehicleRow();
         renderVehicleBubbles();
+        document.getElementById('modele-oui-block').hidden = true;
+        document.getElementById('modele-non-block').hidden = true;
       }
       if (btn.dataset.reset === 'form-convoyage') {
         immatInput.required = true;
