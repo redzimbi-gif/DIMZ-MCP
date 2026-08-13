@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { Download, FileText } from "lucide-react";
+import { Download, FileText, Archive, ArchiveRestore, Trash2 } from "lucide-react";
 import { listAllDocuments, listAllDossierContrats } from "@/lib/queries";
 import { getSignedUrls } from "@/lib/storage";
-import { Card, PageHeader, EmptyState, Badge } from "@/components/ui";
+import { Card, PageHeader, EmptyState, Badge, LinkButton, ConfirmSubmitButton } from "@/components/ui";
 import { DOCUMENT_TYPE_LABELS, CONTRAT_TYPE_LABELS, CONTRAT_STATUT_LABELS } from "@/lib/types";
 import { formatDate } from "@/lib/format";
+import { archiverDocument, reactiverDocument, supprimerDocument } from "../dossiers/[id]/documents-actions";
 
 const CONTRAT_STATUT_TONE: Record<string, "warn" | "good" | "neutral"> = {
   a_signer: "warn",
@@ -12,8 +13,16 @@ const CONTRAT_STATUT_TONE: Record<string, "warn" | "good" | "neutral"> = {
   archive: "neutral",
 };
 
-export default async function DocumentsPage() {
-  const [documents, contrats] = await Promise.all([listAllDocuments(), listAllDossierContrats()]);
+export default async function DocumentsPage({
+  searchParams,
+}: {
+  searchParams: { archives?: string };
+}) {
+  const showArchives = searchParams.archives === "1";
+  const [documents, contrats] = await Promise.all([
+    listAllDocuments({ archived: showArchives }),
+    listAllDossierContrats(),
+  ]);
   const urls = await getSignedUrls(documents.map((d) => d.storage_path));
 
   return (
@@ -65,43 +74,84 @@ export default async function DocumentsPage() {
         )}
       </Card>
 
-      <h2 className="text-sm font-semibold text-ink mb-3">Fichiers uploadés</h2>
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-sm font-semibold text-ink">Fichiers uploadés</h2>
+        <LinkButton href={showArchives ? "/documents" : "/documents?archives=1"} variant="outline">
+          <Archive className="h-4 w-4" /> {showArchives ? "Retour aux fichiers actifs" : "Voir les archives"}
+        </LinkButton>
+      </div>
       <Card>
         {documents.length === 0 ? (
-          <EmptyState title="Aucun document" />
+          <EmptyState title={showArchives ? "Aucun document archivé" : "Aucun document"} />
         ) : (
           <ul className="divide-y divide-line">
-            {documents.map((d) => (
-              <li key={d.id} className="flex items-center justify-between px-5 py-3.5">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-ink truncate">{d.nom}</p>
-                  <p className="text-xs text-ink-soft mt-0.5">
-                    {d.dossiers ? (
-                      <Link href={`/dossiers/${d.dossier_id}?tab=documents`} className="hover:text-blue-600">
-                        {d.dossiers.reference}
-                      </Link>
+            {documents.map((d) => {
+              const archiverAction = archiverDocument.bind(null, d.dossier_id ?? "", d.id);
+              const reactiverAction = reactiverDocument.bind(null, d.dossier_id ?? "", d.id);
+              const supprimerAction = supprimerDocument.bind(null, d.dossier_id ?? "", d.id);
+              return (
+                <li key={d.id} className="flex items-center justify-between px-5 py-3.5">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-ink truncate">{d.nom}</p>
+                    <p className="text-xs text-ink-soft mt-0.5">
+                      {d.dossiers ? (
+                        <Link href={`/dossiers/${d.dossier_id}?tab=documents`} className="hover:text-blue-600">
+                          {d.dossiers.reference}
+                        </Link>
+                      ) : null}
+                      {d.clients ? ` · ${d.clients.prenom} ${d.clients.nom}` : ""}
+                      {" · "}
+                      {formatDate(d.created_at)}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0 ml-3">
+                    <Badge>{DOCUMENT_TYPE_LABELS[d.type]}</Badge>
+                    {urls[d.storage_path] ? (
+                      <a
+                        href={urls[d.storage_path]}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="p-1.5 rounded-md text-ink-soft hover:text-blue-600 hover:bg-blue-50"
+                        aria-label="Télécharger"
+                      >
+                        <Download className="h-4 w-4" />
+                      </a>
                     ) : null}
-                    {d.clients ? ` · ${d.clients.prenom} ${d.clients.nom}` : ""}
-                    {" · "}
-                    {formatDate(d.created_at)}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3 shrink-0 ml-3">
-                  <Badge>{DOCUMENT_TYPE_LABELS[d.type]}</Badge>
-                  {urls[d.storage_path] ? (
-                    <a
-                      href={urls[d.storage_path]}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="p-1.5 rounded-md text-ink-soft hover:text-blue-600 hover:bg-blue-50"
-                      aria-label="Télécharger"
-                    >
-                      <Download className="h-4 w-4" />
-                    </a>
-                  ) : null}
-                </div>
-              </li>
-            ))}
+                    {showArchives ? (
+                      <form action={reactiverAction}>
+                        <button
+                          type="submit"
+                          className="p-1.5 rounded-md text-ink-soft hover:text-blue-600 hover:bg-blue-50"
+                          aria-label="Désarchiver"
+                        >
+                          <ArchiveRestore className="h-4 w-4" />
+                        </button>
+                      </form>
+                    ) : (
+                      <form action={archiverAction}>
+                        <button
+                          type="submit"
+                          className="p-1.5 rounded-md text-ink-soft hover:text-blue-600 hover:bg-blue-50"
+                          aria-label="Archiver"
+                        >
+                          <Archive className="h-4 w-4" />
+                        </button>
+                      </form>
+                    )}
+                    <form action={supprimerAction}>
+                      <ConfirmSubmitButton
+                        variant="ghost"
+                        className="!p-1.5 text-ink-soft hover:text-bad hover:bg-bad-bg"
+                        confirmMessage={`Supprimer définitivement « ${d.nom} » ? Cette action est irréversible.`}
+                        aria-label="Supprimer"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </ConfirmSubmitButton>
+                    </form>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
       </Card>

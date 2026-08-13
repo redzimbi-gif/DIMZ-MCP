@@ -295,12 +295,13 @@ export async function getConvoyage(id: string) {
   return data as (Convoyage & { dossiers: any }) | null;
 }
 
-export async function getDossierDocuments(dossierId: string) {
+export async function getDossierDocuments(dossierId: string, options?: { archived?: boolean }) {
   const db = createAdminClient();
   const { data } = await db
     .from("documents")
     .select("*")
     .eq("dossier_id", dossierId)
+    .eq("archive", options?.archived ?? false)
     .order("created_at", { ascending: false });
   return (data ?? []) as DocumentRow[];
 }
@@ -371,11 +372,12 @@ export async function listAllDossierContrats() {
   return (data ?? []) as (DossierContrat & { dossiers: any })[];
 }
 
-export async function listAllDocuments() {
+export async function listAllDocuments(options?: { archived?: boolean }) {
   const db = createAdminClient();
   const { data } = await db
     .from("documents")
     .select("*, dossiers(reference), clients(nom, prenom)")
+    .eq("archive", options?.archived ?? false)
     .order("created_at", { ascending: false });
   return (data ?? []) as (DocumentRow & { dossiers: any; clients: any })[];
 }

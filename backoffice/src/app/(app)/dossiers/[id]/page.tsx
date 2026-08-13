@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { clsx } from "clsx";
-import { Plus, Star, ExternalLink, Trash2, Mail, PenLine, FileDown, Archive, ArchiveRestore } from "lucide-react";
+import { Plus, Star, ExternalLink, Trash2, Mail, PenLine, FileDown, Archive, ArchiveRestore, Download } from "lucide-react";
 import {
   getDossier,
   getDossierHistory,
@@ -42,6 +42,7 @@ import {
   type DossierOffre,
 } from "@/lib/types";
 import { CONTRAT_CHAMPS } from "@/lib/contrats";
+import { getSignedUrls } from "@/lib/storage";
 import { getEtapesOffre, getOffreAccompagnement, getEtapeLabel, ETAPES_CONVOYAGE } from "@/lib/etapes";
 import { formatCurrency, formatDate, formatDateTime, formatRelative } from "@/lib/format";
 import {
@@ -64,7 +65,7 @@ import {
   sendFicheDecouverteEmail,
   updateFicheDecouverteIntro,
 } from "./decouverte-actions";
-import { uploadDossierDocument } from "./documents-actions";
+import { uploadDossierDocument, archiverDocument, reactiverDocument, supprimerDocument } from "./documents-actions";
 import { generateContrat, marquerContratSigne, archiverContrat, reactiverContrat } from "./contrats-actions";
 
 const OFFRES_ACCOMPAGNEMENT = ["decouverte", "copilote", "copilote_plus", "expertise_seule"] as const;
@@ -94,7 +95,7 @@ export default async function DossierDetailPage({
   searchParams,
 }: {
   params: { id: string };
-  searchParams: { tab?: string; notif?: string; error?: string };
+  searchParams: { tab?: string; notif?: string; error?: string; archives?: string };
 }) {
   const dossier = await getDossier(params.id);
   if (!dossier) notFound();
@@ -394,7 +395,11 @@ export default async function DossierDetailPage({
       {tab === "convoyage" ? <ConvoyageTab dossierId={dossier.id} /> : null}
 
       {tab === "documents" ? (
-        <DocumentsTab dossierId={dossier.id} uploadDocAction={uploadDocAction} />
+        <DocumentsTab
+          dossierId={dossier.id}
+          uploadDocAction={uploadDocAction}
+          showArchives={searchParams.archives === "1"}
+        />
       ) : null}
 
       {tab === "contrats" ? <ContratsTab dossierId={dossier.id} /> : null}
@@ -836,25 +841,85 @@ async function ConvoyageTab({ dossierId }: { dossierId: string }) {
 async function DocumentsTab({
   dossierId,
   uploadDocAction,
+  showArchives,
 }: {
   dossierId: string;
   uploadDocAction: (formData: FormData) => Promise<void>;
+  showArchives: boolean;
 }) {
-  const documents = await getDossierDocuments(dossierId);
+  const documents = await getDossierDocuments(dossierId, { archived: showArchives });
+  const urls = await getSignedUrls(documents.map((d) => d.storage_path));
   return (
     <div className="grid lg:grid-cols-3 gap-4">
       <div className="lg:col-span-2">
+        <div className="flex items-center justify-end mb-3">
+          <LinkButton
+            href={showArchives ? `/dossiers/${dossierId}?tab=documents` : `/dossiers/${dossierId}?tab=documents&archives=1`}
+            variant="outline"
+          >
+            <Archive className="h-4 w-4" /> {showArchives ? "Retour aux fichiers actifs" : "Voir les archives"}
+          </LinkButton>
+        </div>
         <Card>
           {documents.length === 0 ? (
-            <EmptyState title="Aucun document pour ce dossier" />
+            <EmptyState title={showArchives ? "Aucun document archivé" : "Aucun document pour ce dossier"} />
           ) : (
             <ul className="divide-y divide-line">
-              {documents.map((d) => (
-                <li key={d.id} className="px-5 py-3.5 flex items-center justify-between">
-                  <span className="text-sm text-ink">{d.nom}</span>
-                  <Badge>{DOCUMENT_TYPE_LABELS[d.type]}</Badge>
-                </li>
-              ))}
+              {documents.map((d) => {
+                const archiverAction = archiverDocument.bind(null, dossierId, d.id);
+                const reactiverAction = reactiverDocument.bind(null, dossierId, d.id);
+                const supprimerAction = supprimerDocument.bind(null, dossierId, d.id);
+                return (
+                  <li key={d.id} className="px-5 py-3.5 flex items-center justify-between gap-3">
+                    <span className="text-sm text-ink truncate">{d.nom}</span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <Badge>{DOCUMENT_TYPE_LABELS[d.type]}</Badge>
+                      {urls[d.storage_path] ? (
+                        <a
+                          href={urls[d.storage_path]}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="p-1.5 rounded-md text-ink-soft hover:text-blue-600 hover:bg-blue-50"
+                          aria-label="Télécharger"
+                        >
+                          <Download className="h-4 w-4" />
+                        </a>
+                      ) : null}
+                      {showArchives ? (
+                        <form action={reactiverAction}>
+                          <button
+                            type="submit"
+                            className="p-1.5 rounded-md text-ink-soft hover:text-blue-600 hover:bg-blue-50"
+                            aria-label="Désarchiver"
+                          >
+                            <ArchiveRestore className="h-4 w-4" />
+                          </button>
+                        </form>
+                      ) : (
+                        <form action={archiverAction}>
+                          <button
+                            type="submit"
+                            className="p-1.5 rounded-md text-ink-soft hover:text-blue-600 hover:bg-blue-50"
+                            aria-label="Archiver"
+                          >
+                            <Archive className="h-4 w-4" />
+                          </button>
+                        </form>
+                      )}
+                      <form action={supprimerAction}>
+                        <ConfirmSubmitButton
+                          variant="ghost"
+                          className="!p-1.5 text-ink-soft hover:text-bad hover:bg-bad-bg"
+                          confirmMessage={`Supprimer définitivement « ${d.nom} » ? Cette action est irréversible.`}
+                          aria-label="Supprimer"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </ConfirmSubmitButton>
+                      </form>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </Card>

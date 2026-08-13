@@ -307,6 +307,7 @@ export interface DocumentRow {
   storage_path: string;
   taille: number | null;
   uploaded_by: string | null;
+  archive: boolean;
   created_at: string;
 }
 
