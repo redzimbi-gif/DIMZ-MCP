@@ -23,7 +23,7 @@ export function ScoreRing({ value, size = 60, fontSize = 13 }: Props) {
           stroke="#2f6fed"
           strokeWidth={strokeWidth}
           fill="none"
-          strokeDasharray={`${filled} ${circumference}`}
+          strokeDasharray={`${filled}, ${circumference}`}
           strokeLinecap="round"
         />
       </Svg>
