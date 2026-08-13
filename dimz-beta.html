@@ -676,8 +676,9 @@
 
   .form-step h3 { font-size: 1.22rem; margin-bottom: 24px; }
 
-  .form-nav { display: flex; justify-content: space-between; align-items: center; padding-top: 32px; margin-top: 8px; border-top: 1px solid var(--line); }
+  .form-nav { display: flex; justify-content: space-between; align-items: center; padding-top: 32px; margin-top: 8px; border-top: 1px solid var(--line); flex-wrap: wrap; gap: 10px; }
   .form-nav .spacer { flex: 1; }
+  @media (max-width: 480px) { .form-nav .spacer { flex-basis: 100%; height: 0; } }
   .field-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
   @media (max-width: 560px) { .field-grid { grid-template-columns: 1fr; } }
   .field { display: flex; flex-direction: column; gap: 7px; }
@@ -775,7 +776,7 @@
     background: color-mix(in srgb, var(--bleu-vif) 10%, var(--bg)); border-radius: 8px; padding: 5px 0;
   }
 
-  .veh-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto; gap: 12px; align-items: end; margin-bottom: 14px; }
+  .veh-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 12px; align-items: end; margin-bottom: 14px; }
   @media (max-width: 960px) { .veh-row { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 560px) { .veh-row { grid-template-columns: 1fr; } }
   .veh-row .field { margin: 0; }
@@ -1396,6 +1397,7 @@
               <div class="form-nav">
                 <button type="button" class="btn btn-outline" id="acc-back" hidden>Précédent</button>
                 <span class="spacer"></span>
+                <button type="button" class="btn btn-outline" id="acc-recap-return" hidden>Retour au récapitulatif</button>
                 <button type="button" class="btn btn-primary" id="acc-next">Continuer</button>
                 <button type="submit" class="btn btn-primary" id="acc-submit" hidden>Envoyer à mon copilote</button>
               </div>
@@ -2215,6 +2217,7 @@
           <div class="form-nav">
             <button type="button" class="btn btn-outline" id="cvg-back" hidden>Précédent</button>
             <span class="spacer"></span>
+            <button type="button" class="btn btn-outline" id="cvg-recap-return" hidden>Retour au récapitulatif</button>
             <button type="button" class="btn btn-primary" id="cvg-next">Continuer</button>
             <button type="submit" class="btn btn-primary" id="cvg-submit" hidden>Envoyer ma demande de convoyage</button>
           </div>
@@ -3210,54 +3213,6 @@
     return options;
   }
 
-  // Appellations moteur réelles par constructeur (gamme essence/diesel/hybride), pour proposer des motorisations plausibles
-  var MOTOR_FAMILIES = {
-    "Peugeot": { "Essence": "PureTech", "Diesel": "BlueHDi", "Hybride": "Hybrid", "Hybride rechargeable": "Hybrid4" },
-    "Citroën": { "Essence": "PureTech", "Diesel": "BlueHDi", "Hybride": "Hybrid", "Hybride rechargeable": "Hybrid" },
-    "DS Automobiles": { "Essence": "PureTech", "Diesel": "BlueHDi", "Hybride": "E-Tense", "Hybride rechargeable": "E-Tense" },
-    "Renault": { "Essence": "TCe", "Diesel": "dCi", "Hybride": "E-Tech Hybrid", "Hybride rechargeable": "E-Tech Plug-in" },
-    "Dacia": { "Essence": "TCe", "Diesel": "Blue dCi", "Hybride": "Hybrid", "Hybride rechargeable": "Hybrid" },
-    "Volkswagen": { "Essence": "TSI", "Diesel": "TDI", "Hybride": "eHybrid", "Hybride rechargeable": "eHybrid" },
-    "Audi": { "Essence": "TFSI", "Diesel": "TDI", "Hybride": "TFSI mild-hybrid", "Hybride rechargeable": "TFSI e" },
-    "Seat": { "Essence": "TSI", "Diesel": "TDI", "Hybride": "eHybrid", "Hybride rechargeable": "eHybrid" },
-    "Cupra": { "Essence": "TSI", "Diesel": "TDI", "Hybride": "eHybrid", "Hybride rechargeable": "eHybrid" },
-    "Škoda": { "Essence": "TSI", "Diesel": "TDI", "Hybride": "iV", "Hybride rechargeable": "iV" },
-    "Ford": { "Essence": "EcoBoost", "Diesel": "EcoBlue", "Hybride": "Hybrid", "Hybride rechargeable": "Plug-In Hybrid" },
-    "Fiat": { "Essence": "FireFly", "Diesel": "MultiJet", "Hybride": "Hybrid", "Hybride rechargeable": "Hybrid" },
-    "Toyota": { "Essence": "Valvematic", "Diesel": "D-4D", "Hybride": "Hybrid", "Hybride rechargeable": "Plug-in Hybrid" },
-    "Nissan": { "Essence": "DIG-T", "Diesel": "dCi", "Hybride": "e-Power", "Hybride rechargeable": "e-Power" },
-    "Hyundai": { "Essence": "T-GDi", "Diesel": "CRDi", "Hybride": "Hybrid", "Hybride rechargeable": "Plug-in Hybrid" },
-    "Kia": { "Essence": "T-GDi", "Diesel": "CRDi", "Hybride": "Hybrid", "Hybride rechargeable": "Plug-in Hybrid" },
-    "Mazda": { "Essence": "Skyactiv-G", "Diesel": "Skyactiv-D", "Hybride": "e-Skyactiv Hybrid", "Hybride rechargeable": "e-Skyactiv PHEV" },
-    "Honda": { "Essence": "i-VTEC", "Diesel": "i-DTEC", "Hybride": "e:HEV", "Hybride rechargeable": "e:HEV" },
-    "Suzuki": { "Essence": "Boosterjet", "Diesel": "DDiS", "Hybride": "Hybrid", "Hybride rechargeable": "Hybrid" },
-    "Land Rover": { "Essence": "Ingenium", "Diesel": "Ingenium", "Hybride": "Ingenium Hybrid", "Hybride rechargeable": "P400e" },
-    "Jaguar": { "Essence": "Ingenium", "Diesel": "Ingenium", "Hybride": "Ingenium Hybrid", "Hybride rechargeable": "P400e" },
-    "Alfa Romeo": { "Essence": "MultiAir", "Diesel": "MultiJet", "Hybride": "Hybrid", "Hybride rechargeable": "Q4 Plug-in" }
-  };
-
-  // Cylindrées / puissances usuelles par énergie, utilisées quand aucune appellation constructeur n'est connue
-  var MOTOR_POWERS = {
-    "Essence": [["1.0", "65-75"], ["1.2", "100"], ["1.2", "130"], ["1.6", "150"], ["2.0", "180-200"]],
-    "Diesel": [["1.5", "100-115"], ["1.6", "120"], ["2.0", "150"], ["2.0", "180-200"]],
-    "Hybride": [["1.6", "140"], ["1.8", "140"], ["2.0", "180-200"]],
-    "Hybride rechargeable": [["1.6", "180-225"], ["2.0", "250-300"]]
-  };
-
-  function motorisationOptions(brand, energie) {
-    if (energie === 'Peu importe / Je ne sais pas') return ['Peu importe / Je ne sais pas'];
-    if (energie === 'Électrique') {
-      return ['Moteur unique (propulsion ou traction)', 'Double moteur (transmission intégrale, plus puissant)', 'Peu importe / Je ne sais pas'];
-    }
-    var family = MOTOR_FAMILIES[brand] && MOTOR_FAMILIES[brand][energie];
-    var powers = MOTOR_POWERS[energie] || MOTOR_POWERS.Essence;
-    var options = powers.map(function (p) {
-      return family ? (p[0] + ' ' + family + ' ' + p[1] + 'ch') : (p[0] + ' (' + p[1] + ' ch)');
-    });
-    options.push('Peu importe / Je ne sais pas');
-    return options;
-  }
-
   function addVehicleRow() {
     if (vehicleCount >= MAX_VEHICLES) return;
     vehicleCount++;
@@ -3268,7 +3223,6 @@
       '<div class="field"><label>Modèle</label><select class="veh-modele" disabled><option value="">Choisir la marque d\'abord</option></select></div>' +
       '<div class="field"><label>Génération</label><select class="veh-generation" disabled><option value="">—</option></select></div>' +
       '<div class="field"><label>Énergie</label><select class="veh-energie" disabled><option value="">—</option></select></div>' +
-      '<div class="field"><label>Motorisation</label><select class="veh-motorisation" disabled><option value="">—</option></select></div>' +
       '<button type="button" class="veh-remove" aria-label="Retirer ce véhicule">✕</button>';
     vehicleList.appendChild(row);
     updateAddButton();
@@ -3288,11 +3242,10 @@
       var modele = row.querySelector('.veh-modele').value;
       var gen = row.querySelector('.veh-generation').value;
       var energie = row.querySelector('.veh-energie').value;
-      var moteur = row.querySelector('.veh-motorisation').value.trim();
       if (marque && modele && gen) {
         var bubble = document.createElement('span');
         bubble.className = 'veh-bubble';
-        var label = marque + ' ' + modele + ' · ' + gen + (energie ? ' · ' + energie : '') + (moteur ? ' · ' + moteur : '');
+        var label = marque + ' ' + modele + ' · ' + gen + (energie ? ' · ' + energie : '');
         bubble.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>' + label;
         container.appendChild(bubble);
       }
@@ -3306,12 +3259,9 @@
       var modeleSelect = row.querySelector('.veh-modele');
       var genSelect = row.querySelector('.veh-generation');
       var energieSelect = row.querySelector('.veh-energie');
-      var moteurInput = row.querySelector('.veh-motorisation');
       var brand = e.target.value;
       energieSelect.innerHTML = '<option value="">—</option>';
       energieSelect.disabled = true;
-      moteurInput.innerHTML = '<option value="">—</option>';
-      moteurInput.disabled = true;
       if (!brand) {
         modeleSelect.innerHTML = '<option value="">Choisir la marque d\'abord</option>';
         modeleSelect.disabled = true;
@@ -3332,12 +3282,9 @@
       var brand2 = row2.querySelector('.veh-marque').value;
       var genSelect2 = row2.querySelector('.veh-generation');
       var energieSelect2 = row2.querySelector('.veh-energie');
-      var moteurInput2 = row2.querySelector('.veh-motorisation');
       var model = e.target.value;
       energieSelect2.innerHTML = '<option value="">—</option>';
       energieSelect2.disabled = true;
-      moteurInput2.innerHTML = '<option value="">—</option>';
-      moteurInput2.disabled = true;
       if (!model) {
         genSelect2.innerHTML = '<option value="">—</option>';
         genSelect2.disabled = true;
@@ -3353,10 +3300,7 @@
       var row3 = e.target.closest('.veh-row');
       var model3 = row3.querySelector('.veh-modele').value;
       var energieSelect3 = row3.querySelector('.veh-energie');
-      var moteurInput3 = row3.querySelector('.veh-motorisation');
       var generation = e.target.value;
-      moteurInput3.innerHTML = '<option value="">—</option>';
-      moteurInput3.disabled = true;
       if (!generation) {
         energieSelect3.innerHTML = '<option value="">—</option>';
         energieSelect3.disabled = true;
@@ -3366,22 +3310,6 @@
           return '<option value="' + en + '">' + en + '</option>';
         }).join('');
         energieSelect3.disabled = false;
-      }
-    }
-    if (e.target.classList.contains('veh-energie')) {
-      var row4 = e.target.closest('.veh-row');
-      var moteurInput4 = row4.querySelector('.veh-motorisation');
-      var brand4 = row4.querySelector('.veh-marque').value;
-      var energie4 = e.target.value;
-      if (!energie4) {
-        moteurInput4.innerHTML = '<option value="">—</option>';
-        moteurInput4.disabled = true;
-      } else {
-        var motorisations = motorisationOptions(brand4, energie4);
-        moteurInput4.innerHTML = '<option value="">Motorisation…</option>' + motorisations.map(function (mo) {
-          return '<option value="' + mo + '">' + mo + '</option>';
-        }).join('');
-        moteurInput4.disabled = false;
       }
     }
     renderVehicleBubbles();
@@ -3454,6 +3382,8 @@
     var backBtn = document.getElementById(opts.backId);
     var nextBtn = document.getElementById(opts.nextId);
     var submitBtn = document.getElementById(opts.submitId);
+    var recapReturnBtn = opts.recapReturnId ? document.getElementById(opts.recapReturnId) : null;
+    var cameFromRecap = false;
 
     function applyVisibility() {
       steps.forEach(function (s, i) {
@@ -3467,6 +3397,8 @@
       nextBtn.hidden = isLast;
       submitBtn.hidden = !isLast;
       submitBtn.disabled = !isLast;
+      if (isLast) cameFromRecap = false;
+      if (recapReturnBtn) recapReturnBtn.hidden = isLast || !cameFromRecap;
       var fullscreen = current > 0;
       if (fullscreen && card.parentNode !== document.body) {
         document.body.appendChild(card);
@@ -3521,10 +3453,17 @@
       }
     });
 
+    if (recapReturnBtn) {
+      recapReturnBtn.addEventListener('click', function () {
+        if (!form.reportValidity()) return;
+        goToStep(total - 1);
+      });
+    }
+
     render();
     return {
-      reset: function () { current = 0; applyVisibility(); },
-      goTo: function (i) { goToStep(i); }
+      reset: function () { current = 0; cameFromRecap = false; applyVisibility(); },
+      goTo: function (i) { cameFromRecap = true; goToStep(i); }
     };
   }
 
@@ -3960,7 +3899,7 @@
 
   wizards['form-accompagnement'] = setupWizard({
     formId: 'form-accompagnement', fillId: 'acc-progress-fill', currentId: 'acc-step-current',
-    backId: 'acc-back', nextId: 'acc-next', submitId: 'acc-submit',
+    backId: 'acc-back', nextId: 'acc-next', submitId: 'acc-submit', recapReturnId: 'acc-recap-return',
     onLast: function () { renderRecap('acc-recap', buildRecapAccompagnement()); }
   });
 
@@ -3976,7 +3915,7 @@
   })();
   wizards['form-convoyage'] = setupWizard({
     formId: 'form-convoyage', fillId: 'cvg-progress-fill', currentId: 'cvg-step-current',
-    backId: 'cvg-back', nextId: 'cvg-next', submitId: 'cvg-submit',
+    backId: 'cvg-back', nextId: 'cvg-next', submitId: 'cvg-submit', recapReturnId: 'cvg-recap-return',
     onLast: function () { renderRecap('cvg-recap', buildRecapConvoyage()); }
   });
   wizards['form-test'] = setupWizard({
