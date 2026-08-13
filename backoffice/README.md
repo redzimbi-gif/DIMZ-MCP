@@ -224,7 +224,12 @@ l'email de confirmation si le client a renseigné son adresse.
   remplies, statut À signer → Signé → Archivé, dates de génération et de
   signature. Les informations légales de l'entreprise (SIRET, adresse,
   médiateur…) se règlent une fois dans **Paramètres** et alimentent
-  automatiquement tous les documents générés.
+  automatiquement tous les documents générés, dont le pied de page de
+  chaque contrat (nom, SIRET, mention « TVA non applicable, art. 293 B
+  du CGI », logo DIMZ). État du véhicule : deux pages (Départ / Arrivée),
+  chacune avec un schéma à plat de la voiture (vue de dessus) à annoter
+  au stylo à l'impression, et une zone « Autres photos » où on peut
+  ajouter (et retirer) des photos, en plus de la liste standard.
 - Facturation (V1 manuelle) : journal des factures déjà émises par DIMZ —
   client, numéro, date, montant total, montant des frais, notes, PDF de la
   facture en pièce jointe. Pour un client professionnel, sa raison sociale et

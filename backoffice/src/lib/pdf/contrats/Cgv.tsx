@@ -205,7 +205,7 @@ export function CgvDocument({ dossierReference, entreprise, dateGeneration }: Pr
             Trouver. Sécuriser. Accompagner. Livrer.
           </Text>
         </View>
-        <PdfFooter />
+        <PdfFooter entreprise={entreprise} />
       </Page>
     </Document>
   );

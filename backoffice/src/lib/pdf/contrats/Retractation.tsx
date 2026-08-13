@@ -47,7 +47,7 @@ export function RetractationDocument({ dossierReference, client, entreprise, cha
           DIMZ — Mon Copilote Auto · {dossierReference} — {clientNom}
         </Text>
         <LegalBody blocks={blocks} />
-        <PdfFooter />
+        <PdfFooter entreprise={entreprise} />
       </Page>
     </Document>
   );

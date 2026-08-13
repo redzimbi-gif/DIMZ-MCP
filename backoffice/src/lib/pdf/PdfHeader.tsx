@@ -13,13 +13,27 @@ export function PdfLogo() {
   );
 }
 
-export function PdfFooter() {
+interface EntrepriseLegal {
+  nom_dirigeant?: string | null;
+  siret?: string | null;
+}
+
+export function PdfFooter({ entreprise }: { entreprise?: EntrepriseLegal | null } = {}) {
   return (
     <View style={pdfStyles.footer} fixed>
-      <Text style={pdfStyles.footerBrand}>Trouver · Sécuriser · Accompagner · Livrer</Text>
+      <View style={pdfStyles.footerBrandRow}>
+        <Image src={DIMZ_LOGO_DATA_URI} style={{ width: 11, height: 11 }} />
+        <Text style={pdfStyles.footerBrand}>DIMZ - Mon Copilote Auto</Text>
+      </View>
+      <Text style={pdfStyles.footerSlogan}>Trouver · Sécuriser · Accompagner · Livrer</Text>
+      {entreprise ? (
+        <Text style={pdfStyles.footerLegal}>
+          {entreprise.nom_dirigeant || "DIMZ - Mon Copilote Auto"}
+          {entreprise.siret ? ` · SIRET ${entreprise.siret}` : ""} · TVA non applicable, art. 293 B du CGI
+        </Text>
+      ) : null}
       <Text style={pdfStyles.footerMeta}>
-        Dimz — Mon Copilote Auto · Document généré automatiquement le{" "}
-        {new Date().toLocaleDateString("fr-FR")}
+        Document généré automatiquement le {new Date().toLocaleDateString("fr-FR")}
       </Text>
     </View>
   );

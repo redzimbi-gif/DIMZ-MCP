@@ -42,13 +42,15 @@ export const pdfStyles = StyleSheet.create({
     borderTop: "1px solid #e6e8ee",
     paddingTop: 10,
   },
+  footerBrandRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 5, marginBottom: 3 },
   footerBrand: {
     fontSize: 8,
     fontFamily: "Helvetica-Bold",
-    color: "#565c68",
+    color: "#2f6fed",
     letterSpacing: 0.3,
-    marginBottom: 2,
   },
+  footerSlogan: { fontSize: 7.5, color: "#565c68", letterSpacing: 0.2, marginBottom: 3 },
+  footerLegal: { fontSize: 7, color: "#8a909c", marginBottom: 3 },
   footerMeta: { fontSize: 7.5, color: "#8a909c" },
   signatureBox: {
     marginTop: 24,

@@ -66,7 +66,13 @@ import {
   updateFicheDecouverteIntro,
 } from "./decouverte-actions";
 import { uploadDossierDocument, archiverDocument, reactiverDocument, supprimerDocument } from "./documents-actions";
-import { generateContrat, marquerContratSigne, archiverContrat, reactiverContrat } from "./contrats-actions";
+import {
+  generateContrat,
+  marquerContratSigne,
+  archiverContrat,
+  reactiverContrat,
+  supprimerPhotoContrat,
+} from "./contrats-actions";
 
 const OFFRES_ACCOMPAGNEMENT = ["decouverte", "copilote", "copilote_plus", "expertise_seule"] as const;
 
@@ -954,8 +960,24 @@ const CONTRAT_STATUT_TONE: Record<string, "warn" | "good" | "neutral"> = {
   archive: "neutral",
 };
 
+function parsePathArray(raw: string | undefined): string[] {
+  try {
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
 async function ContratsTab({ dossierId }: { dossierId: string }) {
   const contrats = await getDossierContrats(dossierId);
+
+  const allPhotoPaths = contrats.flatMap((c) =>
+    Object.entries(c.champs ?? {}).flatMap(([key, value]) =>
+      CONTRAT_CHAMPS[c.type].find((d) => d.key === key && d.type === "photos") ? parsePathArray(value) : []
+    )
+  );
+  const photoUrls = await getSignedUrls(allPhotoPaths);
 
   return (
     <div className="space-y-3 max-w-2xl">
@@ -1027,41 +1049,76 @@ async function ContratsTab({ dossierId }: { dossierId: string }) {
               <summary className="text-xs font-medium text-blue-600 cursor-pointer select-none">
                 {contrat ? "Régénérer" : "Générer ce document"}
               </summary>
-              <form action={generateAction} className="space-y-3 mt-3">
-                {champsDefs.map((def) => (
-                  <Field key={def.key} label={def.label}>
-                    {def.type === "textarea" ? (
-                      <textarea
-                        name={def.key}
-                        rows={2}
-                        defaultValue={contrat?.champs?.[def.key] ?? ""}
-                        placeholder={def.placeholder}
-                        className={inputClass}
-                      />
-                    ) : def.type === "select" ? (
-                      <select
-                        name={def.key}
-                        defaultValue={contrat?.champs?.[def.key] ?? ""}
-                        className={inputClass}
-                      >
-                        <option value="">—</option>
-                        {def.options?.map((opt) => (
-                          <option key={opt} value={opt}>
-                            {opt}
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <input
-                        name={def.key}
-                        type={def.type}
-                        defaultValue={contrat?.champs?.[def.key] ?? ""}
-                        placeholder={def.placeholder}
-                        className={inputClass}
-                      />
-                    )}
-                  </Field>
-                ))}
+              <form action={generateAction} className="space-y-3 mt-3" encType="multipart/form-data">
+                {champsDefs.map((def) => {
+                  if (def.type === "photos") {
+                    const existingPaths = parsePathArray(contrat?.champs?.[def.key]);
+                    const supprimerPhotoAction = supprimerPhotoContrat.bind(null, dossierId, type, def.key);
+                    return (
+                      <Field key={def.key} label={def.label}>
+                        {existingPaths.length > 0 ? (
+                          <div className="flex flex-wrap gap-2 mb-2">
+                            {existingPaths.map((path) =>
+                              photoUrls[path] ? (
+                                <div key={path} className="relative">
+                                  <img
+                                    src={photoUrls[path]}
+                                    alt=""
+                                    className="h-14 w-20 object-cover rounded-md border border-line"
+                                  />
+                                  <form action={supprimerPhotoAction.bind(null, path)} className="absolute -top-1.5 -right-1.5">
+                                    <button
+                                      type="submit"
+                                      className="h-5 w-5 flex items-center justify-center rounded-full bg-bad text-white text-xs leading-none"
+                                      aria-label="Supprimer cette photo"
+                                    >
+                                      ✕
+                                    </button>
+                                  </form>
+                                </div>
+                              ) : null
+                            )}
+                          </div>
+                        ) : null}
+                        <input name={def.key} type="file" accept="image/*" multiple className={inputClass} />
+                      </Field>
+                    );
+                  }
+                  return (
+                    <Field key={def.key} label={def.label}>
+                      {def.type === "textarea" ? (
+                        <textarea
+                          name={def.key}
+                          rows={2}
+                          defaultValue={contrat?.champs?.[def.key] ?? ""}
+                          placeholder={def.placeholder}
+                          className={inputClass}
+                        />
+                      ) : def.type === "select" ? (
+                        <select
+                          name={def.key}
+                          defaultValue={contrat?.champs?.[def.key] ?? ""}
+                          className={inputClass}
+                        >
+                          <option value="">—</option>
+                          {def.options?.map((opt) => (
+                            <option key={opt} value={opt}>
+                              {opt}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          name={def.key}
+                          type={def.type}
+                          defaultValue={contrat?.champs?.[def.key] ?? ""}
+                          placeholder={def.placeholder}
+                          className={inputClass}
+                        />
+                      )}
+                    </Field>
+                  );
+                })}
                 <Button type="submit" className="text-xs px-3 py-1.5">
                   {contrat ? "Régénérer" : "Générer"}
                 </Button>

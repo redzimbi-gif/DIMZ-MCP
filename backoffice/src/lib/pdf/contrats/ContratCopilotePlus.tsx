@@ -172,13 +172,15 @@ export function ContratCopilotePlusDocument({ dossierReference, client, entrepri
     <Document title={`Contrat Copilote Plus — ${dossierReference}`}>
       <Page size="A4" style={pdfStyles.page}>
         <LegalHeader docTitle="Contrat de prestation — Offre Copilote Plus" dossierReference={dossierReference} />
-        <Text style={legalStyles.title}>Contrat de prestation — Offre Copilote Plus</Text>
+        <Text style={legalStyles.title}>
+          Contrat de prestation — Offre <Text style={{ color: "#2f6fed" }}>Copilote Plus</Text>
+        </Text>
         <Text style={legalStyles.subtitle}>
           {dossierReference} — {clientNom}
         </Text>
         <LegalBody blocks={blocks} />
         <SignatureBlock ville={entreprise?.ville || "Lyon"} date={dateSignature} clientNom={clientNom} dimzNom={cp(entreprise?.nom_dirigeant)} />
-        <PdfFooter />
+        <PdfFooter entreprise={entreprise} />
       </Page>
     </Document>
   );

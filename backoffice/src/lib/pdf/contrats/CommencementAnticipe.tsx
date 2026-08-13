@@ -71,7 +71,7 @@ export function CommencementAnticipeDocument({ dossierReference, client, entrepr
           À envoyer à : {cp(entreprise?.email)}
         </Text>
 
-        <PdfFooter />
+        <PdfFooter entreprise={entreprise} />
       </Page>
     </Document>
   );

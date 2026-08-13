@@ -1,6 +1,6 @@
 import type { ContratType } from "./types";
 
-export type ContratChampType = "text" | "number" | "date" | "select" | "textarea";
+export type ContratChampType = "text" | "number" | "date" | "select" | "textarea" | "photos";
 
 export interface ContratChampDef {
   key: string;
@@ -75,7 +75,8 @@ export const CONTRAT_CHAMPS: Record<ContratType, ContratChampDef[]> = {
     { key: "dommages_arrivee", label: "Dommages constatés à l'arrivée", type: "textarea" },
     { key: "observations_arrivee", label: "Observations à l'arrivée", type: "textarea" },
     { key: "reserves", label: "Réserves du client / destinataire", type: "textarea" },
-    { key: "photos_autres", label: "Autres photos prises (en plus de la liste standard)", type: "text" },
+    { key: "photos_autres_depart", label: "Autres photos — départ", type: "photos" },
+    { key: "photos_autres_arrivee", label: "Autres photos — arrivée", type: "photos" },
   ],
   commencement_anticipe: [
     {

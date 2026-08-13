@@ -126,7 +126,7 @@ export function ContratConvoyageDocument({ dossierReference, client, entreprise,
         </Text>
         <LegalBody blocks={blocks} />
         <SignatureBlock ville={entreprise?.ville || "Lyon"} date={dateSignature} clientNom={clientNom} dimzNom={cp(entreprise?.nom_dirigeant)} />
-        <PdfFooter />
+        <PdfFooter entreprise={entreprise} />
       </Page>
     </Document>
   );

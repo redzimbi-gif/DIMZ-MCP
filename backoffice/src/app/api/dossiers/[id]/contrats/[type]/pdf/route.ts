@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { getDossier, getDossierContrats, getEntrepriseInfo } from "@/lib/queries";
+import { getSignedUrls } from "@/lib/storage";
 import { CONTRAT_TYPES, type ContratType } from "@/lib/types";
 import { formatDate } from "@/lib/format";
 import { CgvDocument } from "@/lib/pdf/contrats/Cgv";
@@ -54,16 +55,31 @@ export async function GET(_request: Request, { params }: { params: { id: string;
       case "contrat_inspection":
         buffer = await renderToBuffer(ContratInspectionDocument({ ...common, dateSignature }));
         break;
-      case "etat_vehicule":
+      case "etat_vehicule": {
+        const parsePaths = (raw: string | undefined): string[] => {
+          try {
+            const parsed = raw ? JSON.parse(raw) : [];
+            return Array.isArray(parsed) ? parsed : [];
+          } catch {
+            return [];
+          }
+        };
+        const pathsDepart = parsePaths(champs.photos_autres_depart);
+        const pathsArrivee = parsePaths(champs.photos_autres_arrivee);
+        const urls = await getSignedUrls([...pathsDepart, ...pathsArrivee]);
         buffer = await renderToBuffer(
           EtatVehiculeDocument({
             dossierReference: dossier.reference,
             client: dossier.clients,
+            entreprise,
             champs,
             date: dateGeneration,
+            photosDepart: pathsDepart.map((p) => urls[p]).filter((u): u is string => !!u),
+            photosArrivee: pathsArrivee.map((p) => urls[p]).filter((u): u is string => !!u),
           })
         );
         break;
+      }
       case "commencement_anticipe":
         buffer = await renderToBuffer(CommencementAnticipeDocument({ ...common, date: dateGeneration }));
         break;
