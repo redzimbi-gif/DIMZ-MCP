@@ -1,7 +1,15 @@
 import { StyleSheet } from "@react-pdf/renderer";
 
 export const pdfStyles = StyleSheet.create({
-  page: { padding: 40, fontSize: 10, fontFamily: "Helvetica", color: "#0b0d12" },
+  page: {
+    paddingTop: 40,
+    paddingLeft: 40,
+    paddingRight: 40,
+    paddingBottom: 100,
+    fontSize: 10,
+    fontFamily: "Helvetica",
+    color: "#0b0d12",
+  },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",

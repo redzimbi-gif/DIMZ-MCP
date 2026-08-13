@@ -1,4 +1,4 @@
-import { Document, Page, Text, View } from "@react-pdf/renderer";
+import { Document, Page, Text } from "@react-pdf/renderer";
 import { pdfStyles } from "../theme";
 import { PdfFooter } from "../PdfHeader";
 import { LegalHeader, LegalBody, legalStyles, type LegalBlock } from "./shared";
@@ -197,14 +197,6 @@ export function CgvDocument({ dossierReference, entreprise, dateGeneration }: Pr
         <Text style={legalStyles.title}>Conditions Générales de Vente et de Prestation de Services</Text>
         <Text style={legalStyles.subtitle}>DIMZ — Mon Copilote Auto · Version : {dateGeneration}</Text>
         <LegalBody blocks={blocks} />
-        <View style={{ marginTop: 20, alignItems: "center" }}>
-          <Text style={{ fontSize: 9, fontFamily: "Helvetica-Bold", color: "#2f6fed" }}>
-            DIMZ — Mon Copilote Auto
-          </Text>
-          <Text style={{ fontSize: 8, color: "#565c68", marginTop: 2 }}>
-            Trouver. Sécuriser. Accompagner. Livrer.
-          </Text>
-        </View>
         <PdfFooter entreprise={entreprise} />
       </Page>
     </Document>
