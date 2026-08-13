@@ -109,6 +109,10 @@ export default async function DossierDetailPage({
   const tab = searchParams.tab || "infos";
   const history = await getDossierHistory(dossier.id);
   const etapeHistory = await getDossierEtapeHistory(dossier.id);
+  const [contratsGeneres, documentsDossier] = await Promise.all([
+    getDossierContrats(dossier.id),
+    getDossierDocuments(dossier.id),
+  ]);
 
   const updateInfosAction = updateDossierInfos.bind(null, dossier.id);
   const updateStatutAction = updateDossierStatut.bind(null, dossier.id);
@@ -252,12 +256,28 @@ export default async function DossierDetailPage({
         )}
 
         {peutEnvoyerEmailEtape ? (
-          <div className="flex items-center justify-between gap-3 mt-3 pt-3 border-t border-line">
-            <p className="text-xs text-ink-soft">
+          <div className="mt-3 pt-3 border-t border-line">
+            <p className="text-xs text-ink-soft mb-2">
               Envoie au client l'email correspondant à l'étape actuelle
               {isConvoyage ? " (ton professionnel)" : " (ton copilote, léger)"}.
             </p>
-            <form action={sendEtapeEmailAction} className="shrink-0">
+            <form action={sendEtapeEmailAction} className="flex flex-wrap items-end gap-3">
+              {contratsGeneres.length > 0 || documentsDossier.length > 0 ? (
+                <Field label="Pièces jointes (optionnel, plusieurs possibles)">
+                  <select name="pieces_jointes" multiple className={`${inputClass} h-24 min-w-[220px]`}>
+                    {contratsGeneres.map((c) => (
+                      <option key={`contrat:${c.type}`} value={`contrat:${c.type}`}>
+                        {CONTRAT_TYPE_LABELS[c.type]}
+                      </option>
+                    ))}
+                    {documentsDossier.map((d) => (
+                      <option key={`doc:${d.id}`} value={`doc:${d.id}`}>
+                        {d.nom}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+              ) : null}
               <Button type="submit" variant="outline">
                 <Mail className="h-4 w-4" /> Informer le client
               </Button>

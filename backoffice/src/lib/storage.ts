@@ -29,6 +29,14 @@ export async function deleteFile(path: string): Promise<void> {
   await db.storage.from(BUCKET).remove([path]);
 }
 
+/** Télécharge le contenu binaire d'un fichier (pour le joindre à un email). */
+export async function downloadFile(path: string): Promise<Buffer | null> {
+  const db = createAdminClient();
+  const { data, error } = await db.storage.from(BUCKET).download(path);
+  if (error || !data) return null;
+  return Buffer.from(await data.arrayBuffer());
+}
+
 /** Génère des URLs signées temporaires (1h) pour afficher des fichiers privés. */
 export async function getSignedUrls(paths: string[]): Promise<Record<string, string>> {
   if (paths.length === 0) return {};

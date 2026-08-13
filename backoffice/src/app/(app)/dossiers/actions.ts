@@ -4,8 +4,10 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { logActivity, getActorId } from "@/lib/log";
-import { getDossier } from "@/lib/queries";
+import { getDossier, getDossierContrats, getDossierDocuments, getEntrepriseInfo } from "@/lib/queries";
 import { sendEmail, getAppUrl } from "@/lib/email";
+import { downloadFile } from "@/lib/storage";
+import { renderContratPdf } from "@/lib/pdf/contrats/build";
 import {
   etapeAccompagnementEmail,
   etapeConvoyageEmail,
@@ -15,7 +17,14 @@ import {
   type EtapeConvoyageKey,
 } from "@/lib/email-templates";
 import { getEtapeLabel } from "@/lib/etapes";
-import { DOSSIER_STATUT_LABELS, DOSSIER_OFFRE_LABELS, type DossierStatut, type DossierOffre } from "@/lib/types";
+import {
+  DOSSIER_STATUT_LABELS,
+  DOSSIER_OFFRE_LABELS,
+  CONTRAT_TYPES,
+  type DossierStatut,
+  type DossierOffre,
+  type ContratType,
+} from "@/lib/types";
 
 function isEtapeAccompagnementKey(value: string): value is EtapeAccompagnementKey {
   return (ETAPE_ACCOMPAGNEMENT_KEYS as string[]).includes(value);
@@ -191,9 +200,46 @@ export async function updateDossierEtapeClient(dossierId: string, formData: Form
   revalidatePath("/dossiers");
 }
 
-export async function sendEtapeClientEmail(dossierId: string, tab: string) {
+async function buildEmailAttachments(dossierId: string, dossier: Awaited<ReturnType<typeof getDossier>>, selection: string[]) {
+  if (selection.length === 0 || !dossier) return [];
+
+  const attachments: { filename: string; content: string }[] = [];
+  const contratSelections = selection.filter((s) => s.startsWith("contrat:"));
+  const docSelections = selection.filter((s) => s.startsWith("doc:"));
+
+  if (contratSelections.length > 0) {
+    const [contrats, entreprise] = await Promise.all([getDossierContrats(dossierId), getEntrepriseInfo()]);
+    for (const sel of contratSelections) {
+      const type = sel.slice("contrat:".length) as ContratType;
+      if (!(CONTRAT_TYPES as readonly string[]).includes(type)) continue;
+      const contrat = contrats.find((c) => c.type === type);
+      try {
+        const buffer = await renderContratPdf(type, dossier, contrat, entreprise);
+        attachments.push({ filename: `${type}-${dossier.reference}.pdf`, content: buffer.toString("base64") });
+      } catch (err) {
+        console.error(`Échec génération PDF ${type} pour pièce jointe:`, err);
+      }
+    }
+  }
+
+  if (docSelections.length > 0) {
+    const documents = await getDossierDocuments(dossierId);
+    for (const sel of docSelections) {
+      const docId = sel.slice("doc:".length);
+      const doc = documents.find((d) => d.id === docId);
+      if (!doc) continue;
+      const buffer = await downloadFile(doc.storage_path);
+      if (buffer) attachments.push({ filename: doc.nom, content: buffer.toString("base64") });
+    }
+  }
+
+  return attachments;
+}
+
+export async function sendEtapeClientEmail(dossierId: string, tab: string, formData: FormData) {
   const dossier = await getDossier(dossierId);
   const email = dossier?.clients?.email;
+  const selection = formData.getAll("pieces_jointes").map(String);
 
   let status: "sent" | "no-email" | "error" = "sent";
 
@@ -218,7 +264,13 @@ export async function sendEtapeClientEmail(dossierId: string, tab: string) {
       if (!templated) {
         status = "error";
       } else {
-        const result = await sendEmail({ to: email, subject: templated.subject, html: templated.html });
+        const attachments = await buildEmailAttachments(dossierId, dossier, selection);
+        const result = await sendEmail({
+          to: email,
+          subject: templated.subject,
+          html: templated.html,
+          attachments: attachments.length > 0 ? attachments : undefined,
+        });
         status = result.ok ? "sent" : "error";
 
         if (result.ok) {
@@ -226,7 +278,9 @@ export async function sendEtapeClientEmail(dossierId: string, tab: string) {
             action: "email.etape_client",
             entiteType: "dossier",
             entiteId: dossierId,
-            description: `Email d'étape (« ${templated.subject} ») envoyé à ${email}`,
+            description: `Email d'étape (« ${templated.subject} ») envoyé à ${email}${
+              attachments.length > 0 ? ` avec ${attachments.length} pièce(s) jointe(s)` : ""
+            }`,
           });
         }
       }
