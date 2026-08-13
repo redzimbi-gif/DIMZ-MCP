@@ -1259,7 +1259,17 @@
                     <input type="hidden" id="a-budget-text">
                   </div>
                   <div class="field full">
-                    <label id="a-budget-mensuel-label">Budget mensuel <span class="hint">(si financement)</span></label>
+                    <label>Mode de financement souhaité <span class="hint">(plusieurs choix possibles)</span></label>
+                    <div class="choice-grid" id="financement-choices">
+                      <label data-tooltip="Vous payez le véhicule en une fois, sans emprunt. Vous en êtes propriétaire immédiatement."><input type="checkbox" name="financement" value="comptant"> Comptant</label>
+                      <label data-tooltip="Vous empruntez auprès d'une banque et remboursez par mensualités. Vous êtes propriétaire dès l'achat."><input type="checkbox" name="financement" value="credit"> Crédit classique</label>
+                      <label data-tooltip="Location avec Option d'Achat : vous louez le véhicule et pouvez l'acheter à la fin du contrat pour un montant fixé à l'avance."><input type="checkbox" name="financement" value="loa"> LOA</label>
+                      <label data-tooltip="Location Longue Durée : vous louez le véhicule sur plusieurs années, entretien souvent inclus, sans devenir propriétaire."><input type="checkbox" name="financement" value="lld"> LLD</label>
+                      <label><input type="checkbox" name="financement" value="indecis"> Je ne sais pas encore</label>
+                    </div>
+                  </div>
+                  <div class="field full" id="budget-mensuel-field" hidden>
+                    <label id="a-budget-mensuel-label">Budget mensuel</label>
                     <div class="range-slider" id="a-budget-mensuel-slider" role="group" aria-labelledby="a-budget-mensuel-label">
                       <div class="range-slider-value"></div>
                       <div class="range-slider-track">
@@ -1271,16 +1281,6 @@
                       <div class="range-slider-ticks"><span>100 €</span><span>1 000 € et +</span></div>
                     </div>
                     <input type="hidden" id="a-budget-mensuel-text">
-                  </div>
-                  <div class="field full">
-                    <label>Mode de financement souhaité <span class="hint">(plusieurs choix possibles)</span></label>
-                    <div class="choice-grid">
-                      <label data-tooltip="Vous payez le véhicule en une fois, sans emprunt. Vous en êtes propriétaire immédiatement."><input type="checkbox" name="financement" value="comptant"> Comptant</label>
-                      <label data-tooltip="Vous empruntez auprès d'une banque et remboursez par mensualités. Vous êtes propriétaire dès l'achat."><input type="checkbox" name="financement" value="credit"> Crédit classique</label>
-                      <label data-tooltip="Location avec Option d'Achat : vous louez le véhicule et pouvez l'acheter à la fin du contrat pour un montant fixé à l'avance."><input type="checkbox" name="financement" value="loa"> LOA</label>
-                      <label data-tooltip="Location Longue Durée : vous louez le véhicule sur plusieurs années, entretien souvent inclus, sans devenir propriétaire."><input type="checkbox" name="financement" value="lld"> LLD</label>
-                      <label><input type="checkbox" name="financement" value="indecis"> Je ne sais pas encore</label>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -4041,6 +4041,13 @@
   });
   toggleOnValue('a-financement-cours', 'financement-detail', 'oui');
   toggleOnValue('a-enfants', 'a-enfants-nombre-wrap', 'oui');
+
+  // ---------- Budget mensuel : visible seulement si un financement est sélectionné (étape "Budget et financement") ----------
+  var FINANCEMENT_AVEC_MENSUALITES = ['credit', 'loa', 'lld', 'indecis'];
+  document.getElementById('financement-choices').addEventListener('change', function () {
+    var checked = Array.prototype.map.call(document.querySelectorAll('input[name="financement"]:checked'), function (el) { return el.value; });
+    document.getElementById('budget-mensuel-field').hidden = !checked.some(function (v) { return FINANCEMENT_AVEC_MENSUALITES.indexOf(v) !== -1; });
+  });
 
   // ---------- Convoyage : véhicule pas encore immatriculé ----------
   var immatInput = document.getElementById('c-immat');
