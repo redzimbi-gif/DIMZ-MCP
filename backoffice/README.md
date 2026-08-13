@@ -156,10 +156,11 @@ l'email de confirmation si le client a renseigné son adresse.
   bouton crayon sur chaque annonce. Pour les offres Copilote / Copilote Plus,
   les annonces marquées « sélectionnée » (étoile) alimentent le PDF
   **Copilote Market** / **Copilote + Market** — intro, commentaire libre du
-  copilote, puis les annonces sélectionnées avec leur Score DIMZ, et en pied
-  de page soit une invitation à passer à Copilote Plus (offre Copilote), soit
-  l'annonce de l'étape suivante (inspection, offre Copilote Plus) — généré et
-  envoyable par email depuis l'onglet Annonces.
+  copilote, puis les annonces sélectionnées avec leur Score DIMZ (même anneau
+  de score et mêmes barres « score par critère » que le Rapport DIMZ présenté
+  sur le site), et en pied de page soit une invitation à passer à Copilote
+  Plus (offre Copilote), soit l'annonce de l'étape suivante (inspection, offre
+  Copilote Plus) — généré et envoyable par email depuis l'onglet Annonces.
 - Fiche Découverte : pour l'offre gratuite Découverte, une fiche plus légère
   que le Rapport DIMZ — véhicules repérés (marque, modèle, énergie), un point
   fort et un point de vigilance chacun, sans score. Générée en PDF et

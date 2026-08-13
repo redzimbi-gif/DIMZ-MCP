@@ -1,10 +1,18 @@
 import { Document, Page, Text, View, Image } from "@react-pdf/renderer";
 import { pdfStyles } from "./theme";
 import { PdfLogo, PdfFooter } from "./PdfHeader";
+import { ScoreRing } from "./ScoreRing";
 import { formatCurrency } from "@/lib/format";
 import type { Annonce, DossierOffre } from "@/lib/types";
 
 type MarketAnnonce = Annonce & { photoUrl?: string | null };
+
+const CRITERE_SCORES: { key: keyof Annonce; label: string }[] = [
+  { key: "score_prix", label: "Prix" },
+  { key: "score_historique", label: "Historique" },
+  { key: "score_etat", label: "État" },
+  { key: "score_adequation", label: "Adéquation" },
+];
 
 interface Props {
   offre: DossierOffre;
@@ -58,53 +66,83 @@ export function MarketReport({ offre, vehicules, commentaire, dossierReference, 
           </View>
         ) : null}
 
-        {vehicules.map((v) => (
-          <View
-            key={v.id}
-            style={{ marginBottom: 14, backgroundColor: "#f7f8fa", borderRadius: 8, overflow: "hidden" }}
-            wrap={false}
-          >
-            {v.photoUrl ? <Image src={v.photoUrl} style={{ width: "100%", height: 140, objectFit: "cover" }} /> : null}
-            <View style={{ padding: 12 }}>
-              <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 4 }}>
-                <View style={{ flex: 1, paddingRight: 8 }}>
-                  <Text style={{ fontSize: 11, fontFamily: "Helvetica-Bold" }}>{v.titre}</Text>
-                  <Text style={{ fontSize: 8.5, color: "#565c68", marginTop: 2 }}>
-                    {[v.annee, v.kilometrage ? `${v.kilometrage.toLocaleString("fr-FR")} km` : null, v.localisation]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </Text>
-                </View>
-                {v.score_confiance != null ? (
-                  <View style={{ alignItems: "center", backgroundColor: "#eef3ff", borderRadius: 6, paddingVertical: 4, paddingHorizontal: 8 }}>
-                    <Text style={{ fontSize: 12, fontFamily: "Helvetica-Bold", color: "#2f6fed" }}>
-                      {v.score_confiance}/10
+        {vehicules.map((v) => {
+          const criteres = CRITERE_SCORES.filter(({ key }) => v[key] != null);
+          return (
+            <View
+              key={v.id}
+              style={{ marginBottom: 14, backgroundColor: "#f7f8fa", borderRadius: 8, overflow: "hidden" }}
+              wrap={false}
+            >
+              {v.photoUrl ? <Image src={v.photoUrl} style={{ width: "100%", height: 140, objectFit: "cover" }} /> : null}
+              <View style={{ padding: 12 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}>
+                  {v.score_confiance != null ? (
+                    <View style={{ marginRight: 12 }}>
+                      <ScoreRing value={v.score_confiance} size={46} fontSize={10} />
+                    </View>
+                  ) : null}
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 11, fontFamily: "Helvetica-Bold" }}>{v.titre}</Text>
+                    <Text style={{ fontSize: 8.5, color: "#565c68", marginTop: 2 }}>
+                      {[v.annee, v.kilometrage ? `${v.kilometrage.toLocaleString("fr-FR")} km` : null, v.localisation]
+                        .filter(Boolean)
+                        .join(" · ")}
                     </Text>
-                    <Text style={{ fontSize: 6.5, color: "#2f6fed" }}>Score DIMZ</Text>
+                    <Text style={{ fontSize: 9.5, fontFamily: "Helvetica-Bold", color: "#2f6fed", marginTop: 3 }}>
+                      {v.prix ? formatCurrency(v.prix) : "Prix non renseigné"}
+                      {v.prix_negocie ? ` → ${formatCurrency(v.prix_negocie)} négocié` : ""}
+                    </Text>
+                  </View>
+                </View>
+
+                {criteres.length > 0 ? (
+                  <View style={{ marginBottom: 8 }}>
+                    <Text style={{ ...pdfStyles.sectionTitle, fontSize: 7, marginBottom: 5 }}>Score par critère</Text>
+                    <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+                      {criteres.map(({ key, label }) => {
+                        const value = v[key] as number;
+                        return (
+                          <View key={key as string} style={{ width: "50%", marginBottom: 6, paddingRight: 10 }}>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 2 }}>
+                              <Text style={{ fontSize: 7.5, color: "#565c68" }}>{label}</Text>
+                              <Text style={{ fontSize: 7.5, fontFamily: "Helvetica-Bold" }}>{value}/10</Text>
+                            </View>
+                            <View style={{ height: 3, borderRadius: 2, backgroundColor: "#e6e8ee" }}>
+                              <View
+                                style={{
+                                  height: 3,
+                                  borderRadius: 2,
+                                  backgroundColor: "#2f6fed",
+                                  width: `${(value / 10) * 100}%`,
+                                }}
+                              />
+                            </View>
+                          </View>
+                        );
+                      })}
+                    </View>
                   </View>
                 ) : null}
+
+                {v.avis_copilote ? (
+                  <View style={{ borderLeft: "2px solid #2f6fed", paddingLeft: 8, marginBottom: 6 }}>
+                    <Text style={{ fontSize: 9, fontFamily: "Helvetica-Oblique", lineHeight: 1.5, color: "#0b0d12" }}>
+                      « {v.avis_copilote} »
+                    </Text>
+                  </View>
+                ) : null}
+
+                {v.points_forts ? (
+                  <Text style={{ fontSize: 8.5, lineHeight: 1.4, color: "#1a9e6b", marginBottom: 2 }}>+ {v.points_forts}</Text>
+                ) : null}
+                {v.points_faibles ? (
+                  <Text style={{ fontSize: 8.5, lineHeight: 1.4, color: "#b5780a" }}>! {v.points_faibles}</Text>
+                ) : null}
               </View>
-
-              <Text style={{ fontSize: 9.5, fontFamily: "Helvetica-Bold", color: "#2f6fed", marginBottom: 6 }}>
-                {v.prix ? formatCurrency(v.prix) : "Prix non renseigné"}
-                {v.prix_negocie ? ` → ${formatCurrency(v.prix_negocie)} négocié` : ""}
-              </Text>
-
-              {v.avis_copilote ? (
-                <Text style={{ fontSize: 9, lineHeight: 1.5, color: "#0b0d12", backgroundColor: "#fff", borderRadius: 6, padding: 8, marginBottom: 6 }}>
-                  « {v.avis_copilote} »
-                </Text>
-              ) : null}
-
-              {v.points_forts ? (
-                <Text style={{ fontSize: 8.5, lineHeight: 1.4, color: "#1a9e6b", marginBottom: 2 }}>+ {v.points_forts}</Text>
-              ) : null}
-              {v.points_faibles ? (
-                <Text style={{ fontSize: 8.5, lineHeight: 1.4, color: "#b5780a" }}>! {v.points_faibles}</Text>
-              ) : null}
             </View>
-          </View>
-        ))}
+          );
+        })}
 
         <View style={{ flexGrow: 1 }} />
 

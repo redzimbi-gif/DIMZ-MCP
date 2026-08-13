@@ -1,6 +1,7 @@
-import { Document, Page, Text, View, Svg, Circle } from "@react-pdf/renderer";
+import { Document, Page, Text, View } from "@react-pdf/renderer";
 import { pdfStyles } from "./theme";
 import { PdfLogo, PdfFooter } from "./PdfHeader";
+import { ScoreRing } from "./ScoreRing";
 import { INSPECTION_VERDICT_LABELS, type Inspection, type DossierOffre } from "@/lib/types";
 import { formatDate, splitLines, splitTags } from "@/lib/format";
 
@@ -25,30 +26,6 @@ const VERDICT_COLORS: Record<string, string> = {
   envisageable: "#b5780a",
   deconseille: "#d13f3f",
 };
-
-function ScoreRing({ value }: { value: number }) {
-  const radius = 24;
-  const circumference = 2 * Math.PI * radius;
-  const filled = (Math.max(0, Math.min(10, value)) / 10) * circumference;
-  return (
-    <View style={{ width: 60, height: 60, alignItems: "center", justifyContent: "center" }}>
-      <Svg width={60} height={60} viewBox="0 0 60 60" style={{ position: "absolute" }}>
-        <Circle cx={30} cy={30} r={radius} stroke="#e6e8ee" strokeWidth={5} fill="none" />
-        <Circle
-          cx={30}
-          cy={30}
-          r={radius}
-          stroke="#2f6fed"
-          strokeWidth={5}
-          fill="none"
-          strokeDasharray={`${filled} ${circumference}`}
-          strokeLinecap="round"
-        />
-      </Svg>
-      <Text style={{ fontSize: 13, fontFamily: "Helvetica-Bold", color: "#0b0d12" }}>{value}</Text>
-    </View>
-  );
-}
 
 export function InspectionReport({ inspection, dossierReference, clientNom, offre }: Props) {
   const tags = splitTags(inspection.tags);
