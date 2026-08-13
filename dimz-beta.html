@@ -1268,6 +1268,10 @@
                       <label><input type="checkbox" name="financement" value="indecis"> Je ne sais pas encore</label>
                     </div>
                   </div>
+                  <div class="field full" id="apport-field" hidden>
+                    <label for="a-apport-souhaite">Apport envisagé (€)</label>
+                    <input type="number" id="a-apport-souhaite" min="0" max="99999">
+                  </div>
                   <div class="field full" id="budget-mensuel-field" hidden>
                     <label id="a-budget-mensuel-label">Budget mensuel</label>
                     <div class="range-slider" id="a-budget-mensuel-slider" role="group" aria-labelledby="a-budget-mensuel-label">
@@ -3631,10 +3635,12 @@
       recapRow('Type de parcours', selectText('a-parcours'))
     ].filter(Boolean) });
 
+    var apportSouhaite = inputVal('a-apport-souhaite');
     groups.push({ title: 'Budget et financement', step: 3, rows: [
       recapRow('Budget total envisagé', inputVal('a-budget-text')),
-      recapRow('Budget mensuel envisagé (si financement)', inputVal('a-budget-mensuel-text')),
-      recapRow('Mode de financement souhaité', recapCheckedList('input[name="financement"]'))
+      recapRow('Mode de financement souhaité', recapCheckedList('input[name="financement"]')),
+      recapRow('Apport envisagé (si financement)', apportSouhaite ? apportSouhaite + ' €' : ''),
+      recapRow('Budget mensuel envisagé (si financement)', inputVal('a-budget-mensuel-text'))
     ].filter(Boolean) });
 
     var bubbles = document.querySelectorAll('#vehicule-bubbles .veh-bubble');
@@ -4042,11 +4048,13 @@
   toggleOnValue('a-financement-cours', 'financement-detail', 'oui');
   toggleOnValue('a-enfants', 'a-enfants-nombre-wrap', 'oui');
 
-  // ---------- Budget mensuel : visible seulement si un financement est sélectionné (étape "Budget et financement") ----------
+  // ---------- Apport et budget mensuel : visibles seulement si un financement est sélectionné (étape "Budget et financement") ----------
   var FINANCEMENT_AVEC_MENSUALITES = ['credit', 'loa', 'lld', 'indecis'];
   document.getElementById('financement-choices').addEventListener('change', function () {
     var checked = Array.prototype.map.call(document.querySelectorAll('input[name="financement"]:checked'), function (el) { return el.value; });
-    document.getElementById('budget-mensuel-field').hidden = !checked.some(function (v) { return FINANCEMENT_AVEC_MENSUALITES.indexOf(v) !== -1; });
+    var show = checked.some(function (v) { return FINANCEMENT_AVEC_MENSUALITES.indexOf(v) !== -1; });
+    document.getElementById('apport-field').hidden = !show;
+    document.getElementById('budget-mensuel-field').hidden = !show;
   });
 
   // ---------- Convoyage : véhicule pas encore immatriculé ----------
