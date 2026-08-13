@@ -14,32 +14,39 @@ import { inspectionFieldsFromForm } from "@/lib/inspection-fields";
 
 export async function updateInspection(dossierId: string, inspectionId: string, formData: FormData) {
   const db = createAdminClient();
-  const existing = await getInspection(inspectionId);
-  if (!existing) throw new Error("Inspection introuvable.");
 
-  const photos = (formData.getAll("photos") as File[]).filter((f) => f.size > 0);
-  const videos = (formData.getAll("videos") as File[]).filter((f) => f.size > 0);
-  const [newPhotoPaths, newVideoPaths] = await Promise.all([
-    uploadFiles(`inspections/${dossierId}`, photos),
-    uploadFiles(`inspections/${dossierId}`, videos),
-  ]);
+  try {
+    const existing = await getInspection(inspectionId);
+    if (!existing) throw new Error("Inspection introuvable.");
 
-  const payload = {
-    date_inspection: String(formData.get("date_inspection") || existing.date_inspection),
-    ...inspectionFieldsFromForm(formData),
-    photos: [...existing.photos, ...newPhotoPaths],
-    videos: [...existing.videos, ...newVideoPaths],
-  };
+    const photos = (formData.getAll("photos") as File[]).filter((f) => f.size > 0);
+    const videos = (formData.getAll("videos") as File[]).filter((f) => f.size > 0);
+    const [newPhotoPaths, newVideoPaths] = await Promise.all([
+      uploadFiles(`inspections/${dossierId}`, photos),
+      uploadFiles(`inspections/${dossierId}`, videos),
+    ]);
 
-  const { error } = await db.from("inspections").update(payload).eq("id", inspectionId);
-  if (error) throw new Error(error.message || "Erreur lors de la mise à jour de l'inspection.");
+    const payload = {
+      date_inspection: String(formData.get("date_inspection") || existing.date_inspection),
+      ...inspectionFieldsFromForm(formData),
+      photos: [...existing.photos, ...newPhotoPaths],
+      videos: [...existing.videos, ...newVideoPaths],
+    };
 
-  await logActivity({
-    action: "inspection.modifiee",
-    entiteType: "inspection",
-    entiteId: inspectionId,
-    description: `Rapport d'inspection mis à jour`,
-  });
+    const { error } = await db.from("inspections").update(payload).eq("id", inspectionId);
+    if (error) throw new Error(error.message || "Erreur lors de la mise à jour de l'inspection.");
+
+    await logActivity({
+      action: "inspection.modifiee",
+      entiteType: "inspection",
+      entiteId: inspectionId,
+      description: `Rapport d'inspection mis à jour`,
+    });
+  } catch (error) {
+    console.error("Erreur mise à jour inspection", error);
+    const message = error instanceof Error ? error.message : "Erreur inconnue lors de la mise à jour de l'inspection.";
+    redirect(`/dossiers/${dossierId}/inspections/${inspectionId}/edit?error=${encodeURIComponent(message)}`);
+  }
 
   revalidatePath(`/dossiers/${dossierId}/inspections/${inspectionId}`);
   redirect(`/dossiers/${dossierId}/inspections/${inspectionId}`);

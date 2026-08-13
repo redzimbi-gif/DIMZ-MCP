@@ -9,8 +9,10 @@ import { updateInspection, deleteInspectionPhoto } from "../actions";
 
 export default async function EditInspectionPage({
   params,
+  searchParams,
 }: {
   params: { id: string; inspectionId: string };
+  searchParams: { error?: string };
 }) {
   const inspection = await getInspection(params.inspectionId);
   if (!inspection || inspection.dossier_id !== params.id) notFound();
@@ -28,6 +30,12 @@ export default async function EditInspectionPage({
         title={`Modifier le rapport ${inspection.reference}`}
         description={`${inspection.dossiers?.reference} — ${inspection.dossiers?.clients?.prenom} ${inspection.dossiers?.clients?.nom}`}
       />
+
+      {searchParams.error ? (
+        <div className="mb-4 text-sm text-bad bg-bad-bg border border-bad/20 rounded-md px-3 py-2">
+          {searchParams.error}
+        </div>
+      ) : null}
 
       {inspection.photos.length > 0 ? (
         <Card className="p-6 mb-6">
