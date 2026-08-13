@@ -121,6 +121,25 @@ export default async function ClientPortalPage({ params }: { params: { token: st
           </div>
         ) : null}
 
+        {dossier.offre === "copilote" && dossier.etape_client === "dossier_envoye" ? (
+          <div className="mt-6 bg-blue-50 border border-blue-100 rounded-lg2 p-6 text-center">
+            <p className="text-sm font-semibold text-blue-700 mb-1">Prêt à passer la vitesse supérieure ?</p>
+            <p className="text-sm text-ink-soft mb-4">
+              Avec Copilote Plus, votre copilote prend le relais jusqu'à la remise des clés : mise en relation
+              avec le vendeur, inspection complète du véhicule choisi, accompagnement à l'achat et livraison. Le
+              montant déjà réglé pour Copilote est intégralement déduit.
+            </p>
+            <form action={upgradeOffreDepuisSuivi.bind(null, params.token, "copilote_plus")}>
+              <button
+                type="submit"
+                className="inline-flex items-center justify-center rounded-md bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2.5 transition-colors"
+              >
+                Passer à l'offre Copilote Plus
+              </button>
+            </form>
+          </div>
+        ) : null}
+
         {annoncesAvecPhoto.length > 0 ? (
           <div className="mt-6">
             <h2 className="text-sm font-semibold text-ink px-1 mb-3">

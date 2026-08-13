@@ -197,12 +197,14 @@ l'email de confirmation si le client a renseigné son adresse.
   Copilote Plus, dès que l'étape client atteint « Livraison », `/suivi/[token]`
   affiche une invitation à remplir le questionnaire de satisfaction — pour
   l'instant, un lien vers le questionnaire de retour déjà présent sur le site
-  (page « Test »). Pour l'offre Découverte, une fois la réponse envoyée
-  (dernière étape client), `/suivi/[token]` propose au client deux boutons
-  « Passer à l'offre Copilote » / « Passer à l'offre Copilote Plus » ; un clic
-  met à jour l'offre du dossier, remet l'étape client sur une valeur commune
-  aux nouvelles étapes, et crée une notification interne (cloche du
-  back-office) pointant vers le dossier.
+  (page « Test »). Deux paliers d'upsell sur `/suivi/[token]`, chacun avec un
+  message d'accompagnement et un ou deux boutons : offre Découverte une fois
+  la réponse envoyée (dernière étape client) → « Passer à l'offre Copilote »
+  / « Passer à l'offre Copilote Plus » ; offre Copilote une fois le dossier
+  envoyé (dernière étape client) → « Passer à l'offre Copilote Plus » seul.
+  Dans les deux cas, un clic met à jour l'offre du dossier, remet l'étape
+  client sur une valeur commune aux nouvelles étapes, et crée une
+  notification interne (cloche du back-office) pointant vers le dossier.
 - Suivi client (Convoyage) : flux dédié — Demande reçue → Étude de la demande
   → boutons Accepté/Refusé (email d'excuse si refusé) → Devis en cours →
   Livraison en cours → Véhicule livré, avec un email pro à chaque étape.
