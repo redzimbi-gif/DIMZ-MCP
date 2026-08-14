@@ -202,9 +202,17 @@ export interface FicheDecouverteVehicule {
   prix_min: number | null;
   prix_max: number | null;
   photo_path: string | null;
+  photo_from_bibliotheque: boolean;
   ordre: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface PhotoBibliotheque {
+  id: string;
+  nom: string;
+  storage_path: string;
+  created_at: string;
 }
 
 export const FICHE_DECOUVERTE_ENERGIES = [

@@ -35,7 +35,25 @@ export async function addFicheDecouverteVehicule(dossierId: string, formData: Fo
     const existing = await getFicheDecouverteVehicules(dossierId);
 
     const photo = formData.get("photo") as File | null;
-    const [photoPath] = photo && photo.size > 0 ? await uploadFiles(`fiche-decouverte/${dossierId}`, [photo]) : [null];
+    const bibliothequeId = text(formData, "photo_bibliotheque_id");
+
+    let photoPath: string | null = null;
+    let photoFromBibliotheque = false;
+
+    if (photo && photo.size > 0) {
+      const [uploadedPath] = await uploadFiles(`fiche-decouverte/${dossierId}`, [photo]);
+      photoPath = uploadedPath ?? null;
+    } else if (bibliothequeId) {
+      const { data: bibPhoto } = await db
+        .from("photos_bibliotheque")
+        .select("storage_path")
+        .eq("id", bibliothequeId)
+        .maybeSingle();
+      if (bibPhoto) {
+        photoPath = bibPhoto.storage_path;
+        photoFromBibliotheque = true;
+      }
+    }
 
     const payload = {
       dossier_id: dossierId,
@@ -46,7 +64,8 @@ export async function addFicheDecouverteVehicule(dossierId: string, formData: Fo
       point_vigilance: text(formData, "point_vigilance"),
       prix_min: num(formData, "prix_min"),
       prix_max: num(formData, "prix_max"),
-      photo_path: photoPath ?? null,
+      photo_path: photoPath,
+      photo_from_bibliotheque: photoFromBibliotheque,
       ordre: existing.length,
     };
 
@@ -72,17 +91,33 @@ export async function updateFicheDecouverteVehicule(dossierId: string, vehiculeI
   try {
     const { data: existing } = await db
       .from("fiche_decouverte_vehicules")
-      .select("photo_path")
+      .select("photo_path, photo_from_bibliotheque")
       .eq("id", vehiculeId)
       .maybeSingle();
 
     const photo = formData.get("photo") as File | null;
+    const bibliothequeId = text(formData, "photo_bibliotheque_id");
+
     let photoPath = existing?.photo_path ?? null;
+    let photoFromBibliotheque = existing?.photo_from_bibliotheque ?? false;
+
     if (photo && photo.size > 0) {
       const [newPath] = await uploadFiles(`fiche-decouverte/${dossierId}`, [photo]);
       if (newPath) {
-        if (existing?.photo_path) await deleteFile(existing.photo_path);
+        if (existing?.photo_path && !existing.photo_from_bibliotheque) await deleteFile(existing.photo_path);
         photoPath = newPath;
+        photoFromBibliotheque = false;
+      }
+    } else if (bibliothequeId) {
+      const { data: bibPhoto } = await db
+        .from("photos_bibliotheque")
+        .select("storage_path")
+        .eq("id", bibliothequeId)
+        .maybeSingle();
+      if (bibPhoto) {
+        if (existing?.photo_path && !existing.photo_from_bibliotheque) await deleteFile(existing.photo_path);
+        photoPath = bibPhoto.storage_path;
+        photoFromBibliotheque = true;
       }
     }
 
@@ -95,6 +130,7 @@ export async function updateFicheDecouverteVehicule(dossierId: string, vehiculeI
       prix_min: num(formData, "prix_min"),
       prix_max: num(formData, "prix_max"),
       photo_path: photoPath,
+      photo_from_bibliotheque: photoFromBibliotheque,
     };
 
     const { error } = await db.from("fiche_decouverte_vehicules").update(payload).eq("id", vehiculeId);
@@ -117,12 +153,12 @@ export async function deleteFicheDecouverteVehicule(dossierId: string, vehiculeI
   const db = createAdminClient();
   const { data: existing } = await db
     .from("fiche_decouverte_vehicules")
-    .select("photo_path")
+    .select("photo_path, photo_from_bibliotheque")
     .eq("id", vehiculeId)
     .maybeSingle();
 
   await db.from("fiche_decouverte_vehicules").delete().eq("id", vehiculeId);
-  if (existing?.photo_path) await deleteFile(existing.photo_path);
+  if (existing?.photo_path && !existing.photo_from_bibliotheque) await deleteFile(existing.photo_path);
 
   revalidatePath(`/dossiers/${dossierId}`);
 }

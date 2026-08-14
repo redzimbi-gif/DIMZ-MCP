@@ -13,6 +13,7 @@ import {
   Truck,
   Bell,
   Settings,
+  Images,
   type LucideIcon,
 } from "lucide-react";
 
@@ -41,6 +42,7 @@ export const NAV: NavGroup[] = [
       { href: "/dossiers", label: "Dossiers", icon: FolderKanban },
       { href: "/clients", label: "Clients", icon: Users },
       { href: "/annonces", label: "Annonces", icon: Car },
+      { href: "/photos", label: "Photos", icon: Images },
     ],
   },
   {

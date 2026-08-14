@@ -18,6 +18,7 @@ import type {
   Inspection,
   NoteInterne,
   Notification,
+  PhotoBibliotheque,
   TestFeedback,
 } from "@/lib/types";
 
@@ -234,6 +235,12 @@ export async function getFicheDecouverteVehicules(dossierId: string) {
     .eq("dossier_id", dossierId)
     .order("ordre", { ascending: true });
   return (data ?? []) as FicheDecouverteVehicule[];
+}
+
+export async function listPhotosBibliotheque() {
+  const db = createAdminClient();
+  const { data } = await db.from("photos_bibliotheque").select("*").order("nom", { ascending: true });
+  return (data ?? []) as PhotoBibliotheque[];
 }
 
 export async function listAllInspections() {

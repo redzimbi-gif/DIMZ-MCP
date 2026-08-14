@@ -37,6 +37,7 @@ stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
    - `0025_documents_archive.sql`
    - `0026_dossier_reference_numerotation.sql`
    - `0027_fiche_decouverte_photo.sql`
+   - `0028_photos_bibliotheque.sql`
 3. Dans **Project Settings → API**, récupère :
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -172,9 +173,14 @@ l'email de confirmation si le client a renseigné son adresse.
   que le Rapport DIMZ — véhicules repérés (marque, modèle, énergie), un point
   fort et un point de vigilance chacun, une petite photo par véhicule
   (optionnelle), sans score. Chaque véhicule est modifiable après ajout
-  (« Modifier », y compris remplacer la photo). Générée en PDF (photo
-  incluse) et envoyable au client par email depuis l'onglet dédié d'un
-  dossier.
+  (« Modifier », y compris remplacer la photo). La photo peut être uploadée
+  directement ou choisie depuis la bibliothèque de photos réutilisables
+  (menu **Photos**). Générée en PDF (photo incluse) et envoyable au client
+  par email depuis l'onglet dédié d'un dossier.
+- Photos : bibliothèque de photos réutilisables (menu **Photos**) — on
+  uploade une photo une fois, on peut ensuite la réutiliser sur n'importe
+  quel véhicule de fiche Découverte sans la re-uploader. Renommage et
+  suppression depuis la même page.
 - Inspection = Rapport DIMZ : même contenu riche que l'exemple du site (score
   global, score par étape du contrôle, tags, points positifs/vigilance, avis
   du copilote, verdict), entièrement éditable depuis le back-office, avec

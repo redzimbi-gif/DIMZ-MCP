@@ -13,6 +13,7 @@ import {
   getDossierDocuments,
   getDossierContrats,
   getDossierNotes,
+  listPhotosBibliotheque,
 } from "@/lib/queries";
 import {
   Card,
@@ -664,10 +665,45 @@ async function VehiculesTab({
   );
 }
 
+function BibliothequePicker({
+  photos,
+  urls,
+}: {
+  photos: { id: string; nom: string; storage_path: string }[];
+  urls: Record<string, string>;
+}) {
+  if (photos.length === 0) return null;
+  return (
+    <details>
+      <summary className="text-xs font-medium text-blue-600 cursor-pointer select-none">
+        Ou choisir depuis la bibliothèque
+      </summary>
+      <div className="mt-2 grid grid-cols-5 gap-2 max-h-44 overflow-y-auto pr-1">
+        {photos.map((p) =>
+          urls[p.storage_path] ? (
+            <label key={p.id} className="flex flex-col items-center gap-1 cursor-pointer">
+              <input type="radio" name="photo_bibliotheque_id" value={p.id} className="peer sr-only" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={urls[p.storage_path]}
+                alt={p.nom}
+                className="h-12 w-12 object-cover rounded-md border border-line peer-checked:ring-2 peer-checked:ring-blue-500 peer-checked:border-transparent"
+              />
+              <span className="text-[10px] text-ink-soft truncate w-12 text-center">{p.nom}</span>
+            </label>
+          ) : null
+        )}
+      </div>
+    </details>
+  );
+}
+
 async function DecouverteTab({ dossierId }: { dossierId: string }) {
   const dossier = await getDossier(dossierId);
   const vehicules = await getFicheDecouverteVehicules(dossierId);
   const photoUrls = await getSignedUrls(vehicules.map((v) => v.photo_path).filter((p): p is string => !!p));
+  const photosBibliotheque = await listPhotosBibliotheque();
+  const bibliothequeUrls = await getSignedUrls(photosBibliotheque.map((p) => p.storage_path));
   const addAction = addFicheDecouverteVehicule.bind(null, dossierId);
   const sendAction = sendFicheDecouverteEmail.bind(null, dossierId);
   const introAction = updateFicheDecouverteIntro.bind(null, dossierId);
@@ -792,6 +828,7 @@ async function DecouverteTab({ dossierId }: { dossierId: string }) {
                     <Field label={photoUrl ? "Remplacer la photo" : "Photo (optionnel)"}>
                       <input name="photo" type="file" accept="image/*" className={inputClass} />
                     </Field>
+                    <BibliothequePicker photos={photosBibliotheque} urls={bibliothequeUrls} />
                     <Button type="submit" className="text-xs px-3 py-1.5">
                       Enregistrer les modifications
                     </Button>
@@ -841,6 +878,7 @@ async function DecouverteTab({ dossierId }: { dossierId: string }) {
           <Field label="Photo (optionnel)">
             <input name="photo" type="file" accept="image/*" className={inputClass} />
           </Field>
+          <BibliothequePicker photos={photosBibliotheque} urls={bibliothequeUrls} />
           <Button type="submit" className="w-full">
             <Plus className="h-4 w-4" /> Ajouter le véhicule
           </Button>
