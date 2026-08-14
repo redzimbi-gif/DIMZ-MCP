@@ -12,7 +12,7 @@ export function Sidebar({ userLabel }: { userLabel: string }) {
   const search = searchParams.toString() ? `?${searchParams.toString()}` : "";
 
   return (
-    <aside className="hidden md:flex md:flex-col md:w-60 shrink-0 border-r border-line bg-surface h-screen sticky top-0">
+    <aside className="hidden lg:flex lg:flex-col lg:w-60 shrink-0 border-r border-line bg-surface h-screen sticky top-0">
       <div className="h-16 flex items-center px-5 border-b border-line">
         <Logo />
       </div>

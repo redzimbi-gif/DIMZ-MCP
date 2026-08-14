@@ -17,7 +17,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <Sidebar userLabel={userLabel} />
       <div className="flex-1 min-w-0 flex flex-col">
         <TopBar unreadCount={unreadCount} />
-        <main className="flex-1 p-4 md:p-8 max-w-[1400px] w-full mx-auto">{children}</main>
+        <main className="flex-1 min-w-0 overflow-x-hidden p-4 md:p-6 lg:p-8 max-w-[1400px] w-full mx-auto">
+          {children}
+        </main>
       </div>
     </div>
   );

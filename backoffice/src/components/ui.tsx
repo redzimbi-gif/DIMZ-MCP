@@ -33,38 +33,50 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <div className="flex items-start justify-between gap-4 mb-6">
-      <div>
-        <h1 className="text-xl font-semibold text-ink tracking-tight">{title}</h1>
+    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-6">
+      <div className="min-w-0">
+        <h1 className="text-xl font-semibold text-ink tracking-tight text-balance">{title}</h1>
         {description ? (
           <p className="text-sm text-ink-soft mt-1">{description}</p>
         ) : null}
       </div>
-      {actions ? <div className="flex items-center gap-2 shrink-0">{actions}</div> : null}
+      {actions ? (
+        <div className="flex flex-wrap items-center gap-2 sm:shrink-0">{actions}</div>
+      ) : null}
     </div>
   );
 }
+
+const STAT_TONES: Record<string, string> = {
+  blue: "bg-blue-50 text-blue-600",
+  good: "bg-good-bg text-good",
+  warn: "bg-warn-bg text-warn",
+};
 
 export function StatCard({
   label,
   value,
   hint,
   icon,
+  tone = "blue",
 }: {
   label: string;
   value: string | number;
   hint?: string;
   icon?: ReactNode;
+  tone?: "blue" | "good" | "warn";
 }) {
   return (
-    <Card className="p-5">
-      <div className="flex items-start justify-between">
+    <Card className="p-5 transition-shadow hover:shadow-pop">
+      <div className="flex items-start justify-between gap-3">
         <span className="text-xs font-medium text-ink-soft uppercase tracking-wide">
           {label}
         </span>
-        {icon ? <span className="text-blue-500">{icon}</span> : null}
+        {icon ? (
+          <span className={clsx("shrink-0 rounded-md p-1.5", STAT_TONES[tone])}>{icon}</span>
+        ) : null}
       </div>
-      <div className="mt-2 text-2xl font-semibold text-ink tnum">{value}</div>
+      <div className="mt-2.5 text-2xl font-semibold text-ink tnum">{value}</div>
       {hint ? <div className="mt-1 text-xs text-ink-faint">{hint}</div> : null}
     </Card>
   );
@@ -131,10 +143,10 @@ export function Button({
   variant?: "primary" | "outline" | "ghost" | "danger";
 }) {
   const variants: Record<string, string> = {
-    primary: "bg-blue-500 hover:bg-blue-600 text-white",
+    primary: "bg-blue-500 hover:bg-blue-600 text-white shadow-sm shadow-blue-500/20",
     outline: "border border-line hover:bg-surface-sunken text-ink",
     ghost: "hover:bg-surface-sunken text-ink-soft",
-    danger: "bg-bad hover:bg-bad/90 text-white",
+    danger: "bg-bad hover:bg-bad/90 text-white shadow-sm shadow-bad/20",
   };
   return (
     <button
@@ -162,7 +174,7 @@ export function LinkButton({
   className?: string;
 }) {
   const variants: Record<string, string> = {
-    primary: "bg-blue-500 hover:bg-blue-600 text-white",
+    primary: "bg-blue-500 hover:bg-blue-600 text-white shadow-sm shadow-blue-500/20",
     outline: "border border-line hover:bg-surface-sunken text-ink",
     ghost: "hover:bg-surface-sunken text-ink-soft",
   };
@@ -184,7 +196,9 @@ export function EmptyState({ title, description }: { title: string; description?
   return (
     <div className="text-center py-14 px-4">
       <p className="text-sm font-medium text-ink">{title}</p>
-      {description ? <p className="text-sm text-ink-soft mt-1">{description}</p> : null}
+      {description ? (
+        <p className="text-sm text-ink-soft mt-1 max-w-sm mx-auto text-balance">{description}</p>
+      ) : null}
     </div>
   );
 }

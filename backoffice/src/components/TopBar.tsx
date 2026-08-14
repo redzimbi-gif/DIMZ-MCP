@@ -14,7 +14,7 @@ export function TopBar({
     <header className="h-16 border-b border-line bg-surface/80 backdrop-blur sticky top-0 z-30 flex items-center justify-between px-4 md:px-6">
       <div className="flex items-center gap-3">
         <MobileNav />
-        {title ? <span className="font-medium text-ink md:hidden">{title}</span> : null}
+        {title ? <span className="font-medium text-ink lg:hidden">{title}</span> : null}
       </div>
       <div className="flex items-center gap-1">
         <Link

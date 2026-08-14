@@ -15,14 +15,15 @@ export default async function DashboardPage() {
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Nouveaux dossiers" value={stats.nouveaux} icon={<FolderPlus className="h-4 w-4" />} />
-        <StatCard label="Dossiers en cours" value={stats.enCours} icon={<Loader className="h-4 w-4" />} />
-        <StatCard label="Dossiers terminés" value={stats.termines} icon={<CheckCircle2 className="h-4 w-4" />} />
+        <StatCard label="Nouveaux dossiers" value={stats.nouveaux} icon={<FolderPlus className="h-4 w-4" />} tone="blue" />
+        <StatCard label="Dossiers en cours" value={stats.enCours} icon={<Loader className="h-4 w-4" />} tone="warn" />
+        <StatCard label="Dossiers terminés" value={stats.termines} icon={<CheckCircle2 className="h-4 w-4" />} tone="good" />
         <StatCard
           label="Chiffre d'affaires"
           value={formatCurrency(stats.chiffreAffaires)}
           hint="Dossiers terminés"
           icon={<Wallet className="h-4 w-4" />}
+          tone="blue"
         />
       </div>
 

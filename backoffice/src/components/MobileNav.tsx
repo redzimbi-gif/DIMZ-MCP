@@ -21,7 +21,7 @@ export function MobileNav() {
   }, []);
 
   const drawer = open ? (
-    <div className="fixed inset-0 z-50 md:hidden">
+    <div className="fixed inset-0 z-50 lg:hidden">
       <div className="absolute inset-0 bg-ink/30" onClick={() => setOpen(false)} />
       <div className="absolute inset-y-0 left-0 w-64 bg-surface border-r border-line flex flex-col">
         <div className="h-16 flex items-center justify-between px-5 border-b border-line">
@@ -77,7 +77,7 @@ export function MobileNav() {
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Ouvrir le menu"
-        className="md:hidden -ml-1.5 p-1.5 text-ink-soft hover:text-ink"
+        className="lg:hidden -ml-1.5 p-1.5 text-ink-soft hover:text-ink"
       >
         <Menu className="h-5 w-5" />
       </button>
