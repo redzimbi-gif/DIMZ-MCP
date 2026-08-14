@@ -38,6 +38,7 @@ stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
    - `0026_dossier_reference_numerotation.sql`
    - `0027_fiche_decouverte_photo.sql`
    - `0028_photos_bibliotheque.sql`
+   - `0029_dossier_reference_counters_rls.sql`
 3. Dans **Project Settings → API**, récupère :
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
