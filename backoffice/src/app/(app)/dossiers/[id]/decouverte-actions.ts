@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getDossier, getFicheDecouverteVehicules } from "@/lib/queries";
+import { uploadFiles, deleteFile, getSignedUrls } from "@/lib/storage";
 import { FicheDecouverteReport } from "@/lib/pdf/FicheDecouverteReport";
 import { sendEmail, getAppUrl } from "@/lib/email";
 import { ficheDecouverteEmail } from "@/lib/email-templates";
@@ -21,38 +22,108 @@ function num(formData: FormData, name: string): number | null {
   return Number.isFinite(value) ? value : null;
 }
 
+function failDecouverte(dossierId: string, error: unknown, fallback: string): never {
+  console.error("Erreur fiche Découverte", error);
+  const message = error instanceof Error ? error.message : fallback;
+  redirect(`/dossiers/${dossierId}?tab=decouverte&error=${encodeURIComponent(message)}`);
+}
+
 export async function addFicheDecouverteVehicule(dossierId: string, formData: FormData) {
   const db = createAdminClient();
 
-  const existing = await getFicheDecouverteVehicules(dossierId);
-  const payload = {
-    dossier_id: dossierId,
-    marque: text(formData, "marque"),
-    modele: text(formData, "modele"),
-    energie: text(formData, "energie"),
-    point_fort: text(formData, "point_fort"),
-    point_vigilance: text(formData, "point_vigilance"),
-    prix_min: num(formData, "prix_min"),
-    prix_max: num(formData, "prix_max"),
-    ordre: existing.length,
-  };
+  try {
+    const existing = await getFicheDecouverteVehicules(dossierId);
 
-  const { error } = await db.from("fiche_decouverte_vehicules").insert(payload);
-  if (error) throw new Error(error.message);
+    const photo = formData.get("photo") as File | null;
+    const [photoPath] = photo && photo.size > 0 ? await uploadFiles(`fiche-decouverte/${dossierId}`, [photo]) : [null];
 
-  await logActivity({
-    action: "fiche_decouverte.vehicule_ajoute",
-    entiteType: "dossier",
-    entiteId: dossierId,
-    description: `Véhicule ajouté à la fiche Découverte : ${[payload.marque, payload.modele].filter(Boolean).join(" ") || "sans nom"}`,
-  });
+    const payload = {
+      dossier_id: dossierId,
+      marque: text(formData, "marque"),
+      modele: text(formData, "modele"),
+      energie: text(formData, "energie"),
+      point_fort: text(formData, "point_fort"),
+      point_vigilance: text(formData, "point_vigilance"),
+      prix_min: num(formData, "prix_min"),
+      prix_max: num(formData, "prix_max"),
+      photo_path: photoPath ?? null,
+      ordre: existing.length,
+    };
+
+    const { error } = await db.from("fiche_decouverte_vehicules").insert(payload);
+    if (error) throw new Error(error.message);
+
+    await logActivity({
+      action: "fiche_decouverte.vehicule_ajoute",
+      entiteType: "dossier",
+      entiteId: dossierId,
+      description: `Véhicule ajouté à la fiche Découverte : ${[payload.marque, payload.modele].filter(Boolean).join(" ") || "sans nom"}`,
+    });
+  } catch (error) {
+    failDecouverte(dossierId, error, "Erreur lors de l'ajout du véhicule.");
+  }
+
+  revalidatePath(`/dossiers/${dossierId}`);
+}
+
+export async function updateFicheDecouverteVehicule(dossierId: string, vehiculeId: string, formData: FormData) {
+  const db = createAdminClient();
+
+  try {
+    const { data: existing } = await db
+      .from("fiche_decouverte_vehicules")
+      .select("photo_path")
+      .eq("id", vehiculeId)
+      .maybeSingle();
+
+    const photo = formData.get("photo") as File | null;
+    let photoPath = existing?.photo_path ?? null;
+    if (photo && photo.size > 0) {
+      const [newPath] = await uploadFiles(`fiche-decouverte/${dossierId}`, [photo]);
+      if (newPath) {
+        if (existing?.photo_path) await deleteFile(existing.photo_path);
+        photoPath = newPath;
+      }
+    }
+
+    const payload = {
+      marque: text(formData, "marque"),
+      modele: text(formData, "modele"),
+      energie: text(formData, "energie"),
+      point_fort: text(formData, "point_fort"),
+      point_vigilance: text(formData, "point_vigilance"),
+      prix_min: num(formData, "prix_min"),
+      prix_max: num(formData, "prix_max"),
+      photo_path: photoPath,
+    };
+
+    const { error } = await db.from("fiche_decouverte_vehicules").update(payload).eq("id", vehiculeId);
+    if (error) throw new Error(error.message);
+
+    await logActivity({
+      action: "fiche_decouverte.vehicule_modifie",
+      entiteType: "dossier",
+      entiteId: dossierId,
+      description: `Véhicule modifié sur la fiche Découverte : ${[payload.marque, payload.modele].filter(Boolean).join(" ") || "sans nom"}`,
+    });
+  } catch (error) {
+    failDecouverte(dossierId, error, "Erreur lors de la modification du véhicule.");
+  }
 
   revalidatePath(`/dossiers/${dossierId}`);
 }
 
 export async function deleteFicheDecouverteVehicule(dossierId: string, vehiculeId: string) {
   const db = createAdminClient();
+  const { data: existing } = await db
+    .from("fiche_decouverte_vehicules")
+    .select("photo_path")
+    .eq("id", vehiculeId)
+    .maybeSingle();
+
   await db.from("fiche_decouverte_vehicules").delete().eq("id", vehiculeId);
+  if (existing?.photo_path) await deleteFile(existing.photo_path);
+
   revalidatePath(`/dossiers/${dossierId}`);
 }
 
@@ -74,9 +145,16 @@ export async function sendFicheDecouverteEmail(dossierId: string) {
   } else {
     try {
       const vehicules = await getFicheDecouverteVehicules(dossierId);
+      const photoUrls = await getSignedUrls(
+        vehicules.map((v) => v.photo_path).filter((p): p is string => !!p)
+      );
+      const vehiculesAvecPhoto = vehicules.map((v) => ({
+        ...v,
+        photoUrl: v.photo_path ? photoUrls[v.photo_path] ?? null : null,
+      }));
       const buffer = await renderToBuffer(
         FicheDecouverteReport({
-          vehicules,
+          vehicules: vehiculesAvecPhoto,
           commentaire: dossier.fiche_decouverte_intro,
           dossierReference: dossier.reference,
           clientNom: `${dossier.clients?.prenom ?? ""} ${dossier.clients?.nom ?? ""}`.trim(),

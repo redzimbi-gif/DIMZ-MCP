@@ -61,6 +61,7 @@ import { createAnnonce, toggleAnnonceSelection, deleteAnnonce } from "./annonces
 import { updateMarketCommentaire, sendMarketEmail } from "./market-actions";
 import {
   addFicheDecouverteVehicule,
+  updateFicheDecouverteVehicule,
   deleteFicheDecouverteVehicule,
   sendFicheDecouverteEmail,
   updateFicheDecouverteIntro,
@@ -666,6 +667,7 @@ async function VehiculesTab({
 async function DecouverteTab({ dossierId }: { dossierId: string }) {
   const dossier = await getDossier(dossierId);
   const vehicules = await getFicheDecouverteVehicules(dossierId);
+  const photoUrls = await getSignedUrls(vehicules.map((v) => v.photo_path).filter((p): p is string => !!p));
   const addAction = addFicheDecouverteVehicule.bind(null, dossierId);
   const sendAction = sendFicheDecouverteEmail.bind(null, dossierId);
   const introAction = updateFicheDecouverteIntro.bind(null, dossierId);
@@ -710,46 +712,100 @@ async function DecouverteTab({ dossierId }: { dossierId: string }) {
             <EmptyState title="Aucun véhicule ajouté à la fiche Découverte" />
           </Card>
         ) : (
-          vehicules.map((v) => (
-            <Card key={v.id} className="p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="font-medium text-ink truncate">
-                      {[v.marque, v.modele].filter(Boolean).join(" ") || "Véhicule"}
-                    </p>
-                    {v.energie ? <Badge tone="blue">{v.energie}</Badge> : null}
+          vehicules.map((v) => {
+            const updateAction = updateFicheDecouverteVehicule.bind(null, dossierId, v.id);
+            const photoUrl = v.photo_path ? photoUrls[v.photo_path] : null;
+            return (
+              <Card key={v.id} className="p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3 min-w-0">
+                    {photoUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={photoUrl} alt="" className="h-14 w-14 object-cover rounded-md border border-line shrink-0" />
+                    ) : null}
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-ink truncate">
+                          {[v.marque, v.modele].filter(Boolean).join(" ") || "Véhicule"}
+                        </p>
+                        {v.energie ? <Badge tone="blue">{v.energie}</Badge> : null}
+                      </div>
+                      {v.prix_min && v.prix_max ? (
+                        <p className="text-sm text-ink-soft mt-1 tnum">
+                          Entre {formatCurrency(v.prix_min)} et {formatCurrency(v.prix_max)}
+                        </p>
+                      ) : v.prix_min || v.prix_max ? (
+                        <p className="text-sm text-ink-soft mt-1 tnum">
+                          Environ {formatCurrency((v.prix_min ?? v.prix_max)!)}
+                        </p>
+                      ) : null}
+                      {v.point_fort ? <p className="text-sm text-good mt-2">+ {v.point_fort}</p> : null}
+                      {v.point_vigilance ? <p className="text-sm text-warn mt-1">! {v.point_vigilance}</p> : null}
+                    </div>
                   </div>
-                  {v.prix_min && v.prix_max ? (
-                    <p className="text-sm text-ink-soft mt-1 tnum">
-                      Entre {formatCurrency(v.prix_min)} et {formatCurrency(v.prix_max)}
-                    </p>
-                  ) : v.prix_min || v.prix_max ? (
-                    <p className="text-sm text-ink-soft mt-1 tnum">
-                      Environ {formatCurrency((v.prix_min ?? v.prix_max)!)}
-                    </p>
-                  ) : null}
-                  {v.point_fort ? <p className="text-sm text-good mt-2">+ {v.point_fort}</p> : null}
-                  {v.point_vigilance ? <p className="text-sm text-warn mt-1">! {v.point_vigilance}</p> : null}
+                  <form action={removeAction.bind(null, v.id)}>
+                    <button
+                      type="submit"
+                      className="p-1.5 rounded-md text-ink-faint hover:text-bad hover:bg-bad-bg shrink-0"
+                      aria-label="Retirer ce véhicule"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </form>
                 </div>
-                <form action={removeAction.bind(null, v.id)}>
-                  <button
-                    type="submit"
-                    className="p-1.5 rounded-md text-ink-faint hover:text-bad hover:bg-bad-bg shrink-0"
-                    aria-label="Retirer ce véhicule"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </form>
-              </div>
-            </Card>
-          ))
+
+                <details className="mt-3">
+                  <summary className="text-xs font-medium text-blue-600 cursor-pointer select-none">Modifier</summary>
+                  <form action={updateAction} className="space-y-3 mt-3" encType="multipart/form-data">
+                    <div className="grid grid-cols-2 gap-3">
+                      <Field label="Marque">
+                        <input name="marque" defaultValue={v.marque ?? ""} className={inputClass} />
+                      </Field>
+                      <Field label="Modèle">
+                        <input name="modele" defaultValue={v.modele ?? ""} className={inputClass} />
+                      </Field>
+                    </div>
+                    <Field label="Énergie">
+                      <select name="energie" defaultValue={v.energie ?? ""} className={inputClass}>
+                        <option value="">—</option>
+                        {FICHE_DECOUVERTE_ENERGIES.map((e) => (
+                          <option key={e} value={e}>
+                            {e}
+                          </option>
+                        ))}
+                      </select>
+                    </Field>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Field label="Prix min (€)">
+                        <input name="prix_min" type="number" step="1" min="0" defaultValue={v.prix_min ?? ""} className={inputClass} />
+                      </Field>
+                      <Field label="Prix max (€)">
+                        <input name="prix_max" type="number" step="1" min="0" defaultValue={v.prix_max ?? ""} className={inputClass} />
+                      </Field>
+                    </div>
+                    <Field label="Point fort">
+                      <input name="point_fort" defaultValue={v.point_fort ?? ""} className={inputClass} />
+                    </Field>
+                    <Field label="Point de vigilance">
+                      <input name="point_vigilance" defaultValue={v.point_vigilance ?? ""} className={inputClass} />
+                    </Field>
+                    <Field label={photoUrl ? "Remplacer la photo" : "Photo (optionnel)"}>
+                      <input name="photo" type="file" accept="image/*" className={inputClass} />
+                    </Field>
+                    <Button type="submit" className="text-xs px-3 py-1.5">
+                      Enregistrer les modifications
+                    </Button>
+                  </form>
+                </details>
+              </Card>
+            );
+          })
         )}
       </div>
 
       <Card className="p-5 h-fit">
         <h2 className="text-sm font-semibold text-ink mb-4">Ajouter un véhicule</h2>
-        <AutoResetForm action={addAction} className="space-y-3">
+        <AutoResetForm action={addAction} className="space-y-3" encType="multipart/form-data">
           <div className="grid grid-cols-2 gap-3">
             <Field label="Marque">
               <input name="marque" className={inputClass} />
@@ -781,6 +837,9 @@ async function DecouverteTab({ dossierId }: { dossierId: string }) {
           </Field>
           <Field label="Point de vigilance">
             <input name="point_vigilance" className={inputClass} />
+          </Field>
+          <Field label="Photo (optionnel)">
+            <input name="photo" type="file" accept="image/*" className={inputClass} />
           </Field>
           <Button type="submit" className="w-full">
             <Plus className="h-4 w-4" /> Ajouter le véhicule

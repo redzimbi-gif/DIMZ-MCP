@@ -36,6 +36,7 @@ stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
    - `0024_factures_pdf.sql`
    - `0025_documents_archive.sql`
    - `0026_dossier_reference_numerotation.sql`
+   - `0027_fiche_decouverte_photo.sql`
 3. Dans **Project Settings → API**, récupère :
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -169,8 +170,11 @@ l'email de confirmation si le client a renseigné son adresse.
   Copilote Plus) — généré et envoyable par email depuis l'onglet Annonces.
 - Fiche Découverte : pour l'offre gratuite Découverte, une fiche plus légère
   que le Rapport DIMZ — véhicules repérés (marque, modèle, énergie), un point
-  fort et un point de vigilance chacun, sans score. Générée en PDF et
-  envoyable au client par email depuis l'onglet dédié d'un dossier.
+  fort et un point de vigilance chacun, une petite photo par véhicule
+  (optionnelle), sans score. Chaque véhicule est modifiable après ajout
+  (« Modifier », y compris remplacer la photo). Générée en PDF (photo
+  incluse) et envoyable au client par email depuis l'onglet dédié d'un
+  dossier.
 - Inspection = Rapport DIMZ : même contenu riche que l'exemple du site (score
   global, score par étape du contrôle, tags, points positifs/vigilance, avis
   du copilote, verdict), entièrement éditable depuis le back-office, avec

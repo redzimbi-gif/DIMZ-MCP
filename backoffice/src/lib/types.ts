@@ -201,6 +201,7 @@ export interface FicheDecouverteVehicule {
   point_vigilance: string | null;
   prix_min: number | null;
   prix_max: number | null;
+  photo_path: string | null;
   ordre: number;
   created_at: string;
   updated_at: string;
