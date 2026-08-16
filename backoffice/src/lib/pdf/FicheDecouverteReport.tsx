@@ -14,9 +14,8 @@ interface Props {
 }
 
 const DEFAULT_INTRO =
-  "Votre copilote a fait le tour du marché pour vous — voici ce qu'il en retient, sans détour. Pas de " +
-  "note chiffrée à ce stade : juste un point fort et un point de vigilance par véhicule, pour vous aider " +
-  "à y voir clair avant d'aller plus loin.";
+  "Votre copilote a bien étudié votre projet et a fait le tour du marché pour vous — voici ce qu'il en " +
+  "retient, sans détour.";
 
 export function FicheDecouverteReport({ vehicules, commentaire, dossierReference, clientNom }: Props) {
   return (
@@ -114,10 +113,9 @@ export function FicheDecouverteReport({ vehicules, commentaire, dossierReference
             Envie d'aller plus loin ?
           </Text>
           <Text style={{ fontSize: 9, lineHeight: 1.5, color: "#0b0d12" }}>
-            Avec l'offre Copilote, votre copilote pousse la recherche plus loin : analyse détaillée de chaque
-            annonce, score DIMZ, rapport écrit et appel de synthèse. Avec Copilote Plus, il vous accompagne
-            jusqu'à la remise des clés : mise en relation avec le vendeur, inspection complète, livraison et
-            démarches administratives incluses.
+            D'abord un appel avec votre copilote, pour bien cerner votre projet. Avec l'offre Copilote, il
+            analyse ensuite les annonces les plus pertinentes et vous remet un rapport noté selon plusieurs
+            critères, pour vous aider à faire le meilleur choix.
           </Text>
         </View>
 
