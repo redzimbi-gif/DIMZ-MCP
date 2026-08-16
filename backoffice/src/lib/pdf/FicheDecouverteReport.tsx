@@ -14,7 +14,7 @@ interface Props {
 }
 
 const DEFAULT_INTRO =
-  "Votre copilote a bien étudié votre projet et a fait le tour du marché pour vous — voici ce qu'il en " +
+  "Votre copilote a bien étudié votre projet et a fait le tour du marché pour vous. Voici ce qu'il en " +
   "retient, sans détour.";
 
 export function FicheDecouverteReport({ vehicules, commentaire, dossierReference, clientNom }: Props) {
