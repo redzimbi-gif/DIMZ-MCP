@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta http-equiv="refresh" content="0; url=dimz-beta.html" />
 <title>Dimz - Mon Copilote Auto : achat, inspection et convoyage</title>
 <meta name="description" content="Dimz - Mon Copilote Auto accompagne votre achat automobile de A à Z : recherche de véhicule, inspection avant achat et convoyage, partout en France. Un copilote, pas un vendeur." />
 <meta name="robots" content="index, follow" />
@@ -80,9 +79,98 @@
   ]
 }
 </script>
+<style>
+  :root {
+    --noir: #10141c;
+    --bleu-vif: #2f6fed;
+    --bg: #f6f7fa;
+    --ink: #10141c;
+    --ink-soft: #5b6472;
+    --serif: "Iowan Old Style", "Palatino Linotype", Georgia, "Times New Roman", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 24px;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    text-align: center;
+  }
+  .wrap {
+    max-width: 460px;
+  }
+  .name {
+    display: inline-flex;
+    align-items: baseline;
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .name em {
+    font-style: normal;
+    font-family: var(--sans);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    color: var(--ink-soft);
+    font-size: 0.5em;
+    margin-left: 4px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .name em::before, .name em::after {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 1.5px;
+    background: var(--bleu-vif);
+    margin: 0 6px;
+  }
+  h1 {
+    margin: 40px 0 12px;
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(1.4rem, 1.15rem + 1vw, 1.8rem);
+    line-height: 1.35;
+    color: var(--ink);
+  }
+  p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 1.02rem;
+    line-height: 1.6;
+  }
+  .contact {
+    margin-top: 40px;
+    font-size: 0.88rem;
+  }
+  .contact a {
+    color: var(--bleu-vif);
+    text-decoration: none;
+  }
+  .contact a:hover {
+    text-decoration: underline;
+  }
+</style>
 </head>
 <body>
-<p>Redirection vers <a href="dimz-beta.html">Dimz, Mon copilote auto</a>.</p>
-<script>location.replace('dimz-beta.html' + location.hash);</script>
+  <div class="wrap">
+    <span class="name">Dimz<em>Mon copilote auto</em></span>
+    <h1>Votre copilote enfile sa combinaison.</h1>
+    <p>Il a besoin d'un peu d'intimité avant la grande aventure.</p>
+    <p class="contact">Une question, un projet en tête ? <a href="mailto:contact@dimz-copilote.com">contact@dimz-copilote.com</a></p>
+  </div>
 </body>
 </html>
