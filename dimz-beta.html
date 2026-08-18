@@ -708,6 +708,27 @@
   .choice-grid label:has(input:checked) { border-color: var(--bleu-vif); background: var(--bleu-vif); color: #fff; }
   .choice-grid label:has(input:focus-visible) { outline: 2px solid var(--bleu-vif); outline-offset: 2px; }
 
+  /* Cartes compactes pour choisir un accompagnement (étape "Projet et délai") :
+     résumé + rappel de prix, sans reproduire les grandes cartes de la section Offres. */
+  .offer-pick-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px; }
+  @media (min-width: 640px) { .offer-pick-grid { grid-template-columns: repeat(4, 1fr); } }
+  .offer-pick {
+    position: relative; display: flex; flex-direction: column; gap: 2px;
+    background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-sm);
+    padding: 11px 13px; cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .offer-pick input {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+  .offer-pick-name { font-size: 0.86rem; font-weight: 700; color: var(--ink); }
+  .offer-pick-desc { font-size: 0.72rem; line-height: 1.35; color: var(--ink-soft); }
+  .offer-pick-price { margin-top: 4px; font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 0.78rem; font-weight: 700; color: var(--bleu-vif); }
+  .offer-pick-price.free { color: var(--vert); font-family: var(--sans); }
+  .offer-pick:has(input:checked) { border-color: var(--bleu-vif); background: color-mix(in srgb, var(--bleu-vif) 8%, var(--bg)); }
+  .offer-pick:has(input:checked) .offer-pick-name { color: var(--bleu-vif); }
+  .offer-pick:has(input:focus-visible) { outline: 2px solid var(--bleu-vif); outline-offset: 2px; }
+
   /* Info-bulle générique au survol/focus (data-tooltip="..."). */
   [data-tooltip] { position: relative; }
   [data-tooltip]::after {
@@ -777,21 +798,24 @@
     background: color-mix(in srgb, var(--bleu-vif) 10%, var(--bg)); border-radius: 8px; padding: 5px 0;
   }
 
-  .veh-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 12px; align-items: end; margin-bottom: 14px; }
+  .veh-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; align-items: end; margin-bottom: 14px; }
   @media (max-width: 960px) { .veh-row { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 560px) { .veh-row { grid-template-columns: 1fr; } }
   .veh-row .field { margin: 0; }
   .veh-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
   @media (max-width: 700px) { .veh-row-3 { grid-template-columns: 1fr; } }
-  .veh-remove { background: transparent; border: 1px solid var(--line); color: var(--ink-soft); border-radius: var(--r-sm); padding: 11px 14px; cursor: pointer; }
-  .veh-remove:hover { color: var(--rouge); border-color: var(--rouge); }
-  .add-vehicle { margin-top: 6px; background: transparent; border: 1px dashed var(--line); color: var(--bleu-vif); border-radius: var(--r-md); padding: 12px 18px; cursor: pointer; font-weight: 700; width: 100%; }
-  .add-vehicle:hover { border-color: var(--bleu-vif); }
-  .add-vehicle:disabled { color: var(--ink-soft); cursor: not-allowed; }
 
   .veh-bubbles { display: flex; flex-wrap: wrap; gap: 8px; margin: -4px 0 12px; }
-  .veh-bubble { display: inline-flex; align-items: center; gap: 8px; background: color-mix(in srgb, var(--bleu-vif) 10%, var(--bg)); border: 1px solid color-mix(in srgb, var(--bleu-vif) 35%, var(--line)); color: var(--ink); border-radius: 100px; padding: 7px 8px 7px 14px; font-size: 0.84rem; font-weight: 600; }
+  .veh-bubble {
+    display: inline-flex; align-items: center; gap: 8px; background: color-mix(in srgb, var(--bleu-vif) 10%, var(--bg));
+    border: 1px solid color-mix(in srgb, var(--bleu-vif) 35%, var(--line)); color: var(--ink); border-radius: 100px;
+    padding: 7px 12px 7px 14px; font-size: 0.84rem; font-weight: 600; font-family: inherit; cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .veh-bubble:hover, .veh-bubble:focus-visible { border-color: var(--rouge); background: color-mix(in srgb, var(--rouge) 8%, var(--bg)); }
   .veh-bubble svg { width: 14px; height: 14px; color: var(--bleu-vif); flex: none; }
+  .veh-bubble-x { width: 11px !important; height: 11px !important; color: var(--ink-soft) !important; }
+  .veh-bubble:hover .veh-bubble-x, .veh-bubble:focus-visible .veh-bubble-x { color: var(--rouge) !important; }
 
   .toggle-row { display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 10px; }
   .toggle-row input { width: auto; }
@@ -1309,10 +1333,10 @@
                 </div>
 
                 <div id="modele-oui-block" hidden style="margin-top:22px;">
-                  <div class="field hint" style="margin-bottom:14px;">Choisissez une ou plusieurs pistes : marque, modèle, puis génération, parmi une trentaine de marques.</div>
-                  <div id="vehicule-list"></div>
+                  <div class="field hint" style="margin-bottom:14px;">Choisissez une ou plusieurs pistes : marque, modèle, génération puis énergie, parmi une trentaine de marques. Chaque véhicule validé s'ajoute ci-dessus et la ligne se vide pour en saisir un nouveau.</div>
                   <div id="vehicule-bubbles" class="veh-bubbles"></div>
-                  <button type="button" class="add-vehicle" id="add-vehicle">+ Ajouter un véhicule</button>
+                  <div id="vehicule-list"></div>
+                  <p class="hint" id="vehicule-max-hint" hidden>Maximum de 4 véhicules atteint — retirez-en un pour en ajouter un autre.</p>
 
                   <div class="field-grid" style="margin-top:26px;">
                     <div class="field full">
@@ -1320,7 +1344,7 @@
                       <div class="choice-grid" id="transmission-choices-oui">
                         <label><input type="checkbox" value="automatique"> Automatique</label>
                         <label><input type="checkbox" value="manuelle"> Manuelle</label>
-                        <label><input type="checkbox" value="peu-importe"> Peu importe</label>
+                        <label><input type="checkbox" value="sans-preference"> Sans préférence</label>
                       </div>
                     </div>
                   </div>
@@ -1351,7 +1375,7 @@
                         <label data-tooltip="Le moteur électrique assiste le moteur thermique (accélération, redémarrages) mais ne roule jamais seul. Pas de prise à brancher, autonomie illimitée."><input type="checkbox" value="hybride"> Hybride (MHEV)</label>
                         <label data-tooltip="Se branche sur une prise et roule plusieurs dizaines de km en 100 % électrique, puis bascule sur le moteur thermique pour les longs trajets."><input type="checkbox" value="hybride-rechargeable"> Hybride rechargeable (PHEV)</label>
                         <label><input type="checkbox" value="electrique"> Électrique</label>
-                        <label><input type="checkbox" value="peu-importe"> Peu importe</label>
+                        <label><input type="checkbox" value="sans-preference"> Sans préférence</label>
                       </div>
                     </div>
                     <div class="field full">
@@ -1359,7 +1383,7 @@
                       <div class="choice-grid" id="transmission-choices-non">
                         <label><input type="checkbox" value="automatique"> Automatique</label>
                         <label><input type="checkbox" value="manuelle"> Manuelle</label>
-                        <label><input type="checkbox" value="peu-importe"> Peu importe</label>
+                        <label><input type="checkbox" value="sans-preference"> Sans préférence</label>
                       </div>
                     </div>
                     <div class="field full">
@@ -1383,11 +1407,31 @@
                 <div class="field-grid">
                   <div class="field full">
                     <label>Quel accompagnement recherchez-vous ?</label>
-                    <div class="choice-grid" id="besoin-choices">
-                      <label><input type="radio" name="besoin" value="conseil"> Découverte</label>
-                      <label><input type="radio" name="besoin" value="accompagnement"> Copilote</label>
-                      <label><input type="radio" name="besoin" value="complet"> Copilote Plus</label>
-                      <label><input type="radio" name="besoin" value="inspection"> Inspection</label>
+                    <div class="offer-pick-grid" id="besoin-choices">
+                      <label class="offer-pick">
+                        <input type="radio" name="besoin" value="conseil">
+                        <span class="offer-pick-name">Découverte</span>
+                        <span class="offer-pick-desc">Un premier avis, sans engagement</span>
+                        <span class="offer-pick-price free">Gratuit</span>
+                      </label>
+                      <label class="offer-pick">
+                        <input type="radio" name="besoin" value="accompagnement">
+                        <span class="offer-pick-name">Copilote</span>
+                        <span class="offer-pick-desc">Recherche et sélection de véhicules</span>
+                        <span class="offer-pick-price">Dès 99 €</span>
+                      </label>
+                      <label class="offer-pick">
+                        <input type="radio" name="besoin" value="complet">
+                        <span class="offer-pick-name">Copilote Plus</span>
+                        <span class="offer-pick-desc">Accompagnement complet, jusqu'aux clés</span>
+                        <span class="offer-pick-price">Dès 749 €</span>
+                      </label>
+                      <label class="offer-pick">
+                        <input type="radio" name="besoin" value="inspection">
+                        <span class="offer-pick-name">Inspection</span>
+                        <span class="offer-pick-desc">Expertise d'un véhicule déjà trouvé</span>
+                        <span class="offer-pick-price">Sur devis</span>
+                      </label>
                     </div>
                   </div>
                   <div class="field">
@@ -1396,11 +1440,12 @@
                       <option>Urgent (moins d'1 mois)</option>
                       <option>1 à 3 mois</option>
                       <option>3 à 6 mois</option>
+                      <option>Plus de 6 mois</option>
                       <option>Je m'informe seulement</option>
                     </select>
                   </div>
                   <div class="field">
-                    <label for="a-source">Comment avez-vous connu Dimz ? <span class="hint">(optionnel)</span></label>
+                    <label for="a-source">Comment avez-vous connu Dimz - Mon Copilote Auto ? <span class="hint">(optionnel)</span></label>
                     <select id="a-source">
                       <option value="">Choisir…</option>
                       <option>Bouche à oreille</option>
@@ -3226,8 +3271,10 @@
   };
 
   var vehicleList = document.getElementById('vehicule-list');
-  var vehicleCount = 0;
+  var vehicleBubblesEl = document.getElementById('vehicule-bubbles');
+  var vehicleMaxHint = document.getElementById('vehicule-max-hint');
   var MAX_VEHICLES = 4;
+  var confirmedVehicles = []; // {marque, modele, gen, energie}
 
   function brandOptions() {
     return '<option value="">Marque…</option>' + Object.keys(VEHICLE_DATA).map(function (b) {
@@ -3240,7 +3287,7 @@
   var VEH_NO_DIESEL = ['up!', 'Aygo', '107', '108', 'C1', 'Twingo', 'i10', 'ForTwo', 'ForFour', 'Ignis'];
 
   function getEnergies(model, generation) {
-    if (VEH_ELECTRIC_ONLY.indexOf(model) !== -1) return ['Électrique', 'Peu importe / Je ne sais pas'];
+    if (VEH_ELECTRIC_ONLY.indexOf(model) !== -1) return ['Électrique', 'Sans préférence'];
     var options = ['Essence'];
     if (VEH_NO_DIESEL.indexOf(model) === -1) options.push('Diesel');
     var m = generation.match(/(\d{4})[–-](\d{4}|présent)/);
@@ -3248,48 +3295,48 @@
     if (endYear >= 2015) options.push('Hybride');
     if (endYear >= 2019) options.push('Hybride rechargeable');
     if (endYear >= 2021) options.push('Électrique');
-    options.push('Peu importe / Je ne sais pas');
+    options.push('Sans préférence');
     return options;
   }
 
-  function addVehicleRow() {
-    if (vehicleCount >= MAX_VEHICLES) return;
-    vehicleCount++;
-    var row = document.createElement('div');
-    row.className = 'veh-row';
-    row.innerHTML =
+  function buildEntryRow() {
+    vehicleList.innerHTML =
+      '<div class="veh-row">' +
       '<div class="field"><label>Marque</label><select class="veh-marque">' + brandOptions() + '</select></div>' +
       '<div class="field"><label>Modèle</label><select class="veh-modele" disabled><option value="">Choisir la marque d\'abord</option></select></div>' +
       '<div class="field"><label>Génération</label><select class="veh-generation" disabled><option value="">—</option></select></div>' +
       '<div class="field"><label>Énergie</label><select class="veh-energie" disabled><option value="">—</option></select></div>' +
-      '<button type="button" class="veh-remove" aria-label="Retirer ce véhicule">✕</button>';
-    vehicleList.appendChild(row);
-    updateAddButton();
+      '</div>';
   }
 
-  function updateAddButton() {
-    var btn = document.getElementById('add-vehicle');
-    btn.disabled = vehicleCount >= MAX_VEHICLES;
-    btn.textContent = vehicleCount >= MAX_VEHICLES ? 'Maximum de 4 véhicules atteint' : '+ Ajouter un véhicule';
+  function updateVehicleUI() {
+    if (confirmedVehicles.length >= MAX_VEHICLES) {
+      vehicleList.innerHTML = '';
+      vehicleMaxHint.hidden = false;
+    } else {
+      vehicleMaxHint.hidden = true;
+      buildEntryRow();
+    }
   }
 
   function renderVehicleBubbles() {
-    var container = document.getElementById('vehicule-bubbles');
-    container.innerHTML = '';
-    document.querySelectorAll('#vehicule-list .veh-row').forEach(function (row) {
-      var marque = row.querySelector('.veh-marque').value;
-      var modele = row.querySelector('.veh-modele').value;
-      var gen = row.querySelector('.veh-generation').value;
-      var energie = row.querySelector('.veh-energie').value;
-      if (marque && modele && gen) {
-        var bubble = document.createElement('span');
-        bubble.className = 'veh-bubble';
-        var label = marque + ' ' + modele + ' · ' + gen + (energie ? ' · ' + energie : '');
-        bubble.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>' + label;
-        container.appendChild(bubble);
-      }
-    });
+    vehicleBubblesEl.innerHTML = confirmedVehicles.map(function (v, i) {
+      var label = v.marque + ' ' + v.modele + ' · ' + v.gen + (v.energie ? ' · ' + v.energie : '');
+      return '<button type="button" class="veh-bubble" data-index="' + i + '" aria-label="Retirer ' + label.replace(/"/g, '&quot;') + '">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>' +
+        '<span>' + label + '</span>' +
+        '<svg class="veh-bubble-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
+        '</button>';
+    }).join('');
   }
+
+  vehicleBubblesEl.addEventListener('click', function (e) {
+    var btn = e.target.closest('.veh-bubble');
+    if (!btn) return;
+    confirmedVehicles.splice(Number(btn.dataset.index), 1);
+    renderVehicleBubbles();
+    updateVehicleUI();
+  });
 
   vehicleList.addEventListener('change', function (e) {
     var row = e.target.closest('.veh-row');
@@ -3315,12 +3362,12 @@
       modeleSelect.disabled = false;
       genSelect.innerHTML = '<option value="">—</option>';
       genSelect.disabled = true;
+      return;
     }
     if (e.target.classList.contains('veh-modele')) {
-      var row2 = e.target.closest('.veh-row');
-      var brand2 = row2.querySelector('.veh-marque').value;
-      var genSelect2 = row2.querySelector('.veh-generation');
-      var energieSelect2 = row2.querySelector('.veh-energie');
+      var brand2 = row.querySelector('.veh-marque').value;
+      var genSelect2 = row.querySelector('.veh-generation');
+      var energieSelect2 = row.querySelector('.veh-energie');
       var model = e.target.value;
       energieSelect2.innerHTML = '<option value="">—</option>';
       energieSelect2.disabled = true;
@@ -3334,11 +3381,11 @@
         return '<option value="' + g + '">' + g + '</option>';
       }).join('');
       genSelect2.disabled = false;
+      return;
     }
     if (e.target.classList.contains('veh-generation')) {
-      var row3 = e.target.closest('.veh-row');
-      var model3 = row3.querySelector('.veh-modele').value;
-      var energieSelect3 = row3.querySelector('.veh-energie');
+      var model3 = row.querySelector('.veh-modele').value;
+      var energieSelect3 = row.querySelector('.veh-energie');
       var generation = e.target.value;
       if (!generation) {
         energieSelect3.innerHTML = '<option value="">—</option>';
@@ -3350,21 +3397,25 @@
         }).join('');
         energieSelect3.disabled = false;
       }
+      return;
     }
-    renderVehicleBubbles();
-  });
-
-  vehicleList.addEventListener('click', function (e) {
-    if (e.target.classList.contains('veh-remove')) {
-      e.target.closest('.veh-row').remove();
-      vehicleCount--;
-      updateAddButton();
+    if (e.target.classList.contains('veh-energie') && e.target.value) {
+      // Marque, modèle et génération sont forcément déjà remplis à ce stade (la
+      // chaîne de <select> dépendants le garantit) : dès qu'une énergie est
+      // choisie, le véhicule est confirmé et la ligne se vide pour en saisir un
+      // nouveau, au lieu de rester affichée remplie.
+      confirmedVehicles.push({
+        marque: row.querySelector('.veh-marque').value,
+        modele: row.querySelector('.veh-modele').value,
+        gen: row.querySelector('.veh-generation').value,
+        energie: e.target.value
+      });
       renderVehicleBubbles();
+      updateVehicleUI();
     }
   });
 
-  document.getElementById('add-vehicle').addEventListener('click', addVehicleRow);
-  addVehicleRow();
+  updateVehicleUI();
 
   // ---------- Marque préférée (étape "La voiture de vos rêves", bloc "Non") ----------
   var marquePrefereeChoices = document.getElementById('marque-preferee-choices');
@@ -3376,9 +3427,8 @@
   var modeleOuiBlock = document.getElementById('modele-oui-block');
   var modeleNonBlock = document.getElementById('modele-non-block');
   function resetModeleOuiBlock() {
-    document.querySelectorAll('#vehicule-list .veh-row').forEach(function (row) { row.remove(); });
-    vehicleCount = 0;
-    addVehicleRow();
+    confirmedVehicles = [];
+    updateVehicleUI();
     document.querySelectorAll('#transmission-choices-oui input').forEach(function (el) { el.checked = false; });
     renderVehicleBubbles();
   }
@@ -4231,9 +4281,8 @@
         actuelModele.disabled = true;
         actuelGeneration.innerHTML = '<option value="">—</option>';
         actuelGeneration.disabled = true;
-        document.querySelectorAll('#vehicule-list .veh-row').forEach(function (row) { row.remove(); });
-        vehicleCount = 0;
-        addVehicleRow();
+        confirmedVehicles = [];
+        updateVehicleUI();
         renderVehicleBubbles();
         document.getElementById('modele-oui-block').hidden = true;
         document.getElementById('modele-non-block').hidden = true;
