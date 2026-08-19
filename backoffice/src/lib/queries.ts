@@ -6,6 +6,7 @@ import type {
   Annonce,
   Client,
   Convoyage,
+  ConvoyageEtatLieux,
   ConvoyageExterne,
   DocumentRow,
   Dossier,
@@ -13,6 +14,7 @@ import type {
   DossierEtapeHistory,
   DossierStatutHistory,
   EntrepriseInfo,
+  EtatLieuxType,
   Facture,
   FicheDecouverteVehicule,
   Inspection,
@@ -300,6 +302,23 @@ export async function getConvoyage(id: string) {
     .eq("id", id)
     .maybeSingle();
   return data as (Convoyage & { dossiers: any }) | null;
+}
+
+export async function getConvoyageEtatsLieux(convoyageId: string) {
+  const db = createAdminClient();
+  const { data } = await db.from("convoyage_etats_lieux").select("*").eq("convoyage_id", convoyageId);
+  return (data ?? []) as ConvoyageEtatLieux[];
+}
+
+export async function getConvoyageEtatLieux(convoyageId: string, type: EtatLieuxType) {
+  const db = createAdminClient();
+  const { data } = await db
+    .from("convoyage_etats_lieux")
+    .select("*")
+    .eq("convoyage_id", convoyageId)
+    .eq("type", type)
+    .maybeSingle();
+  return data as ConvoyageEtatLieux | null;
 }
 
 export async function getDossierDocuments(dossierId: string, options?: { archived?: boolean }) {

@@ -292,6 +292,23 @@ export interface Convoyage {
   updated_at: string;
 }
 
+export type EtatLieuxType = "depart" | "arrivee";
+
+export interface ConvoyageEtatLieux {
+  id: string;
+  convoyage_id: string;
+  type: EtatLieuxType;
+  kilometrage: number | null;
+  carburant: string | null;
+  photos: Record<string, string>;
+  photos_autres: string[];
+  contact_nom: string | null;
+  signature_path: string | null;
+  confirme_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface AgendaEvent {
   id: string;
   titre: string;

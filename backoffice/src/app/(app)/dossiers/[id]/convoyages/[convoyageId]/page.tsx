@@ -1,12 +1,13 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { FileDown, Mail } from "lucide-react";
-import { getConvoyage } from "@/lib/queries";
+import { getConvoyage, getConvoyageEtatsLieux } from "@/lib/queries";
 import { getSignedUrls } from "@/lib/storage";
 import { Card, PageHeader, LinkButton, Badge, Button } from "@/components/ui";
 import { EmailStatusBanner } from "@/components/EmailStatusBanner";
 import { CONVOYAGE_STATUT_LABELS } from "@/lib/types";
-import { formatDate } from "@/lib/format";
+import { ETAT_LIEUX_TYPE_LABELS } from "@/lib/etat-lieux";
+import { formatDate, formatDateTime } from "@/lib/format";
 import { sendConvoyageReportEmail } from "./actions";
 
 export default async function ConvoyageDetailPage({
@@ -18,6 +19,10 @@ export default async function ConvoyageDetailPage({
 }) {
   const convoyage = await getConvoyage(params.convoyageId);
   if (!convoyage || convoyage.dossier_id !== params.id) notFound();
+
+  const etatsLieux = await getConvoyageEtatsLieux(params.convoyageId);
+  const etatDepart = etatsLieux.find((e) => e.type === "depart") ?? null;
+  const etatArrivee = etatsLieux.find((e) => e.type === "arrivee") ?? null;
 
   const allPhotos = [...convoyage.photos_avant, ...convoyage.photos_apres];
   const signatureUrl = convoyage.signature_client ? [convoyage.signature_client] : [];
@@ -77,6 +82,35 @@ export default async function ConvoyageDetailPage({
             <p className="text-sm text-ink whitespace-pre-line">{convoyage.rapport_notes}</p>
           </div>
         ) : null}
+      </Card>
+
+      <Card className="p-6 mt-4">
+        <h2 className="text-sm font-semibold text-ink mb-3">État des lieux guidé</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {(["depart", "arrivee"] as const).map((type) => {
+            const etat = type === "depart" ? etatDepart : etatArrivee;
+            const confirmed = !!etat?.confirme_at;
+            return (
+              <div key={type} className="flex items-center justify-between border border-line rounded-md p-3.5">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-ink">{ETAT_LIEUX_TYPE_LABELS[type]}</p>
+                  <p className="text-xs text-ink-soft mt-0.5">
+                    {confirmed ? `Confirmé le ${formatDateTime(etat!.confirme_at!)}` : etat ? "Brouillon en cours" : "Pas encore commencé"}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0 ml-3">
+                  {confirmed ? <Badge tone="good">Confirmé</Badge> : null}
+                  <LinkButton
+                    href={`/dossiers/${params.id}/convoyages/${convoyage.id}/etat-lieux/${type}`}
+                    variant="outline"
+                  >
+                    {confirmed ? "Voir" : "Continuer"}
+                  </LinkButton>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </Card>
 
       {allPhotos.length > 0 ? (

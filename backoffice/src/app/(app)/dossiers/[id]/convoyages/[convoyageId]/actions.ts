@@ -2,33 +2,32 @@
 
 import { redirect } from "next/navigation";
 import { renderToBuffer } from "@react-pdf/renderer";
-import { getConvoyage } from "@/lib/queries";
-import { getSignedUrl } from "@/lib/storage";
+import { getConvoyageReportData } from "@/lib/convoyage-report";
 import { ConvoyageReport } from "@/lib/pdf/ConvoyageReport";
 import { sendEmail, getAppUrl } from "@/lib/email";
 import { rapportDisponibleEmail } from "@/lib/email-templates";
 import { logActivity } from "@/lib/log";
 
 export async function sendConvoyageReportEmail(dossierId: string, convoyageId: string) {
-  const convoyage = await getConvoyage(convoyageId);
+  const reportData = await getConvoyageReportData(convoyageId);
+  const convoyage = reportData?.convoyage;
   const email = convoyage?.dossiers?.clients?.email as string | undefined;
   const portalToken = convoyage?.dossiers?.portal_token as string | undefined;
   const reference = convoyage?.dossiers?.reference as string | undefined;
 
   let status: "sent" | "no-email" | "error" = "sent";
 
-  if (!convoyage || !email) {
+  if (!reportData || !convoyage || !email) {
     status = "no-email";
   } else {
     try {
-      const signatureUrl = convoyage.signature_client ? await getSignedUrl(convoyage.signature_client) : null;
-
       const buffer = await renderToBuffer(
         ConvoyageReport({
           convoyage,
           dossierReference: reference ?? "",
           clientNom: `${convoyage.dossiers?.clients?.prenom ?? ""} ${convoyage.dossiers?.clients?.nom ?? ""}`.trim(),
-          signatureUrl,
+          entreprise: reportData.entreprise,
+          etatsLieux: reportData.etatsLieux,
         })
       );
 

@@ -40,6 +40,7 @@ stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
    - `0028_photos_bibliotheque.sql`
    - `0029_dossier_reference_counters_rls.sql`
    - `0030_convoyage_devis_envoye.sql`
+   - `0031_convoyage_etats_lieux.sql`
 3. Dans **Project Settings → API**, récupère :
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -190,10 +191,17 @@ l'email de confirmation si le client a renseigné son adresse.
   offre Copilote Plus, le PDF ajoute en pied de page les étapes suivantes
   (mise en relation avec le vendeur, accompagnement à l'achat, convoyage). Vue
   globale de toutes les inspections, tous dossiers confondus, sur `/inspections`.
-- Convoyage : trajet, photos avant/après, signature client (à l'écran), rapport
-  de livraison PDF. Vue globale sur `/convoyages` : convoyages DIMZ (tous
-  dossiers confondus) et convoyages hors plateforme, avec formulaire d'ajout
-  d'un convoyage hors plateforme directement depuis cette page.
+- Convoyage : trajet, plus un **état des lieux guidé en deux temps** (départ
+  puis arrivée) — kilométrage, carburant, 14 photos obligatoires à
+  emplacements fixes (permis, selfie, tour du véhicule, intérieur, coffre,
+  pare-brise, compteur), photos facultatives, nom du contact présent, et
+  signature de confirmation (bloquée tant qu'une photo obligatoire manque).
+  Confirmer le départ passe le dossier en « Livraison en cours », confirmer
+  l'arrivée le passe en « Livraison terminée ». Le rapport PDF (bouton
+  « Rapport PDF » / envoi email) combine les deux états des lieux confirmés.
+  Vue globale sur `/convoyages` : convoyages DIMZ (tous dossiers confondus) et
+  convoyages hors plateforme, avec formulaire d'ajout d'un convoyage hors
+  plateforme directement depuis cette page.
 - Agenda : calendrier mensuel (rendez-vous, visio, inspections, convoyages,
   livraisons).
 - Documents : bibliothèque liée aux dossiers, avec deux listes — les fichiers
