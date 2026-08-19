@@ -6,7 +6,7 @@ import { getDossierByToken, getDossierAnnonces } from "@/lib/queries";
 import { getSignedUrl } from "@/lib/storage";
 import { formatCurrency } from "@/lib/format";
 import { Logo } from "@/components/Logo";
-import { getEtapesOffre, ETAPES_CONVOYAGE } from "@/lib/etapes";
+import { getEtapesOffre, resolveEtapesConvoyage } from "@/lib/etapes";
 import { upgradeOffreDepuisSuivi } from "./actions";
 
 export const metadata = {
@@ -25,7 +25,7 @@ export default async function ClientPortalPage({ params }: { params: { token: st
 
   const isConvoyage = dossier.offre === "convoyage_seul";
   const refuse = isConvoyage && dossier.convoyage_decision === "refuse";
-  const etapes = isConvoyage ? ETAPES_CONVOYAGE : getEtapesOffre(dossier.offre);
+  const etapes = isConvoyage ? resolveEtapesConvoyage(dossier.devis_envoye_at) : getEtapesOffre(dossier.offre);
   const currentIndex = Math.max(
     0,
     etapes.findIndex((e) => e.key === dossier.etape_client)

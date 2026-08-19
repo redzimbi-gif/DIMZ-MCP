@@ -342,6 +342,75 @@ export async function decideConvoyageDemande(dossierId: string, decision: "accep
   revalidatePath("/dossiers");
 }
 
+// Marque le devis comme envoyé sans faire avancer etape_client : côté client,
+// "Devis en cours" est simplement remplacé en place par "Devis envoyé" (cf.
+// resolveEtapesConvoyage dans src/lib/etapes.ts), pas une étape barrée en plus.
+// Provisoire tant que l'outil devis (Phase 3) ne pose pas cette date lui-même.
+export async function marquerDevisEnvoye(dossierId: string) {
+  const db = createAdminClient();
+  await db.from("dossiers").update({ devis_envoye_at: new Date().toISOString() }).eq("id", dossierId);
+
+  const acteur = await getActorId();
+  await db.from("dossier_etape_history").insert({
+    dossier_id: dossierId,
+    etape_client: "devis_en_cours",
+    note: "Devis envoyé au client",
+    changed_by: acteur,
+  });
+
+  await logActivity({
+    action: "dossier.devis_envoye",
+    entiteType: "dossier",
+    entiteId: dossierId,
+    description: "Devis marqué comme envoyé",
+  });
+
+  revalidatePath(`/dossiers/${dossierId}`);
+}
+
+export async function marquerLivraisonProgrammee(dossierId: string) {
+  const dossier = await getDossier(dossierId);
+  if (!dossier) return;
+
+  const db = createAdminClient();
+  await db.from("dossiers").update({ etape_client: "livraison_programmee" }).eq("id", dossierId);
+
+  const acteur = await getActorId();
+  await db.from("dossier_etape_history").insert({
+    dossier_id: dossierId,
+    etape_client: "livraison_programmee",
+    note: "Livraison programmée",
+    changed_by: acteur,
+  });
+
+  await logActivity({
+    action: "dossier.etape_client",
+    entiteType: "dossier",
+    entiteId: dossierId,
+    description: "Étape client : Livraison programmée",
+  });
+
+  const email = dossier.clients?.email;
+  if (email) {
+    const { subject, html } = etapeConvoyageEmail("livraison_programmee", {
+      prenom: dossier.clients?.prenom ?? null,
+      reference: dossier.reference,
+      portalUrl: `${getAppUrl()}/suivi/${dossier.portal_token}`,
+    });
+    const result = await sendEmail({ to: email, subject, html });
+    if (result.ok) {
+      await logActivity({
+        action: "email.etape_client",
+        entiteType: "dossier",
+        entiteId: dossierId,
+        description: `Email (« ${subject} ») envoyé à ${email}`,
+      });
+    }
+  }
+
+  revalidatePath(`/dossiers/${dossierId}`);
+}
+
 export async function addDossierNote(dossierId: string, formData: FormData) {
   const db = createAdminClient();
   const contenu = String(formData.get("contenu") || "").trim();

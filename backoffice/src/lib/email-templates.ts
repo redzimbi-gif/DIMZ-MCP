@@ -250,8 +250,9 @@ export type EtapeConvoyageKey =
   | "traitement_demande"
   | "devis_en_cours"
   | "demande_refusee"
+  | "livraison_programmee"
   | "livraison_en_cours"
-  | "vehicule_livre";
+  | "livraison_terminee";
 
 const ETAPE_CONVOYAGE_COPY: Record<EtapeConvoyageKey, { badge: string; subject: string; body: string }> = {
   traitement_demande: {
@@ -269,13 +270,18 @@ const ETAPE_CONVOYAGE_COPY: Record<EtapeConvoyageKey, { badge: string; subject: 
     subject: "Réponse de DIMZ à votre demande de convoyage",
     body: "Nous vous remercions pour votre demande de convoyage. Après étude, nous ne sommes malheureusement pas en mesure d'y donner suite pour le moment. Nous sommes sincèrement désolés pour la gêne occasionnée et restons à votre disposition pour toute question.",
   },
+  livraison_programmee: {
+    badge: "Livraison programmée",
+    subject: "La livraison de votre véhicule est programmée",
+    body: "Votre devis est validé et la livraison de votre véhicule est désormais programmée. Nous revenons vers vous avec les détails pratiques.",
+  },
   livraison_en_cours: {
     badge: "Livraison en cours",
     subject: "Votre véhicule est en cours de livraison",
     body: "Le convoyage de votre véhicule a débuté. Nous vous tiendrons informé jusqu'à sa livraison.",
   },
-  vehicule_livre: {
-    badge: "Véhicule livré",
+  livraison_terminee: {
+    badge: "Livraison terminée",
     subject: "Votre véhicule a été livré",
     body: "Votre véhicule a été livré avec succès. Nous restons à votre disposition pour toute question complémentaire. Merci de votre confiance.",
   },

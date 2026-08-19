@@ -39,6 +39,7 @@ stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
    - `0027_fiche_decouverte_photo.sql`
    - `0028_photos_bibliotheque.sql`
    - `0029_dossier_reference_counters_rls.sql`
+   - `0030_convoyage_devis_envoye.sql`
 3. Dans **Project Settings → API**, récupère :
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -218,7 +219,12 @@ l'email de confirmation si le client a renseigné son adresse.
   notification interne (cloche du back-office) pointant vers le dossier.
 - Suivi client (Convoyage) : flux dédié — Demande reçue → Étude de la demande
   → boutons Accepté/Refusé (email d'excuse si refusé) → Devis en cours →
-  Livraison en cours → Véhicule livré, avec un email pro à chaque étape.
+  Livraison programmée → Livraison en cours → Livraison terminée, avec un
+  email pro à chaque étape. « Devis en cours » se remplace en place par
+  « Devis envoyé » (sans devenir une étape barrée) une fois
+  `dossiers.devis_envoye_at` renseigné — bouton manuel « Marquer le devis
+  comme envoyé » sur l'onglet Convoyage du dossier en attendant l'outil de
+  génération de devis.
 - Formulaire du site → dossier créé automatiquement (`/api/public/lead`).
 - Journal des actions (`activity_log`) et notifications internes.
 - Emails automatiques (via Resend) :

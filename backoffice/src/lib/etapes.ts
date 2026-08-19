@@ -60,15 +60,28 @@ export function getEtapesOffre(offre: DossierOffre | null): EtapeDef[] {
 // ---------------------------------------------------------------------------
 // Convoyage : flux dédié, avec branche acceptée / refusée.
 // ---------------------------------------------------------------------------
+// "devis_en_cours" est affiché « Devis en cours » puis, une fois le devis
+// envoyé (dossiers.devis_envoye_at renseigné), remplacé en place par
+// « Devis envoyé » — cf. resolveEtapesConvoyage ci-dessous. Ce n'est pas une
+// étape supplémentaire : même position dans la liste, seul le libellé change,
+// pour éviter qu'elle n'apparaisse barrée comme une étape "terminée" alors
+// qu'on est simplement passé du brouillon à l'envoi.
 export const ETAPES_CONVOYAGE: EtapeDef[] = [
   { key: "demande_recue", label: "Demande reçue" },
   { key: "traitement_demande", label: "Étude de votre demande" },
   { key: "devis_en_cours", label: "Devis en cours" },
+  { key: "livraison_programmee", label: "Livraison programmée" },
   { key: "livraison_en_cours", label: "Livraison en cours" },
-  { key: "vehicule_livre", label: "Véhicule livré" },
+  { key: "livraison_terminee", label: "Livraison terminée" },
 ];
 
 export const ETAPE_CONVOYAGE_REFUSEE: EtapeDef = { key: "demande_refusee", label: "Demande non retenue" };
+
+/** ETAPES_CONVOYAGE avec le libellé "Devis en cours" remplacé par "Devis envoyé" si applicable. */
+export function resolveEtapesConvoyage(devisEnvoyeAt: string | null): EtapeDef[] {
+  if (!devisEnvoyeAt) return ETAPES_CONVOYAGE;
+  return ETAPES_CONVOYAGE.map((e) => (e.key === "devis_en_cours" ? { ...e, label: "Devis envoyé" } : e));
+}
 
 export function getEtapeLabel(offre: DossierOffre | null, etapeKey: string): string {
   const liste = offre === "convoyage_seul" ? [...ETAPES_CONVOYAGE, ETAPE_CONVOYAGE_REFUSEE] : getEtapesOffre(offre);

@@ -136,6 +136,7 @@ export interface Dossier {
   statut: DossierStatut;
   etape_client: string;
   convoyage_decision: ConvoyageDecision;
+  devis_envoye_at: string | null;
   valeur_estimee: number | null;
   source: string;
   portal_token: string;

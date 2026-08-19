@@ -44,7 +44,7 @@ import {
 } from "@/lib/types";
 import { CONTRAT_CHAMPS } from "@/lib/contrats";
 import { getSignedUrls } from "@/lib/storage";
-import { getEtapesOffre, getOffreAccompagnement, getEtapeLabel, ETAPES_CONVOYAGE } from "@/lib/etapes";
+import { getEtapesOffre, getOffreAccompagnement, getEtapeLabel, resolveEtapesConvoyage } from "@/lib/etapes";
 import { formatCurrency, formatDate, formatDateTime, formatRelative } from "@/lib/format";
 import {
   updateDossierInfos,
@@ -54,6 +54,8 @@ import {
   updateDossierEtapeClient,
   sendEtapeClientEmail,
   decideConvoyageDemande,
+  marquerDevisEnvoye,
+  marquerLivraisonProgrammee,
   archiveDossier,
   unarchiveDossier,
   deleteDossier,
@@ -134,7 +136,7 @@ export default async function DossierDetailPage({
 
   const isConvoyage = dossier.offre === "convoyage_seul";
   const offreAccompagnement = getOffreAccompagnement(dossier.offre);
-  const etapesSuiviClient = isConvoyage ? ETAPES_CONVOYAGE : getEtapesOffre(dossier.offre);
+  const etapesSuiviClient = isConvoyage ? resolveEtapesConvoyage(dossier.devis_envoye_at) : getEtapesOffre(dossier.offre);
   const peutEnvoyerEmailEtape = dossier.etape_client !== "demande_recue";
 
   return (
@@ -926,9 +928,37 @@ async function InspectionTab({ dossierId }: { dossierId: string }) {
 }
 
 async function ConvoyageTab({ dossierId }: { dossierId: string }) {
-  const convoyages = await getDossierConvoyages(dossierId);
+  const [dossier, convoyages] = await Promise.all([getDossier(dossierId), getDossierConvoyages(dossierId)]);
+  const isConvoyageSeul = dossier?.offre === "convoyage_seul";
+  const marquerDevisEnvoyeAction = marquerDevisEnvoye.bind(null, dossierId);
+  const marquerLivraisonProgrammeeAction = marquerLivraisonProgrammee.bind(null, dossierId);
+
   return (
     <div>
+      {isConvoyageSeul && dossier ? (
+        <Card className="p-4 mb-4">
+          <p className="text-xs text-ink-soft mb-3">
+            Étape actuelle : <strong className="text-ink">{getEtapeLabel(dossier.offre, dossier.etape_client)}</strong>
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {dossier.etape_client === "devis_en_cours" && !dossier.devis_envoye_at ? (
+              <form action={marquerDevisEnvoyeAction}>
+                <Button type="submit" variant="outline">
+                  Marquer le devis comme envoyé
+                </Button>
+              </form>
+            ) : null}
+            {dossier.etape_client === "devis_en_cours" && dossier.devis_envoye_at ? (
+              <form action={marquerLivraisonProgrammeeAction}>
+                <Button type="submit" variant="outline">
+                  Marquer la livraison comme programmée
+                </Button>
+              </form>
+            ) : null}
+          </div>
+        </Card>
+      ) : null}
+
       <div className="flex justify-end mb-4">
         <LinkButton href={`/dossiers/${dossierId}/convoyages/new`}>
           <Plus className="h-4 w-4" /> Nouveau convoyage
