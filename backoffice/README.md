@@ -141,6 +141,20 @@ npx supabase functions deploy test-feedback --project-ref TON-PROJET --no-verify
 var TEST_FEEDBACK_URL = 'https://TON-PROJET.supabase.co/functions/v1/test-feedback';
 ```
 
+La page « Suivre mon projet » (sous-menu Mon Copilote → Mon projet) appelle une
+troisième Edge Function, `track-lookup` : elle cherche un client par email, et
+si un ou plusieurs dossiers lui sont associés, envoie l'email avec le(s)
+lien(s) de suivi (elle a besoin des mêmes secrets `RESEND_API_KEY`/`EMAIL_FROM`/`APP_URL`
+que `lead-intake` ci-dessus) :
+
+```bash
+npx supabase functions deploy track-lookup --project-ref TON-PROJET --no-verify-jwt
+```
+
+```js
+var TRACK_URL = 'https://TON-PROJET.supabase.co/functions/v1/track-lookup';
+```
+
 Chaque soumission des formulaires « Accompagnement » et « Convoyage » du site
 créera automatiquement un client + un dossier dans le back-office, et enverra
 l'email de confirmation si le client a renseigné son adresse.
