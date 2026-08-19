@@ -78,6 +78,30 @@ export function rapportDisponibleEmail(params: {
   };
 }
 
+export function documentCommercialEmail(params: {
+  prenom: string | null;
+  type: "devis" | "facture";
+  numero: string;
+  montantTTC: string;
+  portalUrl?: string | null;
+}): { subject: string; html: string } {
+  const label = params.type === "devis" ? "devis" : "facture";
+  const content = `
+    <p style="margin:0 0 16px;">${greeting(params.prenom)}</p>
+    <p style="margin:0 0 16px;">Vous trouverez ci-joint votre ${label} <strong>${params.numero}</strong>, d'un montant de <strong>${params.montantTTC}</strong>.</p>
+    ${
+      params.type === "devis"
+        ? `<p style="margin:0 0 16px;">N'hésitez pas à revenir vers nous pour toute question avant validation.</p>`
+        : ""
+    }
+    ${params.portalUrl ? ctaButton(params.portalUrl, "Suivre mon dossier") : ""}
+  `;
+  return {
+    subject: `Votre ${label} DIMZ ${params.numero}`,
+    html: emailLayout(content),
+  };
+}
+
 export function ficheDecouverteEmail(params: {
   prenom: string | null;
   reference: string;

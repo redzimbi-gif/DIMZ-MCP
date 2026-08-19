@@ -39,6 +39,9 @@ export default async function ConvoyageDetailPage({
             <Badge tone={convoyage.statut === "livre" ? "good" : "blue"}>
               {CONVOYAGE_STATUT_LABELS[convoyage.statut]}
             </Badge>
+            <LinkButton href={`/facturation?dossier_id=${convoyage.dossier_id}`} variant="outline">
+              Créer un devis
+            </LinkButton>
             <LinkButton href={`/api/convoyages/${convoyage.id}/pdf`} variant="outline">
               <FileDown className="h-4 w-4" /> Rapport PDF
             </LinkButton>

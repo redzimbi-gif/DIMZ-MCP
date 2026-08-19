@@ -449,6 +449,50 @@ export interface Facture {
   updated_at: string;
 }
 
+export type DocumentCommercialType = "devis" | "facture";
+export type DocumentCommercialStatut = "brouillon" | "envoye" | "accepte" | "refuse" | "paye" | "annule";
+
+export interface LigneDocumentCommercial {
+  description: string;
+  quantite: number;
+  prix_unitaire_ht: number;
+}
+
+export interface DocumentCommercial {
+  id: string;
+  numero: string;
+  type: DocumentCommercialType;
+  dossier_id: string | null;
+  client_id: string | null;
+  convoyage_id: string | null;
+  objet: string | null;
+  lignes: LigneDocumentCommercial[];
+  montant_ht: number;
+  montant_tva: number;
+  montant_ttc: number;
+  statut: DocumentCommercialStatut;
+  devis_origine_id: string | null;
+  date_emission: string;
+  date_echeance: string | null;
+  pdf_path: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const DOCUMENT_COMMERCIAL_STATUT_LABELS: Record<DocumentCommercialStatut, string> = {
+  brouillon: "Brouillon",
+  envoye: "Envoyé",
+  accepte: "Accepté",
+  refuse: "Refusé",
+  paye: "Payé",
+  annule: "Annulé",
+};
+
+export const DOCUMENT_COMMERCIAL_TYPE_LABELS: Record<DocumentCommercialType, string> = {
+  devis: "Devis",
+  facture: "Facture",
+};
+
 export const RESSENTI_DUREE_LABELS: Record<string, string> = {
   tres_rapide: "Très rapide",
   assez_rapide: "Assez rapide",

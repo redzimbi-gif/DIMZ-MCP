@@ -8,6 +8,7 @@ import type {
   Convoyage,
   ConvoyageEtatLieux,
   ConvoyageExterne,
+  DocumentCommercial,
   DocumentRow,
   Dossier,
   DossierContrat,
@@ -468,6 +469,25 @@ export async function getFacture(id: string) {
   const db = createAdminClient();
   const { data } = await db.from("factures").select("*").eq("id", id).maybeSingle();
   return data as Facture | null;
+}
+
+export async function listDocumentsCommerciaux() {
+  const db = createAdminClient();
+  const { data } = await db
+    .from("documents_commerciaux")
+    .select("*, clients(nom, prenom, type_client, raison_sociale), dossiers(reference)")
+    .order("created_at", { ascending: false });
+  return (data ?? []) as (DocumentCommercial & { clients: any; dossiers: any })[];
+}
+
+export async function getDocumentCommercial(id: string) {
+  const db = createAdminClient();
+  const { data } = await db
+    .from("documents_commerciaux")
+    .select("*, clients(nom, prenom, email, type_client, raison_sociale, siret, adresse), dossiers(reference)")
+    .eq("id", id)
+    .maybeSingle();
+  return data as (DocumentCommercial & { clients: any; dossiers: any }) | null;
 }
 
 export async function getConvoyageExterne(id: string) {

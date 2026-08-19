@@ -42,6 +42,7 @@ stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
    - `0030_convoyage_devis_envoye.sql`
    - `0031_convoyage_etats_lieux.sql`
    - `0032_convoyage_carburant_pourcentage.sql`
+   - `0033_documents_commerciaux.sql`
 3. Dans **Project Settings → API**, récupère :
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -203,6 +204,18 @@ l'email de confirmation si le client a renseigné son adresse.
   Vue globale sur `/convoyages` : convoyages DIMZ (tous dossiers confondus) et
   convoyages hors plateforme, avec formulaire d'ajout d'un convoyage hors
   plateforme directement depuis cette page.
+- Devis & factures (`/facturation`, section du haut) : génération de vrais
+  devis puis factures, numérotés séquentiellement sans trou (DEV-AAMM-0000 /
+  FAC-AAMM-0000, requis en droit français — même principe que la référence
+  dossier). Lignes libres (description/quantité/prix HT), TVA à 0 (régime
+  micro-entreprise), PDF généré à la volée avec mentions légales. Cycle :
+  brouillon → envoyé (email + PDF joint) → accepté/refusé (devis) ou payé
+  (facture) ; un devis accepté se convertit en facture en un clic
+  (`devis_origine_id`). Envoyer un devis lié à un dossier convoyage renseigne
+  automatiquement `dossiers.devis_envoye_at`, ce qui fait basculer l'étape
+  « Devis en cours » → « Devis envoyé » sur `/suivi/[token]`. L'ancien journal
+  manuel (`factures`, PDF uploadé de l'extérieur) reste en dessous, inchangé,
+  pour l'historique déjà saisi.
 - Agenda : calendrier mensuel (rendez-vous, visio, inspections, convoyages,
   livraisons).
 - Documents : bibliothèque liée aux dossiers, avec deux listes — les fichiers
