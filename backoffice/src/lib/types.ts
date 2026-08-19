@@ -299,7 +299,7 @@ export interface ConvoyageEtatLieux {
   convoyage_id: string;
   type: EtatLieuxType;
   kilometrage: number | null;
-  carburant: string | null;
+  carburant_pourcentage: number | null;
   photos: Record<string, string>;
   photos_autres: string[];
   contact_nom: string | null;

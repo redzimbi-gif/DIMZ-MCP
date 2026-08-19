@@ -56,7 +56,7 @@ export async function saveEtatLieux(
       convoyage_id: convoyageId,
       type,
       kilometrage: formData.get("kilometrage") ? Number(formData.get("kilometrage")) : null,
-      carburant: String(formData.get("carburant") || "").trim() || null,
+      carburant_pourcentage: formData.get("carburant_pourcentage") ? Number(formData.get("carburant_pourcentage")) : null,
       contact_nom: String(formData.get("contact_nom") || "").trim() || null,
       photos,
       photos_autres: photosAutres,
@@ -114,7 +114,7 @@ export async function confirmerEtatLieux(
       .from("convoyages")
       .update({
         [kmField]: existing.kilometrage,
-        niveau_carburant: existing.carburant,
+        niveau_carburant: existing.carburant_pourcentage != null ? `${existing.carburant_pourcentage} %` : null,
         statut: type === "depart" ? "en_cours" : "livre",
       })
       .eq("id", convoyageId);

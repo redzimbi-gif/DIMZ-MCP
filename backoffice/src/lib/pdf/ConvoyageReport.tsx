@@ -47,7 +47,7 @@ function EtatLieuxSection({
     <View style={{ marginTop: 18 }} break={type === "arrivee"}>
       <Text style={pdfStyles.sectionTitle}>État des lieux — {ETAT_LIEUX_TYPE_LABELS[type]}</Text>
       <Row label="Kilométrage" value={data.kilometrage != null ? `${data.kilometrage} km` : null} />
-      <Row label="Carburant" value={data.carburant} />
+      <Row label="Carburant" value={data.carburant_pourcentage != null ? `${data.carburant_pourcentage} %` : null} />
       <Row label="Contact présent" value={data.contact_nom} />
       <Row label="Confirmé le" value={data.confirme_at ? formatDateTime(data.confirme_at) : null} />
 

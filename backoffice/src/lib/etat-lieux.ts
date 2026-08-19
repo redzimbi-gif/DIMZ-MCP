@@ -24,8 +24,6 @@ export const ETAT_LIEUX_PHOTO_SLOTS: EtatLieuxPhotoSlot[] = [
   { key: "compteur_allume", label: "Compteur allumé" },
 ];
 
-export const ETAT_LIEUX_CARBURANT_OPTIONS = ["Réserve", "1/4", "1/2", "3/4", "Plein"];
-
 export const ETAT_LIEUX_TYPE_LABELS: Record<"depart" | "arrivee", string> = {
   depart: "Départ",
   arrivee: "Arrivée",

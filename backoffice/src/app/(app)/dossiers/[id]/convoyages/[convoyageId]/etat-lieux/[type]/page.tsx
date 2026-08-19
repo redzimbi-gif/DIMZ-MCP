@@ -5,7 +5,8 @@ import { getConvoyage, getConvoyageEtatLieux } from "@/lib/queries";
 import { getSignedUrls } from "@/lib/storage";
 import { Card, PageHeader, LinkButton, Button, Field, inputClass, Badge } from "@/components/ui";
 import { SignaturePad } from "@/components/SignaturePad";
-import { ETAT_LIEUX_PHOTO_SLOTS, ETAT_LIEUX_CARBURANT_OPTIONS, ETAT_LIEUX_TYPE_LABELS } from "@/lib/etat-lieux";
+import { FuelGauge } from "@/components/FuelGauge";
+import { ETAT_LIEUX_PHOTO_SLOTS, ETAT_LIEUX_TYPE_LABELS } from "@/lib/etat-lieux";
 import { formatDateTime } from "@/lib/format";
 import { saveEtatLieux, confirmerEtatLieux, deletePhotoAutre } from "../actions";
 
@@ -84,7 +85,9 @@ export default async function EtatLieuxPage({
             </div>
             <div>
               <p className="text-xs text-ink-soft">Carburant</p>
-              <p className="text-ink font-medium">{etatLieux!.carburant ?? "—"}</p>
+              <p className="text-ink font-medium tnum">
+                {etatLieux!.carburant_pourcentage != null ? `${etatLieux!.carburant_pourcentage} %` : "—"}
+              </p>
             </div>
             <div>
               <p className="text-xs text-ink-soft">Contact présent</p>
@@ -93,24 +96,16 @@ export default async function EtatLieuxPage({
           </div>
         ) : (
           <form action={saveAction} className="space-y-4" encType="multipart/form-data">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Kilométrage">
                 <input name="kilometrage" type="number" min="0" defaultValue={etatLieux?.kilometrage ?? ""} className={inputClass} />
-              </Field>
-              <Field label="Carburant">
-                <select name="carburant" defaultValue={etatLieux?.carburant ?? ""} className={inputClass}>
-                  <option value="">Choisir…</option>
-                  {ETAT_LIEUX_CARBURANT_OPTIONS.map((o) => (
-                    <option key={o} value={o}>
-                      {o}
-                    </option>
-                  ))}
-                </select>
               </Field>
               <Field label="Contact présent">
                 <input name="contact_nom" defaultValue={etatLieux?.contact_nom ?? ""} className={inputClass} />
               </Field>
             </div>
+
+            <FuelGauge name="carburant_pourcentage" defaultValue={etatLieux?.carburant_pourcentage ?? 50} />
 
             <div>
               <p className="text-xs font-medium text-ink-soft mb-2">

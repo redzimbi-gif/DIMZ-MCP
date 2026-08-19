@@ -41,6 +41,7 @@ stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
    - `0029_dossier_reference_counters_rls.sql`
    - `0030_convoyage_devis_envoye.sql`
    - `0031_convoyage_etats_lieux.sql`
+   - `0032_convoyage_carburant_pourcentage.sql`
 3. Dans **Project Settings → API**, récupère :
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
