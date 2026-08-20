@@ -9,6 +9,13 @@
 <meta name="author" content="Dimz - Mon Copilote Auto" />
 <link rel="canonical" href="https://dimz-copilote.com/" />
 
+<meta name="referrer" content="strict-origin-when-cross-origin" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self';" />
+<meta name="theme-color" content="#0a0b0d" />
+
+<link rel="icon" href="img/logo-dimz.png" type="image/png" />
+<link rel="apple-touch-icon" href="img/logo-dimz.png" />
+
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Dimz - Mon Copilote Auto" />
 <meta property="og:title" content="Dimz - Mon Copilote Auto : achat, inspection et convoyage" />
@@ -81,11 +88,11 @@
 </script>
 <style>
   :root {
-    --noir: #10141c;
-    --bleu-vif: #2f6fed;
-    --bg: #f6f7fa;
-    --ink: #10141c;
-    --ink-soft: #5b6472;
+    --noir: #0a0b0d;
+    --or: #c9a66b;
+    --or-soft: #e4cfa0;
+    --blanc: #f5f6f8;
+    --blanc-soft: #9aa0ac;
     --serif: "Iowan Old Style", "Palatino Linotype", Georgia, "Times New Roman", serif;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
@@ -100,74 +107,93 @@
     justify-content: center;
     min-height: 100vh;
     min-height: 100dvh;
-    padding: 24px;
-    background: var(--bg);
-    color: var(--ink);
+    padding: 32px 24px;
+    background: radial-gradient(120% 120% at 50% 18%, #17191f 0%, var(--noir) 65%);
+    color: var(--blanc);
     font-family: var(--sans);
     text-align: center;
   }
   .wrap {
     max-width: 460px;
   }
-  .name {
-    display: inline-flex;
-    align-items: baseline;
-    font-family: var(--serif);
-    font-weight: 600;
-    font-size: 1.5rem;
-    color: var(--ink);
-    letter-spacing: -0.01em;
+
+  .logo-frame {
+    position: relative;
+    width: min(260px, 60vw);
+    margin: 0 auto 4px;
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+    animation: logoIn 1s cubic-bezier(.16,1,.3,1) 0.15s forwards;
   }
-  .name em {
-    font-style: normal;
-    font-family: var(--sans);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: 700;
-    color: var(--ink-soft);
-    font-size: 0.5em;
-    margin-left: 4px;
-    display: inline-flex;
-    align-items: center;
-  }
-  .name em::before, .name em::after {
+  .logo-frame::before {
     content: "";
-    display: inline-block;
-    width: 10px;
-    height: 1.5px;
-    background: var(--bleu-vif);
-    margin: 0 6px;
+    position: absolute;
+    inset: -34%;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--or) 32%, transparent) 0%, transparent 70%);
+    filter: blur(22px);
+    animation: glowPulse 3.6s ease-in-out infinite;
   }
+  .logo-frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 20px;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.75);
+  }
+
   h1 {
-    margin: 40px 0 12px;
+    margin: 36px 0 12px;
     font-family: var(--serif);
     font-weight: 600;
     font-size: clamp(1.4rem, 1.15rem + 1vw, 1.8rem);
     line-height: 1.35;
-    color: var(--ink);
+    color: var(--blanc);
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.55s forwards;
   }
   p {
     margin: 0;
-    color: var(--ink-soft);
+    color: var(--blanc-soft);
     font-size: 1.02rem;
     line-height: 1.6;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.7s forwards;
   }
   .contact {
     margin-top: 40px;
     font-size: 0.88rem;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.85s forwards;
   }
   .contact a {
-    color: var(--bleu-vif);
+    color: var(--or-soft);
     text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--or-soft) 40%, transparent);
+    padding-bottom: 1px;
+    transition: color 0.2s ease, border-color 0.2s ease;
   }
   .contact a:hover {
-    text-decoration: underline;
+    color: var(--or);
+    border-color: var(--or);
+  }
+
+  @keyframes logoIn { to { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes glowPulse { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 0.85; transform: scale(1.08); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .logo-frame, h1, p, .contact { animation: none; opacity: 1; transform: none; }
+    .logo-frame::before { animation: none; }
   }
 </style>
 </head>
 <body>
   <div class="wrap">
-    <span class="name">Dimz<em>Mon copilote auto</em></span>
+    <div class="logo-frame">
+      <img src="img/logo-dimz.png" alt="Dimz - Mon Copilote Auto" width="1254" height="1254" />
+    </div>
     <h1>Votre copilote enfile sa combinaison.</h1>
     <p>Il a besoin d'un peu d'intimité avant la grande aventure.</p>
     <p class="contact">Une question, un projet en tête ? <a href="mailto:contact@dimz-copilote.com">contact@dimz-copilote.com</a></p>
