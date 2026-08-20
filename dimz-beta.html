@@ -355,6 +355,27 @@
   .btn-sm { padding: 9px 16px; font-size: 0.83rem; }
   @media (prefers-reduced-motion: reduce) { .btn:hover, .btn:active { transform: none; } }
 
+  /* ---------------- États de chargement ---------------- */
+  .btn.is-loading { cursor: default; opacity: 0.85; }
+  .btn-spinner { width: 15px; height: 15px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; animation: btnSpin 0.7s linear infinite; flex: none; }
+  .btn-outline .btn-spinner, .btn-outline-dark .btn-spinner { border-color: color-mix(in srgb, currentColor 30%, transparent); border-top-color: currentColor; }
+  @keyframes btnSpin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .btn-spinner { animation-duration: 1.4s; } }
+
+  .feature-photo { position: relative; background: linear-gradient(100deg, var(--bg-tint) 25%, var(--line) 50%, var(--bg-tint) 75%); background-size: 200% 100%; animation: imgShimmer 1.5s ease-in-out infinite; }
+  .feature-photo img { opacity: 0; transition: opacity 0.4s ease; }
+  .feature-photo.img-loaded { animation: none; background: none; }
+  .feature-photo.img-loaded img { opacity: 1; }
+  @keyframes imgShimmer { 0% { background-position: 150% 0; } 100% { background-position: -150% 0; } }
+  @media (prefers-reduced-motion: reduce) { .feature-photo { animation: none; } }
+
+  #page-loader { position: fixed; inset: 0; z-index: 500; background: var(--bg); display: flex; align-items: center; justify-content: center; transition: opacity 0.35s ease, visibility 0.35s ease; }
+  #page-loader.page-loader-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+  .page-loader-mark { display: flex; align-items: center; gap: 10px; font-family: var(--serif); font-weight: 600; font-size: 1.3rem; letter-spacing: 0.02em; color: var(--ink); }
+  .page-loader-mark .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--bleu-vif); animation: pageLoaderPulse 1s ease-in-out infinite; }
+  @keyframes pageLoaderPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.35); opacity: 0.55; } }
+  @media (prefers-reduced-motion: reduce) { .page-loader-mark .dot { animation: none; } }
+
   /* ---------------- Scaffolding sections ---------------- */
   section { padding: 96px 0; }
   section.tint { background: var(--bg-tint); }
@@ -927,6 +948,10 @@
 </style>
 </head>
 <body>
+
+<div id="page-loader" aria-hidden="true">
+  <div class="page-loader-mark"><span class="dot"></span>DIMZ</div>
+</div>
 
 <header class="topnav">
   <div class="wrap nav-row">
@@ -3180,6 +3205,36 @@
     settingsLink.addEventListener('click', function () { showBanner(); });
   })();
 
+  // ---------- États de chargement : boutons ----------
+  function setBtnLoading(btn, label) {
+    if (!btn || btn.dataset.loading === '1') return;
+    btn.dataset.loading = '1';
+    btn.dataset.originalHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.classList.add('is-loading');
+    btn.innerHTML = '<span class="btn-spinner" aria-hidden="true"></span>' + label;
+  }
+  function clearBtnLoading(btn) {
+    if (!btn || btn.dataset.loading !== '1') return;
+    btn.disabled = false;
+    btn.classList.remove('is-loading');
+    if (btn.dataset.originalHtml != null) btn.innerHTML = btn.dataset.originalHtml;
+    delete btn.dataset.loading;
+    delete btn.dataset.originalHtml;
+  }
+
+  // ---------- États de chargement : photos (shimmer tant que l'image, souvent lazy, n'est pas chargée) ----------
+  document.querySelectorAll('.feature-photo img').forEach(function (img) {
+    var figure = img.closest('.feature-photo');
+    if (!figure) return;
+    if (img.complete && img.naturalWidth > 0) {
+      figure.classList.add('img-loaded');
+      return;
+    }
+    img.addEventListener('load', function () { figure.classList.add('img-loaded'); });
+    img.addEventListener('error', function () { figure.classList.add('img-loaded'); });
+  });
+
   // ---------- Connexion des formulaires au back-office DIMZ ----------
   // URL complète de la fonction Edge Supabase "lead-intake" (contourne la
   // protection Vercel Authentication qui bloquait l'API Next.js directe).
@@ -4517,13 +4572,21 @@
   function wireForm(formId, confirmId, formType, buildGroups) {
     var form = document.getElementById(formId);
     var confirmPanel = document.getElementById(confirmId);
+    var submitBtn = form.querySelector('[type="submit"]');
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       if (!form.reportValidity()) return;
-      sendToSheet(formType, buildGroups());
-      form.hidden = true;
-      confirmPanel.hidden = false;
-      confirmPanel.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+      setBtnLoading(submitBtn, 'Envoi…');
+      // Léger délai pour donner un retour visuel tangible à l'envoi ; la
+      // confirmation reste garantie ensuite, indépendamment du réseau (même
+      // filet de sécurité que l'envoi silencieux vers sendToSheet).
+      setTimeout(function () {
+        sendToSheet(formType, buildGroups());
+        clearBtnLoading(submitBtn);
+        form.hidden = true;
+        confirmPanel.hidden = false;
+        confirmPanel.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+      }, 600);
     });
   }
   wireForm('form-accompagnement', 'confirm-accompagnement', 'Accompagnement', buildRecapAccompagnement);
@@ -4573,8 +4636,7 @@
       e.preventDefault();
       if (!form.reportValidity()) return;
       var email = document.getElementById('suivi-email').value.trim();
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Envoi…';
+      setBtnLoading(submitBtn, 'Envoi…');
       fetch(TRACK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -4584,8 +4646,7 @@
       }).catch(function () {
         showResult('error');
       }).finally(function () {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Recevoir le lien de suivi';
+        clearBtnLoading(submitBtn);
       });
     });
   })();
@@ -4594,6 +4655,7 @@
   (function () {
     var form = document.getElementById('form-test');
     var confirmPanel = document.getElementById('confirm-test');
+    var submitBtn = document.getElementById('test-submit');
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       if (!form.reportValidity()) return;
@@ -4625,17 +4687,21 @@
         donnees_brutes: brut
       };
 
-      if (TEST_FEEDBACK_URL) {
-        fetch(TEST_FEEDBACK_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        }).catch(function () { /* envoi silencieux : la confirmation ne dépend pas du réseau */ });
-      }
+      setBtnLoading(submitBtn, 'Envoi…');
+      setTimeout(function () {
+        if (TEST_FEEDBACK_URL) {
+          fetch(TEST_FEEDBACK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          }).catch(function () { /* envoi silencieux : la confirmation ne dépend pas du réseau */ });
+        }
 
-      form.hidden = true;
-      confirmPanel.hidden = false;
-      confirmPanel.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+        clearBtnLoading(submitBtn);
+        form.hidden = true;
+        confirmPanel.hidden = false;
+        confirmPanel.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+      }, 600);
     });
   })();
 
@@ -4671,6 +4737,25 @@
       form.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
     });
   });
+
+  // ---------- État de chargement : voile de démarrage de la page ----------
+  // Masqué une fois que tout le script ci-dessus a fini de s'exécuter (donc
+  // que la navigation, le routage par hash et les formulaires sont prêts).
+  // Deux filets de sécurité en plus, pour ne jamais rester bloqué dessus :
+  // l'événement 'load' de la fenêtre, et un délai maximum absolu.
+  (function () {
+    var loader = document.getElementById('page-loader');
+    if (!loader) return;
+    var hidden = false;
+    function hidePageLoader() {
+      if (hidden) return;
+      hidden = true;
+      loader.classList.add('page-loader-hidden');
+    }
+    hidePageLoader();
+    window.addEventListener('load', hidePageLoader);
+    setTimeout(hidePageLoader, 4000);
+  })();
 </script>
 </body>
 </html>
