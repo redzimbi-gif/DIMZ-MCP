@@ -3492,7 +3492,23 @@
       if (e.key === 'Escape' && !overlay.hidden) closeOfferModal();
     });
     body.addEventListener('click', function (e) {
-      if (e.target.closest('[data-goto-subtab], [data-goto-tab]')) closeOfferModal();
+      // Les boutons de la modale viennent d'un <template> cloné après coup :
+      // ils n'existaient pas dans le DOM au moment où les écouteurs génériques
+      // [data-goto-subtab]/[data-goto-tab] ont été posés (querySelectorAll +
+      // forEach, exécuté une seule fois au chargement) donc ils n'y sont
+      // jamais rattachés. On déclenche la navigation nous-mêmes ici.
+      var subtabTarget = e.target.closest('[data-goto-subtab]');
+      var tabTarget = e.target.closest('[data-goto-tab]');
+      if (subtabTarget || tabTarget) {
+        closeOfferModal();
+        if (tabTarget) {
+          showMainTab(tabTarget.dataset.gotoTab, true);
+          window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+        } else if (subtabTarget) {
+          showSubTab(subtabTarget.dataset.gotoSubtab);
+          window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+        }
+      }
     });
   })();
 
@@ -4717,6 +4733,10 @@
         icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>';
         title.textContent = 'Aucun dossier trouvé';
         text.textContent = "Nous n'avons trouvé aucun dossier associé à cet email. Vérifiez l'adresse utilisée lors de votre demande, ou décrivez un nouveau projet.";
+      } else if (state === 'email_error') {
+        icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>';
+        title.textContent = "L'email n'a pas pu être envoyé";
+        text.textContent = "Votre dossier a bien été retrouvé, mais l'email de suivi n'a pas pu être envoyé pour le moment. Réessayez dans un instant ou contactez-nous directement.";
       } else {
         icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>';
         title.textContent = 'Envoi impossible';
@@ -4744,7 +4764,8 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email })
       }).then(function (r) { return r.json(); }).then(function (json) {
-        showResult(json && json.status === 'ok' ? 'ok' : 'not_found');
+        var status = json && json.status;
+        showResult(status === 'ok' || status === 'not_found' || status === 'email_error' ? status : 'not_found');
       }).catch(function () {
         showResult('error');
       }).finally(function () {

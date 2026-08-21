@@ -27,11 +27,11 @@ async function sendTrackingEmail(params: {
   to: string;
   prenom: string | null;
   dossiers: { reference: string; portalUrl: string }[];
-}) {
+}): Promise<{ ok: boolean; error?: string }> {
   const apiKey = Deno.env.get("RESEND_API_KEY");
   if (!apiKey) {
     console.error("RESEND_API_KEY manquante : email de suivi non envoyé.");
-    return;
+    return { ok: false, error: "RESEND_API_KEY manquante" };
   }
 
   const hello = params.prenom ? `Bonjour ${params.prenom},` : "Bonjour,";
@@ -86,10 +86,14 @@ async function sendTrackingEmail(params: {
       }),
     });
     if (!res.ok) {
-      console.error("Échec envoi email Resend:", res.status, await res.text().catch(() => ""));
+      const detail = await res.text().catch(() => "");
+      console.error("Échec envoi email Resend:", res.status, detail);
+      return { ok: false, error: `Resend ${res.status}: ${detail}` };
     }
+    return { ok: true };
   } catch (err) {
     console.error("Échec envoi email de suivi:", err);
+    return { ok: false, error: String(err) };
   }
 }
 
@@ -136,7 +140,7 @@ Deno.serve(async (req: Request) => {
   }
 
   const appUrl = (Deno.env.get("APP_URL") || "http://localhost:3000").replace(/\/$/, "");
-  await sendTrackingEmail({
+  const sendResult = await sendTrackingEmail({
     to: email,
     prenom: client.prenom,
     dossiers: dossiers.map((d: { reference: string; portal_token: string }) => ({
@@ -144,6 +148,10 @@ Deno.serve(async (req: Request) => {
       portalUrl: `${appUrl}/suivi/${d.portal_token}`,
     })),
   });
+
+  if (!sendResult.ok) {
+    return jsonResponse({ status: "email_error" });
+  }
 
   return jsonResponse({ status: "ok" });
 });
