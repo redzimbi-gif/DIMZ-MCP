@@ -92,6 +92,7 @@ export function documentCommercialEmail(params: {
   numero: string;
   montantTTC: string;
   portalUrl?: string | null;
+  paiementUrl?: string | null;
 }): { subject: string; html: string } {
   const label = params.type === "devis" ? "devis" : "facture";
   const content = `
@@ -102,7 +103,13 @@ export function documentCommercialEmail(params: {
         ? `<p style="margin:0 0 16px;">N'hésitez pas à revenir vers nous pour toute question avant validation.</p>`
         : ""
     }
-    ${params.portalUrl ? ctaButton(params.portalUrl, "Suivre mon dossier") : ""}
+    ${
+      params.paiementUrl
+        ? `<p style="margin:0 0 4px;">Vous pouvez régler cette facture en ligne, en toute sécurité :</p>${ctaButton(params.paiementUrl, `Payer ${params.montantTTC}`)}`
+        : params.portalUrl
+          ? ctaButton(params.portalUrl, "Suivre mon dossier")
+          : ""
+    }
   `;
   return {
     subject: `Votre ${label} DIMZ ${params.numero}`,

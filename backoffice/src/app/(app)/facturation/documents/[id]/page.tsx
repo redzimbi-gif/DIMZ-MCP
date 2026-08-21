@@ -125,6 +125,15 @@ export default async function DocumentCommercialPage({ params }: { params: { id:
 function DocumentSummary({ doc }: { doc: NonNullable<Awaited<ReturnType<typeof getDocumentCommercial>>> }) {
   return (
     <Card className="p-6 space-y-4">
+      {doc.type === "facture" && doc.stripe_payment_intent_id ? (
+        <div className="text-sm text-good bg-good-bg border border-good/20 rounded-md px-3 py-2">
+          Payée en ligne via Stripe.
+        </div>
+      ) : doc.type === "facture" && doc.stripe_checkout_session_id && doc.statut === "envoye" ? (
+        <div className="text-sm text-ink-soft bg-surface-sunken border border-line rounded-md px-3 py-2">
+          Un lien de paiement en ligne a été envoyé au client avec cette facture.
+        </div>
+      ) : null}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
         <div>
           <p className="text-xs text-ink-soft">Objet</p>

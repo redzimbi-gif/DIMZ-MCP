@@ -489,6 +489,8 @@ export interface DocumentCommercial {
   date_emission: string;
   date_echeance: string | null;
   pdf_path: string | null;
+  stripe_checkout_session_id: string | null;
+  stripe_payment_intent_id: string | null;
   created_at: string;
   updated_at: string;
 }

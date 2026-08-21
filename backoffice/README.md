@@ -70,16 +70,35 @@ depuis le dashboard Supabase pour l'instant).
    `DIMZ - Mon Copilote Auto <contact@dimz.fr>`) — l'envoi à n'importe quel
    client se débloque automatiquement, sans autre changement de code.
 
-## 4. Configurer les variables d'environnement
+## 4. Créer ton compte Stripe (paiement en ligne des factures)
+
+1. Va sur [stripe.com](https://stripe.com) → crée un compte.
+2. **Développeurs → Clés API**, copie la **clé secrète** (commence par `sk_`,
+   utilise le mode Test tant que tu n'as pas activé le compte) → `STRIPE_SECRET_KEY`.
+3. Une fois le back-office déployé (étape 7) et l'URL connue : **Développeurs
+   → Webhooks → Ajouter un endpoint**, URL `https://TON-URL/api/stripe/webhook`,
+   événement à écouter : `checkout.session.completed`. Stripe affiche alors
+   une **clé de signature** (commence par `whsec_`) → `STRIPE_WEBHOOK_SECRET`.
+4. Tant que le compte Stripe est en mode Test, les paiements ne débitent
+   jamais de vraie carte (utilise `4242 4242 4242 4242`, une date future, un
+   CVC quelconque pour tester). Active le compte (informations bancaires,
+   KYC) quand tu es prêt à encaisser réellement.
+
+Concrètement : quand tu cliques **Envoyer au client** sur une facture (page
+Facturation), un lien de paiement Stripe est créé et inclus dans l'email — la
+facture passe automatiquement en statut **Payée** dès que le client règle en
+ligne (webhook), sans action manuelle de ta part.
+
+## 5. Configurer les variables d'environnement
 
 ```bash
 cp .env.local.example .env.local
 ```
 
-Remplis les valeurs récupérées aux étapes 1 et 3. `NEXT_PUBLIC_APP_URL` peut
-rester tel quel en local ; mets l'URL Vercel une fois déployé (étape 6).
+Remplis les valeurs récupérées aux étapes 1, 3 et 4. `NEXT_PUBLIC_APP_URL` peut
+rester tel quel en local ; mets l'URL Vercel une fois déployé (étape 7).
 
-## 5. Lancer en local
+## 6. Lancer en local
 
 ```bash
 npm install
@@ -89,7 +108,7 @@ npm run dev
 Ouvre [http://localhost:3000](http://localhost:3000), connecte-toi avec le
 compte créé à l'étape 2.
 
-## 6. Déployer sur Vercel
+## 7. Déployer sur Vercel
 
 1. Pousse ce dépôt sur GitHub (déjà fait si tu lis ce fichier depuis le repo).
 2. Sur [vercel.com](https://vercel.com) → **Add New Project** → importe le
@@ -99,7 +118,7 @@ compte créé à l'étape 2.
    (tu peux redéployer après coup pour la corriger).
 4. Déploie. Vercel te donne une URL du type `https://dimz-backoffice.vercel.app`.
 
-## 7. Connecter le site vitrine
+## 8. Connecter le site vitrine
 
 Le site vitrine (`dimz-beta.html`) n'appelle pas directement le back-office
 Vercel : il appelle une **Edge Function Supabase** (`supabase/functions/lead-intake`),

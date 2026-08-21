@@ -8,6 +8,7 @@ import { getDocumentCommercial, getEntrepriseInfo } from "@/lib/queries";
 import { DocumentCommercialPdf } from "@/lib/pdf/DocumentCommercial";
 import { sendEmail, getAppUrl } from "@/lib/email";
 import { documentCommercialEmail } from "@/lib/email-templates";
+import { createCheckoutSession } from "@/lib/stripe";
 import { logActivity } from "@/lib/log";
 import { formatCurrency } from "@/lib/format";
 import type { DocumentCommercialType, DocumentCommercialStatut, LigneDocumentCommercial } from "@/lib/types";
@@ -210,12 +211,38 @@ export async function envoyerDocumentCommercial(id: string) {
         if (dossier?.portal_token) portalUrl = `${getAppUrl()}/suivi/${dossier.portal_token}`;
       }
 
+      // Une facture (pas un devis) déclenche un lien de paiement Stripe à
+      // chaque envoi, pour toujours proposer un lien valide (une session
+      // Checkout expire après 24h) — la précédente, si elle existe, est
+      // simplement remplacée.
+      let paiementUrl: string | null = null;
+      if (doc.type === "facture" && doc.statut !== "paye") {
+        const checkout = await createCheckoutSession({
+          montantTTC: doc.montant_ttc,
+          description: doc.objet || `Facture DIMZ ${doc.numero}`,
+          clientEmail: email,
+          successUrl: portalUrl ? `${portalUrl}?paiement=succes` : `${getAppUrl()}?paiement=succes`,
+          cancelUrl: portalUrl ? `${portalUrl}?paiement=annule` : `${getAppUrl()}?paiement=annule`,
+          metadata: { document_commercial_id: doc.id },
+        });
+        if (checkout.ok) {
+          paiementUrl = checkout.session.url;
+          await db
+            .from("documents_commerciaux")
+            .update({ stripe_checkout_session_id: checkout.session.id })
+            .eq("id", id);
+        } else {
+          console.error("Lien de paiement Stripe non créé:", checkout.error);
+        }
+      }
+
       const { subject, html } = documentCommercialEmail({
         prenom: doc.clients?.prenom ?? null,
         type: doc.type,
         numero: doc.numero,
         montantTTC: formatCurrency(doc.montant_ttc),
         portalUrl,
+        paiementUrl,
       });
 
       const result = await sendEmail({
