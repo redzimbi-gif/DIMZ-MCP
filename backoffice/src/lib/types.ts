@@ -76,6 +76,7 @@ export const AGENDA_EVENT_TYPES = [
   "convoyage",
   "livraison",
   "convoyage_externe",
+  "conge",
 ] as const;
 export type AgendaEventType = (typeof AGENDA_EVENT_TYPES)[number];
 
@@ -86,6 +87,7 @@ export const AGENDA_EVENT_TYPE_LABELS: Record<AgendaEventType, string> = {
   convoyage: "Convoyage",
   livraison: "Livraison",
   convoyage_externe: "Convoyage (hors DIMZ)",
+  conge: "Congé",
 };
 
 export const CONVOYAGE_STATUTS = ["planifie", "en_cours", "livre", "annule"] as const;
@@ -393,6 +395,18 @@ export interface EntrepriseInfo {
   mediateur_adresse: string | null;
   mediateur_site: string | null;
   updated_at: string;
+}
+
+export type MessageAuteur = "staff" | "client";
+
+export interface Message {
+  id: string;
+  dossier_id: string;
+  auteur: MessageAuteur;
+  contenu: string;
+  lu_par_client: boolean;
+  lu_par_staff: boolean;
+  created_at: string;
 }
 
 export interface NoteInterne {

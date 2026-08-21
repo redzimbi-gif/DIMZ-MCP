@@ -15,12 +15,14 @@ export async function createAgendaEvent(formData: FormData) {
   if (!titre || !dateDebut) throw new Error("Titre et date sont obligatoires.");
 
   const dossierId = String(formData.get("dossier_id") || "") || null;
+  const dateFin = String(formData.get("date_fin") || "");
 
   const payload = {
     titre,
     type: String(formData.get("type") || "rendez_vous") as AgendaEventType,
     dossier_id: dossierId,
     date_debut: new Date(dateDebut).toISOString(),
+    date_fin: dateFin ? new Date(dateFin).toISOString() : null,
     lieu: String(formData.get("lieu") || "").trim() || null,
     notes: String(formData.get("notes") || "").trim() || null,
   };
@@ -47,12 +49,14 @@ export async function updateAgendaEvent(id: string, formData: FormData) {
   if (!titre || !dateDebut) throw new Error("Titre et date sont obligatoires.");
 
   const dossierId = String(formData.get("dossier_id") || "") || null;
+  const dateFin = String(formData.get("date_fin") || "");
 
   const payload = {
     titre,
     type: String(formData.get("type") || "rendez_vous") as AgendaEventType,
     dossier_id: dossierId,
     date_debut: new Date(dateDebut).toISOString(),
+    date_fin: dateFin ? new Date(dateFin).toISOString() : null,
     lieu: String(formData.get("lieu") || "").trim() || null,
     notes: String(formData.get("notes") || "").trim() || null,
   };

@@ -55,3 +55,37 @@ export async function upgradeOffreDepuisSuivi(token: string, offre: OffreCible) 
 
   revalidatePath(`/suivi/${token}`);
 }
+
+const MESSAGE_MAX_LENGTH = 4000;
+
+/** Permet au client d'envoyer un message à son copilote depuis sa page de suivi. */
+export async function sendMessageClient(token: string, formData: FormData) {
+  const contenu = String(formData.get("contenu") || "").trim().slice(0, MESSAGE_MAX_LENGTH);
+  if (!contenu) return;
+
+  const dossier = await getDossierByToken(token);
+  if (!dossier) return;
+
+  const db = createAdminClient();
+  await db
+    .from("messages")
+    .insert({ dossier_id: dossier.id, auteur: "client", contenu, lu_par_client: true, lu_par_staff: false });
+
+  const clientNom = `${dossier.clients?.prenom ?? ""} ${dossier.clients?.nom ?? ""}`.trim();
+
+  await logActivity({
+    action: "message.envoye_client",
+    entiteType: "dossier",
+    entiteId: dossier.id,
+    description: `Message reçu du client pour le dossier ${dossier.reference}`,
+  });
+
+  await notifyStaff({
+    titre: `Nouveau message de ${clientNom || "un client"}`,
+    message: `Dossier ${dossier.reference} : « ${contenu.slice(0, 140)}${contenu.length > 140 ? "…" : ""} »`,
+    type: "message_client",
+    lien: `/dossiers/${dossier.id}`,
+  });
+
+  revalidatePath(`/suivi/${token}`);
+}

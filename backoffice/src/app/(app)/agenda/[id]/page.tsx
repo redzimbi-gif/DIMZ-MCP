@@ -14,6 +14,7 @@ export default async function EditAgendaEventPage({ params }: { params: { id: st
   const action = updateAgendaEvent.bind(null, event.id);
   const deleteAction = deleteAgendaEvent.bind(null, event.id, "/agenda");
   const dateDebutValue = format(new Date(event.date_debut), "yyyy-MM-dd'T'HH:mm");
+  const dateFinValue = event.date_fin ? format(new Date(event.date_fin), "yyyy-MM-dd'T'HH:mm") : "";
 
   return (
     <div className="max-w-lg">
@@ -40,8 +41,11 @@ export default async function EditAgendaEventPage({ params }: { params: { id: st
               ))}
             </select>
           </Field>
-          <Field label="Date et heure">
+          <Field label="Date et heure de début">
             <input name="date_debut" type="datetime-local" required defaultValue={dateDebutValue} className={inputClass} />
+          </Field>
+          <Field label="Date et heure de fin (optionnel, si l'événement dure plusieurs jours)">
+            <input name="date_fin" type="datetime-local" defaultValue={dateFinValue} className={inputClass} />
           </Field>
           <Field label="Dossier lié (optionnel)">
             <select name="dossier_id" defaultValue={event.dossier_id ?? ""} className={inputClass}>

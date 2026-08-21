@@ -2,6 +2,14 @@ const BLUE = "#2f6fed";
 const INK = "#0b0d12";
 const INK_SOFT = "#565c68";
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 function emailLayout(contentHtml: string): string {
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -133,6 +141,25 @@ export function marketDisponibleEmail(params: {
   `;
   return {
     subject: `Votre ${params.titre} est disponible (${params.reference})`,
+    html: emailLayout(content),
+  };
+}
+
+export function messageRecuEmail(params: {
+  prenom: string | null;
+  reference: string;
+  portalUrl: string;
+  contenu: string;
+}): { subject: string; html: string } {
+  const content = `
+    <p style="margin:0 0 16px;">${greeting(params.prenom)}</p>
+    <p style="margin:0 0 16px;">Votre copilote vous a envoyé un nouveau message au sujet du dossier <strong>${params.reference}</strong> :</p>
+    <p style="margin:0 0 16px;padding:14px 16px;background:#f4f5f7;border-radius:8px;color:${INK};font-style:italic;white-space:pre-wrap;">« ${escapeHtml(params.contenu)} »</p>
+    <p style="margin:0 0 4px;">Vous pouvez répondre directement depuis votre espace de suivi :</p>
+    ${ctaButton(params.portalUrl, "Voir le message")}
+  `;
+  return {
+    subject: `Nouveau message de votre copilote (${params.reference})`,
     html: emailLayout(content),
   };
 }

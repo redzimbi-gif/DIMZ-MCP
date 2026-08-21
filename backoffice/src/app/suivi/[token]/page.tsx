@@ -2,12 +2,12 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Check, ExternalLink } from "lucide-react";
 import { clsx } from "clsx";
-import { getDossierByToken, getDossierAnnonces } from "@/lib/queries";
+import { getDossierByToken, getDossierAnnonces, getDossierMessages } from "@/lib/queries";
 import { getSignedUrl } from "@/lib/storage";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatRelative } from "@/lib/format";
 import { Logo } from "@/components/Logo";
 import { getEtapesOffre, resolveEtapesConvoyage } from "@/lib/etapes";
-import { upgradeOffreDepuisSuivi } from "./actions";
+import { upgradeOffreDepuisSuivi, sendMessageClient } from "./actions";
 
 export const metadata = {
   title: "Suivi de votre dossier — Dimz",
@@ -19,6 +19,8 @@ export default async function ClientPortalPage({ params }: { params: { token: st
   if (!dossier) notFound();
 
   const annonces = dossier.offre === "convoyage_seul" ? [] : await getDossierAnnonces(dossier.id);
+  const messages = await getDossierMessages(dossier.id);
+  const sendMessageAction = sendMessageClient.bind(null, params.token);
   const annoncesAvecPhoto = await Promise.all(
     annonces.map(async (a) => ({ ...a, photoUrl: a.photos[0] ? await getSignedUrl(a.photos[0]) : null }))
   );
@@ -225,9 +227,45 @@ export default async function ClientPortalPage({ params }: { params: { token: st
           </div>
         ) : null}
 
-        <p className="text-center text-xs text-ink-faint mt-6">
-          Une question sur votre dossier ? Votre copilote DIMZ vous répond.
-        </p>
+        <div className="mt-6 bg-surface border border-line rounded-lg2 shadow-card p-6">
+          <p className="text-sm font-semibold text-ink mb-1">Messages</p>
+          <p className="text-xs text-ink-soft mb-4">
+            Une question sur votre dossier ? Écrivez directement à votre copilote.
+          </p>
+          {messages.length > 0 ? (
+            <ul className="space-y-2.5 mb-4">
+              {messages.map((m) => (
+                <li
+                  key={m.id}
+                  className={clsx(
+                    "rounded-lg2 px-3.5 py-2.5 text-sm max-w-[85%]",
+                    m.auteur === "client" ? "bg-blue-50 text-ink ml-auto" : "bg-surface-sunken text-ink"
+                  )}
+                >
+                  <p className="whitespace-pre-wrap">{m.contenu}</p>
+                  <p className="text-[11px] text-ink-faint mt-1">
+                    {m.auteur === "client" ? "Vous" : "Votre copilote"} · {formatRelative(m.created_at)}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <form action={sendMessageAction} className="flex gap-2 pt-3 border-t border-line">
+            <textarea
+              name="contenu"
+              required
+              rows={2}
+              placeholder="Écrire un message…"
+              className="w-full rounded-md border border-line px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-blue-500 bg-surface"
+            />
+            <button
+              type="submit"
+              className="shrink-0 self-end inline-flex items-center justify-center rounded-md bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 transition-colors"
+            >
+              Envoyer
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

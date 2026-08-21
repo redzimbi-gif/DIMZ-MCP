@@ -7,6 +7,7 @@ const TABS = [
   { key: "decouverte", label: "Fiche Découverte" },
   { key: "inspection", label: "Inspection" },
   { key: "convoyage", label: "Convoyage" },
+  { key: "messages", label: "Messages" },
   { key: "documents", label: "Documents" },
   { key: "contrats", label: "Documents & contrats" },
   { key: "notes", label: "Notes & historique" },

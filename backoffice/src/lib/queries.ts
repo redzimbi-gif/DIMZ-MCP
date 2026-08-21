@@ -19,6 +19,7 @@ import type {
   Facture,
   FicheDecouverteVehicule,
   Inspection,
+  Message,
   NoteInterne,
   Notification,
   PhotoBibliotheque,
@@ -26,12 +27,81 @@ import type {
 } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
+// Chiffre d'affaires : total facturé - frais, réparti DIMZ Accompagnement /
+// DIMZ Convoyage. Trois sources agrégées :
+// - factures (journal manuel historique, sans lien dossier) : toujours
+//   Convoyage, toutes les factures existantes ne correspondant qu'à ça.
+// - convoyages_externes (convoyages réalisés hors plateforme DIMZ) :
+//   toujours Convoyage.
+// - documents_commerciaux de type "facture", hors brouillon/refusé/annulé
+//   (une facture réellement émise, pas forcément déjà payée) : Convoyage si
+//   liée à un convoyage ou à un dossier "convoyage_seul", Accompagnement
+//   sinon (découverte, copilote, copilote_plus, expertise_seule).
+// ---------------------------------------------------------------------------
+export interface RevenueBreakdown {
+  total: number;
+  accompagnement: number;
+  convoyage: number;
+}
+
+function addRevenue(bucket: RevenueBreakdown, montant: number, isConvoyage: boolean) {
+  bucket.total += montant;
+  if (isConvoyage) bucket.convoyage += montant;
+  else bucket.accompagnement += montant;
+}
+
+export async function getRevenueStats(): Promise<{ total: RevenueBreakdown; mois: RevenueBreakdown }> {
+  const db = createAdminClient();
+  const now = new Date();
+  const startOfMonthISO = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+
+  const [facturesRes, docsRes, externesRes] = await Promise.all([
+    db.from("factures").select("montant_total, montant_frais, date_facture"),
+    db
+      .from("documents_commerciaux")
+      .select("montant_ttc, date_emission, convoyage_id, dossiers(offre)")
+      .eq("type", "facture")
+      .not("statut", "in", "(brouillon,refuse,annule)"),
+    db.from("convoyages_externes").select("total_prestation, frais, date_convoyage"),
+  ]);
+
+  const total: RevenueBreakdown = { total: 0, accompagnement: 0, convoyage: 0 };
+  const mois: RevenueBreakdown = { total: 0, accompagnement: 0, convoyage: 0 };
+
+  for (const f of facturesRes.data ?? []) {
+    const montant = Number(f.montant_total || 0) - Number(f.montant_frais || 0);
+    addRevenue(total, montant, true);
+    if (f.date_facture && f.date_facture >= startOfMonthISO) addRevenue(mois, montant, true);
+  }
+
+  for (const c of externesRes.data ?? []) {
+    const montant = Number(c.total_prestation || 0) - Number(c.frais || 0);
+    addRevenue(total, montant, true);
+    if (c.date_convoyage && c.date_convoyage >= startOfMonthISO) addRevenue(mois, montant, true);
+  }
+
+  for (const d of (docsRes.data ?? []) as unknown as {
+    montant_ttc: number;
+    date_emission: string | null;
+    convoyage_id: string | null;
+    dossiers: { offre: string | null } | null;
+  }[]) {
+    const montant = Number(d.montant_ttc || 0);
+    const isConvoyage = !!d.convoyage_id || d.dossiers?.offre === "convoyage_seul";
+    addRevenue(total, montant, isConvoyage);
+    if (d.date_emission && d.date_emission >= startOfMonthISO) addRevenue(mois, montant, isConvoyage);
+  }
+
+  return { total, mois };
+}
+
+// ---------------------------------------------------------------------------
 // Dashboard
 // ---------------------------------------------------------------------------
 export async function getDashboardStats() {
   const db = createAdminClient();
 
-  const [{ count: nouveaux }, { count: enCours }, { count: termines }, valeurs] =
+  const [{ count: nouveaux }, { count: enCours }, { count: termines }, revenue] =
     await Promise.all([
       db.from("dossiers").select("*", { count: "exact", head: true }).eq("statut", "demande_recue"),
       db
@@ -39,13 +109,8 @@ export async function getDashboardStats() {
         .select("*", { count: "exact", head: true })
         .not("statut", "in", "(demande_recue,dossier_termine)"),
       db.from("dossiers").select("*", { count: "exact", head: true }).eq("statut", "dossier_termine"),
-      db.from("dossiers").select("valeur_estimee").eq("statut", "dossier_termine"),
+      getRevenueStats(),
     ]);
-
-  const chiffreAffaires = (valeurs.data ?? []).reduce(
-    (sum, d) => sum + (d.valeur_estimee ? Number(d.valeur_estimee) : 0),
-    0
-  );
 
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
@@ -82,7 +147,7 @@ export async function getDashboardStats() {
     nouveaux: nouveaux ?? 0,
     enCours: enCours ?? 0,
     termines: termines ?? 0,
-    chiffreAffaires,
+    revenue,
     convoyagesAVenir: (convoyagesAVenir.data ?? []) as any[],
     livraisonsDuJour: (livraisonsDuJour.data ?? []) as AgendaEvent[],
     notifications: (notifications.data ?? []) as Notification[],
@@ -352,6 +417,29 @@ export async function getEntrepriseInfo() {
   return data as EntrepriseInfo | null;
 }
 
+// ---------------------------------------------------------------------------
+// Messagerie interne (client <-> copilote, par dossier)
+// ---------------------------------------------------------------------------
+export async function getDossierMessages(dossierId: string) {
+  const db = createAdminClient();
+  const { data } = await db
+    .from("messages")
+    .select("*")
+    .eq("dossier_id", dossierId)
+    .order("created_at", { ascending: true });
+  return (data ?? []) as Message[];
+}
+
+export async function listRecentMessages() {
+  const db = createAdminClient();
+  const { data } = await db
+    .from("messages")
+    .select("*, dossiers(reference, clients(nom, prenom))")
+    .order("created_at", { ascending: false })
+    .limit(50);
+  return (data ?? []) as (Message & { dossiers: any })[];
+}
+
 export async function getDossierNotes(dossierId: string) {
   const db = createAdminClient();
   const { data } = await db
@@ -367,11 +455,14 @@ export async function getDossierNotes(dossierId: string) {
 // ---------------------------------------------------------------------------
 export async function listAgendaEvents(fromISO: string, toISO: string) {
   const db = createAdminClient();
+  // Chevauchement avec la plage demandée, pas juste date_debut dedans : un
+  // événement multi-jours (congé, convoyage) démarré avant `fromISO` doit
+  // quand même apparaître sur les jours de la plage qu'il traverse encore.
   const { data } = await db
     .from("agenda_events")
     .select("*, dossiers(reference), clients(nom, prenom)")
-    .gte("date_debut", fromISO)
     .lte("date_debut", toISO)
+    .or(`date_fin.gte.${fromISO},and(date_fin.is.null,date_debut.gte.${fromISO})`)
     .order("date_debut", { ascending: true });
   return (data ?? []) as (AgendaEvent & { dossiers: any; clients: any })[];
 }

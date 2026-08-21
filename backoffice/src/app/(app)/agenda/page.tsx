@@ -21,13 +21,14 @@ import { AutoResetForm } from "@/components/AutoResetForm";
 import { AGENDA_EVENT_TYPE_LABELS, type AgendaEventType } from "@/lib/types";
 import { createAgendaEvent, marquerConvoyageExterneTermine } from "./actions";
 
-const TYPE_TONES: Record<AgendaEventType, "blue" | "warn" | "good"> = {
+const TYPE_TONES: Record<AgendaEventType, "blue" | "warn" | "good" | "neutral"> = {
   rendez_vous: "blue",
   visioconference: "blue",
   inspection: "warn",
   convoyage: "blue",
   livraison: "good",
   convoyage_externe: "warn",
+  conge: "neutral",
 };
 
 export default async function AgendaPage({
@@ -51,11 +52,30 @@ export default async function AgendaPage({
   const dossiers = await listDossiers();
   const convoyagesAFaire = await listConvoyagesExternesAFaire();
 
+  // Un événement avec date_fin apparaît sur chaque jour qu'il traverse, pas
+  // seulement son jour de départ (cas des convoyages ou congés sur plusieurs
+  // jours).
   const eventsByDay = new Map<string, typeof events>();
   events.forEach((e) => {
-    const key = format(new Date(e.date_debut), "yyyy-MM-dd");
-    eventsByDay.set(key, [...(eventsByDay.get(key) ?? []), e]);
+    const debut = new Date(e.date_debut);
+    const fin = e.date_fin ? new Date(e.date_fin) : debut;
+    const jours = fin > debut ? eachDayOfInterval({ start: debut, end: fin }) : [debut];
+    jours.forEach((jour) => {
+      const key = format(jour, "yyyy-MM-dd");
+      eventsByDay.set(key, [...(eventsByDay.get(key) ?? []), e]);
+    });
   });
+
+  // Jours tombant dans la plage d'un congé : case assombrie sur la grille.
+  const congeDays = new Set<string>();
+  events
+    .filter((e) => e.type === "conge")
+    .forEach((e) => {
+      const debut = new Date(e.date_debut);
+      const fin = e.date_fin ? new Date(e.date_fin) : debut;
+      const jours = fin > debut ? eachDayOfInterval({ start: debut, end: fin }) : [debut];
+      jours.forEach((jour) => congeDays.add(format(jour, "yyyy-MM-dd")));
+    });
 
   const selectedDayEvents = selectedDay ? eventsByDay.get(selectedDay) ?? [] : [];
 
@@ -103,44 +123,53 @@ export default async function AgendaPage({
               const key = format(day, "yyyy-MM-dd");
               const dayEvents = eventsByDay.get(key) ?? [];
               const isSelected = selectedDay === key;
+              const isConge = congeDays.has(key);
               return (
                 <div
                   key={key}
                   className={clsx(
-                    "min-h-[92px] rounded-md border p-1.5 text-left align-top",
-                    isSameMonth(day, monthStart) ? "border-line bg-surface" : "border-line-soft bg-surface-sunken",
+                    "relative min-h-[92px] rounded-md border p-1.5 text-left align-top",
+                    isConge ? "bg-ink/10 border-ink/15" : isSameMonth(day, monthStart) ? "border-line bg-surface" : "border-line-soft bg-surface-sunken",
                     isSameDay(day, today) && "ring-1 ring-blue-500",
-                    isSelected && "border-blue-500 bg-blue-50"
+                    isSelected && !isConge && "border-blue-500 bg-blue-50"
                   )}
                 >
+                  {/* Lien plein-cellule, sous le contenu : cliquer n'importe où dans la case ouvre le panneau du jour. */}
                   <Link
                     href={`/agenda?month=${monthKey}&day=${key}`}
-                    className={clsx(
-                      "inline-flex items-center justify-center h-5 w-5 rounded-full text-xs tnum font-medium hover:bg-blue-100",
-                      isSelected ? "bg-blue-500 text-white hover:bg-blue-600" : isSameMonth(day, monthStart) ? "text-ink-soft" : "text-ink-faint"
-                    )}
-                  >
-                    {format(day, "d")}
-                  </Link>
-                  <div className="mt-1 space-y-1">
-                    {dayEvents.slice(0, 3).map((e) => (
-                      <Link
-                        key={e.id}
-                        href={`/agenda/${e.id}`}
-                        className="block text-[11px] leading-tight rounded px-1.5 py-1 bg-blue-50 text-blue-700 truncate hover:bg-blue-100"
-                        title={e.titre}
-                      >
-                        {e.titre}
-                      </Link>
-                    ))}
-                    {dayEvents.length > 3 ? (
-                      <Link
-                        href={`/agenda?month=${monthKey}&day=${key}`}
-                        className="block text-[10px] text-ink-faint px-1 hover:text-blue-600"
-                      >
-                        +{dayEvents.length - 3}
-                      </Link>
-                    ) : null}
+                    className="absolute inset-0 rounded-md"
+                    aria-label={`Voir les événements du ${format(day, "d MMMM", { locale: fr })}`}
+                  />
+                  <div className="relative">
+                    <Link
+                      href={`/agenda?month=${monthKey}&day=${key}`}
+                      className={clsx(
+                        "relative inline-flex items-center justify-center h-5 w-5 rounded-full text-xs tnum font-medium hover:bg-blue-100",
+                        isSelected ? "bg-blue-500 text-white hover:bg-blue-600" : isSameMonth(day, monthStart) ? "text-ink-soft" : "text-ink-faint"
+                      )}
+                    >
+                      {format(day, "d")}
+                    </Link>
+                    <div className="mt-1 space-y-1">
+                      {dayEvents.slice(0, 3).map((e) => (
+                        <Link
+                          key={e.id}
+                          href={`/agenda/${e.id}`}
+                          className="relative block text-[11px] leading-tight rounded px-1.5 py-1 bg-blue-50 text-blue-700 truncate hover:bg-blue-100"
+                          title={e.titre}
+                        >
+                          {e.titre}
+                        </Link>
+                      ))}
+                      {dayEvents.length > 3 ? (
+                        <Link
+                          href={`/agenda?month=${monthKey}&day=${key}`}
+                          className="relative block text-[10px] text-ink-faint px-1 hover:text-blue-600"
+                        >
+                          +{dayEvents.length - 3}
+                        </Link>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
               );
@@ -171,6 +200,7 @@ export default async function AgendaPage({
                             <Badge tone={TYPE_TONES[e.type]}>{AGENDA_EVENT_TYPE_LABELS[e.type]}</Badge>
                             <span className="text-xs text-ink-faint tnum">
                               {format(new Date(e.date_debut), "HH:mm")}
+                              {e.date_fin ? ` — ${format(new Date(e.date_fin), "HH:mm")}` : ""}
                             </span>
                           </div>
                           <p className="text-sm font-medium text-ink mt-1 truncate">{e.titre}</p>
@@ -205,7 +235,7 @@ export default async function AgendaPage({
                 ))}
               </select>
             </Field>
-            <Field label="Date et heure">
+            <Field label="Date et heure de début">
               <input
                 name="date_debut"
                 type="datetime-local"
@@ -213,6 +243,9 @@ export default async function AgendaPage({
                 defaultValue={selectedDay ? `${selectedDay}T09:00` : undefined}
                 className={inputClass}
               />
+            </Field>
+            <Field label="Date et heure de fin (optionnel, si l'événement dure plusieurs jours)">
+              <input name="date_fin" type="datetime-local" className={inputClass} />
             </Field>
             <Field label="Dossier lié (optionnel)">
               <select name="dossier_id" className={inputClass}>

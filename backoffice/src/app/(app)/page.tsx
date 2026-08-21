@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 import { FolderPlus, Loader, CheckCircle2, Wallet, Truck, PackageCheck } from "lucide-react";
 import { getDashboardStats } from "@/lib/queries";
 import { Card, PageHeader, StatCard, EmptyState } from "@/components/ui";
@@ -20,11 +22,51 @@ export default async function DashboardPage() {
         <StatCard label="Dossiers terminés" value={stats.termines} icon={<CheckCircle2 className="h-4 w-4" />} tone="good" />
         <StatCard
           label="Chiffre d'affaires"
-          value={formatCurrency(stats.chiffreAffaires)}
-          hint="Dossiers terminés"
+          value={formatCurrency(stats.revenue.total.total)}
+          hint="Facturé − frais"
           icon={<Wallet className="h-4 w-4" />}
           tone="blue"
         />
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <StatCard
+          label="CA du mois"
+          value={formatCurrency(stats.revenue.mois.total)}
+          hint={format(new Date(), "MMMM yyyy", { locale: fr })}
+          icon={<Wallet className="h-4 w-4" />}
+          tone="blue"
+        />
+        <Card className="p-5 col-span-2 lg:col-span-3">
+          <h2 className="text-sm font-semibold text-ink mb-4">Répartition du chiffre d'affaires</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs text-ink-soft">DIMZ Accompagnement</p>
+              <p className="text-lg font-semibold text-ink tnum mt-0.5">
+                {formatCurrency(stats.revenue.total.accompagnement)}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-ink-soft">DIMZ Convoyage</p>
+              <p className="text-lg font-semibold text-ink tnum mt-0.5">
+                {formatCurrency(stats.revenue.total.convoyage)}
+              </p>
+            </div>
+          </div>
+          <div className="mt-3 h-1.5 rounded-full bg-surface-sunken overflow-hidden flex">
+            <div
+              className="h-full bg-blue-500"
+              style={{
+                width: `${
+                  stats.revenue.total.total > 0
+                    ? (stats.revenue.total.accompagnement / stats.revenue.total.total) * 100
+                    : 0
+                }%`,
+              }}
+            />
+            <div className="h-full bg-blue-200" style={{ flex: 1 }} />
+          </div>
+        </Card>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-4 mb-6">

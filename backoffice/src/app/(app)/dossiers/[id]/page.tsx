@@ -13,6 +13,7 @@ import {
   getDossierDocuments,
   getDossierContrats,
   getDossierNotes,
+  getDossierMessages,
   listPhotosBibliotheque,
 } from "@/lib/queries";
 import {
@@ -71,6 +72,7 @@ import {
   updateFicheDecouverteIntro,
 } from "./decouverte-actions";
 import { uploadDossierDocument, archiverDocument, reactiverDocument, supprimerDocument } from "./documents-actions";
+import { sendMessageStaff } from "./messages-actions";
 import {
   generateContrat,
   marquerContratSigne,
@@ -122,6 +124,7 @@ export default async function DossierDetailPage({
   const updateInfosAction = updateDossierInfos.bind(null, dossier.id);
   const updateStatutAction = updateDossierStatut.bind(null, dossier.id);
   const addNoteAction = addDossierNote.bind(null, dossier.id);
+  const sendMessageAction = sendMessageStaff.bind(null, dossier.id);
   const createAnnonceAction = createAnnonce.bind(null, dossier.id);
   const marketCommentaireAction = updateMarketCommentaire.bind(null, dossier.id);
   const sendMarketAction = sendMarketEmail.bind(null, dossier.id);
@@ -424,6 +427,10 @@ export default async function DossierDetailPage({
       {tab === "inspection" ? <InspectionTab dossierId={dossier.id} /> : null}
 
       {tab === "convoyage" ? <ConvoyageTab dossierId={dossier.id} /> : null}
+
+      {tab === "messages" ? (
+        <MessagesTab dossierId={dossier.id} sendMessageAction={sendMessageAction} />
+      ) : null}
 
       {tab === "documents" ? (
         <DocumentsTab
@@ -1276,6 +1283,57 @@ async function ContratsTab({ dossierId }: { dossierId: string }) {
         );
       })}
     </div>
+  );
+}
+
+async function MessagesTab({
+  dossierId,
+  sendMessageAction,
+}: {
+  dossierId: string;
+  sendMessageAction: (formData: FormData) => Promise<void>;
+}) {
+  const messages = await getDossierMessages(dossierId);
+
+  return (
+    <Card className="p-5 max-w-2xl">
+      <h2 className="text-sm font-semibold text-ink mb-4">Messages avec le client</h2>
+      {messages.length === 0 ? (
+        <EmptyState
+          title="Aucun message pour le moment"
+          description="Le client verra vos messages sur sa page de suivi, et recevra un email à chaque nouveau message."
+        />
+      ) : (
+        <ul className="space-y-3 mb-5">
+          {messages.map((m) => (
+            <li
+              key={m.id}
+              className={clsx(
+                "rounded-lg2 px-4 py-3 text-sm max-w-[85%]",
+                m.auteur === "staff" ? "bg-blue-50 text-ink ml-auto" : "bg-surface-sunken text-ink"
+              )}
+            >
+              <p className="whitespace-pre-wrap">{m.contenu}</p>
+              <p className="text-xs text-ink-faint mt-1.5">
+                {m.auteur === "staff" ? "Vous" : "Le client"} · {formatRelative(m.created_at)}
+              </p>
+            </li>
+          ))}
+        </ul>
+      )}
+      <AutoResetForm action={sendMessageAction} className="flex gap-2 pt-4 border-t border-line">
+        <textarea
+          name="contenu"
+          required
+          rows={2}
+          placeholder="Écrire un message au client…"
+          className={inputClass}
+        />
+        <Button type="submit" className="shrink-0 self-end">
+          Envoyer
+        </Button>
+      </AutoResetForm>
+    </Card>
   );
 }
 
