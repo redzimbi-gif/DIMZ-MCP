@@ -144,11 +144,18 @@ export async function getClientNotes(clientId: string) {
 // ---------------------------------------------------------------------------
 // Dossiers
 // ---------------------------------------------------------------------------
+// Colonnes du pipeline/liste : tout sauf donnees_brutes (le JSON brut de
+// soumission de formulaire, potentiellement volumineux, qui n'est affiché
+// que sur la fiche détail d'un dossier — pas de raison de le retélécharger
+// sur chaque chargement de la liste, ça alourdit inutilement l'egress).
+const DOSSIER_LISTE_COLONNES =
+  "id, client_id, reference, offre, budget, vehicule_recherche, marques_souhaitees, motorisation, boite_vitesses, km_max, region, commentaires, statut, etape_client, convoyage_decision, devis_envoye_at, valeur_estimee, source, portal_token, fiche_decouverte_intro, market_commentaire_copilote, market_commentaire_copilote_plus, archive, created_at, updated_at, clients(id, nom, prenom, email, telephone)";
+
 export async function listDossiers(options?: { archived?: boolean }) {
   const db = createAdminClient();
   const { data } = await db
     .from("dossiers")
-    .select("*, clients(id, nom, prenom, email, telephone)")
+    .select(DOSSIER_LISTE_COLONNES)
     .eq("archive", options?.archived ?? false)
     .order("created_at", { ascending: false });
   return (data ?? []) as Dossier[];
@@ -499,9 +506,14 @@ export async function getConvoyageExterne(id: string) {
 // ---------------------------------------------------------------------------
 // Retours du questionnaire de test utilisateur
 // ---------------------------------------------------------------------------
+// Même logique que DOSSIER_LISTE_COLONNES ci-dessus : donnees_brutes n'est
+// utile que sur la fiche détail d'un retour, pas dans la liste.
+const TEST_FEEDBACK_LISTE_COLONNES =
+  "id, reference, comprehension_immediate, confiance_site, offres_faciles, tarifs_clairs, navigation_facile, note_design_general, note_professionnalisme, note_logo, note_couleurs, note_lisibilite, note_modernite, ressenti_duree, hesite_abandonner, note_experience_formulaire, offre_choisie, prix_coherents, meilleur_rapport_qualite_prix, utiliserait_dimz, recommanderait_dimz, note_globale, duree_secondes, duree_declaree, created_at";
+
 export async function listTestFeedback() {
   const db = createAdminClient();
-  const { data } = await db.from("test_feedback").select("*").order("created_at", { ascending: false });
+  const { data } = await db.from("test_feedback").select(TEST_FEEDBACK_LISTE_COLONNES).order("created_at", { ascending: false });
   return (data ?? []) as TestFeedback[];
 }
 
