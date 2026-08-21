@@ -60,7 +60,7 @@
     {
       "@type": "Offer",
       "name": "Copilote",
-      "description": "Recherche, analyse et sélection de véhicules avec rapport et appel de synthèse.",
+      "description": "Appel pour approfondir votre projet, recherche de véhicules, puis rapport écrit avec avis et recommandations.",
       "priceCurrency": "EUR",
       "priceSpecification": {
         "@type": "PriceSpecification",
@@ -72,8 +72,8 @@
     {
       "@type": "Offer",
       "name": "Copilote Plus",
-      "description": "Accompagnement de bout en bout : mise en relation avec le vendeur, expertise physique du véhicule, livraison et mise en main.",
-      "price": "749",
+      "description": "Accompagnement de bout en bout : mise en relation avec le vendeur, inspection physique du véhicule avec rapport, livraison en Rhône-Alpes et mise en main.",
+      "price": "599",
       "priceCurrency": "EUR"
     }
   ]
@@ -243,46 +243,6 @@
   .acc-content > div > section.dark, .acc-content > div > div.wrap > section.dark { border-radius: var(--r-xl); margin: 28px 28px 0; overflow: hidden; }
 
   /* ---------------- Accueil : sections repliables ---------------- */
-  .gift-banner {
-    display: flex; align-items: center; gap: 18px;
-    background: linear-gradient(135deg, var(--bleu-vif), color-mix(in srgb, var(--bleu-vif) 65%, #142a6b));
-    border: none; border-radius: var(--r-xl);
-    box-shadow: 0 22px 40px -20px color-mix(in srgb, var(--bleu-vif) 60%, transparent);
-    padding: 24px 28px; margin: 28px 0; text-decoration: none; color: #fff;
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
-  }
-  .gift-banner:hover { transform: translateY(-3px) scale(1.008); box-shadow: 0 28px 50px -18px color-mix(in srgb, var(--bleu-vif) 70%, transparent); }
-  .gift-banner-icon {
-    width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.16);
-    color: #fff; display: flex; align-items: center; justify-content: center; flex: none;
-    animation: giftPulse 2.2s ease-in-out infinite;
-  }
-  .gift-banner-icon svg { width: 24px; height: 24px; }
-  .gift-banner-text { flex: 1; min-width: 0; }
-  .gift-banner-badge {
-    display: inline-block; background: rgba(255,255,255,0.2); color: #fff; font-size: 0.68rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 10px; border-radius: 100px; margin-bottom: 7px;
-  }
-  .gift-banner-text strong { display: block; font-family: var(--serif); font-weight: 600; font-size: 1.1rem; margin-bottom: 3px; color: #fff; }
-  .gift-banner-text span { color: rgba(255,255,255,0.88); font-size: 0.88rem; }
-  .gift-banner-cta {
-    display: inline-flex; align-items: center; gap: 6px; flex: none; background: #fff; color: var(--bleu-vif);
-    font-weight: 700; font-size: 0.86rem; padding: 11px 18px; border-radius: 100px; white-space: nowrap;
-    transition: transform 0.18s ease;
-  }
-  .gift-banner-cta svg { width: 16px; height: 16px; transition: transform 0.18s ease; }
-  .gift-banner:hover .gift-banner-cta svg { transform: translateX(3px); }
-  @keyframes giftPulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
-    50% { box-shadow: 0 0 0 9px rgba(255,255,255,0); }
-  }
-  @media (prefers-reduced-motion: reduce) { .gift-banner-icon { animation: none; } }
-  @media (max-width: 560px) {
-    .gift-banner { padding: 18px 20px; gap: 14px; flex-wrap: wrap; }
-    .gift-banner-text strong { font-size: 0.96rem; }
-    .gift-banner-cta { width: 100%; justify-content: center; }
-  }
-
   .acc-collapse { border: 1px solid var(--line); border-radius: var(--r-xl); background: var(--bg-raised); box-shadow: var(--shadow); margin: 28px 0; overflow: hidden; transition: box-shadow 0.3s var(--ease), border-color 0.3s var(--ease); }
   .acc-collapse:hover { box-shadow: var(--shadow-lg); border-color: color-mix(in srgb, var(--bleu-vif) 24%, var(--line)); }
   .acc-collapse summary { list-style: none; cursor: pointer; padding: 32px 36px; display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; transition: background 0.2s ease; }
@@ -507,6 +467,7 @@
   .offer-card li::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--bleu-vif); margin-top: 9px; flex: none; }
   .offer-card .btn { justify-content: center; margin-top: auto; }
   .offer-note { margin-top: 26px; text-align: center; color: var(--ink-soft); font-size: 0.85rem; max-width: 60ch; margin-left: auto; margin-right: auto; }
+  .offer-footnote { margin-top: 10px; text-align: center; color: color-mix(in srgb, var(--ink-soft) 82%, transparent); font-size: 0.76rem; line-height: 1.5; max-width: 68ch; margin-left: auto; margin-right: auto; }
 
   /* ---------------- Cartes d'offres cliquables + modale "ce que vous recevez" ---------------- */
   .offer-card { cursor: pointer; }
@@ -543,11 +504,15 @@
   .offer-modal-example-title::after { content: ""; flex: 1; height: 1px; background: var(--line); }
   .offer-modal-footnote { color: var(--ink-soft); font-size: 0.86rem; font-style: italic; line-height: 1.55; margin: 18px 0 0; }
 
-  .example-vehicules { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
-  .example-vehicule { display: flex; justify-content: space-between; align-items: center; gap: 14px; border: 1px solid var(--line); border-radius: var(--r-md); padding: 13px 16px; background: var(--bg); }
-  .example-vehicule-name { font-weight: 700; font-size: 0.9rem; }
-  .example-vehicule-tip { font-size: 0.81rem; color: var(--ink-soft); margin-top: 3px; }
-  .example-vehicule-price { font-weight: 700; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .offer-modal-comment { color: var(--ink-soft); font-size: 0.9rem; font-style: italic; line-height: 1.55; margin: 0 0 16px; }
+  .example-modeles { display: flex; flex-direction: column; gap: 10px; margin-bottom: 6px; }
+  .example-modele { border: 1px solid var(--line); border-radius: var(--r-md); padding: 13px 16px; background: var(--bg); }
+  .example-modele-name { font-weight: 700; font-size: 0.9rem; margin: 0 0 8px; }
+  .pc-line { display: flex; align-items: baseline; gap: 8px; font-size: 0.81rem; color: var(--ink-soft); line-height: 1.5; margin: 0 0 5px; }
+  .pc-line:last-child { margin-bottom: 0; }
+  .pc-label { flex: none; font-size: 0.64rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; padding: 2px 8px; border-radius: 100px; }
+  .pc-label.good { background: color-mix(in srgb, var(--vert) 16%, transparent); color: var(--vert); }
+  .pc-label.bad { background: color-mix(in srgb, var(--rouge) 14%, transparent); color: var(--rouge); }
   .offer-note strong { color: var(--ink); }
 
   .option-card { background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 26px; box-shadow: var(--shadow); display: flex; gap: 18px; align-items: flex-start; overflow: hidden; transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease); }
@@ -1056,21 +1021,6 @@
     
 
     <div class="wrap">
-      <a class="gift-banner" href="dimz-testeurs.html" target="_blank" rel="noopener">
-        <span class="gift-banner-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8"/><path d="M16.5 8a2.5 2.5 0 0 0 0-5C13 3 12 8 12 8"/></svg>
-        </span>
-        <span class="gift-banner-text">
-          <span class="gift-banner-badge">🎁 Cadeau à la clé</span>
-          <strong>Testez Dimz en avant-première</strong>
-          <span>5 minutes de votre temps, votre avis compte — et un petit cadeau vous attend pour vous remercier.</span>
-        </span>
-        <span class="gift-banner-cta" aria-hidden="true">
-          Je teste maintenant
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
-        </span>
-      </a>
-
       <details class="acc-collapse" open>
         <summary>
           <div class="acc-collapse-head">
@@ -1134,7 +1084,7 @@
           <ul class="offres-teaser-list">
             <li><span class="offres-teaser-name">Découverte</span><span class="offres-teaser-price">Gratuit</span><span class="offres-teaser-desc">Le premier coup d'œil</span></li>
             <li class="featured"><span class="offres-teaser-name">Copilote<span class="offres-teaser-badge">Le plus choisi</span></span><span class="offres-teaser-price">dès 99 €</span><span class="offres-teaser-desc">Je cherche, vous choisissez</span></li>
-            <li><span class="offres-teaser-name">Copilote Plus</span><span class="offres-teaser-price">à partir de 749 €</span><span class="offres-teaser-desc">Vous n'avez plus qu'à conduire</span></li>
+            <li><span class="offres-teaser-name">Copilote Plus</span><span class="offres-teaser-price">à partir de 599 €</span><span class="offres-teaser-desc">Vous n'avez plus qu'à conduire</span></li>
           </ul>
           <a href="javascript:void(0)" class="btn btn-primary" data-goto-subtab="offres">Voir toutes nos offres</a>
         </div>
@@ -1504,7 +1454,7 @@
                         <input type="radio" name="besoin" value="complet">
                         <span class="offer-pick-name">Copilote Plus</span>
                         <span class="offer-pick-desc">Accompagnement complet, jusqu'aux clés</span>
-                        <span class="offer-pick-price">Dès 749 €</span>
+                        <span class="offer-pick-price">Dès 599 €</span>
                       </label>
                       <label class="offer-pick">
                         <input type="radio" name="besoin" value="inspection">
@@ -1681,11 +1631,10 @@
             <div class="offer-price"><span id="offer-price-value">99 €</span></div>
             <div class="offer-sub" id="offer-sub-copilote">Pour une recherche courante, sur des véhicules classiques.</div>
             <ul>
-              <li>Analyse approfondie de votre formulaire</li>
+              <li>Appel téléphonique pour approfondir votre projet (30 min)</li>
               <li>Recherche et présélection de 5 à 7 véhicules</li>
               <li>Analyse détaillée de chaque annonce (prix, kilométrage, historique, équipements)</li>
               <li>Rapport écrit avec avis et recommandations</li>
-              <li>1 appel téléphonique de synthèse (30 min)</li>
             </ul>
             <button type="button" class="offer-example-hint">Voir un exemple concret <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg></button>
             <a href="javascript:void(0)" class="btn btn-primary preselect-need" data-need="accompagnement" data-goto-subtab="accueil" data-scroll-to="formulaire">Je veux être accompagné</a>
@@ -1697,15 +1646,14 @@
             <h3>Copilote Plus</h3>
             <p class="offer-subtitle">Vous n'avez plus qu'à conduire</p>
             <p class="offer-texte">Faisons la route ensemble.</p>
-            <div class="offer-price"><span class="from-label">À partir de</span>749 €</div>
+            <div class="offer-price"><span class="from-label">À partir de</span>599 €</div>
             <ul>
               <li>Tout le contenu de l'offre Copilote (recherche + analyse)</li>
               <li>Mise en relation avec le vendeur</li>
-              <li>Expertise physique du véhicule : carrosserie, intérieur, pneus, moteur, historique, essai routier, avis clair « OK » ou « à éviter »</li>
-              <li>Livraison du véhicule jusqu'à votre domicile (convoyage)</li>
+              <li>1 inspection physique du véhicule avec rapport</li>
+              <li>Livraison en Rhône-Alpes<sup>*</sup></li>
               <li>Mise en main : fonctions principales et bons gestes d'entretien</li>
               <li>Accompagnement aux démarches administratives (demande de carte grise, certificat de cession)</li>
-              <li>Rapport d'inspection complet</li>
             </ul>
             <button type="button" class="offer-example-hint">Voir un exemple concret <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg></button>
             <a href="javascript:void(0)" class="btn btn-outline preselect-need" data-need="complet" data-goto-subtab="accueil" data-scroll-to="formulaire">Je veux la formule complète</a>
@@ -1723,29 +1671,32 @@
         <template id="offer-example-decouverte">
           <span class="offer-modal-eyebrow">Offre Découverte — Gratuit</span>
           <h3 id="offer-modal-title">Ce que vous recevez</h3>
-          <p class="offer-modal-lede">Vous décrivez votre budget, votre usage et vos envies. Sous 24 à 48h, votre copilote revient avec un premier avis concret : pas un catalogue, une sélection commentée.</p>
+          <p class="offer-modal-lede">Vous décrivez votre budget, votre usage et vos envies. Sous 24 à 48h, votre copilote revient avec un commentaire personnalisé sur 3 modèles à regarder en priorité.</p>
           <p class="offer-modal-example-title">Exemple de retour reçu</p>
-          <div class="example-vehicules">
-            <div class="example-vehicule">
-              <div><div class="example-vehicule-name">Peugeot 308 SW 1.5 BlueHDi — 2019</div><div class="example-vehicule-tip">Bon compromis, entretien régulier visible sur le carnet.</div></div>
-              <div class="example-vehicule-price">14 800 €</div>
+          <p class="offer-modal-comment">« J'ai bien étudié votre dossier, voici les trois modèles que vous devriez regarder. »</p>
+          <div class="example-modeles">
+            <div class="example-modele">
+              <p class="example-modele-name">Peugeot 308 SW 1.5 BlueHDi — 2019</p>
+              <p class="pc-line"><span class="pc-label good">Points forts</span>Entretien régulier et bien documenté, carrosserie saine, bon niveau d'équipement pour le prix.</p>
+              <p class="pc-line"><span class="pc-label bad">Points faibles</span>Kilométrage un peu élevé pour l'année, pneus arrière à surveiller.</p>
             </div>
-            <div class="example-vehicule">
-              <div><div class="example-vehicule-name">Renault Mégane IV Estate — 2018</div><div class="example-vehicule-tip">Kilométrage élevé pour l'âge, à négocier fermement.</div></div>
-              <div class="example-vehicule-price">12 200 €</div>
+            <div class="example-modele">
+              <p class="example-modele-name">Škoda Octavia III Combi — 2020</p>
+              <p class="pc-line"><span class="pc-label good">Points forts</span>Grand volume de coffre, boîte automatique fiable, un seul propriétaire.</p>
+              <p class="pc-line"><span class="pc-label bad">Points faibles</span>Prix un peu au-dessus du marché, à négocier.</p>
             </div>
-            <div class="example-vehicule">
-              <div><div class="example-vehicule-name">Škoda Octavia III Combi — 2020</div><div class="example-vehicule-tip">Le meilleur rapport équipement / prix des trois.</div></div>
-              <div class="example-vehicule-price">16 500 €</div>
+            <div class="example-modele">
+              <p class="example-modele-name">Renault Mégane IV Estate — 2018</p>
+              <p class="pc-line"><span class="pc-label good">Points forts</span>Prix attractif, consommation raisonnable au quotidien.</p>
+              <p class="pc-line"><span class="pc-label bad">Points faibles</span>Kilométrage élevé pour l'âge, historique d'entretien incomplet — à négocier fermement si vous le retenez.</p>
             </div>
           </div>
-          <p class="offer-modal-footnote">+ 3 conseils personnalisés à l'oral ou par écrit, sans aucun engagement de votre part.</p>
         </template>
 
         <template id="offer-example-copilote">
           <span class="offer-modal-eyebrow">Offre Copilote — Dès 99 €</span>
           <h3 id="offer-modal-title">Ce que vous recevez</h3>
-          <p class="offer-modal-lede">Recherche et présélection de 5 à 7 véhicules, analyse détaillée de chaque annonce, puis un rapport écrit avec avis et recommandations — suivi d'un appel de synthèse de 30 minutes.</p>
+          <p class="offer-modal-lede">Un appel pour approfondir votre projet, puis une recherche et une analyse détaillée de 5 à 7 véhicules, et à la fin un rapport écrit avec avis et recommandations.</p>
           <p class="offer-modal-example-title">Extrait du rapport reçu</p>
           <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px;">
             <div class="report-cat-card"><div class="report-cat-top"><span>Peugeot 308 SW 2019</span><strong>8,2/10</strong></div><div class="report-cat-bar"><span style="width:82%;"></span></div></div>
@@ -1759,9 +1710,9 @@
         </template>
 
         <template id="offer-example-copilote_plus">
-          <span class="offer-modal-eyebrow">Offre Copilote Plus — À partir de 749 €</span>
+          <span class="offer-modal-eyebrow">Offre Copilote Plus — À partir de 599 €</span>
           <h3 id="offer-modal-title">Ce que vous recevez</h3>
-          <p class="offer-modal-lede">Tout Copilote, plus l'expertise physique du véhicule, la livraison jusqu'à chez vous et l'accompagnement aux démarches administratives. Deux documents concrets viennent avec :</p>
+          <p class="offer-modal-lede">Tout Copilote, plus l'inspection physique du véhicule avec rapport, la livraison en Rhône-Alpes<sup>*</sup> et l'accompagnement aux démarches administratives. Deux documents concrets viennent avec :</p>
           <div class="tag-row" style="margin-bottom:24px;">
             <span class="tag">Rapport d'inspection complet</span>
             <span class="tag">État des lieux départ + arrivée signé</span>
@@ -1774,7 +1725,8 @@
           </div>
         </template>
 
-        <p class="offer-note" data-reveal>Le convoyage est proposé en option, sur devis. Et si vous avez déjà réglé une offre Copilote à <strong>99 €</strong> ou <strong>149 €</strong>, cette somme est intégralement déduite du prix de l'offre Copilote Plus.</p>
+        <p class="offer-note" data-reveal>Le convoyage seul est proposé en option, sur devis. Et si vous avez déjà réglé une offre Copilote à <strong>99 €</strong> ou <strong>149 €</strong>, cette somme est intégralement déduite du prix de l'offre Copilote Plus. Sur devis également, dans l'offre Copilote Plus : 2<sup>e</sup> inspection, livraison hors zone.</p>
+        <p class="offer-footnote" data-reveal><sup>*</sup> Zone de livraison incluse dans l'offre Copilote Plus : Rhône (69), Haute-Savoie (74), Savoie (73, hors 3 Vallées), Isère (38), Drôme (26), Ardèche (07), Ain (01, hors Pays de Gex).</p>
 
         <div class="grid-2" style="margin-top:32px;" data-reveal>
           <div class="option-card option-card-photo">
@@ -1822,13 +1774,13 @@
               <tr><th scope="row">Recherche approfondie (5 à 7 annonces)</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
               <tr><th scope="row">Analyse détaillée des annonces</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
               <tr><th scope="row">Rapport écrit avec avis</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
-              <tr><th scope="row">Appel de synthèse (30 min)</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Appel pour approfondir le projet (30 min)</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
               <tr><th scope="row">Mise en relation avec le vendeur</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
-              <tr><th scope="row">Expertise physique du véhicule</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
-              <tr><th scope="row">Livraison (convoyage)</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Inspection physique du véhicule avec rapport</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
+              <tr><th scope="row">Livraison en Rhône-Alpes<sup>*</sup></th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
               <tr><th scope="row">Mise en main</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
               <tr><th scope="row">Accompagnement démarches admin.</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
-              <tr class="compare-price-row"><th scope="row">Tarif</th><td>Gratuit</td><td>99 € / 149 €</td><td>À partir de 749 €</td></tr>
+              <tr class="compare-price-row"><th scope="row">Tarif</th><td>Gratuit</td><td>99 € / 149 €</td><td>À partir de 599 €</td></tr>
             </tbody>
           </table>
         </div>
@@ -3164,7 +3116,7 @@
     <a href="javascript:void(0)" data-goto-legal="mentions">Mentions légales</a>
     <a href="javascript:void(0)" data-goto-legal="cgv">CGV</a>
     <a href="javascript:void(0)" id="cookie-settings-link">Gérer les cookies</a>
-    <a href="javascript:void(0)" data-goto-tab="test">Tu testes le site ? Donne ton avis en 5 min</a>
+    <a href="javascript:void(0)" data-goto-tab="test">Donner votre avis sur le site</a>
   </nav>
 </footer>
 
@@ -4083,8 +4035,8 @@
 
     var OFFRE_RAPPELS = {
       conseil: 'Découverte — un formulaire, au moins 3 véhicules proposés et des conseils personnalisés. Gratuit.',
-      accompagnement: 'Copilote — recherche et analyse de 5 à 7 véhicules, rapport écrit, un appel de synthèse.',
-      complet: 'Copilote Plus — recherche, expertise physique du véhicule, livraison à domicile et démarches administratives.',
+      accompagnement: 'Copilote — appel pour approfondir votre projet, recherche et analyse de 5 à 7 véhicules, rapport écrit avec avis.',
+      complet: 'Copilote Plus — recherche, inspection physique du véhicule avec rapport, livraison en Rhône-Alpes et démarches administratives.',
       inspection: 'Inspection — je me déplace pour expertiser le véhicule que vous avez trouvé et vous donne mon avis.'
     };
     var besoinChecked = document.querySelector('#besoin-choices input:checked');
