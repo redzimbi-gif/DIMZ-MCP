@@ -4,6 +4,7 @@ import { Plus, Pencil, Trash2, Calculator, Paperclip } from "lucide-react";
 import { listConvoyagesExternes } from "@/lib/queries";
 import { Card, PageHeader, StatCard, EmptyState, Field, inputClass, Button } from "@/components/ui";
 import { AutoResetForm } from "@/components/AutoResetForm";
+import { CompressedImageInput } from "@/components/CompressedImageInput";
 import { formatDate } from "@/lib/format";
 import { createConvoyageExterne, deleteConvoyageExterne } from "./actions";
 
@@ -204,7 +205,7 @@ export default async function ComptabilitePage({
               <textarea name="notes" rows={2} className={inputClass} />
             </Field>
             <Field label="Justificatifs (photos, factures)">
-              <input name="justificatifs" type="file" accept="image/*,application/pdf" multiple className={inputClass} />
+              <CompressedImageInput name="justificatifs" accept="image/*,application/pdf" multiple className={inputClass} />
             </Field>
             <Button type="submit" className="w-full">
               <Plus className="h-4 w-4" /> Ajouter

@@ -3,6 +3,7 @@ import { Plus } from "lucide-react";
 import { listAllConvoyages, listConvoyagesExternes } from "@/lib/queries";
 import { Card, PageHeader, EmptyState, Badge, Field, inputClass, Button } from "@/components/ui";
 import { AutoResetForm } from "@/components/AutoResetForm";
+import { CompressedImageInput } from "@/components/CompressedImageInput";
 import { CONVOYAGE_STATUT_LABELS } from "@/lib/types";
 import { formatDate, formatCurrency } from "@/lib/format";
 import { createConvoyageExterne } from "../comptabilite/actions";
@@ -119,7 +120,7 @@ export default async function ConvoyagesPage() {
               <textarea name="notes" rows={2} className={inputClass} />
             </Field>
             <Field label="Justificatifs (photos, factures)">
-              <input name="justificatifs" type="file" accept="image/*,application/pdf" multiple className={inputClass} />
+              <CompressedImageInput name="justificatifs" accept="image/*,application/pdf" multiple className={inputClass} />
             </Field>
             <Button type="submit" className="w-full">
               <Plus className="h-4 w-4" /> Ajouter

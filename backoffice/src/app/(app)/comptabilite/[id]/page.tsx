@@ -3,6 +3,7 @@ import { ArrowLeft, Download, X, Paperclip } from "lucide-react";
 import { getConvoyageExterne } from "@/lib/queries";
 import { getSignedUrls } from "@/lib/storage";
 import { Card, PageHeader, Field, inputClass, Button, LinkButton } from "@/components/ui";
+import { CompressedImageInput } from "@/components/CompressedImageInput";
 import { updateConvoyageExterne, deleteJustificatif } from "../actions";
 
 export default async function EditConvoyageExternePage({ params }: { params: { id: string } }) {
@@ -64,7 +65,7 @@ export default async function EditConvoyageExternePage({ params }: { params: { i
             <textarea name="notes" rows={2} defaultValue={convoyage.notes ?? ""} className={inputClass} />
           </Field>
           <Field label="Ajouter des justificatifs (photos, factures)">
-            <input name="justificatifs" type="file" accept="image/*,application/pdf" multiple className={inputClass} />
+            <CompressedImageInput name="justificatifs" accept="image/*,application/pdf" multiple className={inputClass} />
           </Field>
           <Button type="submit" className="w-full">
             Enregistrer les modifications

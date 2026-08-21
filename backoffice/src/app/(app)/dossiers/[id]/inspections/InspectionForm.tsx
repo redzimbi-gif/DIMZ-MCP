@@ -1,5 +1,6 @@
 import { type ReactNode } from "react";
 import { Field, inputClass, Button } from "@/components/ui";
+import { CompressedImageInput } from "@/components/CompressedImageInput";
 import { INSPECTION_VERDICTS, INSPECTION_VERDICT_LABELS, type Inspection } from "@/lib/types";
 
 const CATEGORY_SCORES: { name: string; label: string }[] = [
@@ -181,7 +182,7 @@ export function InspectionForm({
       <Card title="Photos et vidéos">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label={inspection ? "Ajouter des photos" : "Photos"}>
-            <input name="photos" type="file" accept="image/*" multiple className={inputClass} />
+            <CompressedImageInput name="photos" multiple className={inputClass} />
           </Field>
           <Field label={inspection ? "Ajouter des vidéos" : "Vidéos"}>
             <input name="videos" type="file" accept="video/*" multiple className={inputClass} />

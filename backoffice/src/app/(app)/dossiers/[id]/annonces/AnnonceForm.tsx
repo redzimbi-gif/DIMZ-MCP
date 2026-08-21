@@ -1,5 +1,6 @@
 import { type ReactNode } from "react";
 import { Field, inputClass, Button } from "@/components/ui";
+import { CompressedImageInput } from "@/components/CompressedImageInput";
 import type { Annonce } from "@/lib/types";
 
 const SCORE_DIMZ_CRITERES: { name: string; label: string }[] = [
@@ -104,7 +105,7 @@ export function AnnonceForm({
 
       <Card title="Photos">
         <Field label={annonce ? "Ajouter des photos" : "Photos"}>
-          <input name="photos" type="file" accept="image/*" multiple className={inputClass} />
+          <CompressedImageInput name="photos" multiple className={inputClass} />
         </Field>
       </Card>
 

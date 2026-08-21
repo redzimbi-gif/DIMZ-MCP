@@ -3,6 +3,7 @@ import { listPhotosBibliotheque } from "@/lib/queries";
 import { getSignedUrls } from "@/lib/storage";
 import { Card, PageHeader, EmptyState, Field, Button, inputClass } from "@/components/ui";
 import { AutoResetForm } from "@/components/AutoResetForm";
+import { CompressedImageInput } from "@/components/CompressedImageInput";
 import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
 import { addPhotosBibliotheque, renamePhotoBibliotheque, deletePhotoBibliotheque } from "./actions";
 
@@ -27,7 +28,7 @@ export default async function PhotosPage({ searchParams }: { searchParams: { err
         <h2 className="text-sm font-semibold text-ink mb-3">Ajouter des photos</h2>
         <AutoResetForm action={addPhotosBibliotheque} className="space-y-3" encType="multipart/form-data">
           <Field label="Photos">
-            <input name="photos" type="file" accept="image/*" multiple required className={inputClass} />
+            <CompressedImageInput name="photos" multiple required className={inputClass} />
           </Field>
           <Field label="Nom (optionnel, uniquement si une seule photo — sinon le nom du fichier est utilisé)">
             <input name="nom" placeholder="ex. Peugeot 208 rouge" className={inputClass} />

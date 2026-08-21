@@ -30,6 +30,7 @@ import { EmailStatusBanner } from "@/components/EmailStatusBanner";
 import { DossierTabs } from "@/components/DossierTabs";
 import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
 import { AutoResetForm } from "@/components/AutoResetForm";
+import { CompressedImageInput } from "@/components/CompressedImageInput";
 import {
   DOSSIER_STATUTS,
   DOSSIER_STATUT_LABELS,
@@ -652,7 +653,7 @@ async function VehiculesTab({
             <input name="score_confiance" type="number" min={0} max={10} step="0.5" className={inputClass} />
           </Field>
           <Field label="Photos">
-            <input name="photos" type="file" accept="image/*" multiple className={inputClass} />
+            <CompressedImageInput name="photos" multiple className={inputClass} />
           </Field>
           <Button type="submit" className="w-full">
             <Plus className="h-4 w-4" /> Ajouter l'annonce
@@ -828,7 +829,7 @@ async function DecouverteTab({ dossierId }: { dossierId: string }) {
                       <input name="point_vigilance" defaultValue={v.point_vigilance ?? ""} className={inputClass} />
                     </Field>
                     <Field label={photoUrl ? "Remplacer la photo" : "Photo (optionnel)"}>
-                      <input name="photo" type="file" accept="image/*" className={inputClass} />
+                      <CompressedImageInput name="photo" className={inputClass} />
                     </Field>
                     <BibliothequePicker photos={photosBibliotheque} urls={bibliothequeUrls} />
                     <Button type="submit" className="text-xs px-3 py-1.5">
@@ -878,7 +879,7 @@ async function DecouverteTab({ dossierId }: { dossierId: string }) {
             <input name="point_vigilance" className={inputClass} />
           </Field>
           <Field label="Photo (optionnel)">
-            <input name="photo" type="file" accept="image/*" className={inputClass} />
+            <CompressedImageInput name="photo" className={inputClass} />
           </Field>
           <BibliothequePicker photos={photosBibliotheque} urls={bibliothequeUrls} />
           <Button type="submit" className="w-full">
@@ -1227,7 +1228,7 @@ async function ContratsTab({ dossierId }: { dossierId: string }) {
                             )}
                           </div>
                         ) : null}
-                        <input name={def.key} type="file" accept="image/*" multiple className={inputClass} />
+                        <CompressedImageInput name={def.key} multiple className={inputClass} />
                       </Field>
                     );
                   }

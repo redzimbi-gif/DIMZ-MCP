@@ -6,6 +6,7 @@ import { getSignedUrls } from "@/lib/storage";
 import { Card, PageHeader, LinkButton, Button, Field, inputClass, Badge } from "@/components/ui";
 import { SignaturePad } from "@/components/SignaturePad";
 import { FuelGauge } from "@/components/FuelGauge";
+import { CompressedImageInput } from "@/components/CompressedImageInput";
 import { ETAT_LIEUX_PHOTO_SLOTS, ETAT_LIEUX_TYPE_LABELS } from "@/lib/etat-lieux";
 import { formatDateTime } from "@/lib/format";
 import { saveEtatLieux, confirmerEtatLieux, deletePhotoAutre } from "../actions";
@@ -130,7 +131,7 @@ export default async function EtatLieuxPage({
                         ) : null}
                       </div>
                       <p className="text-[11px] text-ink-soft mt-1 text-center truncate">{slot.label}</p>
-                      <input type="file" name={`photo_${slot.key}`} accept="image/*" capture="environment" className="hidden" />
+                      <CompressedImageInput name={`photo_${slot.key}`} capture="environment" className="hidden" />
                     </label>
                   );
                 })}
@@ -142,7 +143,7 @@ export default async function EtatLieuxPage({
             </div>
 
             <Field label="Ajouter des photos facultatives">
-              <input type="file" name="photos_autres" accept="image/*" multiple className={inputClass} />
+              <CompressedImageInput name="photos_autres" multiple className={inputClass} />
             </Field>
 
             <Button type="submit">Enregistrer</Button>

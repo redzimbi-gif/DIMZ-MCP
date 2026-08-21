@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getDossier } from "@/lib/queries";
 import { Card, PageHeader, Field, inputClass, Button } from "@/components/ui";
 import { SignaturePad } from "@/components/SignaturePad";
+import { CompressedImageInput } from "@/components/CompressedImageInput";
 import { CONVOYAGE_STATUTS, CONVOYAGE_STATUT_LABELS } from "@/lib/types";
 import { createConvoyage } from "../actions";
 
@@ -64,10 +65,10 @@ export default async function NewConvoyagePage({ params }: { params: { id: strin
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Photos avant convoyage">
-              <input name="photos_avant" type="file" accept="image/*" multiple className={inputClass} />
+              <CompressedImageInput name="photos_avant" multiple className={inputClass} />
             </Field>
             <Field label="Photos après convoyage">
-              <input name="photos_apres" type="file" accept="image/*" multiple className={inputClass} />
+              <CompressedImageInput name="photos_apres" multiple className={inputClass} />
             </Field>
           </div>
 
