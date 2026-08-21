@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getDossierByToken } from "@/lib/queries";
 import { notifyStaff, logActivity } from "@/lib/log";
+import { syncStatutAvecEtape } from "@/lib/dossier-statut";
 import { DOSSIER_OFFRE_LABELS } from "@/lib/types";
 
 const OFFRE_LABELS = {
@@ -35,6 +36,7 @@ export async function upgradeOffreDepuisSuivi(token: string, offre: OffreCible) 
   // Copilote / Copilote Plus : on repositionne le client sur l'étape commune "votre copilote
   // prend connaissance de votre dossier" pour que sa page de suivi reste cohérente.
   await db.from("dossiers").update({ offre, etape_client: "traitement_en_cours" }).eq("id", dossier.id);
+  await syncStatutAvecEtape(db, dossier.id, offre, "traitement_en_cours");
 
   const clientNom = `${dossier.clients?.prenom ?? ""} ${dossier.clients?.nom ?? ""}`.trim();
   const label = OFFRE_LABELS[offre];

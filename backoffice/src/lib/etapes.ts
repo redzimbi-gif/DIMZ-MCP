@@ -3,7 +3,7 @@
 // ce fichier pilote uniquement ce que le client voit, et dépend de l'offre
 // choisie. Le statut interne continue de vivre sa vie de son côté.
 
-import type { DossierOffre } from "./types";
+import type { DossierOffre, DossierStatut } from "./types";
 
 export interface EtapeDef {
   key: string;
@@ -86,4 +86,66 @@ export function resolveEtapesConvoyage(devisEnvoyeAt: string | null): EtapeDef[]
 export function getEtapeLabel(offre: DossierOffre | null, etapeKey: string): string {
   const liste = offre === "convoyage_seul" ? [...ETAPES_CONVOYAGE, ETAPE_CONVOYAGE_REFUSEE] : getEtapesOffre(offre);
   return liste.find((e) => e.key === etapeKey)?.label ?? etapeKey;
+}
+
+// ---------------------------------------------------------------------------
+// Correspondance étape client -> statut du pipeline interne (kanban à 10
+// valeurs, /dossiers). Chaque dossier doit être classé, sur le pipeline
+// interne, à l'endroit qui correspond à son étape actuelle — pas seulement
+// sorti une fois de "Demande reçue" puis laissé figé. La dernière étape de
+// chaque offre (celle qui n'a rien après elle dans ETAPES_OFFRE/ETAPES_CONVOYAGE)
+// correspond à "dossier_termine" : rien à traiter ensuite côté équipe.
+const STATUT_PAR_ETAPE_ACCOMPAGNEMENT: Record<OffreAccompagnement, Record<string, DossierStatut>> = {
+  decouverte: {
+    demande_recue: "demande_recue",
+    traitement_en_cours: "analyse_besoin",
+    exploration_projet: "analyse_besoin",
+    reponse_envoyee: "dossier_termine",
+  },
+  copilote: {
+    demande_recue: "demande_recue",
+    traitement_en_cours: "analyse_besoin",
+    exploration_projet: "analyse_besoin",
+    recherche_annonces: "recherche",
+    redaction_rapport: "vehicules_selectionnes",
+    dossier_envoye: "dossier_termine",
+  },
+  copilote_plus: {
+    demande_recue: "demande_recue",
+    traitement_en_cours: "analyse_besoin",
+    exploration_projet: "analyse_besoin",
+    recherche_annonces: "recherche",
+    redaction_rapport: "vehicules_selectionnes",
+    mise_en_relation: "negociation",
+    inspection_vehicule: "inspection",
+    processus_achat: "achat_valide",
+    demarches_administratives: "achat_valide",
+    livraison: "dossier_termine",
+  },
+  expertise_seule: {
+    demande_recue: "demande_recue",
+    traitement_en_cours: "analyse_besoin",
+    inspection_planifiee: "inspection",
+    inspection_realisee: "inspection",
+    rapport_envoye: "dossier_termine",
+  },
+};
+
+const STATUT_PAR_ETAPE_CONVOYAGE: Record<string, DossierStatut> = {
+  demande_recue: "demande_recue",
+  traitement_demande: "analyse_besoin",
+  devis_en_cours: "negociation",
+  livraison_programmee: "convoyage",
+  livraison_en_cours: "convoyage",
+  livraison_terminee: "dossier_termine",
+  demande_refusee: "dossier_termine",
+};
+
+/** Statut de pipeline interne correspondant à une étape client donnée. */
+export function computeStatutFromEtape(offre: DossierOffre | null, etapeClient: string): DossierStatut {
+  if (offre === "convoyage_seul") {
+    return STATUT_PAR_ETAPE_CONVOYAGE[etapeClient] ?? "demande_recue";
+  }
+  const table = STATUT_PAR_ETAPE_ACCOMPAGNEMENT[getOffreAccompagnement(offre)];
+  return table[etapeClient] ?? "demande_recue";
 }

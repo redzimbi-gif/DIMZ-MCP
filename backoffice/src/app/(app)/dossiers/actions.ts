@@ -17,6 +17,7 @@ import {
   type EtapeConvoyageKey,
 } from "@/lib/email-templates";
 import { getEtapeLabel } from "@/lib/etapes";
+import { syncStatutAvecEtape } from "@/lib/dossier-statut";
 import {
   DOSSIER_STATUT_LABELS,
   DOSSIER_OFFRE_LABELS,
@@ -32,29 +33,6 @@ function isEtapeAccompagnementKey(value: string): value is EtapeAccompagnementKe
 
 function isEtapeConvoyageKey(value: string): value is EtapeConvoyageKey {
   return (ETAPE_CONVOYAGE_KEYS as string[]).includes(value);
-}
-
-// Le pipeline interne (dossiers.statut, 10 étapes, visible sur /dossiers) et
-// l'étape client (dossiers.etape_client, visible sur /suivi/[token]) ne sont
-// pas synchronisés automatiquement : un dossier peut avancer côté client sans
-// jamais bouger sur le pipeline interne si personne ne va changer le second
-// champ à la main. On sort simplement le dossier de la première colonne dès
-// que l'étape client quitte "demande_recue" — sans jamais régresser un statut
-// déjà avancé manuellement par ailleurs (d'où le check `=== "demande_recue"`).
-async function bumpStatutSiDemandeRecue(
-  db: ReturnType<typeof createAdminClient>,
-  dossierId: string
-) {
-  const { data } = await db.from("dossiers").select("statut").eq("id", dossierId).maybeSingle();
-  if (data?.statut !== "demande_recue") return;
-
-  await db.from("dossiers").update({ statut: "analyse_besoin" }).eq("id", dossierId);
-  await db.from("dossier_statut_history").insert({
-    dossier_id: dossierId,
-    statut: "analyse_besoin",
-    note: "Passage automatique : le dossier a quitté « Demande reçue » côté suivi client.",
-    changed_by: await getActorId(),
-  });
 }
 
 export async function createDossier(formData: FormData) {
@@ -175,7 +153,7 @@ export async function updateDossierOffre(dossierId: string, offre: DossierOffre)
   // pour la nouvelle, mieux vaut repartir d'une étape que le client a déjà
   // vue plutôt que de retomber sur "Demande reçue".
   await db.from("dossiers").update({ offre, etape_client: "traitement_en_cours" }).eq("id", dossierId);
-  await bumpStatutSiDemandeRecue(db, dossierId);
+  await syncStatutAvecEtape(db, dossierId, offre, "traitement_en_cours");
 
   const acteur = await getActorId();
   await db.from("dossier_etape_history").insert({
@@ -204,7 +182,7 @@ export async function updateDossierEtapeClient(dossierId: string, formData: Form
 
   const dossier = await getDossier(dossierId);
   await db.from("dossiers").update({ etape_client: etape }).eq("id", dossierId);
-  if (etape !== "demande_recue") await bumpStatutSiDemandeRecue(db, dossierId);
+  await syncStatutAvecEtape(db, dossierId, dossier?.offre ?? null, etape);
 
   const acteur = await getActorId();
   await db.from("dossier_etape_history").insert({
@@ -326,7 +304,7 @@ export async function decideConvoyageDemande(dossierId: string, decision: "accep
   const etape = decision === "accepte" ? "devis_en_cours" : "demande_refusee";
 
   await db.from("dossiers").update({ convoyage_decision: decision, etape_client: etape }).eq("id", dossierId);
-  await bumpStatutSiDemandeRecue(db, dossierId);
+  await syncStatutAvecEtape(db, dossierId, dossier.offre, etape);
 
   const acteur = await getActorId();
   await db.from("dossier_etape_history").insert({
@@ -400,7 +378,7 @@ export async function marquerLivraisonProgrammee(dossierId: string) {
 
   const db = createAdminClient();
   await db.from("dossiers").update({ etape_client: "livraison_programmee" }).eq("id", dossierId);
-  await bumpStatutSiDemandeRecue(db, dossierId);
+  await syncStatutAvecEtape(db, dossierId, dossier.offre, "livraison_programmee");
 
   const acteur = await getActorId();
   await db.from("dossier_etape_history").insert({
