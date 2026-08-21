@@ -82,7 +82,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Overpass:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;500;600;700&family=Instrument+Sans:wght@500;600&display=swap" rel="stylesheet">
 
 <style>
   :root {
@@ -442,7 +442,14 @@
   /* ---------------- Offres ---------------- */
   .offers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; align-items: stretch; }
   @media (max-width: 940px) { .offers { grid-template-columns: 1fr; } }
-  .offer-card { background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--r-xl); padding: 34px 28px; box-shadow: var(--shadow); display: flex; flex-direction: column; position: relative; overflow: hidden; transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease), border-color 0.3s var(--ease); }
+  .offer-card { background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--r-xl); padding: 34px 28px; box-shadow: var(--shadow); display: flex; flex-direction: column; position: relative; overflow: hidden; font-family: var(--display); transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease), border-color 0.3s var(--ease); }
+  @media (min-width: 941px) {
+    @supports (grid-template-rows: subgrid) {
+      .offers { grid-template-rows: repeat(8, auto); }
+      .offer-card { display: grid; grid-template-rows: subgrid; grid-row: 1 / 9; }
+      .offer-card > * { align-self: start; }
+    }
+  }
   .offer-card:hover { transform: translateY(-7px) scale(1.015); box-shadow: var(--shadow-lg); border-color: color-mix(in srgb, var(--bleu-vif) 32%, var(--line)); }
   .offer-card:hover .value-icon { transform: scale(1.08); }
   .offer-card.featured { border-color: color-mix(in srgb, var(--bleu-vif) 55%, var(--line)); box-shadow: var(--shadow-lg); }
@@ -454,7 +461,7 @@
   @keyframes featuredSweep { 0% { background-position: 0% 0; } 50% { background-position: 100% 0; } 100% { background-position: 0% 0; } }
   @media (prefers-reduced-motion: reduce) { .offer-card.featured::before { animation: none; } }
   .offer-tag { position: absolute; top: 20px; right: 20px; z-index: 1; background: var(--bg-raised); color: var(--bleu-vif); font-size: 0.66rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 11px; border-radius: 100px; box-shadow: var(--shadow); }
-  .offer-card h3 { font-size: clamp(1.55rem, 1.32rem + 1vw, 1.9rem); font-weight: 600; letter-spacing: -0.02em; margin-bottom: 4px; }
+  .offer-card h3 { font-family: "Instrument Sans", var(--sans); font-size: clamp(1.55rem, 1.32rem + 1vw, 1.9rem); font-weight: 600; letter-spacing: -0.02em; margin-bottom: 4px; }
   .offer-subtitle { margin: 0 0 12px; color: var(--ink-soft); font-size: 0.85rem; font-weight: 600; }
   .offer-texte { margin: 0 0 18px; color: var(--ink); font-size: 0.92rem; line-height: 1.5; }
   .price-toggle { display: inline-flex; background: var(--bg-tint); border-radius: 100px; padding: 3px; margin-bottom: 16px; gap: 2px; }
@@ -1192,7 +1199,9 @@
             <h3>Découverte</h3>
             <p class="offer-subtitle">Le premier coup d'œil</p>
             <p class="offer-texte">Vous voulez découvrir le parcours ? Votre copilote vous guide.</p>
-            <div class="offer-price"><span class="free">Gratuit</span></div>
+            <div class="offer-price-zone">
+              <div class="offer-price"><span class="free">Gratuit</span></div>
+            </div>
             <ul>
               <li>Un formulaire de découverte à remplir (budget, usage, délai)</li>
               <li>Au moins 3 véhicules proposés</li>
@@ -1209,12 +1218,14 @@
             <h3>Copilote</h3>
             <p class="offer-subtitle">Je cherche, vous choisissez</p>
             <p class="offer-texte">Votre copilote vous accompagne sur un bout du parcours.</p>
-            <div class="price-toggle" role="tablist" aria-label="Type de recherche">
-              <button type="button" role="tab" aria-selected="true" data-price="99" data-sub="Pour une recherche courante, sur des véhicules classiques.">Recherche simple</button>
-              <button type="button" role="tab" aria-selected="false" data-price="149" data-sub="Concerne les véhicules rares, de collection, ou les recherches qui demandent plus de temps.">Recherche complexe</button>
+            <div class="offer-price-zone">
+              <div class="price-toggle" role="tablist" aria-label="Type de recherche">
+                <button type="button" role="tab" aria-selected="true" data-price="99" data-sub="Pour une recherche courante, sur des véhicules classiques.">Recherche simple</button>
+                <button type="button" role="tab" aria-selected="false" data-price="149" data-sub="Concerne les véhicules rares, de collection, ou les recherches qui demandent plus de temps.">Recherche complexe</button>
+              </div>
+              <div class="offer-price"><span id="offer-price-value">99 €</span></div>
+              <div class="offer-sub" id="offer-sub-copilote">Pour une recherche courante, sur des véhicules classiques.</div>
             </div>
-            <div class="offer-price"><span id="offer-price-value">99 €</span></div>
-            <div class="offer-sub" id="offer-sub-copilote">Pour une recherche courante, sur des véhicules classiques.</div>
             <ul>
               <li>Appel téléphonique pour approfondir votre projet (30 min)</li>
               <li>Recherche et présélection de 5 à 7 véhicules</li>
@@ -1230,7 +1241,9 @@
             <h3>Copilote Plus</h3>
             <p class="offer-subtitle">Vous n'avez plus qu'à conduire</p>
             <p class="offer-texte">Faisons la route ensemble.</p>
-            <div class="offer-price"><span class="from-label">À partir de</span>599 €</div>
+            <div class="offer-price-zone">
+              <div class="offer-price"><span class="from-label">À partir de</span>599 €</div>
+            </div>
             <ul>
               <li>Tout le contenu de l'offre Copilote (recherche + analyse)</li>
               <li>Mise en relation avec le vendeur</li>
