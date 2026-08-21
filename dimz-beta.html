@@ -450,13 +450,13 @@
   @media (prefers-reduced-motion: reduce) { .offer-card.featured::before { animation: none; } }
   .offer-tag { position: absolute; top: 20px; right: 20px; z-index: 1; background: var(--bg-raised); color: var(--bleu-vif); font-size: 0.66rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 11px; border-radius: 100px; box-shadow: var(--shadow); }
   .offer-card .value-icon { margin-bottom: 16px; }
-  .offer-card h3 { font-size: var(--fs-card-title); margin-bottom: 4px; }
+  .offer-card h3 { font-size: clamp(1.55rem, 1.32rem + 1vw, 1.9rem); font-weight: 600; letter-spacing: -0.02em; margin-bottom: 4px; }
   .offer-subtitle { margin: 0 0 12px; color: var(--ink-soft); font-size: 0.85rem; font-weight: 600; }
   .offer-texte { margin: 0 0 18px; color: var(--ink); font-size: 0.92rem; line-height: 1.5; }
   .price-toggle { display: inline-flex; background: var(--bg-tint); border-radius: 100px; padding: 3px; margin-bottom: 16px; gap: 2px; }
   .price-toggle button { border: none; background: transparent; padding: 6px 14px; border-radius: 100px; font-size: 0.77rem; font-weight: 700; color: var(--ink-soft); cursor: pointer; }
   .price-toggle button[aria-selected="true"] { background: var(--bg-raised); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
-  .offer-price { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: 2rem; color: var(--bleu); margin-bottom: 16px; letter-spacing: -0.02em; }
+  .offer-price { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 700; font-size: clamp(2.1rem, 1.85rem + 1vw, 2.6rem); line-height: 1; color: var(--bleu); margin-bottom: 16px; letter-spacing: -0.03em; }
   :root[data-theme="dark"] .offer-price { color: var(--bleu-vif); }
   @media (prefers-color-scheme: dark) { .offer-price { color: var(--bleu-vif); } }
   .offer-price .free { color: var(--vert); font-family: var(--serif); font-size: 0.85em; }
@@ -1230,7 +1230,7 @@
               <li>Tout le contenu de l'offre Copilote (recherche + analyse)</li>
               <li>Mise en relation avec le vendeur</li>
               <li>1 inspection physique du véhicule avec rapport</li>
-              <li>Livraison en Rhône-Alpes<sup>*</sup></li>
+              <li>Livraison incluse en Rhône-Alpes<sup>*</sup></li>
               <li>Mise en main : fonctions principales et bons gestes d'entretien</li>
               <li>Accompagnement aux démarches administratives (demande de carte grise, certificat de cession)</li>
             </ul>
@@ -1304,8 +1304,8 @@
           </div>
         </template>
 
-        <p class="offer-note" data-reveal>Le convoyage seul est proposé en option, sur devis. Et si vous avez déjà réglé une offre Copilote à <strong>99 €</strong> ou <strong>149 €</strong>, cette somme est intégralement déduite du prix de l'offre Copilote Plus. Sur devis également, dans l'offre Copilote Plus : 2<sup>e</sup> inspection, livraison hors zone.</p>
-        <p class="offer-footnote" data-reveal><sup>*</sup> Zone de livraison incluse dans l'offre Copilote Plus : Rhône (69), Haute-Savoie (74), Savoie (73, hors 3 Vallées), Isère (38), Drôme (26), Ardèche (07), Ain (01, hors Pays de Gex).</p>
+        <p class="offer-note" data-reveal>Si vous avez déjà réglé une offre Copilote à <strong>99 €</strong> ou <strong>149 €</strong>, cette somme est intégralement déduite du prix de l'offre Copilote Plus. Sur devis, dans l'offre Copilote Plus : 2<sup>e</sup> inspection, livraison hors zone.</p>
+        <p class="offer-footnote" data-reveal><sup>*</sup> Livraison incluse dans l'offre Copilote Plus : Rhône (69), Haute-Savoie (74, hors Porte du Soleil), Savoie (73, hors 3 Vallées), Isère (38, hors 2 Alpes), Drôme (26), Ardèche (07), Ain (01, hors Pays de Gex), agglomérations de Mâcon et de Clermont-Ferrand.</p>
 
         <div class="grid-2" style="margin-top:32px;" data-reveal>
           <div class="option-card option-card-photo">
@@ -3138,7 +3138,7 @@
       <ul>
         <li><strong>Découverte</strong> : offre gratuite, sans engagement, fondée sur les informations fournies par le client dans le formulaire ;</li>
         <li><strong>Copilote</strong> (99 € pour une recherche simple, 149 € pour une recherche complexe) : le nombre de véhicules proposés (5 à 7) dépend de la disponibilité du marché au moment de la demande ;</li>
-        <li><strong>Copilote Plus</strong> (à partir de 599 €) : comprend une inspection physique du véhicule avec rapport, et une livraison incluse uniquement dans la zone géographique précisée sur la page « Nos offres » du site (Rhône, Haute-Savoie, Savoie hors 3 Vallées, Isère, Drôme, Ardèche, Ain hors Pays de Gex). Toute prestation en dehors de ce périmètre (livraison hors zone, deuxième inspection) fait l'objet d'un devis complémentaire. Si le client a déjà réglé une offre Copilote, cette somme est déduite du prix de l'offre Copilote Plus souscrite ensuite ;</li>
+        <li><strong>Copilote Plus</strong> (à partir de 599 €) : comprend une inspection physique du véhicule avec rapport, et une livraison incluse uniquement dans la zone géographique précisée sur la page « Nos offres » du site (Rhône, Haute-Savoie hors Porte du Soleil, Savoie hors 3 Vallées, Isère hors 2 Alpes, Drôme, Ardèche, Ain hors Pays de Gex, agglomérations de Mâcon et de Clermont-Ferrand). Toute prestation en dehors de ce périmètre (livraison hors zone, deuxième inspection) fait l'objet d'un devis complémentaire. Si le client a déjà réglé une offre Copilote, cette somme est déduite du prix de l'offre Copilote Plus souscrite ensuite ;</li>
         <li><strong>Inspection seule</strong> et <strong>convoyage seul</strong> : proposés sur devis, le tarif étant déterminé selon la localisation et la complexité de la demande.</li>
       </ul>
       <p>DIMZ se réserve le droit de refuser ou d'ajuster une prestation si les conditions (zone géographique, faisabilité technique, disponibilité) ne permettent pas de l'assurer dans de bonnes conditions.</p>
