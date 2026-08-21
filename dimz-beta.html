@@ -277,6 +277,35 @@
     .acc-collapse summary { padding: 24px 22px; }
     .acc-collapse-body { padding: 0 22px 28px; }
   }
+
+  /* Variante "bandeau plein écran" (Accueil) : même comportement repliable que
+     .acc-collapse, mais en bande edge-to-edge au lieu d'une carte encadrée.
+     <summary> doit rester un enfant direct de <details> (contrainte HTML), donc
+     le centrage passe par .wrap placé À L'INTÉRIEUR du summary et du body — pas
+     par .acc-collapse lui-même. N'affecte pas .acc-collapse "nu" (ex. le
+     processus de Convoyage), qui garde sa carte encadrée d'origine. */
+  .acc-collapse.band { border: none; border-radius: 0; box-shadow: none; background: none; margin: 0; border-top: 1px solid var(--line); }
+  .acc-collapse.band:hover { box-shadow: none; border-color: var(--line); }
+  .acc-collapse.band.band-tint { background: var(--bg-tint); }
+  .acc-collapse.band summary { display: block; padding: 0; }
+  .acc-collapse.band summary:hover { background: none; }
+  .acc-band-head { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 64px 28px 40px; }
+  .acc-band-head .acc-collapse-head { max-width: 60ch; }
+  .acc-band-head .label { margin-bottom: 14px; }
+  .acc-band-head h2 { margin: 0; font-size: clamp(1.5rem, 3vw, 2.1rem); }
+  .acc-band-head .chevron { margin: 18px 0 0; width: 22px; height: 22px; color: var(--ink-soft); transition: transform 0.2s ease, color 0.2s ease; }
+  .acc-collapse.band[open] .acc-band-head .chevron { transform: rotate(180deg); }
+  .acc-collapse.band summary:hover .acc-band-head .chevron { color: var(--bleu-vif); }
+  .acc-collapse.band .acc-collapse-body { padding: 0; }
+  .acc-collapse.band .acc-collapse-body > .wrap { padding-bottom: 64px; }
+  .acc-collapse.band .acc-collapse-intro { text-align: center; max-width: 60ch; margin: 0 auto 22px; }
+  .acc-collapse.band .values-grid, .acc-collapse.band .offres-teaser-list { margin-left: auto; margin-right: auto; }
+  .acc-collapse.band .offres-teaser-list { max-width: 640px; text-align: left; }
+  .acc-band-cta { display: table; margin: 8px auto 0; }
+  @media (max-width: 640px) {
+    .acc-band-head { padding: 44px 22px 28px; }
+    .acc-collapse.band .acc-collapse-body > .wrap { padding-bottom: 44px; }
+  }
   @media (max-width: 900px) {
     .acc-shell { flex-direction: column; align-items: stretch; }
     .acc-mobile-toggle {
@@ -363,7 +392,7 @@
   .icon-line { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 
   /* ---------------- Hero (Accompagnement / Convoyage) ---------------- */
-  .hero { padding: 84px 0 96px; position: relative; max-width: 1120px; margin: 28px auto; border-radius: var(--r-xl); overflow: hidden; }
+  .hero { padding: 84px 0 96px; position: relative; }
   .hero-solo { text-align: center; position: relative; }
   .hero-solo .kicker { justify-content: center; }
   .hero-solo .cta-row { justify-content: center; }
@@ -1053,56 +1082,37 @@
 
     
 
-    <div class="wrap">
-      <details class="acc-collapse" open>
-        <summary>
-          <div class="acc-collapse-head">
-            <span class="label">Votre projet</span>
-            <h2>Démarrer avec votre copilote.</h2>
-          </div>
-          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
-        </summary>
-        <div class="acc-collapse-body">
-          <p class="acc-collapse-intro">Laissez-nous votre email pour démarrer : votre copilote reviendra vers vous avec les questions utiles à votre projet. Vos coordonnées complètes vous seront demandées à la dernière étape.</p>
-          <form id="form-accueil-teaser" novalidate style="max-width:480px;">
-            <div class="field-grid">
-              <div class="field">
-                <label for="accueil-teaser-email">Email</label>
-                <input type="email" id="accueil-teaser-email" required>
-              </div>
-            </div>
-            <div class="field full toggle-row" style="margin-top:16px;">
-              <label><input type="checkbox" id="accueil-teaser-consentement" required> J'accepte que mes données soient utilisées par DIMZ afin d'être recontacté dans le cadre de ma demande d'accompagnement automobile.</label>
-            </div>
-            <button type="submit" class="btn btn-primary" style="margin-top:20px;">Continuer</button>
-          </form>
-        </div>
-      </details>
-
-      <details class="acc-collapse" open>
-        <summary>
+    <details class="acc-collapse band" open>
+      <summary>
+        <div class="wrap acc-band-head">
           <div class="acc-collapse-head">
             <span class="label">À propos de nous</span>
             <h2>Votre copilote automobile, du premier doute jusqu'à la remise des clés.</h2>
           </div>
           <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
-        </summary>
-        <div class="acc-collapse-body">
+        </div>
+      </summary>
+      <div class="acc-collapse-body">
+        <div class="wrap">
           <p class="acc-collapse-intro">Acheter une voiture, ça devrait être excitant, pas un jeu de piste entre annonces trafiquées et vendeurs qui « ne se souviennent plus trop » de l'historique.</p>
           <p class="acc-collapse-intro">DIMZ est né de ce constat (et d'un bon paquet de kilomètres de convoyage). <strong>L'idée : vous offrir l'accompagnement que j'aurais aimé avoir pour mon premier achat.</strong></p>
-          <a href="javascript:void(0)" class="btn btn-outline" data-goto-subtab="apropos">Découvrir notre histoire et nos valeurs</a>
+          <a href="javascript:void(0)" class="btn btn-outline acc-band-cta" data-goto-subtab="apropos">Découvrir notre histoire et nos valeurs</a>
         </div>
-      </details>
+      </div>
+    </details>
 
-      <details class="acc-collapse" open>
-        <summary>
+    <details class="acc-collapse band band-tint" open>
+      <summary>
+        <div class="wrap acc-band-head">
           <div class="acc-collapse-head">
             <span class="label">La méthode</span>
             <h2>La méthode DIMZ.</h2>
           </div>
           <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
-        </summary>
-        <div class="acc-collapse-body">
+        </div>
+      </summary>
+      <div class="acc-collapse-body">
+        <div class="wrap">
           <p class="acc-collapse-intro">D-I-M-Z, ce n'est pas qu'un joli nom : chaque lettre est une étape du travail de votre copilote, du premier échange à la remise des clés.</p>
           <div class="values-grid">
             <div class="value-card" data-reveal>
@@ -1127,27 +1137,59 @@
             </div>
           </div>
         </div>
-      </details>
+      </div>
+    </details>
 
-      <details class="acc-collapse" open>
-        <summary>
+    <details class="acc-collapse band" open>
+      <summary>
+        <div class="wrap acc-band-head">
           <div class="acc-collapse-head">
             <span class="label">Nos offres</span>
             <h2>Trois façons de rouler l'esprit tranquille.</h2>
           </div>
           <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
-        </summary>
-        <div class="acc-collapse-body">
+        </div>
+      </summary>
+      <div class="acc-collapse-body">
+        <div class="wrap">
           <p class="acc-collapse-intro">Que vous ayez juste besoin d'un avis ou que vous souhaitiez être accompagné de A à Z, il y a une offre faite pour vous.</p>
           <ul class="offres-teaser-list">
             <li><span class="offres-teaser-name">Découverte</span><span class="offres-teaser-price">Gratuit</span><span class="offres-teaser-desc">Le premier coup d'œil</span></li>
             <li class="featured"><span class="offres-teaser-name">Copilote<span class="offres-teaser-badge">Le plus choisi</span></span><span class="offres-teaser-price">dès 99 €</span><span class="offres-teaser-desc">Je cherche, vous choisissez</span></li>
             <li><span class="offres-teaser-name">Copilote Plus</span><span class="offres-teaser-price">à partir de 599 €</span><span class="offres-teaser-desc">Vous n'avez plus qu'à conduire</span></li>
           </ul>
-          <a href="javascript:void(0)" class="btn btn-primary" data-goto-subtab="offres">Voir toutes nos offres</a>
+          <a href="javascript:void(0)" class="btn btn-primary acc-band-cta" data-goto-subtab="offres">Voir toutes nos offres</a>
         </div>
-      </details>
-    </div>
+      </div>
+    </details>
+
+    <details class="acc-collapse band band-tint" open>
+      <summary>
+        <div class="wrap acc-band-head">
+          <div class="acc-collapse-head">
+            <span class="label">Votre projet</span>
+            <h2>Démarrer avec votre copilote.</h2>
+          </div>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+      </summary>
+      <div class="acc-collapse-body">
+        <div class="wrap">
+          <form id="form-accueil-teaser" novalidate style="max-width:480px; margin:0 auto; text-align:left;">
+            <div class="field-grid">
+              <div class="field">
+                <label for="accueil-teaser-email">Email</label>
+                <input type="email" id="accueil-teaser-email" required>
+              </div>
+            </div>
+            <div class="field full toggle-row" style="margin-top:16px;">
+              <label><input type="checkbox" id="accueil-teaser-consentement" required> J'accepte que mes données soient utilisées par DIMZ afin d'être recontacté dans le cadre de ma demande d'accompagnement automobile.</label>
+            </div>
+            <button type="submit" class="btn btn-primary acc-band-cta" style="margin-top:20px;">Continuer</button>
+          </form>
+        </div>
+      </div>
+    </details>
 
   </div>
   <!-- ---------- Page : À propos ---------- -->
