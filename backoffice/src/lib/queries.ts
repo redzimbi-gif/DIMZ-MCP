@@ -158,7 +158,7 @@ export async function listDossiers(options?: { archived?: boolean }) {
     .select(DOSSIER_LISTE_COLONNES)
     .eq("archive", options?.archived ?? false)
     .order("created_at", { ascending: false });
-  return (data ?? []) as Dossier[];
+  return (data ?? []) as unknown as Dossier[];
 }
 
 export async function getDossier(id: string) {
@@ -514,7 +514,7 @@ const TEST_FEEDBACK_LISTE_COLONNES =
 export async function listTestFeedback() {
   const db = createAdminClient();
   const { data } = await db.from("test_feedback").select(TEST_FEEDBACK_LISTE_COLONNES).order("created_at", { ascending: false });
-  return (data ?? []) as TestFeedback[];
+  return (data ?? []) as unknown as TestFeedback[];
 }
 
 export async function getTestFeedback(id: string) {
