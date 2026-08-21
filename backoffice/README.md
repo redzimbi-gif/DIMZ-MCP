@@ -43,6 +43,7 @@ stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
    - `0031_convoyage_etats_lieux.sql`
    - `0032_convoyage_carburant_pourcentage.sql`
    - `0033_documents_commerciaux.sql`
+   - `0034_avis_clients.sql`
 3. Dans **Project Settings → API**, récupère :
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -153,6 +154,20 @@ npx supabase functions deploy track-lookup --project-ref TON-PROJET --no-verify-
 
 ```js
 var TRACK_URL = 'https://TON-PROJET.supabase.co/functions/v1/track-lookup';
+```
+
+La page « Avis clients » appelle une quatrième Edge Function, `avis` : en GET
+elle renvoie les avis déjà validés (colonne `publie = true` dans la table
+`avis` — à passer à `true` manuellement dans l'éditeur de table Supabase
+pour publier un avis reçu), en POST elle enregistre un nouvel avis, toujours
+non publié à la réception (aucun secret nécessaire, elle n'envoie pas d'email) :
+
+```bash
+npx supabase functions deploy avis --project-ref TON-PROJET --no-verify-jwt
+```
+
+```js
+var AVIS_URL = 'https://TON-PROJET.supabase.co/functions/v1/avis';
 ```
 
 Chaque soumission des formulaires « Accompagnement » et « Convoyage » du site
