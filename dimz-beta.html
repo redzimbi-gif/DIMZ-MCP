@@ -363,7 +363,7 @@
   .icon-line { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 
   /* ---------------- Hero (Accompagnement / Convoyage) ---------------- */
-  .hero { padding: 84px 0 96px; position: relative; }
+  .hero { padding: 84px 0 96px; position: relative; max-width: 1120px; margin: 28px auto; border-radius: var(--r-xl); overflow: hidden; }
   .hero-solo { text-align: center; position: relative; }
   .hero-solo .kicker { justify-content: center; }
   .hero-solo .cta-row { justify-content: center; }
@@ -1054,6 +1054,31 @@
     
 
     <div class="wrap">
+      <details class="acc-collapse" open>
+        <summary>
+          <div class="acc-collapse-head">
+            <span class="label">Votre projet</span>
+            <h2>Démarrer avec votre copilote.</h2>
+          </div>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+        </summary>
+        <div class="acc-collapse-body">
+          <p class="acc-collapse-intro">Laissez-nous votre email pour démarrer : votre copilote reviendra vers vous avec les questions utiles à votre projet. Vos coordonnées complètes vous seront demandées à la dernière étape.</p>
+          <form id="form-accueil-teaser" novalidate style="max-width:480px;">
+            <div class="field-grid">
+              <div class="field">
+                <label for="accueil-teaser-email">Email</label>
+                <input type="email" id="accueil-teaser-email" required>
+              </div>
+            </div>
+            <div class="field full toggle-row" style="margin-top:16px;">
+              <label><input type="checkbox" id="accueil-teaser-consentement" required> J'accepte que mes données soient utilisées par DIMZ afin d'être recontacté dans le cadre de ma demande d'accompagnement automobile.</label>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top:20px;">Continuer</button>
+          </form>
+        </div>
+      </details>
+
       <details class="acc-collapse" open>
         <summary>
           <div class="acc-collapse-head">
@@ -3796,6 +3821,24 @@
         var target = btn.dataset.reasons;
         Object.keys(panels).forEach(function (key) { panels[key].hidden = key !== target; });
       });
+    });
+  })();
+
+  // ---------- Teaser "Votre projet" sur l'accueil : reprend l'email/consentement dans le vrai formulaire ----------
+  (function () {
+    var form = document.getElementById('form-accueil-teaser');
+    if (!form) return;
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!form.reportValidity()) return;
+      var email = document.getElementById('accueil-teaser-email').value;
+      var consentement = document.getElementById('accueil-teaser-consentement').checked;
+      var targetEmail = document.getElementById('a-email');
+      var targetConsentement = document.getElementById('a-consentement');
+      if (targetEmail) targetEmail.value = email;
+      if (targetConsentement) targetConsentement.checked = consentement;
+      showMainTab('accompagnement-form', true);
+      window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
     });
   })();
 
