@@ -491,16 +491,17 @@
   @media (prefers-reduced-motion: reduce) { .offer-card.featured::before { animation: none; } }
   .offer-tag { position: absolute; top: 20px; right: 20px; z-index: 1; background: var(--bg-raised); color: var(--bleu-vif); font-size: 0.66rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 11px; border-radius: 100px; box-shadow: var(--shadow); }
   .offer-card h3 { font-family: "Instrument Sans", var(--sans); font-size: clamp(1.55rem, 1.32rem + 1vw, 1.9rem); font-weight: 600; letter-spacing: -0.02em; margin-bottom: 4px; }
+  .offer-plus { color: var(--bleu-vif); }
   .offer-subtitle { margin: 0 0 12px; color: var(--ink-soft); font-size: 0.85rem; font-weight: 600; }
   .offer-texte { margin: 0 0 18px; color: var(--ink); font-size: 0.92rem; line-height: 1.5; }
-  .price-toggle { display: inline-flex; background: var(--bg-tint); border-radius: 100px; padding: 3px; margin-bottom: 16px; gap: 2px; }
-  .price-toggle button { border: none; background: transparent; padding: 6px 14px; border-radius: 100px; font-size: 0.77rem; font-weight: 700; color: var(--ink-soft); cursor: pointer; }
+  .price-toggle { display: inline-flex; background: var(--bg-tint); border-radius: 100px; padding: 2px; margin: 2px 0 16px; gap: 2px; }
+  .price-toggle button { border: none; background: transparent; padding: 4px 10px; border-radius: 100px; font-size: 0.66rem; font-weight: 700; color: var(--ink-soft); cursor: pointer; }
   .price-toggle button[aria-selected="true"] { background: var(--bg-raised); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
-  .offer-price { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 700; font-size: clamp(2.1rem, 1.85rem + 1vw, 2.6rem); line-height: 1; color: var(--bleu); margin-bottom: 16px; letter-spacing: -0.03em; }
+  .offer-price { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 800; font-size: clamp(2.1rem, 1.85rem + 1vw, 2.6rem); line-height: 1; color: var(--bleu); margin-bottom: 10px; letter-spacing: -0.03em; text-shadow: 0 2px 20px color-mix(in srgb, var(--bleu-vif) 38%, transparent); }
   :root[data-theme="dark"] .offer-price { color: var(--bleu-vif); }
   @media (prefers-color-scheme: dark) { .offer-price { color: var(--bleu-vif); } }
-  .offer-price .free { color: var(--vert); font-family: var(--serif); font-size: 0.85em; }
-  .offer-price .from-label { display: block; font-family: var(--sans); font-weight: 700; font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin-bottom: 3px; }
+  .offer-price .free { color: var(--vert); font-family: var(--serif); font-size: 0.85em; text-shadow: 0 2px 20px color-mix(in srgb, var(--vert) 38%, transparent); }
+  .offer-price .from-label { display: block; font-family: var(--sans); font-weight: 700; font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin-bottom: 3px; text-shadow: none; }
   .offer-sub { color: var(--ink-soft); font-size: 0.84rem; margin-bottom: 20px; min-height: 2.6em; }
   .offer-card ul { list-style: none; margin: 0 0 28px; padding: 0; display: flex; flex-direction: column; gap: 11px; flex: 1; }
   .offer-card li { display: flex; gap: 10px; font-size: 0.91rem; line-height: 1.45; }
@@ -911,7 +912,7 @@
   .form-solo { max-width: 760px; margin: 0 auto; }
 
   footer { padding: 44px 0 40px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 26px; color: var(--ink-soft); font-size: 0.85rem; }
-  .footer-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+  .footer-top { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; padding-top: 22px; border-top: 1px solid var(--line); }
   .footer-pillars { list-style: none; display: flex; gap: 22px; margin: 0; padding: 0; flex-wrap: wrap; justify-content: center; }
   .footer-pillars li { display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700; font-size: 0.74rem; color: var(--bleu-vif); }
   .footer-pillars svg { width: 15px; height: 15px; flex: none; }
@@ -919,7 +920,7 @@
   .footer-legal a { color: var(--ink-soft); text-decoration: none; font-size: 0.82rem; font-weight: 600; transition: color 0.15s ease; }
   .footer-legal a:hover { color: var(--bleu-vif); text-decoration: underline; }
   .footer-legal a:focus-visible { outline: 2px solid var(--bleu-vif); outline-offset: 2px; }
-  .footer-social { display: flex; gap: 14px; justify-content: center; padding-top: 22px; border-top: 1px solid var(--line); }
+  .footer-social { display: flex; gap: 14px; justify-content: center; }
   .footer-social a {
     display: flex; align-items: center; justify-content: center; width: 36px; height: 36px;
     border-radius: 50%; border: 1px solid var(--line); color: var(--ink-soft);
@@ -1176,11 +1177,9 @@
       <div class="acc-collapse-body">
         <div class="wrap">
           <form id="form-accueil-teaser" novalidate style="max-width:480px; margin:0 auto; text-align:left;">
-            <div class="field-grid">
-              <div class="field">
-                <label for="accueil-teaser-email">Email</label>
-                <input type="email" id="accueil-teaser-email" required>
-              </div>
+            <div class="field">
+              <label for="accueil-teaser-email">Email</label>
+              <input type="email" id="accueil-teaser-email" required>
             </div>
             <div class="field full toggle-row" style="margin-top:16px;">
               <label><input type="checkbox" id="accueil-teaser-consentement" required> J'accepte que mes données soient utilisées par DIMZ afin d'être recontacté dans le cadre de ma demande d'accompagnement automobile.</label>
@@ -1286,11 +1285,11 @@
             <p class="offer-subtitle">Je cherche, vous choisissez</p>
             <p class="offer-texte">Votre copilote vous accompagne sur un bout du parcours.</p>
             <div class="offer-price-zone">
+              <div class="offer-price"><span id="offer-price-value">99 €</span></div>
               <div class="price-toggle" role="tablist" aria-label="Type de recherche">
                 <button type="button" role="tab" aria-selected="true" data-price="99" data-sub="Pour une recherche courante, sur des véhicules classiques.">Recherche simple</button>
                 <button type="button" role="tab" aria-selected="false" data-price="149" data-sub="Concerne les véhicules rares, de collection, ou les recherches qui demandent plus de temps.">Recherche complexe</button>
               </div>
-              <div class="offer-price"><span id="offer-price-value">99 €</span></div>
               <div class="offer-sub" id="offer-sub-copilote">Pour une recherche courante, sur des véhicules classiques.</div>
             </div>
             <ul>
@@ -1305,7 +1304,7 @@
 
           <div class="offer-card" data-reveal data-offer-example="copilote_plus">
             <figure class="feature-photo feature-photo-crop" style="margin:-34px -28px 20px;border-radius:0;"><img src="img/remise-cles-pro.png" alt="Remise des clés au client à la livraison du véhicule" loading="lazy" width="1536" height="1024"></figure>
-            <h3>Copilote Plus</h3>
+            <h3>Copilote <span class="offer-plus">Plus</span></h3>
             <p class="offer-subtitle">Vous n'avez plus qu'à conduire</p>
             <p class="offer-texte">Faisons la route ensemble.</p>
             <div class="offer-price-zone">
@@ -3372,15 +3371,6 @@
 </main>
 
 <footer class="wrap">
-  <div class="footer-top">
-    <span>© 2026 Dimz · Mon copilote auto. <span class="footer-beta">Bêta</span></span>
-    <ul class="footer-pillars">
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-5-5"/></svg>Trouver</li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>Sécuriser</li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6.3 6-6.3s6 2.8 6 6.3"/><circle cx="17" cy="7" r="2.4"/><path d="M14.8 20c.2-3 2.2-5.4 4.7-6"/></svg>Accompagner</li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="15" r="4"/><path d="M10 12l9-9"/><path d="M15 6l3 3"/><path d="M17 4l3 3"/></svg>Livrer</li>
-    </ul>
-  </div>
   <div class="footer-social" aria-label="Réseaux sociaux">
     <a href="javascript:void(0)" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10.5 9.3v5.4l4.7-2.7z" fill="currentColor" stroke="none"/></svg></a>
     <a href="javascript:void(0)" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3.5v11.2a3.3 3.3 0 1 1-2.8-3.26"/><path d="M14 3.5c.4 2.4 2.1 4.2 4.6 4.5"/></svg></a>
@@ -3393,6 +3383,15 @@
     <a href="javascript:void(0)" id="cookie-settings-link">Gérer les cookies</a>
     <a href="javascript:void(0)" data-goto-tab="test">Donner votre avis sur le site</a>
   </nav>
+  <div class="footer-top">
+    <span>© 2026 Dimz · Mon copilote auto. <span class="footer-beta">Bêta</span></span>
+    <ul class="footer-pillars">
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-5-5"/></svg>Trouver</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>Sécuriser</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6.3 6-6.3s6 2.8 6 6.3"/><circle cx="17" cy="7" r="2.4"/><path d="M14.8 20c.2-3 2.2-5.4 4.7-6"/></svg>Accompagner</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="15" r="4"/><path d="M10 12l9-9"/><path d="M15 6l3 3"/><path d="M17 4l3 3"/></svg>Livrer</li>
+    </ul>
+  </div>
 </footer>
 
 <div class="cookie-banner" id="cookie-banner" role="dialog" aria-label="Préférences cookies" hidden>
