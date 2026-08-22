@@ -206,11 +206,22 @@
   }
   .nav-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 15px 0; flex-wrap: wrap; }
   .brand { display: flex; align-items: center; gap: 11px; text-decoration: none; }
-  .brand .name { font-family: var(--serif); font-weight: 600; font-size: 1.12rem; color: var(--ink); letter-spacing: -0.01em; }
-  .brand .name em { font-style: normal; font-family: var(--sans); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; color: var(--ink-soft); font-size: 0.56em; margin-left: 2px; }
-  .brand .name em::before, .brand .name em::after { content: ""; display: inline-block; width: 10px; height: 1.5px; background: var(--bleu-vif); vertical-align: middle; margin: 0 6px 2px 0; }
-  .brand .name em::after { margin: 0 0 2px 6px; }
-  .brand-logo { height: 27px; width: auto; display: block; }
+  /* Le logo porte lui-même « DIMZ » et « MON COPILOTE AUTO » : il remplace le
+     texte qui était posé à côté. Deux fichiers, générés par
+     tools/logo-transparent.py à partir du logo d'origine : l'encre du logo
+     est noire, donc illisible sur le bandeau en mode sombre — la variante
+     -dark passe cette encre en clair, le bleu de la marque restant intact. */
+  .brand-logo { height: 40px; width: auto; display: block; }
+  .brand-logo-dark { display: none; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .brand-logo-light { display: none; }
+    :root:not([data-theme="light"]) .brand-logo-dark { display: block; }
+  }
+  :root[data-theme="dark"] .brand-logo-light { display: none; }
+  :root[data-theme="dark"] .brand-logo-dark { display: block; }
+  :root[data-theme="light"] .brand-logo-light { display: block; }
+  :root[data-theme="light"] .brand-logo-dark { display: none; }
+  @media (max-width: 560px) { .brand-logo { height: 32px; } }
   .beta-badge { font-size: 0.64rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--bleu-vif); background: color-mix(in srgb, var(--bleu-vif) 12%, transparent); border: 1px solid color-mix(in srgb, var(--bleu-vif) 28%, transparent); border-radius: 100px; padding: 3px 9px; }
   .footer-beta { font-size: 0.64rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); border: 1px solid var(--line); border-radius: 100px; padding: 3px 9px; }
 
@@ -435,6 +446,10 @@
   @media (prefers-reduced-motion: reduce) { .hero .kicker .dot { animation: none; } }
   .hero h1, .hero h2 { font-size: clamp(2.3rem, 4.4vw, 3.4rem); line-height: 1.08; color: #fff; margin-bottom: 22px; }
   .hero h1 em, .hero h2 em { font-style: normal; color: #9db9ec; }
+  /* Passe la seconde moitié du titre à la ligne, avec un peu d'air au-dessus.
+     Classe dédiée : la règle générique ci-dessus sert aussi au hero d'accueil,
+     qui doit garder son <em> dans le fil du texte. */
+  .hero h1 em.hero-em-block, .hero h2 em.hero-em-block { display: block; margin-top: 0.18em; }
   .hero p.lede { color: rgba(255,255,255,0.68); font-size: 1.07rem; max-width: 48ch; margin: 0 auto 32px; }
   .hero .cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
 
@@ -1009,8 +1024,8 @@
 <header class="topnav">
   <div class="wrap nav-row">
     <a href="javascript:void(0)" class="brand" data-goto-tab="accompagnement">
-      <img class="brand-logo" src="img/logo-dimz-mark-blue.png" alt="">
-      <span class="name">Dimz <em>Mon copilote auto</em></span>
+      <img class="brand-logo brand-logo-light" src="img/logo-dimz-full.png" alt="DIMZ - Mon Copilote Auto" width="1136" height="405">
+      <img class="brand-logo brand-logo-dark" src="img/logo-dimz-full-dark.png" alt="" aria-hidden="true" width="1136" height="405">
       <span class="beta-badge">Bêta</span>
     </a>
     
@@ -1106,7 +1121,7 @@
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Démarches administratives</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Livraison partout en France</li>
         </ul>
-        <p class="lede">On travaille pour vous. Pas pour le vendeur, pas pour une commission.</p>
+        <p class="lede">Aucune commission sur la vente : nos conseils ne dépendent que de votre projet.</p>
         <div class="cta-row">
           <a href="javascript:void(0)" class="btn btn-primary" data-goto-tab="accompagnement-form">Décrire mon projet</a>
           <a href="javascript:void(0)" class="btn btn-outline-dark" data-goto-subtab="offres">Trouvez votre offre</a>
@@ -1453,7 +1468,7 @@
             </div>
             <p><strong>Recommandation finale :</strong> véhicule envisageable, sous réserve d'une négociation sur le prix et de la prise en compte des plaquettes arrière dans les prochains mois. Aucun point bloquant identifié.</p>
           </div>
-          <p class="offer-modal-footnote">Exemple fictif. Chaque rapport réel est établi sur site par un expert Dimz, avec les photos du véhicule inspecté.</p>
+          <p class="offer-modal-footnote">Exemple fictif. Chaque rapport réel est établi sur site par votre copilote, avec les photos du véhicule inspecté.</p>
         </template>
 
         <template id="offer-example-edl">
@@ -1564,7 +1579,7 @@
 
           <h3 class="faq-cat">Comprendre DIMZ</h3>
           <details class="faq-item">
-            <summary>À qui s'adresse votre copilote ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <summary>À qui s'adresse DIMZ - Mon Copilote Auto ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
             <div class="faq-answer">
               <p>À toutes les personnes qui souhaitent acheter, déplacer ou sécuriser un véhicule, sans être seules face aux différentes étapes.</p>
               <p>Que vous soyez à la recherche de votre premier véhicule, d'une voiture familiale, d'un modèle plus haut de gamme, ou que vous ayez simplement besoin de faire transporter un véhicule, votre copilote s'adapte à votre projet.</p>
@@ -1969,7 +1984,7 @@
               <div class="report-mark"><span class="dot" aria-hidden="true"></span>Rapport DIMZ</div>
               <div class="report-meta" style="margin-top:8px;">
                 <span>Inspection réalisée à Lyon (69)</span>
-                <span>Par un expert Dimz, copilote certifié</span>
+                <span>Par votre copilote DIMZ</span>
               </div>
             </div>
             <div class="report-meta report-meta-list">
@@ -2059,7 +2074,7 @@
           </div>
 
           <div class="report-doc-footer">
-            Rapport fictif fourni à titre d'exemple pour illustrer le format et le contenu du Rapport DIMZ. Chaque inspection réelle est réalisée sur site par un expert Dimz et donne lieu à un document individualisé, avec photos réelles du véhicule inspecté.
+            Rapport fictif fourni à titre d'exemple pour illustrer le format et le contenu du Rapport DIMZ. Chaque inspection réelle est réalisée sur site par votre copilote et donne lieu à un document individualisé, avec photos réelles du véhicule inspecté.
           </div>
         </div>
 
@@ -2117,8 +2132,8 @@
     <div class="wrap hero-solo">
       <div class="hero-illustration" aria-hidden="true"></div>
       <span class="kicker"><span class="dot"></span>Convoyage</span>
-      <h2>Besoin de déplacer votre véhicule ? <em>Votre copilote prend le relais.</em></h2>
-      <p class="lede">Achat à distance, déménagement, manque de temps : confiez votre véhicule à un professionnel du convoyage, du point de départ jusqu'à la porte d'arrivée.</p>
+      <h2>Besoin de déplacer votre véhicule&nbsp;? <em class="hero-em-block">Votre copilote prend le relais.</em></h2>
+      <p class="lede">Achat à distance, déménagement, manque de temps : confiez votre véhicule à un professionnel du convoyage, du&nbsp;point&nbsp;de&nbsp;départ jusqu'à la porte d'arrivée.</p>
       <div class="cta-row">
         <a href="javascript:void(0)" class="btn btn-primary" data-goto-tab="convoyage-form">Demander un convoyage</a>
       </div>
@@ -2127,7 +2142,6 @@
 
   <div class="wrap">
     <div class="section-head" data-reveal>
-      <span class="label">Pourquoi convoyer ?</span>
       <h2>Un convoyage, pour quoi faire ?</h2>
       <p>Particulier ou professionnel, les raisons de confier son véhicule à un convoyeur ne sont pas les mêmes.</p>
     </div>
