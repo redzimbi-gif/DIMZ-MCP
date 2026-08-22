@@ -301,7 +301,7 @@
   .acc-collapse.band .acc-collapse-intro { text-align: center; max-width: 60ch; margin: 0 auto 22px; }
   .acc-collapse.band .values-grid, .acc-collapse.band .offres-teaser-list { margin-left: auto; margin-right: auto; }
   .acc-collapse.band .offres-teaser-list { max-width: 640px; text-align: left; }
-  .acc-band-cta { display: table; margin: 8px auto 0; }
+  .btn.acc-band-cta { display: table; margin: 8px auto 0; }
   @media (max-width: 640px) {
     .acc-band-head { padding: 44px 22px 28px; }
     .acc-collapse.band .acc-collapse-body > .wrap { padding-bottom: 44px; }
@@ -500,8 +500,8 @@
   .offer-price { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 800; font-size: clamp(2.1rem, 1.85rem + 1vw, 2.6rem); line-height: 1; color: var(--bleu); margin-bottom: 10px; letter-spacing: -0.03em; text-shadow: 0 2px 20px color-mix(in srgb, var(--bleu-vif) 38%, transparent); }
   :root[data-theme="dark"] .offer-price { color: var(--bleu-vif); }
   @media (prefers-color-scheme: dark) { .offer-price { color: var(--bleu-vif); } }
-  .offer-price .free { color: var(--vert); font-family: var(--serif); font-size: 0.85em; text-shadow: 0 2px 20px color-mix(in srgb, var(--vert) 38%, transparent); }
-  .offer-price .from-label { display: block; font-family: var(--sans); font-weight: 700; font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin-bottom: 3px; text-shadow: none; }
+  .offer-price .free { color: var(--vert); text-shadow: 0 2px 20px color-mix(in srgb, var(--vert) 38%, transparent); }
+  .offer-price .from-label { font-family: var(--sans); font-weight: 700; font-size: 0.5em; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin-right: 6px; text-shadow: none; vertical-align: middle; }
   .offer-sub { color: var(--ink-soft); font-size: 0.84rem; margin-bottom: 20px; min-height: 2.6em; }
   .offer-card ul { list-style: none; margin: 0 0 28px; padding: 0; display: flex; flex-direction: column; gap: 11px; flex: 1; }
   .offer-card li { display: flex; gap: 10px; font-size: 0.91rem; line-height: 1.45; }
@@ -1169,13 +1169,14 @@
         <div class="wrap acc-band-head">
           <div class="acc-collapse-head">
             <span class="label">Votre projet</span>
-            <h2>Démarrer avec votre copilote.</h2>
+            <h2>Parlez-nous de votre projet.</h2>
           </div>
           <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
         </div>
       </summary>
       <div class="acc-collapse-body">
         <div class="wrap">
+          <p class="acc-collapse-intro">Ces quelques questions permettent à votre copilote de vous conduire jusqu'à votre projet idéal.</p>
           <form id="form-accueil-teaser" novalidate style="max-width:480px; margin:0 auto; text-align:left;">
             <div class="field">
               <label for="accueil-teaser-email">Email</label>
@@ -1260,7 +1261,7 @@
         </div>
 
         <div class="offers">
-          <div class="offer-card" data-reveal data-offer-example="decouverte">
+          <div class="offer-card featured" data-reveal data-offer-example="decouverte">
             <figure class="feature-photo feature-photo-crop" style="margin:-34px -28px 20px;border-radius:0;"><img src="img/offre-decouverte.jpg" alt="Étude du dossier client autour d'un bureau" loading="lazy" width="1200" height="801"></figure>
             <h3>Découverte</h3>
             <p class="offer-subtitle">Le premier coup d'œil</p>
