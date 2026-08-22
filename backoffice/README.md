@@ -330,9 +330,6 @@ l'email de confirmation si le client a renseigné son adresse.
 Ces modules demandent tes propres comptes/clés API tiers (payants) — on les
 ajoute dès que tu es prêt :
 
-- **Facturation avancée** (devis, génération/envoi de factures, paiement en
-  ligne) → nécessite Stripe. En attendant, `/facturation` sert de journal
-  manuel pour retrouver les factures déjà émises ailleurs (voir plus haut).
 - **SMS** → nécessite Twilio ou équivalent.
 - **Signature électronique légale** (au-delà de la signature à l'écran déjà
   en place pour le convoyage) → nécessite un prestataire type Yousign/DocuSign.

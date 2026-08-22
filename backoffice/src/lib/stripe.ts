@@ -85,6 +85,12 @@ export async function createCheckoutSession(
   }
 }
 
+// Fenêtre d'acceptation de l'horodatage d'un webhook, en secondes. Même
+// valeur que le SDK Stripe officiel. Sans elle, la signature reste valable
+// indéfiniment : un événement intercepté pourrait être rejoué des mois plus
+// tard, et l'endpoint n'a pas d'autre authentification que cette signature.
+const WEBHOOK_TOLERANCE_SECONDS = 300;
+
 /**
  * Vérifie la signature d'un événement webhook Stripe (en-tête
  * "Stripe-Signature"), à partir du corps brut de la requête. Implémentation
@@ -94,28 +100,40 @@ export async function createCheckoutSession(
 export function verifyStripeWebhookSignature(
   rawBody: string,
   signatureHeader: string | null,
-  webhookSecret: string
+  webhookSecret: string,
+  toleranceSeconds: number = WEBHOOK_TOLERANCE_SECONDS
 ): boolean {
   if (!signatureHeader) return false;
 
-  const parts = Object.fromEntries(
-    signatureHeader.split(",").map((part) => {
-      const [key, value] = part.split("=");
-      return [key, value];
-    })
-  );
-  const timestamp = parts["t"];
-  const signature = parts["v1"];
-  if (!timestamp || !signature) return false;
+  // Pendant une rotation de secret, Stripe envoie plusieurs "v1=" dans le même
+  // en-tête (un par secret actif) : on les collecte tous, la signature est
+  // valable si l'un d'eux correspond. Un Object.fromEntries n'en garderait
+  // qu'un seul et ferait échouer la vérification pendant la rotation.
+  let timestamp = "";
+  const signatures: string[] = [];
+  for (const part of signatureHeader.split(",")) {
+    const index = part.indexOf("=");
+    if (index === -1) continue;
+    const key = part.slice(0, index).trim();
+    const value = part.slice(index + 1).trim();
+    if (key === "t") timestamp = value;
+    else if (key === "v1") signatures.push(value);
+  }
+  if (!timestamp || signatures.length === 0) return false;
+
+  const sentAt = Number(timestamp);
+  if (!Number.isFinite(sentAt)) return false;
+  if (Math.abs(Date.now() / 1000 - sentAt) > toleranceSeconds) return false;
 
   const expected = crypto
     .createHmac("sha256", webhookSecret)
     .update(`${timestamp}.${rawBody}`)
     .digest("hex");
-
   const expectedBuffer = Buffer.from(expected, "hex");
-  const signatureBuffer = Buffer.from(signature, "hex");
-  if (expectedBuffer.length !== signatureBuffer.length) return false;
 
-  return crypto.timingSafeEqual(expectedBuffer, signatureBuffer);
+  return signatures.some((signature) => {
+    const signatureBuffer = Buffer.from(signature, "hex");
+    if (expectedBuffer.length !== signatureBuffer.length) return false;
+    return crypto.timingSafeEqual(expectedBuffer, signatureBuffer);
+  });
 }

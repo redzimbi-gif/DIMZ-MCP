@@ -37,13 +37,36 @@ export async function POST(request: Request) {
     };
 
     const db = createAdminClient();
-    const { data: doc } = await db
+    const colonnes = "id, numero, dossier_id, statut";
+    let { data: doc } = await db
       .from("documents_commerciaux")
-      .select("id, numero, dossier_id")
+      .select(colonnes)
       .eq("stripe_checkout_session_id", session.id)
       .maybeSingle();
 
+    // Repli par les métadonnées. Chaque envoi d'une facture crée une nouvelle
+    // session Checkout et écrase stripe_checkout_session_id : si le client
+    // paie via un lien précédent (une session reste valable 24h), la recherche
+    // par identifiant de session ne trouve rien alors que le paiement est bien
+    // réel. L'identifiant du document est justement joint aux métadonnées à la
+    // création de la session, côté facturation.
+    const documentId = session.metadata?.document_commercial_id;
+    if (!doc && documentId) {
+      ({ data: doc } = await db
+        .from("documents_commerciaux")
+        .select(colonnes)
+        .eq("id", documentId)
+        .maybeSingle());
+    }
+
     if (doc) {
+      // Stripe réémet un événement tant qu'il n'a pas reçu de 200 : sans cette
+      // sortie, chaque réémission renotifierait l'équipe et rejournaliserait
+      // un paiement déjà enregistré.
+      if (doc.statut === "paye") {
+        return NextResponse.json({ received: true, already: true });
+      }
+
       await db
         .from("documents_commerciaux")
         .update({ statut: "paye", stripe_payment_intent_id: session.payment_intent })
@@ -63,7 +86,12 @@ export async function POST(request: Request) {
         lien: doc.dossier_id ? `/dossiers/${doc.dossier_id}` : `/facturation/documents/${doc.id}`,
       });
     } else {
-      console.error("Webhook Stripe : session Checkout inconnue", session.id);
+      console.error(
+        "Webhook Stripe : aucune facture pour la session Checkout",
+        session.id,
+        "ni pour le document",
+        documentId ?? "(absent des métadonnées)"
+      );
     }
   }
 
