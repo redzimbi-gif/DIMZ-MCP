@@ -146,13 +146,17 @@
   }
 
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  /* Base typographique du site. Toutes les tailles de texte sont en rem
+     (aucune mise en page ne dépend du rem), donc régler la base ici fait
+     grossir l'ensemble du texte proportionnellement, sans toucher aux
+     gabarits qui sont tous en px. 106.25% = 17px. */
+  html { scroll-behavior: smooth; font-size: 106.25%; }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
   body {
     margin: 0; background: var(--bg); color: var(--ink);
     font-family: var(--sans);
-    font-size: 16px; line-height: 1.65; -webkit-font-smoothing: antialiased;
+    font-size: 1rem; line-height: 1.65; -webkit-font-smoothing: antialiased;
   }
   /* Fond photo (différent en mode clair et en mode sombre) : fixe et sous
      tout le contenu, avec un voile pour garder le texte et les cartes
@@ -500,14 +504,20 @@
   .offer-price { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 800; font-size: clamp(2.1rem, 1.85rem + 1vw, 2.6rem); line-height: 1; color: var(--bleu); margin-bottom: 10px; letter-spacing: -0.03em; text-shadow: 0 2px 20px color-mix(in srgb, var(--bleu-vif) 38%, transparent); }
   :root[data-theme="dark"] .offer-price { color: var(--bleu-vif); }
   @media (prefers-color-scheme: dark) { .offer-price { color: var(--bleu-vif); } }
+  /* "Gratuit" n'a aucune surcharge de police : il hérite de .offer-price
+     (mono, 800) pour tomber exactement sur la même ligne de base que
+     "99 €" et "599 €". Seule la couleur change. */
   .offer-price .free { color: var(--vert); text-shadow: 0 2px 20px color-mix(in srgb, var(--vert) 38%, transparent); }
-  .offer-price .from-label { font-family: var(--sans); font-weight: 700; font-size: 0.5em; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin-right: 6px; text-shadow: none; vertical-align: middle; }
+  /* Placé APRÈS le prix dans le markup : légende sous le montant, pour ne
+     pas décaler "599 €" vers le bas par rapport aux deux autres cartes. */
+  .offer-price .from-label { display: block; font-family: var(--sans); font-weight: 700; font-size: 0.28em; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin-top: 6px; text-shadow: none; }
   .offer-sub { color: var(--ink-soft); font-size: 0.84rem; margin-bottom: 20px; min-height: 2.6em; }
   .offer-card ul { list-style: none; margin: 0 0 28px; padding: 0; display: flex; flex-direction: column; gap: 11px; flex: 1; }
   .offer-card li { display: flex; gap: 10px; font-size: 0.91rem; line-height: 1.45; }
   .offer-card li::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--bleu-vif); margin-top: 9px; flex: none; }
   .offer-card .btn { justify-content: center; margin-top: auto; }
   .offer-note { margin-top: 26px; text-align: center; color: var(--ink-soft); font-size: 0.85rem; max-width: 60ch; margin-left: auto; margin-right: auto; }
+  .offer-note-devis { margin-top: 8px; }
   .offer-footnote { margin-top: 10px; text-align: center; color: color-mix(in srgb, var(--ink-soft) 82%, transparent); font-size: 0.76rem; line-height: 1.5; max-width: 68ch; margin-left: auto; margin-right: auto; }
 
   /* ---------------- Avis clients ---------------- */
@@ -549,6 +559,7 @@
   .offer-modal-close:hover { color: var(--ink); border-color: color-mix(in srgb, var(--bleu-vif) 40%, var(--line)); }
   .offer-modal-close svg { width: 16px; height: 16px; }
   .offer-modal-eyebrow { display: block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--bleu-vif); margin-bottom: 8px; }
+  .btn-sm-back { padding: 7px 14px; font-size: 0.78rem; margin-bottom: 18px; }
   .offer-modal-body h3 { font-size: 1.35rem; margin: 0 0 10px; padding-right: 30px; }
   .offer-modal-lede { color: var(--ink-soft); font-size: 0.94rem; line-height: 1.6; margin: 0 0 26px; }
   .offer-modal-example-title { font-size: 0.76rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin: 0 0 14px; display: flex; align-items: center; gap: 10px; }
@@ -558,7 +569,19 @@
   .offer-modal-comment { color: var(--ink-soft); font-size: 0.9rem; font-style: italic; line-height: 1.55; margin: 0 0 16px; }
   .example-modeles { display: flex; flex-direction: column; gap: 10px; margin-bottom: 6px; }
   .example-modele { border: 1px solid var(--line); border-radius: var(--r-md); padding: 13px 16px; background: var(--bg); }
-  .example-modele-name { font-weight: 700; font-size: 0.9rem; margin: 0 0 8px; }
+  .example-modele-name { font-weight: 700; font-size: 0.9rem; margin: 0 0 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .example-modele-tag { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; padding: 2px 8px; border-radius: 100px; background: var(--bg-tint); border: 1px solid var(--line); color: var(--ink-soft); }
+  .example-modele-tag.occasion { color: var(--bleu-vif); border-color: color-mix(in srgb, var(--bleu-vif) 32%, var(--line)); background: color-mix(in srgb, var(--bleu-vif) 8%, transparent); }
+  .example-modele-prix { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 0.82rem; font-weight: 600; color: var(--bleu-vif); margin: -4px 0 9px; }
+  /* Annonce réelle (offre Copilote) : même carte que .example-modele, avec
+     en plus une ligne de caractéristiques et un lien vers l'annonce. */
+  .example-annonce { border: 1px solid var(--line); border-radius: var(--r-md); padding: 15px 16px; background: var(--bg); }
+  .example-annonce-specs { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0 0 12px; font-size: 0.79rem; color: var(--ink-soft); }
+  .example-annonce-specs span { display: flex; align-items: baseline; gap: 5px; }
+  .example-annonce-specs strong { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 700; }
+  .example-annonce-lien { display: inline-flex; align-items: center; gap: 5px; font-size: 0.78rem; font-weight: 700; color: var(--bleu-vif); text-decoration: none; margin-bottom: 12px; }
+  .example-annonce-lien:hover { text-decoration: underline; }
+  .example-annonce-lien svg { width: 12px; height: 12px; flex: none; }
   .pc-line { display: flex; align-items: baseline; gap: 8px; font-size: 0.81rem; color: var(--ink-soft); line-height: 1.5; margin: 0 0 5px; }
   .pc-line:last-child { margin-bottom: 0; }
   .pc-label { flex: none; font-size: 0.64rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; padding: 2px 8px; border-radius: 100px; }
@@ -726,6 +749,9 @@
   .faq-answer p { margin: 0; }
   .faq-answer p + p { margin-top: 10px; }
   .faq-answer strong { color: var(--ink); }
+  .faq-cat { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.16em; font-weight: 700; color: var(--bleu-vif); margin: 30px 0 4px; display: flex; align-items: center; gap: 12px; }
+  .faq-cat:first-child { margin-top: 0; }
+  .faq-cat::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 
   /* ---------------- Formulaires (communs) ---------------- */
   .form-card { background: var(--bg-raised); color: var(--ink); border: 1px solid var(--line); border-radius: var(--r-xl); padding: 42px; box-shadow: var(--shadow-lg); transition: opacity 0.3s ease; }
@@ -739,7 +765,7 @@
     padding: 48px 24px 64px;
     animation: formFullscreenIn 0.35s ease;
   }
-  .form-card.form-fullscreen > * { width: 100%; max-width: 640px; flex: none; }
+  .form-card.form-fullscreen > * { width: 100%; max-width: 860px; flex: none; }
   @keyframes formFullscreenIn { from { opacity: 0; } to { opacity: 1; } }
   @media (max-width: 640px) { .form-card.form-fullscreen { padding: 32px 20px 48px; } }
   @media (prefers-reduced-motion: reduce) { .form-card.form-fullscreen { animation: none; } }
@@ -912,6 +938,13 @@
   .form-solo { max-width: 760px; margin: 0 auto; }
 
   footer { padding: 44px 0 40px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 26px; color: var(--ink-soft); font-size: 0.85rem; }
+  /* Le pied de page vit au niveau de la page, hors de <main> : ses 1120px se
+     centrent donc sur la fenêtre entière. Or l'onglet Accompagnement décale
+     son contenu de la largeur de sa barre latérale. On applique le même
+     décalage au pied de page pour qu'il s'aligne sur les blocs de contenu
+     et non sur la page. Au-dessous de 901px la barre passe en menu
+     déroulant : plus de décalage à compenser. */
+  @media (min-width: 901px) { body.has-acc-sidebar footer { margin-left: 240px; } }
   .footer-top { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; padding-top: 22px; border-top: 1px solid var(--line); }
   .footer-pillars { list-style: none; display: flex; gap: 22px; margin: 0; padding: 0; flex-wrap: wrap; justify-content: center; }
   .footer-pillars li { display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700; font-size: 0.74rem; color: var(--bleu-vif); }
@@ -967,7 +1000,7 @@
   .legal-doc .todo { background: color-mix(in srgb, var(--ambre) 18%, transparent); color: var(--ambre); padding: 1px 7px; border-radius: 5px; font-weight: 700; font-size: 0.92em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
 </style>
 </head>
-<body>
+<body class="has-acc-sidebar">
 
 <div id="page-loader" aria-hidden="true">
   <div class="page-loader-mark"><span class="dot"></span>DIMZ</div>
@@ -1177,7 +1210,7 @@
       <div class="acc-collapse-body">
         <div class="wrap">
           <p class="acc-collapse-intro">Ces quelques questions permettent à votre copilote de vous conduire jusqu'à votre projet idéal.</p>
-          <form id="form-accueil-teaser" novalidate style="max-width:480px; margin:0 auto; text-align:left;">
+          <form id="form-accueil-teaser" novalidate style="max-width:560px; margin:0 auto; text-align:left;">
             <div class="field">
               <label for="accueil-teaser-email">Email</label>
               <input type="email" id="accueil-teaser-email" required>
@@ -1309,7 +1342,7 @@
             <p class="offer-subtitle">Vous n'avez plus qu'à conduire</p>
             <p class="offer-texte">Faisons la route ensemble.</p>
             <div class="offer-price-zone">
-              <div class="offer-price"><span class="from-label">À partir de</span>599 €</div>
+              <div class="offer-price">599 €<span class="from-label">À partir de</span></div>
             </div>
             <ul>
               <li>Tout le contenu de l'offre Copilote (recherche + analyse)</li>
@@ -1337,22 +1370,25 @@
           <h3 id="offer-modal-title">Ce que vous recevez</h3>
           <p class="offer-modal-lede">Vous décrivez votre budget, votre usage et vos envies. Sous 24 à 48h, votre copilote revient avec un commentaire personnalisé sur 3 modèles à regarder en priorité.</p>
           <p class="offer-modal-example-title">Exemple de retour reçu</p>
-          <p class="offer-modal-comment">« J'ai bien étudié votre dossier, voici les trois modèles que vous devriez regarder. »</p>
+          <p class="offer-modal-comment">« J'ai bien étudié votre dossier, voici les trois modèles que vous devriez regarder, avec la fourchette de prix à viser sur le marché actuel. »</p>
           <div class="example-modeles">
             <div class="example-modele">
-              <p class="example-modele-name">Peugeot 308 SW 1.5 BlueHDi — 2019</p>
-              <p class="pc-line"><span class="pc-label good">Points forts</span>Entretien régulier et bien documenté, carrosserie saine, bon niveau d'équipement pour le prix.</p>
-              <p class="pc-line"><span class="pc-label bad">Points faibles</span>Kilométrage un peu élevé pour l'année, pneus arrière à surveiller.</p>
+              <p class="example-modele-name">Peugeot 308 SW 1.5 BlueHDi<span class="example-modele-tag occasion">Occasion</span></p>
+              <p class="example-modele-prix">14 500 € – 17 000 € (2019-2020, 90 000 à 130 000 km)</p>
+              <p class="pc-line"><span class="pc-label good">Point fort</span>Le meilleur compromis coffre / consommation de la catégorie : idéal pour vos trajets domicile-travail et les week-ends chargés.</p>
+              <p class="pc-line"><span class="pc-label bad">Point faible</span>Vérifiez systématiquement l'historique de la distribution et de l'embrayage sur ce moteur : c'est là que les factures arrivent.</p>
             </div>
             <div class="example-modele">
-              <p class="example-modele-name">Škoda Octavia III Combi — 2020</p>
-              <p class="pc-line"><span class="pc-label good">Points forts</span>Grand volume de coffre, boîte automatique fiable, un seul propriétaire.</p>
-              <p class="pc-line"><span class="pc-label bad">Points faibles</span>Prix un peu au-dessus du marché, à négocier.</p>
+              <p class="example-modele-name">Škoda Octavia III Combi<span class="example-modele-tag occasion">Occasion</span></p>
+              <p class="example-modele-prix">15 000 € – 18 500 € (2019-2020, 70 000 à 120 000 km)</p>
+              <p class="pc-line"><span class="pc-label good">Point fort</span>Volume de coffre au-dessus de tout le segment et mécanique éprouvée : elle encaisse très bien les gros kilométrages.</p>
+              <p class="pc-line"><span class="pc-label bad">Point faible</span>Attention aux versions à boîte DSG mal entretenues : demandez la preuve des vidanges de boîte.</p>
             </div>
             <div class="example-modele">
-              <p class="example-modele-name">Renault Mégane IV Estate — 2018</p>
-              <p class="pc-line"><span class="pc-label good">Points forts</span>Prix attractif, consommation raisonnable au quotidien.</p>
-              <p class="pc-line"><span class="pc-label bad">Points faibles</span>Kilométrage élevé pour l'âge, historique d'entretien incomplet — à négocier fermement si vous le retenez.</p>
+              <p class="example-modele-name">Dacia Jogger Hybrid 140<span class="example-modele-tag">Neuf</span></p>
+              <p class="example-modele-prix">24 000 € – 27 500 € (neuf, selon finition et remises)</p>
+              <p class="pc-line"><span class="pc-label good">Point fort</span>Le neuf reste dans votre budget ici : garantie constructeur, aucun historique à vérifier, et une consommation très basse en ville.</p>
+              <p class="pc-line"><span class="pc-label bad">Point faible</span>Finition et insonorisation en retrait. À essayer sur autoroute avant de vous décider, ça ne convient pas à tout le monde.</p>
             </div>
           </div>
         </template>
@@ -1361,16 +1397,24 @@
           <span class="offer-modal-eyebrow">Offre Copilote — Dès 99 €</span>
           <h3 id="offer-modal-title">Ce que vous recevez</h3>
           <p class="offer-modal-lede">Un appel pour approfondir votre projet, puis une recherche et une analyse détaillée de 5 à 7 véhicules, et à la fin un rapport écrit avec avis et recommandations.</p>
-          <p class="offer-modal-example-title">Extrait du rapport reçu</p>
-          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px;">
-            <div class="report-cat-card"><div class="report-cat-top"><span>Peugeot 308 SW 2019</span><strong>8,2/10</strong></div><div class="report-cat-bar"><span style="width:82%;"></span></div></div>
-            <div class="report-cat-card"><div class="report-cat-top"><span>Renault Mégane IV 2018</span><strong>5,6/10</strong></div><div class="report-cat-bar"><span style="width:56%;"></span></div></div>
+          <p class="offer-modal-example-title">Une des annonces analysées</p>
+          <div class="example-annonce">
+            <p class="example-modele-name">Peugeot 308 SW 1.5 BlueHDi 130 Allure<span class="example-modele-tag occasion">Occasion</span></p>
+            <div class="example-annonce-specs">
+              <span>Prix <strong>15 490 €</strong></span>
+              <span>Kilométrage <strong>96 400 km</strong></span>
+              <span>Année <strong>2019</strong></span>
+              <span>Lieu <strong>Villeurbanne (69)</strong></span>
+            </div>
+            <a class="example-annonce-lien" href="javascript:void(0)">Voir l'annonce d'origine<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg></a>
+            <p class="pc-line"><span class="pc-label good">Point positif</span>Carnet d'entretien complet chez Peugeot, distribution faite à 92 000 km facture à l'appui, deuxième main.</p>
+            <p class="pc-line"><span class="pc-label bad">À regarder</span>Pneus arrière à 3 mm et plaquettes en fin de vie : environ 450 € à prévoir, à faire valoir dans la négociation.</p>
           </div>
+          <div class="report-cat-card" style="margin:12px 0 14px;"><div class="report-cat-top"><span>Score DIMZ</span><strong>8,2/10</strong></div><div class="report-cat-bar"><span style="width:82%;"></span></div></div>
           <div class="reco-row" style="margin-bottom:14px;">
-            <span class="reco-pill vert active">🟢 308 SW recommandée</span>
-            <span class="reco-pill rouge active">🔴 Mégane à éviter</span>
+            <span class="reco-pill vert active">🟢 Recommandée</span>
           </div>
-          <p class="offer-modal-footnote">« La 308 a un historique clair et un prix cohérent avec le marché. La Mégane affiche 30 000 km de plus que la moyenne pour son âge : je m'en méfierais. »</p>
+          <p class="offer-modal-footnote">« Prix cohérent avec le marché pour ce kilométrage, historique clair et sans zone d'ombre. Avec les 450 € de pneus et plaquettes en argument, viser 15 000 € me semble jouable. C'est celle que je regarderais en premier. »</p>
         </template>
 
         <template id="offer-example-copilote_plus">
@@ -1384,12 +1428,60 @@
           </div>
           <p class="offer-modal-example-title">Voir les exemples</p>
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button type="button" class="btn btn-outline" data-goto-subtab="rapport">Exemple de rapport d'inspection</button>
-            <button type="button" class="btn btn-outline" data-goto-tab="convoyage">Exemple d'état des lieux</button>
+            <button type="button" class="btn btn-outline" data-offer-sub="rapport">Exemple de rapport d'inspection</button>
+            <button type="button" class="btn btn-outline" data-offer-sub="edl">Exemple d'état des lieux</button>
           </div>
         </template>
 
-        <p class="offer-note" data-reveal>Si vous avez déjà réglé une offre Copilote à <strong>99 €</strong> ou <strong>149 €</strong>, cette somme est intégralement déduite du prix de l'offre Copilote Plus. Sur devis, dans l'offre Copilote Plus : 2<sup>e</sup> inspection, livraison hors zone.</p>
+        <!-- Sous-vues de la modale Copilote Plus : elles remplacent le contenu
+             de la modale au lieu d'envoyer le visiteur sur une autre page. -->
+        <template id="offer-example-rapport">
+          <button type="button" class="btn btn-outline btn-sm-back" data-offer-sub="copilote_plus">← Retour à l'offre</button>
+          <span class="offer-modal-eyebrow">Copilote Plus — Livrable 1</span>
+          <h3 id="offer-modal-title">Le Rapport DIMZ</h3>
+          <p class="offer-modal-lede">Après l'inspection physique du véhicule, votre copilote vous remet un document unique : ce qui va, ce qui doit vous alerter, et si le prix demandé colle à la réalité du véhicule.</p>
+          <p class="offer-modal-example-title">Score par étape du contrôle</p>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+            <div class="report-cat-card"><div class="report-cat-top"><span>Contrôle administratif</span><strong>9/10</strong></div><div class="report-cat-bar"><span style="width:90%;"></span></div></div>
+            <div class="report-cat-card"><div class="report-cat-top"><span>Inspection extérieure</span><strong>7/10</strong></div><div class="report-cat-bar"><span style="width:70%;"></span></div></div>
+            <div class="report-cat-card"><div class="report-cat-top"><span>Contrôle mécanique</span><strong>8/10</strong></div><div class="report-cat-bar"><span style="width:80%;"></span></div></div>
+            <div class="report-cat-card"><div class="report-cat-top"><span>Essai routier</span><strong>8/10</strong></div><div class="report-cat-bar"><span style="width:80%;"></span></div></div>
+          </div>
+          <div class="report-verdict">
+            <div class="reco-row">
+              <span class="reco-pill ambre active">🟠 Envisageable</span>
+            </div>
+            <p><strong>Recommandation finale :</strong> véhicule envisageable, sous réserve d'une négociation sur le prix et de la prise en compte des plaquettes arrière dans les prochains mois. Aucun point bloquant identifié.</p>
+          </div>
+          <p class="offer-modal-footnote">Exemple fictif. Chaque rapport réel est établi sur site par un expert Dimz, avec les photos du véhicule inspecté.</p>
+        </template>
+
+        <template id="offer-example-edl">
+          <button type="button" class="btn btn-outline btn-sm-back" data-offer-sub="copilote_plus">← Retour à l'offre</button>
+          <span class="offer-modal-eyebrow">Copilote Plus — Livrable 2</span>
+          <h3 id="offer-modal-title">L'état des lieux contradictoire</h3>
+          <p class="offer-modal-lede">Établi à l'identique au départ et à l'arrivée de la livraison, pour comparaison directe : aucun désaccord ne reste sans preuve.</p>
+          <div class="example-annonce" style="margin-bottom:16px;">
+            <p class="example-modele-name">État des lieux — Départ</p>
+            <div class="example-annonce-specs">
+              <span>Référence <strong>CVG-2026-0341</strong></span>
+              <span>Date <strong>14/03/2026</strong></span>
+              <span>Kilométrage <strong>78 400 km</strong></span>
+              <span>Carburant <strong>82 %</strong></span>
+            </div>
+            <p class="pc-line"><span class="pc-label good">Photos</span>14 photos obligatoires : avant, arrière, chaque flanc, compteur allumé, sièges, coffre, pare-brise, permis du convoyeur.</p>
+            <p class="pc-line"><span class="pc-label bad">Réserves</span>Rayure superficielle sur le bouclier arrière, photographiée et notée au départ.</p>
+          </div>
+          <div class="tag-row" style="margin-bottom:16px;">
+            <span class="tag">Signature électronique du client</span>
+            <span class="tag">Identique au départ et à l'arrivée</span>
+          </div>
+          <p class="offer-modal-comment">« Je reconnais l'exactitude de cet état des lieux, établi contradictoirement au moment de la prise en charge du véhicule. »</p>
+          <p class="offer-modal-footnote">Exemple fictif. Chaque état des lieux réel comprend 14 photos obligatoires, un relevé kilométrage/carburant et une signature électronique.</p>
+        </template>
+
+        <p class="offer-note" data-reveal>Si vous avez déjà réglé une offre Copilote à <strong>99 €</strong> ou <strong>149 €</strong>, cette somme est intégralement déduite du prix de l'offre Copilote Plus.</p>
+        <p class="offer-note offer-note-devis" data-reveal>Sur devis, dans l'offre Copilote Plus : 2<sup>e</sup> inspection, livraison hors zone.</p>
         <p class="offer-footnote" data-reveal><sup>*</sup> Zone DIMZ, la zone de livraison incluse dans l'offre Copilote Plus : Rhône (69), Haute-Savoie (74, hors Porte du Soleil), Savoie (73, hors 3 Vallées), Isère (38, hors 2 Alpes), Drôme (26), Ardèche (07), Ain (01, hors Pays de Gex), agglomérations de Mâcon et de Clermont-Ferrand.</p>
 
         <div class="grid-2" style="margin-top:32px;" data-reveal>
@@ -1469,6 +1561,8 @@
           <h2>Tout ce qu'on nous demande le plus souvent.</h2>
         </div>
         <div class="faq-list" data-reveal>
+
+          <h3 class="faq-cat">Comprendre DIMZ</h3>
           <details class="faq-item">
             <summary>À qui s'adresse votre copilote ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
             <div class="faq-answer">
@@ -1489,57 +1583,7 @@
             <div class="faq-answer">
               <p>Non, votre copilote n'est pas un vendeur automobile.</p>
               <p>Nous sommes un accompagnateur indépendant qui vous aide à trouver, analyser et sécuriser votre projet d'achat. La décision finale d'achat reste toujours entre vous et le vendeur.</p>
-            </div>
-          </details>
-          <details class="faq-item">
-            <summary>Est-ce que vous pouvez rechercher un véhicule à ma place ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
-            <div class="faq-answer">
-              <p>Oui.</p>
-              <p>Une fois vos critères définis (budget, modèle recherché, utilisation, contraintes), votre copilote se met en recherche des véhicules qui correspondent vraiment à votre projet.</p>
-            </div>
-          </details>
-          <details class="faq-item">
-            <summary>Est-ce que vous travaillez uniquement avec des professionnels ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
-            <div class="faq-answer">
-              <p>Non.</p>
-              <p>Votre copilote peut vous accompagner face à des vendeurs professionnels comme à des particuliers, selon vos besoins et votre situation.</p>
-            </div>
-          </details>
-          <details class="faq-item">
-            <summary>Est-ce que vous pouvez vérifier un véhicule avant l'achat ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
-            <div class="faq-answer">
-              <p>Oui, selon la prestation choisie.</p>
-              <p>Votre copilote analyse les informations disponibles, échange avec le vendeur et vérifie les éléments importants avant votre décision.</p>
-              <p>Des prestations d'inspection plus poussées peuvent également être proposées.</p>
-            </div>
-          </details>
-          <details class="faq-item">
-            <summary>Est-ce que vous négociez le prix du véhicule ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
-            <div class="faq-answer">
-              <p>Selon la prestation choisie, votre copilote vous conseille dans votre approche et vous accompagne dans les échanges avec le vendeur.</p>
-              <p>L'objectif : un achat cohérent, au juste prix, et en toute sérénité.</p>
-            </div>
-          </details>
-          <details class="faq-item">
-            <summary>Est-ce que vous transportez les véhicules ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
-            <div class="faq-answer">
-              <p>Oui.</p>
-              <p>Grâce au service de convoyage, votre copilote organise et réalise le déplacement de votre véhicule, de son lieu de départ jusqu'à son lieu d'arrivée.</p>
-            </div>
-          </details>
-          <details class="faq-item">
-            <summary>Combien coûte un accompagnement avec votre copilote ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
-            <div class="faq-answer">
-              <p>Le tarif dépend du niveau d'accompagnement souhaité et de la complexité de votre projet.</p>
-              <p>Certaines prestations démarrent à 99 € pour un accompagnement conseil, tandis que les accompagnements complets sont établis selon vos besoins.</p>
-              <p>Un devis personnalisé vous est proposé avant toute prestation.</p>
-            </div>
-          </details>
-          <details class="faq-item">
-            <summary>Où intervient votre copilote ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
-            <div class="faq-answer">
-              <p>Votre copilote vous accompagne partout en France, selon la nature de votre projet.</p>
-              <p>Les modalités d'intervention sont définies au cas par cas, pour vous garantir un service adapté.</p>
+              <p><strong>Nous ne touchons aucune commission sur la vente</strong> : notre rémunération vient uniquement de vous, c'est ce qui garantit notre indépendance.</p>
             </div>
           </details>
           <details class="faq-item">
@@ -1550,21 +1594,179 @@
             </div>
           </details>
           <details class="faq-item">
-            <summary>Comment commencer mon projet avec mon copilote ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
-            <div class="faq-answer">
-              <p>C'est simple.</p>
-              <p>Remplissez le formulaire de contact en indiquant votre projet automobile. Nous reviendrons rapidement vers vous pour échanger sur vos besoins et définir l'accompagnement le plus adapté.</p>
-              <p><strong>Votre copilote est là pour vous, du premier échange jusqu'à la remise des clés.</strong></p>
-            </div>
-          </details>
-          <details class="faq-item">
             <summary>Pourquoi payer un accompagnement alors que les annonces sont accessibles gratuitement en ligne ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
             <div class="faq-answer">
               <p>Les annonces sont accessibles à tous, mais trouver le bon véhicule demande bien plus que de simplement les consulter.</p>
               <p>Un achat automobile soulève beaucoup de questions : le véhicule correspond-il vraiment à vos besoins ? Le prix est-il cohérent avec le marché ? L'annonce est-elle fiable ? Que faut-il vérifier avant de s'engager ?</p>
               <p>Votre copilote vous apporte un regard extérieur, une expertise et un accompagnement personnalisé, pour vous faire gagner du temps, limiter les risques et décider plus sereinement.</p>
               <p>L'objectif n'est pas seulement de trouver une voiture, mais de trouver la bonne voiture, au bon moment et dans les meilleures conditions.</p>
-              <p>Votre temps, votre argent et votre tranquillité d'esprit méritent un accompagnement professionnel.</p>
+            </div>
+          </details>
+
+          <h3 class="faq-cat">Les offres et les tarifs</h3>
+          <details class="faq-item">
+            <summary>Quelles sont les offres et que contient chacune ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p><strong>Découverte (gratuit)</strong> — un formulaire à remplir, au moins 3 véhicules proposés, 3 conseils personnalisés et une première prise de contact sans engagement.</p>
+              <p><strong>Copilote (dès 99 €)</strong> — un appel de 30 minutes, la recherche et la présélection de 5 à 7 véhicules, l'analyse détaillée de chaque annonce et un rapport écrit avec avis et recommandations.</p>
+              <p><strong>Copilote Plus (à partir de 599 €)</strong> — tout Copilote, plus la mise en relation avec le vendeur, une inspection physique avec rapport, la livraison incluse en Zone DIMZ, la mise en main du véhicule et l'accompagnement aux démarches administratives.</p>
+              <p><strong>Inspection seule</strong> et <strong>Convoyage seul</strong> — proposés sur devis, si vous avez déjà trouvé votre véhicule ou si vous avez seulement besoin de le faire déplacer.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Combien coûte un accompagnement avec votre copilote ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Le tarif dépend du niveau d'accompagnement souhaité et de la complexité de votre projet.</p>
+              <p>L'offre Copilote démarre à 99 € pour une recherche courante, et passe à 149 € pour une recherche complexe (véhicule rare, de collection, ou demandant plus de temps). L'offre Copilote Plus démarre à 599 €.</p>
+              <p>Un devis personnalisé vous est proposé avant toute prestation sur devis.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Si je prends Copilote puis Copilote Plus, est-ce que je paie deux fois ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Non.</p>
+              <p>Si vous avez déjà réglé une offre Copilote à 99 € ou 149 €, <strong>cette somme est intégralement déduite</strong> du prix de l'offre Copilote Plus si vous décidez d'aller plus loin ensuite. Vous pouvez donc commencer petit et monter en gamme sans rien perdre.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Qu'est-ce que la Zone DIMZ ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>C'est la zone géographique dans laquelle la livraison est <strong>incluse</strong> dans l'offre Copilote Plus, sans supplément.</p>
+              <p>Elle couvre le Rhône (69), la Haute-Savoie (74, hors Porte du Soleil), la Savoie (73, hors 3 Vallées), l'Isère (38, hors 2 Alpes), la Drôme (26), l'Ardèche (07), l'Ain (01, hors Pays de Gex), ainsi que les agglomérations de Mâcon et de Clermont-Ferrand.</p>
+              <p>En dehors de cette zone, la livraison reste possible : elle fait simplement l'objet d'un devis complémentaire.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Qu'est-ce qui est proposé sur devis ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>L'inspection seule et le convoyage seul sont toujours établis sur devis : le tarif dépend de la localisation et de la complexité de la demande.</p>
+              <p>Dans l'offre Copilote Plus, deux prestations font l'objet d'un devis complémentaire : une <strong>deuxième inspection</strong> (si le premier véhicule ne se concrétise pas) et une <strong>livraison hors Zone DIMZ</strong>.</p>
+            </div>
+          </details>
+
+          <h3 class="faq-cat">Le déroulement d'un accompagnement</h3>
+          <details class="faq-item">
+            <summary>Comment commencer mon projet avec mon copilote ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>C'est simple, et ça commence par votre email.</p>
+              <p>Remplissez le formulaire en décrivant votre projet automobile : votre situation, votre quotidien, votre budget et le type de véhicule que vous cherchez. Nous revenons rapidement vers vous pour échanger sur vos besoins et définir l'accompagnement le plus adapté.</p>
+              <p><strong>Votre copilote est là pour vous, du premier échange jusqu'à la remise des clés.</strong></p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Comment se déroule un accompagnement, étape par étape ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Votre demande est d'abord reçue et étudiée par votre copilote, qui prend connaissance de votre dossier.</p>
+              <p>Vient ensuite l'exploration de votre projet (vos critères, vos contraintes), puis la recherche d'annonces qualifiées et la rédaction de votre rapport.</p>
+              <p>Avec l'offre Copilote Plus, le parcours continue : mise en relation avec le vendeur, inspection du véhicule, accompagnement à l'achat, démarches administratives, puis livraison.</p>
+              <p>À chaque étape, vous voyez où en est votre dossier depuis votre page de suivi.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Est-ce que vous pouvez rechercher un véhicule à ma place ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Oui.</p>
+              <p>Une fois vos critères définis (budget, modèle recherché, utilisation, contraintes), votre copilote se met en recherche des véhicules qui correspondent vraiment à votre projet.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Est-ce que vous négociez le prix du véhicule ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Selon la prestation choisie, votre copilote vous conseille dans votre approche et vous accompagne dans les échanges avec le vendeur.</p>
+              <p>L'objectif : un achat cohérent, au juste prix, et en toute sérénité.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Est-ce que vous travaillez uniquement avec des professionnels ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Non.</p>
+              <p>Votre copilote peut vous accompagner face à des vendeurs professionnels comme à des particuliers, selon vos besoins et votre situation.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Où intervient votre copilote ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Votre copilote vous accompagne partout en France, selon la nature de votre projet.</p>
+              <p>La recherche et l'analyse se font à distance, sans limite géographique. Pour les déplacements physiques (inspection, livraison), les modalités sont définies au cas par cas — la livraison est incluse en Zone DIMZ, et sur devis au-delà.</p>
+            </div>
+          </details>
+
+          <h3 class="faq-cat">Inspection et convoyage</h3>
+          <details class="faq-item">
+            <summary>Est-ce que vous pouvez vérifier un véhicule avant l'achat ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Oui, selon la prestation choisie.</p>
+              <p>Votre copilote analyse les informations disponibles, échange avec le vendeur et vérifie les éléments importants avant votre décision.</p>
+              <p>Pour aller plus loin, une inspection physique sur place est incluse dans l'offre Copilote Plus, et disponible sur devis si vous avez déjà trouvé votre véhicule.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Que contient le Rapport DIMZ remis après une inspection ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Un document unique, écrit en français clair, qui vous dit ce qui va, ce qui doit vous alerter, et si le prix demandé colle à la réalité du véhicule.</p>
+              <p>Il comprend un score détaillé par étape du contrôle (administratif, extérieur, intérieur, mécanique, essai routier, analyse du marché), les photos prises sur place, et une recommandation finale claire : recommandé, envisageable ou déconseillé.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Est-ce que vous transportez les véhicules ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Oui.</p>
+              <p>Grâce au service de convoyage, votre copilote organise et réalise le déplacement de votre véhicule, de son lieu de départ jusqu'à son lieu d'arrivée.</p>
+              <p>Le convoyage est inclus en Zone DIMZ dans l'offre Copilote Plus, et disponible seul sur devis pour tout autre besoin (achat à distance, déménagement, manque de temps).</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Qu'est-ce que l'état des lieux contradictoire ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>C'est le document qui protège votre véhicule pendant le convoyage.</p>
+              <p>Il est établi <strong>deux fois à l'identique</strong> : au départ, au moment de la prise en charge, et à l'arrivée. Chacun comprend 14 photos obligatoires, un relevé du kilométrage et du carburant, et une signature électronique.</p>
+              <p>Les deux documents étant comparables directement, aucun désaccord sur l'état du véhicule ne peut rester sans preuve.</p>
+            </div>
+          </details>
+
+          <h3 class="faq-cat">Suivi, paiement et données</h3>
+          <details class="faq-item">
+            <summary>Comment suivre l'avancement de mon dossier ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Chaque dossier dispose d'une page de suivi personnelle, accessible par un lien privé.</p>
+              <p>Vous y voyez à tout moment l'étape en cours de votre projet, les documents que votre copilote vous a transmis, et vous pouvez lui écrire directement.</p>
+              <p>Si vous avez perdu votre lien, la page <strong>« Suivre mon projet »</strong> vous le renvoie par email.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Comment échanger avec mon copilote pendant le dossier ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Une messagerie est intégrée à votre page de suivi : vous écrivez à votre copilote, il vous répond, et tout l'historique de vos échanges reste au même endroit.</p>
+              <p>Vous êtes prévenu par email dès qu'un nouveau message vous attend, sans avoir à surveiller la page.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Comment se passe le paiement ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Rien n'est prélevé automatiquement, et rien n'est dû avant que votre copilote ait validé la prestation avec vous.</p>
+              <p>Votre facture vous est envoyée par email avec un <strong>lien de paiement en ligne sécurisé</strong> : vous réglez par carte bancaire quand vous le souhaitez. Vos coordonnées bancaires ne transitent jamais par DIMZ.</p>
+              <p>L'offre Découverte est entièrement gratuite et sans engagement : aucun moyen de paiement ne vous est demandé.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Est-ce que je peux laisser un avis ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Oui, et c'est très utile. La page <strong>Avis clients</strong> vous permet de partager votre expérience une fois votre projet terminé.</p>
+              <p>Chaque avis est vérifié avant publication. Nous ne publions aucun avis fictif : tant qu'il n'y en a pas de réels, la page reste vide.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Proposez-vous l'import de véhicules depuis l'étranger ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Pas encore : le service d'import est en préparation.</p>
+              <p>Il couvrira à terme la Suisse, l'Allemagne, l'Espagne, l'Italie, la Belgique et le Luxembourg. La page <strong>Import</strong> détaille où nous en sommes.</p>
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary>Que deviennent mes données personnelles ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">
+              <p>Les informations que vous transmettez servent uniquement à traiter votre demande et à vous recontacter dans le cadre de votre projet automobile. Elles ne sont ni vendues, ni cédées à des tiers à des fins commerciales.</p>
+              <p>Vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Le détail figure dans notre <strong>politique de confidentialité (RGPD)</strong>, accessible en bas de chaque page.</p>
             </div>
           </details>
         </div>
@@ -3542,6 +3744,10 @@
     document.getElementById('tab-accompagnement-form').hidden = tab !== 'accompagnement-form';
     document.getElementById('tab-convoyage-form').hidden = tab !== 'convoyage-form';
     document.getElementById('tab-test').hidden = tab !== 'test';
+    // Seul l'onglet Accompagnement a une barre latérale : le pied de page,
+    // qui vit hors de <main>, doit être décalé d'autant pour s'aligner sur
+    // les blocs de contenu plutôt que sur la page entière (cf. CSS).
+    document.body.classList.toggle('has-acc-sidebar', tab === 'accompagnement');
     if (tab === 'accompagnement' && resetSubtab) showSubTab('accueil');
     observeNewReveals();
     updateHash();
@@ -3556,6 +3762,7 @@
     document.getElementById('tab-convoyage').hidden = true;
     document.getElementById('tab-test').hidden = true;
     document.querySelectorAll('.legal-page').forEach(function (p) { p.hidden = p.id !== 'page-legal-' + name; });
+    document.body.classList.remove('has-acc-sidebar');
     window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
     observeNewReveals();
   }
@@ -3625,6 +3832,15 @@
       if (e.key === 'Escape' && !overlay.hidden) closeOfferModal();
     });
     body.addEventListener('click', function (e) {
+      // Navigation interne à la modale (Copilote Plus -> rapport / état des
+      // lieux, et retour). On reste dans la même bulle : openOfferModal
+      // remplace intégralement le contenu, l'overlay ne se ferme pas.
+      // À traiter avant les data-goto-*, qui eux ferment la modale.
+      var subTarget = e.target.closest('[data-offer-sub]');
+      if (subTarget) {
+        openOfferModal(subTarget.dataset.offerSub);
+        return;
+      }
       // Les boutons de la modale viennent d'un <template> cloné après coup :
       // ils n'existaient pas dans le DOM au moment où les écouteurs génériques
       // [data-goto-subtab]/[data-goto-tab] ont été posés (querySelectorAll +
@@ -3880,6 +4096,13 @@
       if (targetEmail) targetEmail.value = email;
       if (targetConsentement) targetConsentement.checked = consentement;
       showMainTab('accompagnement-form', true);
+      // L'étape 1 (email + consentement) vient d'être remplie ici : on
+      // enchaîne directement sur l'étape 2 plutôt que de la redemander.
+      // fromRecap = false, sinon le bouton « Retour au récapitulatif »
+      // s'afficherait alors qu'aucun récapitulatif n'existe encore.
+      if (typeof wizards !== 'undefined' && wizards && wizards['form-accompagnement']) {
+        wizards['form-accompagnement'].goTo(1, false);
+      }
       window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
     });
   })();
@@ -4233,7 +4456,11 @@
     render();
     return {
       reset: function () { current = 0; cameFromRecap = false; applyVisibility(); },
-      goTo: function (i) { cameFromRecap = true; goToStep(i); }
+      // fromRecap = false pour un saut d'étape qui ne vient PAS du
+      // récapitulatif (ex. le teaser de l'accueil) : sans ça, le bouton
+      // « Retour au récapitulatif » apparaîtrait alors qu'il n'y a pas
+      // encore de récapitulatif à retrouver.
+      goTo: function (i, fromRecap) { cameFromRecap = fromRecap !== false; goToStep(i); }
     };
   }
 
