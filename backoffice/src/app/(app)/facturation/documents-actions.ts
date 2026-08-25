@@ -217,6 +217,12 @@ export async function envoyerDocumentCommercial(id: string) {
       // simplement remplacée.
       let paiementUrl: string | null = null;
       if (doc.type === "facture" && doc.statut !== "paye") {
+        console.log("Création session Stripe pour facture:", {
+          documentId: doc.id,
+          montant: doc.montant_ttc,
+          objet: doc.objet,
+          email,
+        });
         const checkout = await createCheckoutSession({
           montantTTC: doc.montant_ttc,
           description: doc.objet || `Facture DIMZ ${doc.numero}`,
@@ -225,6 +231,7 @@ export async function envoyerDocumentCommercial(id: string) {
           cancelUrl: portalUrl ? `${portalUrl}?paiement=annule` : `${getAppUrl()}?paiement=annule`,
           metadata: { document_commercial_id: doc.id },
         });
+        console.log("Résultat createCheckoutSession:", { ok: checkout.ok, error: checkout.ok ? null : checkout.error });
         if (checkout.ok) {
           paiementUrl = checkout.session.url;
           await db
@@ -234,6 +241,8 @@ export async function envoyerDocumentCommercial(id: string) {
         } else {
           console.error("Lien de paiement Stripe non créé:", checkout.error);
         }
+      } else {
+        console.log("Checkout non créé: type=", doc.type, "statut=", doc.statut);
       }
 
       const { subject, html } = documentCommercialEmail({
