@@ -14,6 +14,12 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
+// "%" et "_" sont des jokers pour ILIKE : un email saisi avec l'un de ces
+// caractères élargirait la recherche à d'autres clients.
+function escapeLikePattern(value: string): string {
+  return value.replace(/[\\%_]/g, "\\$&");
+}
+
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -119,30 +125,43 @@ Deno.serve(async (req: Request) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
 
-  const { data: client } = await db
+  // clients.email n'est pas unique en base : un même email peut porter
+  // plusieurs fiches (doublons de saisie, demandes successives). On les
+  // récupère toutes — un maybeSingle() échouerait sur un doublon et ferait
+  // répondre "aucun dossier" à un client qui en a pourtant.
+  const { data: clients, error: clientsError } = await db
     .from("clients")
     .select("id, nom, prenom")
-    .ilike("email", email)
-    .maybeSingle();
+    .ilike("email", escapeLikePattern(email));
 
-  if (!client) {
+  if (clientsError) {
+    console.error("Recherche client échouée:", clientsError.message);
+    return jsonResponse({ status: "error" }, 500);
+  }
+  if (!clients || clients.length === 0) {
     return jsonResponse({ status: "not_found" });
   }
 
-  const { data: dossiers } = await db
+  const { data: dossiers, error: dossiersError } = await db
     .from("dossiers")
     .select("reference, portal_token")
-    .eq("client_id", client.id)
+    .in("client_id", clients.map((c: { id: string }) => c.id))
     .order("created_at", { ascending: false });
 
+  if (dossiersError) {
+    console.error("Recherche dossiers échouée:", dossiersError.message);
+    return jsonResponse({ status: "error" }, 500);
+  }
   if (!dossiers || dossiers.length === 0) {
     return jsonResponse({ status: "not_found" });
   }
 
+  const prenom = clients.find((c: { prenom: string | null }) => c.prenom)?.prenom ?? null;
+
   const appUrl = (Deno.env.get("APP_URL") || "http://localhost:3000").replace(/\/$/, "");
   const sendResult = await sendTrackingEmail({
     to: email,
-    prenom: client.prenom,
+    prenom,
     dossiers: dossiers.map((d: { reference: string; portal_token: string }) => ({
       reference: d.reference,
       portalUrl: `${appUrl}/suivi/${d.portal_token}`,

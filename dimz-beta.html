@@ -635,6 +635,18 @@
   .offers-closing-quote { font-size: 1.05rem; color: var(--ink-soft); margin: 0 0 26px; line-height: 1.6; }
   .offers-closing-cta { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
 
+  /* ---------------- Retour en haut de page ---------------- */
+  .to-top-row { display: flex; justify-content: center; padding: 56px 0 8px; }
+  .to-top {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: transparent; border: 1px solid var(--line); border-radius: 100px;
+    color: var(--ink-soft); font: inherit; font-size: 0.84rem; font-weight: 700;
+    padding: 9px 18px; cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  }
+  .to-top:hover { color: var(--ink); border-color: var(--ink-soft); background: var(--bg-tint); }
+  .to-top svg { width: 15px; height: 15px; }
+
   /* ---------------- Inspection : 6 étapes ---------------- */
   .control-steps { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
   @media (max-width: 760px) { .control-steps { grid-template-columns: 1fr; } }
@@ -1251,6 +1263,13 @@
         </div>
       </div>
     </details>
+
+    <div class="wrap to-top-row">
+      <button type="button" class="to-top" data-to-top>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+        Retour en haut
+      </button>
+    </div>
 
   </div>
   <!-- ---------- Page : À propos ---------- -->
@@ -2130,6 +2149,13 @@
             </div>
           </div>
         </div>
+
+        <div class="to-top-row" style="padding:26px 0 0;">
+          <button type="button" class="to-top" data-goto-tab="accompagnement">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+            Retour à l'accueil
+          </button>
+        </div>
       </div>
     </section>
   </div>
@@ -2293,6 +2319,13 @@
       </div>
       </div>
     </details>
+  </div>
+
+  <div class="wrap to-top-row">
+    <button type="button" class="to-top" data-to-top>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+      Retour en haut
+    </button>
   </div>
 
 </div>
@@ -3806,6 +3839,12 @@
     btn.addEventListener('click', function () { showMainTab(btn.dataset.tab, true); });
   });
 
+  document.querySelectorAll('[data-to-top]').forEach(function (el) {
+    el.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    });
+  });
+
   document.querySelectorAll('[data-goto-tab]').forEach(function (el) {
     el.addEventListener('click', function () {
       var offerModalOverlay = document.getElementById('offer-modal-overlay');
@@ -5188,7 +5227,7 @@
         body: JSON.stringify({ email: email })
       }).then(function (r) { return r.json(); }).then(function (json) {
         var status = json && json.status;
-        showResult(status === 'ok' || status === 'not_found' || status === 'email_error' ? status : 'not_found');
+        showResult(status === 'ok' || status === 'not_found' || status === 'email_error' ? status : 'error');
       }).catch(function () {
         showResult('error');
       }).finally(function () {
