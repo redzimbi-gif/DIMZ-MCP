@@ -1,0 +1,53 @@
+# Déploie les Edge Functions Supabase sans passer par la CLI en local —
+# utile depuis un téléphone : onglet Actions du dépôt → « Run workflow ».
+# Se déclenche aussi automatiquement quand une fonction change sur la branche.
+#
+# Prérequis, une seule fois : ajouter le secret SUPABASE_ACCESS_TOKEN dans
+# Settings → Secrets and variables → Actions (jeton créé depuis Supabase →
+# Account settings → Access tokens).
+#
+# Les quatre fonctions sont appelées par des visiteurs anonymes du site
+# vitrine, d'où --no-verify-jwt : elles valident elles-mêmes leurs entrées.
+name: Déployer les Edge Functions Supabase
+
+on:
+  workflow_dispatch:
+    inputs:
+      fonction:
+        description: "Fonction à déployer (toutes par défaut)"
+        required: false
+        default: toutes
+        type: choice
+        options: [toutes, track-lookup, lead-intake, test-feedback, avis]
+  push:
+    branches: [claude/artifact-standalone-webpage-bvi82b]
+    paths: ["backoffice/supabase/functions/**"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PROJECT_REF: tlkstfmheprsmbxlmrgr
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Déployer
+        working-directory: backoffice
+        run: |
+          set -euo pipefail
+          choix="${{ github.event.inputs.fonction || 'toutes' }}"
+          if [ "$choix" = "toutes" ]; then
+            fonctions="track-lookup lead-intake test-feedback avis"
+          else
+            fonctions="$choix"
+          fi
+          for f in $fonctions; do
+            echo "::group::$f"
+            supabase functions deploy "$f" --project-ref "$PROJECT_REF" --no-verify-jwt
+            echo "::endgroup::"
+          done
