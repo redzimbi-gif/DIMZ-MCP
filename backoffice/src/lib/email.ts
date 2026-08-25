@@ -2,9 +2,16 @@ import "server-only";
 
 const RESEND_API_URL = "https://api.resend.com/emails";
 
+// Domaine stable du back-office en production. En dur ici plutôt qu'en
+// variable d'environnement : VERCEL_URL change à chaque déploiement, et des
+// liens envoyés par email (suivi client, retour de paiement Stripe) doivent
+// rester valides après le déploiement suivant.
+const PRODUCTION_APP_URL = "https://back.dimz-copilote.com";
+
 /** Base URL publique du back-office, pour construire des liens absolus dans les emails. */
 export function getAppUrl(): string {
   if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
+  if (process.env.VERCEL_ENV === "production") return PRODUCTION_APP_URL;
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
   return "http://localhost:3000";
 }
