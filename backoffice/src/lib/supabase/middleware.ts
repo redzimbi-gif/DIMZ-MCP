@@ -2,7 +2,11 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 const PUBLIC_PATHS = ["/login"];
-const PUBLIC_PREFIXES = ["/suivi/", "/api/public/"];
+// /api/stripe/ est appelé par Stripe, jamais par un navigateur : sans cookie
+// de session, le middleware le redirigerait vers /login (307) et le webhook
+// ne serait jamais exécuté. Ces routes s'authentifient elles-mêmes par la
+// signature HMAC de l'en-tête Stripe-Signature (cf. src/lib/stripe.ts).
+const PUBLIC_PREFIXES = ["/suivi/", "/api/public/", "/api/stripe/"];
 
 function isPublicPath(pathname: string) {
   if (PUBLIC_PATHS.includes(pathname)) return true;
