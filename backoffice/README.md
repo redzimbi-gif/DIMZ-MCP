@@ -319,11 +319,14 @@ l'email de confirmation si le client a renseigné son adresse.
   chacune avec un schéma à plat de la voiture (vue de dessus) à annoter
   au stylo à l'impression, et une zone « Autres photos » où on peut
   ajouter (et retirer) des photos, en plus de la liste standard.
-- Facturation (V1 manuelle) : journal des factures déjà émises par DIMZ —
-  client, numéro, date, montant total, montant des frais, notes, PDF de la
-  facture en pièce jointe. Pour un client professionnel, sa raison sociale et
-  son SIRET s'affichent automatiquement sur ses factures. Pas encore de
-  génération/envoi de facture ni de paiement en ligne (voir plus bas).
+- Facturation : deux blocs distincts. « Devis & factures générés » crée un
+  document, produit son PDF et l'envoie au client par email ; une facture part
+  avec son lien de paiement Stripe, et repasse automatiquement en « Payée » dès
+  que Stripe confirme le règlement (section 4). « Anciennes factures (import
+  manuel) » reste le journal des factures émises hors back-office — client,
+  numéro, date, montant total, montant des frais, notes, PDF en pièce jointe.
+  Pour un client professionnel, sa raison sociale et son SIRET s'affichent
+  automatiquement sur ses factures.
 
 ## Ce qui n'est volontairement pas dans cette V1
 
