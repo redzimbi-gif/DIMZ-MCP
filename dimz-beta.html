@@ -538,6 +538,22 @@
   .offer-note-devis { margin-top: 8px; }
   .offer-footnote { margin-top: 10px; text-align: center; color: color-mix(in srgb, var(--ink-soft) 82%, transparent); font-size: 0.76rem; line-height: 1.5; max-width: 68ch; margin-left: auto; margin-right: auto; }
 
+  /* ---------------- Copilote -> Copilote Plus : déduction permanente ---------------- */
+  .upgrade-flow { margin: 30px auto 0; max-width: 860px; background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--r-xl); padding: 34px 30px; box-shadow: var(--shadow); text-align: center; }
+  .upgrade-flow-kicker { margin: 0 0 8px; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--bleu-vif); }
+  .upgrade-flow-title { margin: 0 0 28px; font-family: "Instrument Sans", var(--sans); font-size: clamp(1.15rem, 1.02rem + 0.6vw, 1.4rem); font-weight: 600; letter-spacing: -0.01em; }
+  .upgrade-flow-steps { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+  .upgrade-step { display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 118px; }
+  .upgrade-step-label { font-size: 0.72rem; color: var(--ink-soft); font-weight: 600; }
+  .upgrade-step-name { font-size: 0.98rem; font-weight: 700; }
+  .upgrade-step-value { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 800; font-size: 1.3rem; color: var(--ink); letter-spacing: -0.02em; }
+  .upgrade-step-value .upgrade-step-from { display: block; font-family: var(--sans); font-weight: 700; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin-top: 2px; }
+  .upgrade-step-value.deduit { color: var(--vert); }
+  .upgrade-step-value.final { color: var(--bleu-vif); font-size: 1.55rem; }
+  .upgrade-arrow { width: 20px; height: 20px; flex: none; color: var(--line); }
+  @media (max-width: 700px) { .upgrade-arrow { transform: rotate(90deg); } .upgrade-flow-steps { gap: 10px; } }
+  .upgrade-flow-note { margin: 26px 0 0; color: var(--ink-soft); font-size: 0.86rem; line-height: 1.55; max-width: 60ch; margin-left: auto; margin-right: auto; }
+
   /* ---------------- Avis clients ---------------- */
   .avis-empty { text-align: center; color: var(--ink-soft); font-size: 0.94rem; padding: 40px 24px; border: 1px dashed var(--line); border-radius: var(--r-lg); }
   .avis-card { border: 1px solid var(--line); border-radius: var(--r-md); padding: 18px 20px; background: var(--bg-raised); box-shadow: var(--shadow); margin-bottom: 14px; }
@@ -1179,45 +1195,6 @@
       <summary>
         <div class="wrap acc-band-head">
           <div class="acc-collapse-head">
-            <span class="label">La méthode</span>
-            <h2>La méthode DIMZ.</h2>
-          </div>
-          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
-        </div>
-      </summary>
-      <div class="acc-collapse-body">
-        <div class="wrap">
-          <p class="acc-collapse-intro">D-I-M-Z, ce n'est pas qu'un joli nom : chaque lettre est une étape du travail de votre copilote, du premier échange à la remise des clés.</p>
-          <div class="values-grid">
-            <div class="value-card" data-reveal>
-              <div class="value-icon method-letter">D</div>
-              <h3>Définir</h3>
-              <p>On pose les bases ensemble : budget, usage, et vos deux ou trois critères non négociables (le chauffage qui marche, ça compte).</p>
-            </div>
-            <div class="value-card" data-reveal>
-              <div class="value-icon method-letter">I</div>
-              <h3>Identifier</h3>
-              <p>Je passe au crible les annonces qui collent à votre budget et à votre vie, pas à celle du vendeur.</p>
-            </div>
-            <div class="value-card" data-reveal>
-              <div class="value-icon method-letter">M</div>
-              <h3>Mesurer</h3>
-              <p>Chaque véhicule passe au Score DIMZ : prix, historique, état, adéquation. Pas de note de complaisance.</p>
-            </div>
-            <div class="value-card" data-reveal>
-              <div class="value-icon method-letter">Z</div>
-              <h3>Zéro surprise</h3>
-              <p>Aucune mauvaise surprise après la signature. Promis, même pas une petite.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </details>
-
-    <details class="acc-collapse band" open>
-      <summary>
-        <div class="wrap acc-band-head">
-          <div class="acc-collapse-head">
             <span class="label">Nos offres</span>
             <h2>Trois façons de rouler l'esprit tranquille.</h2>
           </div>
@@ -1237,7 +1214,7 @@
       </div>
     </details>
 
-    <details class="acc-collapse band band-tint" open>
+    <details class="acc-collapse band" open>
       <summary>
         <div class="wrap acc-band-head">
           <div class="acc-collapse-head">
@@ -1304,7 +1281,7 @@
           <div class="value-card" data-reveal>
             <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24" stroke-width="1.8"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></div>
             <h3>Sécuriser</h3>
-            <p>On vérifie tout, même ce que le vendeur a « oublié » de mentionner.</p>
+            <p>Nous vérifions les principaux éléments susceptibles d'influencer votre décision.</p>
           </div>
           <div class="value-card" data-reveal>
             <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6.3 6-6.3s6 2.8 6 6.3"/><circle cx="17" cy="7" r="2.4"/><path d="M14.8 20c.2-3 2.2-5.4 4.7-6"/></svg></div>
@@ -1507,7 +1484,7 @@
           <button type="button" class="btn btn-outline btn-sm-back" data-offer-sub="copilote_plus">← Retour à l'offre</button>
           <span class="offer-modal-eyebrow">Copilote Plus — Livrable 2</span>
           <h3 id="offer-modal-title">L'état des lieux contradictoire</h3>
-          <p class="offer-modal-lede">Établi à l'identique au départ et à l'arrivée de la livraison, pour comparaison directe : aucun désaccord ne reste sans preuve.</p>
+          <p class="offer-modal-lede">Établi à l'identique au départ et à l'arrivée de la livraison, pour comparaison directe : notre objectif est de réduire au maximum les désaccords sur l'état du véhicule.</p>
           <div class="example-annonce" style="margin-bottom:16px;">
             <p class="example-modele-name">État des lieux — Départ</p>
             <div class="example-annonce-specs">
@@ -1527,7 +1504,34 @@
           <p class="offer-modal-footnote">Exemple fictif. Chaque état des lieux réel comprend 14 photos obligatoires, un relevé kilométrage/carburant et une signature électronique.</p>
         </template>
 
-        <p class="offer-note" data-reveal>Si vous avez déjà réglé une offre Copilote à <strong>99 €</strong> ou <strong>149 €</strong>, cette somme est intégralement déduite du prix de l'offre Copilote Plus.</p>
+        <div class="upgrade-flow" data-reveal>
+          <p class="upgrade-flow-kicker">Un principe permanent, pas une remise ponctuelle</p>
+          <h3 class="upgrade-flow-title">Commencez par Copilote. Rien n'est jamais payé deux fois.</h3>
+          <div class="upgrade-flow-steps">
+            <div class="upgrade-step">
+              <span class="upgrade-step-label">Vous commencez par</span>
+              <span class="upgrade-step-name">Copilote</span>
+              <span class="upgrade-step-value" id="uf-copilote-price">99 €</span>
+            </div>
+            <svg class="upgrade-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+            <div class="upgrade-step">
+              <span class="upgrade-step-label">Vous passez à</span>
+              <span class="upgrade-step-name">Copilote Plus</span>
+              <span class="upgrade-step-value">599 €<span class="upgrade-step-from">à partir de</span></span>
+            </div>
+            <svg class="upgrade-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+            <div class="upgrade-step upgrade-step-deduit">
+              <span class="upgrade-step-label">Votre Copilote déjà réglé</span>
+              <span class="upgrade-step-value deduit" id="uf-deduit">− 99 €</span>
+            </div>
+            <svg class="upgrade-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+            <div class="upgrade-step upgrade-step-final">
+              <span class="upgrade-step-label">Reste à payer</span>
+              <span class="upgrade-step-value final" id="uf-reste">500 €</span>
+            </div>
+          </div>
+          <p class="upgrade-flow-note">Votre prestation Copilote (99 € ou 149 €) est intégralement déduite du prix de Copilote Plus si vous décidez d'aller plus loin ensuite. Vous pouvez commencer petit et monter en gamme sans rien perdre.</p>
+        </div>
         <p class="offer-note offer-note-devis" data-reveal>Sur devis, dans l'offre Copilote Plus : 2<sup>e</sup> inspection, livraison hors zone.</p>
         <p class="offer-footnote" data-reveal><sup>*</sup> Zone DIMZ, la zone de livraison incluse dans l'offre Copilote Plus : Rhône (69), Haute-Savoie (74, hors Porte du Soleil), Savoie (73, hors 3 Vallées), Isère (38, hors 2 Alpes), Drôme (26), Ardèche (07), Ain (01, hors Pays de Gex), agglomérations de Mâcon et de Clermont-Ferrand.</p>
 
@@ -1767,7 +1771,7 @@
             <div class="faq-answer">
               <p>C'est le document qui protège votre véhicule pendant le convoyage.</p>
               <p>Il est établi <strong>deux fois à l'identique</strong> : au départ, au moment de la prise en charge, et à l'arrivée. Chacun comprend 14 photos obligatoires, un relevé du kilométrage et du carburant, et une signature électronique.</p>
-              <p>Les deux documents étant comparables directement, aucun désaccord sur l'état du véhicule ne peut rester sans preuve.</p>
+              <p>Les deux documents étant comparables directement, notre objectif est de réduire au maximum les désaccords sur l'état du véhicule.</p>
             </div>
           </details>
 
@@ -1882,45 +1886,28 @@
   <div id="subtab-import" role="tabpanel" aria-labelledby="subtab-btn-import" hidden>
     <section>
       <div class="wrap" style="max-width:720px;">
-        <div class="section-head" data-reveal>
-          <span class="label">À venir</span>
-          <h2>Votre prochain véhicule pourrait venir de l'étranger.</h2>
-          <p>Le service d'import DIMZ est actuellement en préparation. Le Copilote apprend, analyse les marchés et prépare de nouvelles façons de vous accompagner dans votre recherche automobile.</p>
+        <div style="text-align:center; margin-bottom:20px;" data-reveal>
+          <span class="sample-badge">🚧 Bientôt disponible</span>
         </div>
-        <div style="text-align:center; margin-bottom:44px;" data-reveal>
-          <span class="sample-badge">🚧 Service en préparation</span>
+        <div class="section-head" data-reveal>
+          <span class="label">Bientôt chez DIMZ</span>
+          <h2>L'import automobile</h2>
+          <p>Nous préparons actuellement l'ouverture de notre service d'import automobile. DIMZ pourra bientôt vous accompagner dans la recherche et la sécurisation de véhicules provenant de plusieurs marchés européens.</p>
         </div>
 
-        <div class="section-head" data-reveal>
-          <span class="label">Le parcours DIMZ</span>
-          <h2>Aujourd'hui</h2>
-        </div>
-        <div style="display:flex; flex-wrap:wrap; gap:14px;" data-reveal>
-          <div class="control-card" style="flex:1 1 150px;"><div class="control-card-head"><span class="step-num">🔎</span><h3>Trouver</h3></div></div>
-          <div class="control-card" style="flex:1 1 150px;"><div class="control-card-head"><span class="step-num">🛡️</span><h3>Sécuriser</h3></div></div>
-          <div class="control-card" style="flex:1 1 150px;"><div class="control-card-head"><span class="step-num">🤝</span><h3>Accompagner</h3></div></div>
-          <div class="control-card" style="flex:1 1 150px;"><div class="control-card-head"><span class="step-num">🚚</span><h3>Livrer</h3></div></div>
-        </div>
-
-        <div class="section-head" data-reveal style="margin-top:48px;">
-          <h2>Demain</h2>
-        </div>
         <div class="control-card" data-reveal style="border-color:color-mix(in srgb, var(--bleu-vif) 40%, var(--line));">
-          <div class="control-card-head"><span class="step-num">🌍</span><h3>Importer</h3></div>
-          <p style="color:var(--ink-soft); font-size:0.92rem; margin:0 0 16px;">DIMZ pourra progressivement vous accompagner dans vos projets d'importation automobile depuis plusieurs pays européens.</p>
-          <p class="offer-modal-example-title" style="margin-bottom:12px;">Bientôt disponible</p>
           <div class="tag-row">
-            <span class="tag">🇨🇭 Suisse</span>
             <span class="tag">🇩🇪 Allemagne</span>
-            <span class="tag">🇪🇸 Espagne</span>
+            <span class="tag">🇨🇭 Suisse</span>
             <span class="tag">🇮🇹 Italie</span>
+            <span class="tag">🇪🇸 Espagne</span>
             <span class="tag">🇧🇪 Belgique</span>
             <span class="tag">🇱🇺 Luxembourg</span>
           </div>
         </div>
 
         <div class="offers-closing" data-reveal style="margin-top:48px;">
-          <p class="offers-closing-quote">Le Copilote apprend. Le service évolue.<br>Aujourd'hui, DIMZ vous accompagne pour trouver, sécuriser, accompagner et livrer votre véhicule. Demain, votre Copilote pourra aussi vous accompagner au-delà des frontières.</p>
+          <p class="offers-closing-quote">Le Copilote apprend, le service évolue.<br>Aujourd'hui, DIMZ vous accompagne pour trouver, sécuriser, accompagner et livrer votre véhicule en France. Demain, votre Copilote pourra aussi vous accompagner au-delà des frontières.</p>
         </div>
       </div>
     </section>
@@ -4121,12 +4108,20 @@
   var priceButtons = document.querySelectorAll('.price-toggle button');
   var priceValue = document.getElementById('offer-price-value');
   var offerSubCopilote = document.getElementById('offer-sub-copilote');
+  var ufCopilotePrice = document.getElementById('uf-copilote-price');
+  var ufDeduit = document.getElementById('uf-deduit');
+  var ufReste = document.getElementById('uf-reste');
+  var COPILOTE_PLUS_PRIX = 599;
   priceButtons.forEach(function (btn) {
     btn.addEventListener('click', function () {
       priceButtons.forEach(function (b) { b.setAttribute('aria-selected', 'false'); });
       btn.setAttribute('aria-selected', 'true');
       priceValue.textContent = btn.dataset.price + ' €';
       if (offerSubCopilote && btn.dataset.sub) offerSubCopilote.textContent = btn.dataset.sub;
+      var prix = parseInt(btn.dataset.price, 10);
+      if (ufCopilotePrice) ufCopilotePrice.textContent = prix + ' €';
+      if (ufDeduit) ufDeduit.textContent = '− ' + prix + ' €';
+      if (ufReste) ufReste.textContent = (COPILOTE_PLUS_PRIX - prix) + ' €';
     });
   });
 
