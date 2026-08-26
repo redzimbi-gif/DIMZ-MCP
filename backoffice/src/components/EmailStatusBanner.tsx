@@ -2,6 +2,16 @@ const MESSAGES: Record<string, { text: string; tone: "good" | "bad" | "warn" }> 
   sent: { text: "Email envoyé au client.", tone: "good" },
   error: { text: "Échec de l'envoi de l'email. Réessaie dans un instant.", tone: "bad" },
   "no-email": { text: "Impossible d'envoyer : ce client n'a pas d'adresse email enregistrée.", tone: "warn" },
+  "paiement-sent": {
+    text: "Facture envoyée au client avec son lien de paiement en ligne.",
+    tone: "good",
+  },
+  "paiement-error": { text: "Échec de l'envoi de la facture. Réessaie dans un instant.", tone: "bad" },
+  "paiement-no-email": {
+    text: "Facture créée, mais non envoyée : ce client n'a pas d'adresse email enregistrée.",
+    tone: "warn",
+  },
+  "paiement-creation-erreur": { text: "La facture n'a pas pu être créée.", tone: "bad" },
 };
 
 const TONE_CLASSES: Record<string, string> = {

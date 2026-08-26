@@ -14,6 +14,7 @@ import {
   getDossierContrats,
   getDossierNotes,
   getDossierMessages,
+  getMontantDejaPaye,
   listPhotosBibliotheque,
 } from "@/lib/queries";
 import {
@@ -42,11 +43,18 @@ import {
   CONTRAT_TYPES,
   CONTRAT_TYPE_LABELS,
   CONTRAT_STATUT_LABELS,
+  TARIF_OFFRE_DEFAUT,
   type DossierOffre,
 } from "@/lib/types";
 import { CONTRAT_CHAMPS } from "@/lib/contrats";
 import { getSignedUrls } from "@/lib/storage";
-import { getEtapesOffre, getOffreAccompagnement, getEtapeLabel, resolveEtapesConvoyage } from "@/lib/etapes";
+import {
+  ETAPE_PAIEMENT_KEY,
+  getOffreAccompagnement,
+  getEtapeLabel,
+  resolveEtapesOffre,
+  resolveEtapesConvoyage,
+} from "@/lib/etapes";
 import { formatCurrency, formatDate, formatDateTime, formatRelative } from "@/lib/format";
 import {
   updateDossierInfos,
@@ -54,6 +62,7 @@ import {
   addDossierNote,
   updateDossierOffre,
   updateDossierEtapeClient,
+  demanderPaiementOffre,
   sendEtapeClientEmail,
   decideConvoyageDemande,
   marquerDevisEnvoye,
@@ -140,8 +149,19 @@ export default async function DossierDetailPage({
 
   const isConvoyage = dossier.offre === "convoyage_seul";
   const offreAccompagnement = getOffreAccompagnement(dossier.offre);
-  const etapesSuiviClient = isConvoyage ? resolveEtapesConvoyage(dossier.devis_envoye_at) : getEtapesOffre(dossier.offre);
+  const etapesSuiviClient = isConvoyage
+    ? resolveEtapesConvoyage(dossier.devis_envoye_at)
+    : resolveEtapesOffre(dossier.offre, dossier.paiement_offre);
   const peutEnvoyerEmailEtape = dossier.etape_client !== "demande_recue";
+
+  // Le client attend son lien de règlement : le montant proposé part du tarif
+  // d'entrée de l'offre, diminué de ce qui a déjà été encaissé sur le dossier
+  // (un passage Copilote → Copilote Plus déduit le Copilote déjà réglé).
+  const attendPaiement = dossier.etape_client === ETAPE_PAIEMENT_KEY;
+  const montantSuggere = attendPaiement
+    ? Math.max(0, (TARIF_OFFRE_DEFAUT[offreAccompagnement] ?? 0) - (await getMontantDejaPaye(dossier.id)))
+    : 0;
+  const demanderPaiementAction = demanderPaiementOffre.bind(null, dossier.id);
 
   return (
     <div>
@@ -244,6 +264,32 @@ export default async function DossierDetailPage({
             </div>
           </>
         )}
+
+        {attendPaiement ? (
+          <div className="mb-4 rounded-md border border-warn/25 bg-warn-bg p-4">
+            <p className="text-sm font-semibold text-ink">
+              Le client attend son lien de paiement ({DOSSIER_OFFRE_LABELS[offreAccompagnement]})
+            </p>
+            <p className="text-xs text-ink-soft mt-1 mb-3">
+              Envoie la facture pour débloquer le dossier : le client reçoit le PDF et un lien de
+              paiement en ligne. Dès l'encaissement, le suivi passe automatiquement à l'étape suivante.
+            </p>
+            <form action={demanderPaiementAction} className="flex flex-wrap items-end gap-3">
+              <Field label="Montant à facturer (€)">
+                <input
+                  name="montant"
+                  type="number"
+                  min="1"
+                  step="0.01"
+                  required
+                  defaultValue={montantSuggere || undefined}
+                  className={`${inputClass} w-36`}
+                />
+              </Field>
+              <Button type="submit">Créer et envoyer la facture</Button>
+            </form>
+          </div>
+        ) : null}
 
         {dossier.etape_client === "demande_refusee" ? null : (
           <form action={updateEtapeAction} className="flex flex-wrap items-end gap-3">

@@ -200,6 +200,7 @@ function etapeEmail(params: EtapeEmailParams, badgeLabel: string, bodyHtml: stri
 // l'email de confirmation envoyé à la soumission du formulaire.
 // ---------------------------------------------------------------------------
 export type EtapeAccompagnementKey =
+  | "paiement_en_attente"
   | "traitement_en_cours"
   | "exploration_projet"
   | "reponse_envoyee"
@@ -216,6 +217,11 @@ export type EtapeAccompagnementKey =
   | "rapport_envoye";
 
 const ETAPE_ACCOMPAGNEMENT_COPY: Record<EtapeAccompagnementKey, { badge: string; subject: string; body: string }> = {
+  paiement_en_attente: {
+    badge: "En attente du paiement",
+    subject: "Votre offre est réservée",
+    body: "Votre offre est enregistrée. Il ne reste qu'à la régler : votre facture et son lien de paiement sécurisé vous arrivent par email. Dès réception du paiement, votre copilote démarre le travail.",
+  },
   traitement_en_cours: {
     badge: "Votre copilote prend connaissance de votre dossier",
     subject: "Votre dossier est pris en charge",
@@ -294,6 +300,37 @@ export function etapeAccompagnementEmail(
 ): { subject: string; html: string } {
   const copy = ETAPE_ACCOMPAGNEMENT_COPY[etape];
   return etapeEmail(params, copy.badge, copy.body, copy.subject);
+}
+
+/**
+ * Confirmation d'encaissement, envoyée automatiquement par le webhook Stripe.
+ *
+ * Un seul email, qui confirme le paiement *et* enchaîne sur le message de
+ * l'étape qui démarre : deux emails à une seconde d'intervalle seraient du
+ * bruit pour le client.
+ */
+export function paiementConfirmeEmail(params: {
+  prenom: string | null;
+  reference: string;
+  portalUrl: string;
+  offreLabel: string;
+  montant: string;
+  etapeSuivante: EtapeAccompagnementKey | null;
+}): { subject: string; html: string } {
+  const suite = params.etapeSuivante ? ETAPE_ACCOMPAGNEMENT_COPY[params.etapeSuivante] : null;
+  const content = `
+    <p style="margin:0 0 16px;">${greeting(params.prenom)}</p>
+    <p style="margin:0 0 16px;">Nous avons bien reçu votre paiement de <strong>${params.montant}</strong> pour l'offre <strong>${params.offreLabel}</strong>. Votre dossier <strong>${params.reference}</strong> est lancé.</p>
+    ${
+      suite
+        ? `<p style="margin:0 0 14px;">Prochaine étape : ${etapeBadge(suite.badge)}</p>
+    <p style="margin:0 0 16px;">${suite.body}</p>`
+        : ""
+    }
+    <p style="margin:0 0 4px;">Vous pouvez suivre l'avancement à tout moment :</p>
+    ${ctaButton(params.portalUrl, "Suivre mon dossier")}
+  `;
+  return { subject: `Paiement reçu, votre dossier est lancé (${params.reference})`, html: emailLayout(content) };
 }
 
 // ---------------------------------------------------------------------------

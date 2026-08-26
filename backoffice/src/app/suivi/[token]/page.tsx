@@ -6,7 +6,7 @@ import { getDossierByToken, getDossierAnnonces, getDossierMessages } from "@/lib
 import { getSignedUrl } from "@/lib/storage";
 import { formatCurrency, formatRelative } from "@/lib/format";
 import { Logo } from "@/components/Logo";
-import { getEtapesOffre, resolveEtapesConvoyage } from "@/lib/etapes";
+import { ETAPE_PAIEMENT_KEY, resolveEtapesOffre, resolveEtapesConvoyage } from "@/lib/etapes";
 import { upgradeOffreDepuisSuivi, sendMessageClient } from "./actions";
 
 export const metadata = {
@@ -14,7 +14,13 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function ClientPortalPage({ params }: { params: { token: string } }) {
+export default async function ClientPortalPage({
+  params,
+  searchParams,
+}: {
+  params: { token: string };
+  searchParams: { paiement?: string };
+}) {
   const dossier = await getDossierByToken(params.token);
   if (!dossier) notFound();
 
@@ -27,11 +33,14 @@ export default async function ClientPortalPage({ params }: { params: { token: st
 
   const isConvoyage = dossier.offre === "convoyage_seul";
   const refuse = isConvoyage && dossier.convoyage_decision === "refuse";
-  const etapes = isConvoyage ? resolveEtapesConvoyage(dossier.devis_envoye_at) : getEtapesOffre(dossier.offre);
+  const etapes = isConvoyage
+    ? resolveEtapesConvoyage(dossier.devis_envoye_at)
+    : resolveEtapesOffre(dossier.offre, dossier.paiement_offre);
   const currentIndex = Math.max(
     0,
     etapes.findIndex((e) => e.key === dossier.etape_client)
   );
+  const attendPaiement = dossier.etape_client === ETAPE_PAIEMENT_KEY;
 
   return (
     <div className="min-h-viewport bg-surface-sunken py-12 px-4">
@@ -50,6 +59,20 @@ export default async function ClientPortalPage({ params }: { params: { token: st
           <p className="text-sm text-ink-soft mb-8">
             Voici l'avancement de votre dossier {dossier.reference}.
           </p>
+
+          {/* Retour de Stripe après paiement. L'encaissement est confirmé par
+              le webhook, quelques secondes plus tard : ce bandeau accuse
+              seulement réception du passage en caisse. */}
+          {searchParams.paiement === "succes" ? (
+            <div className="mb-6 rounded-md bg-good-bg text-good px-4 py-3 text-sm leading-relaxed">
+              Merci, votre paiement a bien été transmis. Votre dossier démarre dès sa confirmation par
+              notre prestataire de paiement, dans quelques instants.
+            </div>
+          ) : searchParams.paiement === "annule" ? (
+            <div className="mb-6 rounded-md bg-surface-sunken text-ink-soft px-4 py-3 text-sm leading-relaxed">
+              Paiement interrompu. Rien n'a été débité, et le lien reçu par email reste valable.
+            </div>
+          ) : null}
 
           {refuse ? (
             <div className="rounded-md bg-bad-bg text-bad px-4 py-3.5 text-sm leading-relaxed">
@@ -95,6 +118,16 @@ export default async function ClientPortalPage({ params }: { params: { token: st
             </ol>
           )}
         </div>
+
+        {attendPaiement ? (
+          <div className="mt-6 bg-surface border border-line rounded-lg2 shadow-card p-6">
+            <p className="text-sm font-semibold text-ink mb-1">Votre offre est réservée</p>
+            <p className="text-sm text-ink-soft leading-relaxed">
+              Votre facture et son lien de paiement sécurisé vous sont envoyés par email. Dès réception
+              du règlement, votre copilote démarre le travail et cette page se met à jour.
+            </p>
+          </div>
+        ) : null}
 
         {dossier.offre === "decouverte" && dossier.etape_client === "reponse_envoyee" ? (
           <div className="mt-6 bg-blue-50 border border-blue-100 rounded-lg2 p-6 text-center">

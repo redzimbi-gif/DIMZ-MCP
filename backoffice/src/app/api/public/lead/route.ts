@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { notifyStaff } from "@/lib/log";
 import { sendEmail, getAppUrl } from "@/lib/email";
 import { confirmationDemandeEmail } from "@/lib/email-templates";
+import { ETAPE_PAIEMENT_KEY, besoinPaiementOffre } from "@/lib/etapes";
 import type { DossierOffre } from "@/lib/types";
 
 // Endpoint public appelé directement depuis le site vitrine DIMZ (autre
@@ -98,12 +99,20 @@ export async function POST(request: Request) {
 
   const offreLabel = pick(data, "Projet et délai — Accompagnement recherché");
 
+  const offre = isConvoyage ? ("convoyage_seul" as DossierOffre) : guessOffre(offreLabel);
+
+  // Une demande qui arrive directement sur une offre payante commence par
+  // l'étape de paiement, comme un passage d'offre depuis la page de suivi :
+  // un seul parcours à maintenir, et aucun dossier ne démarre sans règlement.
+  const etapeInitiale = besoinPaiementOffre(offre, null) ? ETAPE_PAIEMENT_KEY : "demande_recue";
+
   // Le détail complet de la soumission est conservé dans donnees_brutes et
   // affiché de façon structurée dans le back-office ; "commentaires" reste
   // un champ de notes libres pour l'équipe, pas un déversoir des réponses.
   const payload = {
     client_id: clientId,
-    offre: isConvoyage ? ("convoyage_seul" as DossierOffre) : guessOffre(offreLabel),
+    offre,
+    etape_client: etapeInitiale,
     budget: pick(data, "Budget et financement — Budget total envisagé"),
     vehicule_recherche: vehiculeRecherche,
     boite_vitesses: pick(data, "Le véhicule — Transmission"),

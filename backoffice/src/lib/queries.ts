@@ -214,7 +214,7 @@ export async function getClientNotes(clientId: string) {
 // que sur la fiche détail d'un dossier — pas de raison de le retélécharger
 // sur chaque chargement de la liste, ça alourdit inutilement l'egress).
 const DOSSIER_LISTE_COLONNES =
-  "id, client_id, reference, offre, budget, vehicule_recherche, marques_souhaitees, motorisation, boite_vitesses, km_max, region, commentaires, statut, etape_client, convoyage_decision, devis_envoye_at, valeur_estimee, source, portal_token, fiche_decouverte_intro, market_commentaire_copilote, market_commentaire_copilote_plus, archive, created_at, updated_at, clients(id, nom, prenom, email, telephone)";
+  "id, client_id, reference, offre, budget, vehicule_recherche, marques_souhaitees, motorisation, boite_vitesses, km_max, region, commentaires, statut, etape_client, convoyage_decision, devis_envoye_at, paiement_recu_at, paiement_offre, valeur_estimee, source, portal_token, fiche_decouverte_intro, market_commentaire_copilote, market_commentaire_copilote_plus, archive, created_at, updated_at, clients(id, nom, prenom, email, telephone)";
 
 export async function listDossiers(options?: { archived?: boolean }) {
   const db = createAdminClient();
@@ -586,6 +586,24 @@ export async function getDocumentCommercial(id: string) {
     .eq("id", id)
     .maybeSingle();
   return data as (DocumentCommercial & { clients: any; dossiers: any }) | null;
+}
+
+/**
+ * Total déjà encaissé sur un dossier (factures effectivement payées).
+ *
+ * Sert à déduire ce que le client a déjà réglé du montant à facturer lors d'un
+ * passage à une offre supérieure — sur du réel plutôt que sur un tarif
+ * supposé, puisque Copilote peut avoir été facturé 99 ou 149 €.
+ */
+export async function getMontantDejaPaye(dossierId: string): Promise<number> {
+  const db = createAdminClient();
+  const { data } = await db
+    .from("documents_commerciaux")
+    .select("montant_ttc")
+    .eq("dossier_id", dossierId)
+    .eq("type", "facture")
+    .eq("statut", "paye");
+  return (data ?? []).reduce((sum, d) => sum + Number(d.montant_ttc || 0), 0);
 }
 
 export async function getConvoyageExterne(id: string) {

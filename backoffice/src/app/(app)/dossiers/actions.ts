@@ -16,7 +16,8 @@ import {
   type EtapeAccompagnementKey,
   type EtapeConvoyageKey,
 } from "@/lib/email-templates";
-import { getEtapeLabel } from "@/lib/etapes";
+import { getEtapeLabel, etapeApresChangementOffre } from "@/lib/etapes";
+import { envoyerDocument } from "@/app/(app)/facturation/documents-actions";
 import { syncStatutAvecEtape } from "@/lib/dossier-statut";
 import {
   DOSSIER_STATUT_LABELS,
@@ -100,11 +101,27 @@ export async function updateDossierInfos(dossierId: string, formData: FormData) 
   // client sur une étape commune pour éviter une étape orpheline qui
   // n'existerait plus dans la nouvelle offre (même logique que le bandeau
   // d'offres ci-dessus, qui passe par updateDossierOffre).
-  if (offre && offre !== previous?.offre) {
-    payload.etape_client = "traitement_en_cours";
-  }
+  const offreChangee = !!offre && offre !== previous?.offre;
+  const etape = offreChangee
+    ? etapeApresChangementOffre(offre as DossierOffre, previous?.paiement_offre ?? null)
+    : null;
+  if (etape) payload.etape_client = etape;
 
   await db.from("dossiers").update(payload).eq("id", dossierId);
+
+  // Ce chemin écrivait l'étape sans synchroniser le pipeline ni tracer
+  // l'historique, contrairement à updateDossierOffre : à offre égale, les deux
+  // doivent laisser le dossier dans le même état.
+  if (etape) {
+    await syncStatutAvecEtape(db, dossierId, offre as DossierOffre, etape);
+    await db.from("dossier_etape_history").insert({
+      dossier_id: dossierId,
+      etape_client: etape,
+      note: `Offre choisie : ${DOSSIER_OFFRE_LABELS[offre as DossierOffre]}`,
+      changed_by: await getActorId(),
+    });
+  }
+
   await logActivity({
     action: "dossier.modifie",
     entiteType: "dossier",
@@ -148,17 +165,20 @@ export async function updateDossierStatut(dossierId: string, formData: FormData)
 // ---------------------------------------------------------------------------
 export async function updateDossierOffre(dossierId: string, offre: DossierOffre) {
   const db = createAdminClient();
-  // Changer d'offre remet le client sur l'étape commune "traitement en
+  // Changer d'offre remet le client sur l'étape de paiement de la nouvelle
+  // offre si elle reste à régler, sinon sur l'étape commune "traitement en
   // cours" : les étapes spécifiques à l'ancienne offre n'ont plus de sens
   // pour la nouvelle, mieux vaut repartir d'une étape que le client a déjà
   // vue plutôt que de retomber sur "Demande reçue".
-  await db.from("dossiers").update({ offre, etape_client: "traitement_en_cours" }).eq("id", dossierId);
-  await syncStatutAvecEtape(db, dossierId, offre, "traitement_en_cours");
+  const dossier = await getDossier(dossierId);
+  const etape = etapeApresChangementOffre(offre, dossier?.paiement_offre ?? null);
+  await db.from("dossiers").update({ offre, etape_client: etape }).eq("id", dossierId);
+  await syncStatutAvecEtape(db, dossierId, offre, etape);
 
   const acteur = await getActorId();
   await db.from("dossier_etape_history").insert({
     dossier_id: dossierId,
-    etape_client: "traitement_en_cours",
+    etape_client: etape,
     note: `Offre choisie : ${DOSSIER_OFFRE_LABELS[offre]}`,
     changed_by: acteur,
   });
@@ -172,6 +192,59 @@ export async function updateDossierOffre(dossierId: string, offre: DossierOffre)
 
   revalidatePath(`/dossiers/${dossierId}`);
   revalidatePath("/dossiers");
+}
+
+/**
+ * Facture l'offre d'un dossier en attente de paiement et envoie au client le
+ * lien de règlement, sans quitter la fiche dossier.
+ *
+ * Le montant est saisi par l'équipe : Copilote se facture 99 ou 149 € selon la
+ * complexité, Copilote Plus est un « à partir de 599 € », et un passage à
+ * l'offre supérieure déduit ce qui a déjà été réglé. Le formulaire propose une
+ * valeur, l'équipe tranche.
+ */
+export async function demanderPaiementOffre(dossierId: string, formData: FormData) {
+  const montant = Number(formData.get("montant") || 0);
+  const dossier = await getDossier(dossierId);
+  if (!dossier || !dossier.offre || montant <= 0) return;
+
+  const db = createAdminClient();
+  const offreLabel = DOSSIER_OFFRE_LABELS[dossier.offre];
+  const objet = `Offre ${offreLabel}`;
+
+  const { data: doc, error } = await db
+    .from("documents_commerciaux")
+    .insert({
+      type: "facture",
+      dossier_id: dossierId,
+      client_id: dossier.client_id,
+      objet,
+      lignes: [{ description: objet, quantite: 1, prix_unitaire_ht: montant }],
+      montant_ht: montant,
+      // Régime micro-entreprise : TVA non applicable (art. 293 B du CGI).
+      montant_tva: 0,
+      montant_ttc: montant,
+    })
+    .select("id, numero")
+    .single();
+
+  if (error || !doc) {
+    console.error("Facture de l'offre non créée:", error?.message);
+    redirect(`/dossiers/${dossierId}?notif=paiement-creation-erreur`);
+  }
+
+  const status = await envoyerDocument(doc.id);
+
+  await logActivity({
+    action: "dossier.paiement_demande",
+    entiteType: "dossier",
+    entiteId: dossierId,
+    description: `Facture ${doc.numero} (${offreLabel}) envoyée au client pour règlement`,
+  });
+
+  revalidatePath(`/dossiers/${dossierId}`);
+  revalidatePath("/facturation");
+  redirect(`/dossiers/${dossierId}?notif=paiement-${status}`);
 }
 
 export async function updateDossierEtapeClient(dossierId: string, formData: FormData) {

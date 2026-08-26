@@ -287,6 +287,23 @@ l'email de confirmation si le client a renseigné son adresse.
   Dans les deux cas, un clic met à jour l'offre du dossier, remet l'étape
   client sur une valeur commune aux nouvelles étapes, et crée une
   notification interne (cloche du back-office) pointant vers le dossier.
+- Étape de paiement (offres Copilote et Copilote Plus) : leur parcours client
+  commence par « En attente du paiement », intercalée entre « Demande reçue »
+  et la prise en charge. Découverte (gratuite) et Convoyage (qui a son propre
+  flux de devis) ne sont pas concernées. La règle vit dans une seule fonction,
+  `besoinPaiementOffre` (`src/lib/etapes.ts`), appelée par les quatre chemins
+  qui changent l'offre d'un dossier : upsell depuis `/suivi/[token]`, bandeau
+  d'offres et champ « Offre » de la fiche dossier, et formulaire du site.
+  Elle compare l'offre en cours à `dossiers.paiement_offre` — *quelle* offre a
+  été réglée, pas seulement le fait qu'un paiement a eu lieu — pour qu'un
+  passage Copilote → Copilote Plus redemande bien la différence.
+  Sur la fiche dossier, un encart « Le client attend son lien de paiement »
+  propose un montant (tarif d'entrée de l'offre moins ce qui a déjà été
+  encaissé sur le dossier) et crée la facture d'un clic : le client reçoit le
+  PDF et son lien Stripe. À l'encaissement, le webhook (section 4) renseigne
+  `paiement_recu_at` / `paiement_offre`, l'étape se relabellise en place en
+  « Paiement reçu », le dossier passe à l'étape suivante et le client reçoit
+  un email qui confirme le paiement et annonce cette étape suivante.
 - Suivi client (Convoyage) : flux dédié — Demande reçue → Étude de la demande
   → boutons Accepté/Refusé (email d'excuse si refusé) → Devis en cours →
   Livraison programmée → Livraison en cours → Livraison terminée, avec un

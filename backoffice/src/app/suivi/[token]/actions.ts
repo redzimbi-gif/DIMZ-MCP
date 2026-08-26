@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getDossierByToken } from "@/lib/queries";
 import { notifyStaff, logActivity } from "@/lib/log";
 import { syncStatutAvecEtape } from "@/lib/dossier-statut";
+import { ETAPE_PAIEMENT_KEY, etapeApresChangementOffre } from "@/lib/etapes";
 import { DOSSIER_OFFRE_LABELS } from "@/lib/types";
 
 const OFFRE_LABELS = {
@@ -33,13 +34,21 @@ export async function upgradeOffreDepuisSuivi(token: string, offre: OffreCible) 
 
   const db = createAdminClient();
   // Les étapes-source ("reponse_envoyee", "dossier_envoye") n'existent pas dans les étapes
-  // Copilote / Copilote Plus : on repositionne le client sur l'étape commune "votre copilote
-  // prend connaissance de votre dossier" pour que sa page de suivi reste cohérente.
-  await db.from("dossiers").update({ offre, etape_client: "traitement_en_cours" }).eq("id", dossier.id);
-  await syncStatutAvecEtape(db, dossier.id, offre, "traitement_en_cours");
+  // Copilote / Copilote Plus : le client est repositionné sur l'étape de paiement de sa
+  // nouvelle offre, ou directement sur la prise en charge si elle est déjà réglée.
+  const etape = etapeApresChangementOffre(offre, dossier.paiement_offre);
+  await db.from("dossiers").update({ offre, etape_client: etape }).eq("id", dossier.id);
+  await syncStatutAvecEtape(db, dossier.id, offre, etape);
 
   const clientNom = `${dossier.clients?.prenom ?? ""} ${dossier.clients?.nom ?? ""}`.trim();
   const label = OFFRE_LABELS[offre];
+  const attendPaiement = etape === ETAPE_PAIEMENT_KEY;
+
+  await db.from("dossier_etape_history").insert({
+    dossier_id: dossier.id,
+    etape_client: etape,
+    note: `Offre ${label} choisie par le client depuis sa page de suivi`,
+  });
 
   await logActivity({
     action: "dossier.offre_changee",
@@ -49,8 +58,12 @@ export async function upgradeOffreDepuisSuivi(token: string, offre: OffreCible) 
   });
 
   await notifyStaff({
-    titre: `${clientNom || "Un client"} passe à l'offre ${label}`,
-    message: `Dossier ${dossier.reference} — passage de ${ancienLabel} à ${label} demandé depuis la page de suivi.`,
+    titre: attendPaiement
+      ? `${clientNom || "Un client"} attend son lien de paiement (${label})`
+      : `${clientNom || "Un client"} passe à l'offre ${label}`,
+    message: attendPaiement
+      ? `Dossier ${dossier.reference} — passage de ${ancienLabel} à ${label}. À facturer pour que le dossier démarre.`
+      : `Dossier ${dossier.reference} — passage de ${ancienLabel} à ${label} demandé depuis la page de suivi.`,
     type: "changement_offre",
     lien: `/dossiers/${dossier.id}`,
   });

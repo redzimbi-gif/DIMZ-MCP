@@ -175,7 +175,15 @@ export async function convertirEnFacture(devisId: string) {
   redirect(`/facturation/documents/${newId}`);
 }
 
-export async function envoyerDocumentCommercial(id: string) {
+/**
+ * Envoi effectif d'un devis ou d'une facture au client : PDF, lien de paiement
+ * Stripe pour une facture non réglée, email, et passage du document en
+ * "envoyé".
+ *
+ * Séparé de la Server Action ci-dessous, qui redirige vers /facturation : la
+ * fiche dossier a besoin d'envoyer une facture sans quitter la page.
+ */
+export async function envoyerDocument(id: string): Promise<"sent" | "no-email" | "error"> {
   const db = createAdminClient();
   let status: "sent" | "no-email" | "error" = "sent";
 
@@ -282,6 +290,11 @@ export async function envoyerDocumentCommercial(id: string) {
     status = "error";
   }
 
+  return status;
+}
+
+export async function envoyerDocumentCommercial(id: string) {
+  const status = await envoyerDocument(id);
   revalidatePath("/facturation");
   redirect(`/facturation?notif=${status}`);
 }

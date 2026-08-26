@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { verifyStripeWebhookSignature } from "@/lib/stripe";
 import { logActivity, notifyStaff } from "@/lib/log";
+import { enregistrerPaiementOffre } from "@/lib/paiement-dossier";
 
 // Endpoint public appelé par Stripe (jamais par le navigateur) à chaque
 // événement de paiement. Authentifié uniquement par la signature HMAC de
@@ -37,7 +38,7 @@ export async function POST(request: Request) {
     };
 
     const db = createAdminClient();
-    const colonnes = "id, numero, dossier_id, statut";
+    const colonnes = "id, numero, dossier_id, statut, montant_ttc";
     let { data: doc } = await db
       .from("documents_commerciaux")
       .select(colonnes)
@@ -85,6 +86,13 @@ export async function POST(request: Request) {
         type: "paiement_recu",
         lien: doc.dossier_id ? `/dossiers/${doc.dossier_id}` : `/facturation/documents/${doc.id}`,
       });
+
+      // Fait avancer le parcours client quand cette facture est celle que le
+      // dossier attendait pour démarrer (offre Copilote / Copilote Plus).
+      // enregistrerPaiementOffre ignore les autres cas.
+      if (doc.dossier_id) {
+        await enregistrerPaiementOffre(db, doc.dossier_id, Number(doc.montant_ttc || 0));
+      }
     } else {
       console.error(
         "Webhook Stripe : aucune facture pour la session Checkout",

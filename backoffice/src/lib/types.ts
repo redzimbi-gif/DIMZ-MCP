@@ -43,6 +43,15 @@ export const DOSSIER_OFFRE_LABELS: Record<DossierOffre, string> = {
   expertise_seule: "Inspection",
 };
 
+// Tarif d'entrée de chaque offre payante, utilisé uniquement pour pré-remplir
+// le montant à facturer côté équipe. Copilote monte à 149 € pour une recherche
+// complexe et Copilote Plus est un « à partir de » : le montant reste saisi à
+// la main, rien n'est facturé sans validation.
+export const TARIF_OFFRE_DEFAUT: Partial<Record<DossierOffre, number>> = {
+  copilote: 99,
+  copilote_plus: 599,
+};
+
 export const CONVOYAGE_DECISIONS = ["en_attente", "accepte", "refuse"] as const;
 export type ConvoyageDecision = (typeof CONVOYAGE_DECISIONS)[number];
 
@@ -139,6 +148,8 @@ export interface Dossier {
   etape_client: string;
   convoyage_decision: ConvoyageDecision;
   devis_envoye_at: string | null;
+  paiement_recu_at: string | null;
+  paiement_offre: DossierOffre | null;
   valeur_estimee: number | null;
   source: string;
   portal_token: string;

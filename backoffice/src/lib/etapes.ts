@@ -10,12 +10,26 @@ export interface EtapeDef {
   label: string;
 }
 
+const DEMANDE_RECUE: EtapeDef = { key: "demande_recue", label: "Demande reçue" };
+const TRAITEMENT: EtapeDef = {
+  key: "traitement_en_cours",
+  label: "Votre copilote prend connaissance de votre dossier",
+};
+
 // Communes à toutes les offres d'accompagnement : avant que le copilote
 // n'ait confirmé l'offre, le client ne voit que ces deux étapes.
-export const ETAPES_SOCLE: EtapeDef[] = [
-  { key: "demande_recue", label: "Demande reçue" },
-  { key: "traitement_en_cours", label: "Votre copilote prend connaissance de votre dossier" },
-];
+export const ETAPES_SOCLE: EtapeDef[] = [DEMANDE_RECUE, TRAITEMENT];
+
+// Offres payantes : le travail ne démarre qu'une fois la prestation réglée.
+// L'étape s'intercale entre la demande et la prise en charge — et son libellé
+// bascule sur place en « Paiement reçu » une fois encaissé (cf.
+// resolveEtapesOffre), sur le même principe que « Devis en cours » →
+// « Devis envoyé » côté convoyage.
+export const ETAPE_PAIEMENT_KEY = "paiement_en_attente";
+const PAIEMENT: EtapeDef = { key: ETAPE_PAIEMENT_KEY, label: "En attente du paiement" };
+const PAIEMENT_LABEL_RECU = "Paiement reçu";
+
+const SOCLE_PAYANT: EtapeDef[] = [DEMANDE_RECUE, PAIEMENT, TRAITEMENT];
 
 const EXPLORATION: EtapeDef = { key: "exploration_projet", label: "Exploration de votre projet" };
 const RECHERCHE: EtapeDef = { key: "recherche_annonces", label: "Recherche d'annonces qualifiées" };
@@ -23,11 +37,14 @@ const REDACTION: EtapeDef = { key: "redaction_rapport", label: "Rédaction de vo
 
 export type OffreAccompagnement = Exclude<DossierOffre, "convoyage_seul">;
 
+/** Offres dont le parcours client commence par une étape de paiement. */
+export const OFFRES_PAYANTES: DossierOffre[] = ["copilote", "copilote_plus"];
+
 export const ETAPES_OFFRE: Record<OffreAccompagnement, EtapeDef[]> = {
   decouverte: [...ETAPES_SOCLE, EXPLORATION, { key: "reponse_envoyee", label: "Réponse envoyée" }],
-  copilote: [...ETAPES_SOCLE, EXPLORATION, RECHERCHE, REDACTION, { key: "dossier_envoye", label: "Dossier envoyé" }],
+  copilote: [...SOCLE_PAYANT, EXPLORATION, RECHERCHE, REDACTION, { key: "dossier_envoye", label: "Dossier envoyé" }],
   copilote_plus: [
-    ...ETAPES_SOCLE,
+    ...SOCLE_PAYANT,
     EXPLORATION,
     RECHERCHE,
     REDACTION,
@@ -55,6 +72,56 @@ export function getOffreAccompagnement(offre: DossierOffre | null): OffreAccompa
 
 export function getEtapesOffre(offre: DossierOffre | null): EtapeDef[] {
   return ETAPES_OFFRE[getOffreAccompagnement(offre)];
+}
+
+// ---------------------------------------------------------------------------
+// Paiement des offres payantes
+// ---------------------------------------------------------------------------
+/**
+ * Vrai si l'offre demande un paiement qui n'a pas encore été encaissé.
+ *
+ * Le test porte sur *quelle* offre a été réglée, pas sur le simple fait qu'un
+ * paiement a eu lieu : un dossier qui passe de Copilote à Copilote Plus a déjà
+ * payé son Copilote, et doit pourtant régler la différence avant que le
+ * travail ne reprenne.
+ *
+ * Seule source de vérité sur la question : les quatre endroits qui changent
+ * l'offre d'un dossier appellent tous cette fonction plutôt que de réécrire la
+ * règle chacun de leur côté.
+ */
+export function besoinPaiementOffre(
+  offre: DossierOffre | null,
+  paiementOffre: DossierOffre | null
+): boolean {
+  return !!offre && OFFRES_PAYANTES.includes(offre) && paiementOffre !== offre;
+}
+
+/** Étape sur laquelle poser le dossier après un changement d'offre. */
+export function etapeApresChangementOffre(
+  offre: DossierOffre | null,
+  paiementOffre: DossierOffre | null
+): string {
+  return besoinPaiementOffre(offre, paiementOffre) ? ETAPE_PAIEMENT_KEY : TRAITEMENT.key;
+}
+
+/**
+ * Étape qui suit le paiement, déduite de la liste de l'offre plutôt que codée
+ * en dur, pour rester juste si l'ordre des étapes change un jour.
+ */
+export function etapeApresPaiement(offre: DossierOffre | null): string {
+  const etapes = getEtapesOffre(offre);
+  const index = etapes.findIndex((e) => e.key === ETAPE_PAIEMENT_KEY);
+  return etapes[index + 1]?.key ?? TRAITEMENT.key;
+}
+
+/** ETAPES_OFFRE avec « En attente du paiement » remplacé par « Paiement reçu » si applicable. */
+export function resolveEtapesOffre(
+  offre: DossierOffre | null,
+  paiementOffre: DossierOffre | null
+): EtapeDef[] {
+  const etapes = getEtapesOffre(offre);
+  if (besoinPaiementOffre(offre, paiementOffre)) return etapes;
+  return etapes.map((e) => (e.key === ETAPE_PAIEMENT_KEY ? { ...e, label: PAIEMENT_LABEL_RECU } : e));
 }
 
 // ---------------------------------------------------------------------------
@@ -104,6 +171,7 @@ const STATUT_PAR_ETAPE_ACCOMPAGNEMENT: Record<OffreAccompagnement, Record<string
   },
   copilote: {
     demande_recue: "demande_recue",
+    paiement_en_attente: "demande_recue",
     traitement_en_cours: "analyse_besoin",
     exploration_projet: "analyse_besoin",
     recherche_annonces: "recherche",
@@ -112,6 +180,7 @@ const STATUT_PAR_ETAPE_ACCOMPAGNEMENT: Record<OffreAccompagnement, Record<string
   },
   copilote_plus: {
     demande_recue: "demande_recue",
+    paiement_en_attente: "demande_recue",
     traitement_en_cours: "analyse_besoin",
     exploration_projet: "analyse_besoin",
     recherche_annonces: "recherche",
