@@ -444,8 +444,27 @@
   }
   .hero-photo.dark { background: none; }
   /* Hero d'accueil : photo différente en mode clair (route de campagne)
-     et en mode sombre (route de nuit), via --hero-accueil-photo redéfini par thème. */
+     et en mode sombre (route de nuit), via --hero-accueil-photo redéfini par thème.
+     Voile plus léger en mode clair (photo lumineuse), voile standard conservé
+     en mode sombre (photo de nuit, qui a besoin du voile fort d'origine). */
   .hero-accueil-bg { --hero-photo: var(--hero-accueil-photo); }
+  .hero-accueil-bg::after {
+    background:
+      radial-gradient(1100px 520px at var(--glow-x, 82%) -10%, color-mix(in srgb, var(--bleu-vif) 18%, transparent), transparent 60%),
+      linear-gradient(165deg, color-mix(in srgb, var(--bleu-nuit) 30%, transparent) 6%, color-mix(in srgb, var(--noir) 42%, transparent) 94%);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .hero-accueil-bg::after {
+      background:
+        radial-gradient(1100px 520px at var(--glow-x, 82%) -10%, color-mix(in srgb, var(--bleu-vif) 30%, transparent), transparent 60%),
+        linear-gradient(165deg, color-mix(in srgb, var(--bleu-nuit) 60%, transparent) 6%, color-mix(in srgb, var(--noir) 70%, transparent) 94%);
+    }
+  }
+  :root[data-theme="dark"] .hero-accueil-bg::after {
+    background:
+      radial-gradient(1100px 520px at var(--glow-x, 82%) -10%, color-mix(in srgb, var(--bleu-vif) 30%, transparent), transparent 60%),
+      linear-gradient(165deg, color-mix(in srgb, var(--bleu-nuit) 60%, transparent) 6%, color-mix(in srgb, var(--noir) 70%, transparent) 94%);
+  }
   .hero-photo .hero-illustration { display: none; }
   .hero-photo > .wrap { position: relative; z-index: 2; }
   .hero-points { list-style: none; margin: 6px 0 26px; padding: 0 4px 6px; display: flex; flex-wrap: wrap; gap: 9px; justify-content: center; }
