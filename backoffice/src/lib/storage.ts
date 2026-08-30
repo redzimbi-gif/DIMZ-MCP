@@ -2,7 +2,7 @@ import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const BUCKET = "dimz-files";
-const SIGNED_URL_TTL = 3600;
+const SIGNED_URL_TTL = 60 * 60 * 24 * 365; // 1 an — contenu permanent, autant réutiliser la même URL longtemps
 const CACHE_MARGIN_SECONDS = 60;
 
 type CacheEntry = { url: string; expiresAt: number };
