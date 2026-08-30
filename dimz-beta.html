@@ -814,20 +814,6 @@
   @media (max-width: 640px) { .form-card.form-fullscreen { padding: 32px 20px 48px; } }
   @media (prefers-reduced-motion: reduce) { .form-card.form-fullscreen { animation: none; } }
 
-  /* Photo de fond sur toutes les pages du formulaire Accompagnement : même
-     principe que .hero-photo (photo + voile pour garder le texte lisible). */
-  .form-card-accompagnement { position: relative; }
-  .form-card-accompagnement:not(.form-fullscreen) { overflow: hidden; }
-  .form-card-accompagnement::before {
-    content: ""; position: absolute; inset: 0; z-index: 0;
-    background: url('img/lac-garda.jpg') center / cover no-repeat;
-  }
-  .form-card-accompagnement::after {
-    content: ""; position: absolute; inset: 0; z-index: 1;
-    background: color-mix(in srgb, var(--bg) 85%, transparent);
-  }
-  .form-card-accompagnement > * { position: relative; z-index: 2; }
-
   .form-step { transition: opacity 0.22s ease, transform 0.22s ease; }
   .form-step.step-fade-out { opacity: 0; transform: translateY(-8px); }
   .form-step.step-fade-in { opacity: 0; transform: translateY(8px); }
@@ -2390,7 +2376,7 @@
         </div>
 
         <div class="form-solo">
-          <div class="form-card form-card-accompagnement">
+          <div class="form-card">
             <div class="form-progress">
               <div class="form-progress-bar"><div class="form-progress-fill" id="acc-progress-fill" style="width:16.66%"></div></div>
               <div class="form-progress-label">Étape <strong id="acc-step-current">1</strong> sur <span id="acc-step-total">7</span></div>
