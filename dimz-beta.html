@@ -3895,8 +3895,10 @@
   if (footerContactLink) {
     footerContactLink.addEventListener('click', function (e) {
       e.preventDefault();
-      // Naviguer vers la page FAQ
-      showMainTab('faq', true);
+      // "faq" est un sous-onglet de l'onglet principal "accompagnement" :
+      // il faut d'abord afficher cet onglet, puis basculer sur le sous-onglet.
+      showMainTab('accompagnement', false);
+      showSubTab('faq');
       // Attendre un moment puis ouvrir le formulaire de contact et scroller
       setTimeout(function () {
         var contactSection = document.getElementById('faq-contact');
