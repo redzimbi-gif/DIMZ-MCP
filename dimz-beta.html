@@ -519,7 +519,7 @@
   .price-toggle { display: inline-flex; background: var(--bg-tint); border-radius: 100px; padding: 2px; margin: 2px 0 16px; gap: 2px; }
   .price-toggle button { border: none; background: transparent; padding: 4px 10px; border-radius: 100px; font-size: 0.66rem; font-weight: 700; color: var(--ink-soft); cursor: pointer; }
   .price-toggle button[aria-selected="true"] { background: var(--bg-raised); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
-  .offer-price { display: flex; flex-direction: column-reverse; align-items: center; font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 800; font-size: clamp(2.1rem, 1.85rem + 1vw, 2.6rem); line-height: 1; color: var(--bleu); margin-bottom: 10px; letter-spacing: -0.03em; text-shadow: 0 2px 20px color-mix(in srgb, var(--bleu-vif) 38%, transparent); }
+  .offer-price { display: flex; flex-direction: column-reverse; font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 800; font-size: clamp(2.1rem, 1.85rem + 1vw, 2.6rem); line-height: 1; color: var(--bleu); margin-bottom: 10px; letter-spacing: -0.03em; text-shadow: 0 2px 20px color-mix(in srgb, var(--bleu-vif) 38%, transparent); }
   :root[data-theme="dark"] .offer-price { color: var(--bleu-vif); }
   @media (prefers-color-scheme: dark) { .offer-price { color: var(--bleu-vif); } }
   /* "Gratuit" n'a aucune surcharge de police : il hérite de .offer-price
