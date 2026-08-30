@@ -1816,32 +1816,45 @@
               <p>Vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Le détail figure dans notre <strong>politique de confidentialité (RGPD)</strong>, accessible en bas de chaque page.</p>
             </div>
           </details>
+        </div>
+      </div>
+    </section>
 
-          <div style="margin-top: 48px; border-top: 1px solid var(--gris-clair); padding-top: 48px;">
-            <details class="faq-item">
-              <summary style="cursor: pointer; font-size: 1.125rem; font-weight: 600; display: flex; align-items: center; gap: 12px;">
-                Vous ne trouvez pas votre question ?
-                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink: 0;"><path d="M6 9l6 6 6-6"/></svg>
-              </summary>
-              <div class="faq-answer" style="margin-top: 16px;">
-                <p style="margin-bottom: 20px; font-size: 0.95rem; color: var(--gris-moyen);">Posez votre question ici — votre copilote se fera un plaisir d'y répondre rapidement.</p>
-                <form id="form-contact-faq" novalidate style="display: grid; gap: 16px;">
-                  <div class="field">
-                    <label for="faq-contact-nom" style="display: block; font-weight: 500; margin-bottom: 6px; font-size: 0.95rem;">Votre nom</label>
-                    <input id="faq-contact-nom" name="nom" type="text" required placeholder="Prénom Nom" style="width: 100%; padding: 10px 12px; border: 1px solid var(--gris-clair); border-radius: 4px; font-size: 1rem; font-family: inherit;">
-                  </div>
-                  <div class="field">
-                    <label for="faq-contact-email" style="display: block; font-weight: 500; margin-bottom: 6px; font-size: 0.95rem;">Votre email</label>
-                    <input id="faq-contact-email" name="email" type="email" required placeholder="vous@exemple.fr" style="width: 100%; padding: 10px 12px; border: 1px solid var(--gris-clair); border-radius: 4px; font-size: 1rem; font-family: inherit;">
-                  </div>
-                  <div class="field">
-                    <label for="faq-contact-message" style="display: block; font-weight: 500; margin-bottom: 6px; font-size: 0.95rem;">Votre question</label>
-                    <textarea id="faq-contact-message" name="message" required placeholder="Décrivez votre question…" rows="4" style="width: 100%; padding: 10px 12px; border: 1px solid var(--gris-clair); border-radius: 4px; font-size: 1rem; font-family: inherit; resize: vertical;"></textarea>
-                  </div>
-                  <button type="submit" class="btn btn-primary" style="align-self: flex-start; margin-top: 8px;">Envoyer ma question</button>
-                </form>
+    <section class="tint" id="faq-contact">
+      <div class="wrap" style="max-width:640px;">
+        <div class="section-head" data-reveal>
+          <span class="label">Une question ?</span>
+          <h2>Vous ne trouvez pas votre question ?</h2>
+          <p>Posez-la ici, votre copilote se fera un plaisir d'y répondre rapidement.</p>
+        </div>
+
+        <div style="text-align:center; margin-bottom:32px;" data-reveal>
+          <button type="button" class="btn btn-primary" id="faq-contact-toggle-form">Poser ma question</button>
+        </div>
+
+        <div class="form-card" id="faq-contact-form-card" hidden data-reveal>
+          <form id="form-contact-faq" novalidate>
+            <div class="field-grid">
+              <div class="field">
+                <label for="faq-contact-nom">Votre nom</label>
+                <input id="faq-contact-nom" name="nom" required placeholder="Prénom Nom">
               </div>
-            </details>
+              <div class="field">
+                <label for="faq-contact-email">Votre email</label>
+                <input id="faq-contact-email" name="email" type="email" required placeholder="vous@exemple.fr">
+              </div>
+              <div class="field full">
+                <label for="faq-contact-message">Votre question</label>
+                <textarea id="faq-contact-message" name="message" required placeholder="Décrivez votre question."></textarea>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" id="faq-contact-submit" style="margin-top:18px;width:100%;">Envoyer ma question</button>
+          </form>
+
+          <div class="confirm-panel" id="confirm-faq-contact" hidden>
+            <div class="confirm-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+            <h3>Merci pour votre question</h3>
+            <p>Votre copilote vous répondra rapidement.</p>
           </div>
         </div>
       </div>
@@ -3873,16 +3886,14 @@
       e.preventDefault();
       // Naviguer vers la page FAQ
       showMainTab('faq', true);
-      // Attendre un moment puis ouvrir la section de contact et scroller
+      // Attendre un moment puis ouvrir le formulaire de contact et scroller
       setTimeout(function () {
-        var contactForm = document.getElementById('form-contact-faq');
-        if (!contactForm) return;
-        // Remonter jusqu'à la section details la plus proche
-        var contactDetails = contactForm.closest('details');
-        if (contactDetails) {
-          contactDetails.open = true;
-          contactDetails.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
-        }
+        var contactSection = document.getElementById('faq-contact');
+        var contactToggle = document.getElementById('faq-contact-toggle-form');
+        var contactFormCard = document.getElementById('faq-contact-form-card');
+        if (!contactSection) return;
+        if (contactToggle && contactFormCard && contactFormCard.hidden) contactToggle.click();
+        contactSection.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
       }, 300);
     });
   }
@@ -5338,46 +5349,40 @@
 
   // ---------- Formulaire de contact FAQ ----------
   (function () {
+    var toggleBtn = document.getElementById('faq-contact-toggle-form');
+    var formCard = document.getElementById('faq-contact-form-card');
     var form = document.getElementById('form-contact-faq');
-    if (!form) return;
+    var confirmPanel = document.getElementById('confirm-faq-contact');
+    var submitBtn = document.getElementById('faq-contact-submit');
+    if (!toggleBtn || !form) return;
+
+    toggleBtn.addEventListener('click', function () {
+      formCard.hidden = false;
+      toggleBtn.hidden = true;
+      formCard.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+    });
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       if (!form.reportValidity()) return;
-
       var payload = {
         nom: document.getElementById('faq-contact-nom').value.trim(),
         email: document.getElementById('faq-contact-email').value.trim(),
         message: document.getElementById('faq-contact-message').value.trim()
       };
-
-      var submitBtn = form.querySelector('button[type="submit"]');
       setBtnLoading(submitBtn, 'Envoi…');
-
       fetch(CONTACT_FAQ_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       }).then(function () {
-        // Succès ou erreur, on réinitialise le formulaire et ferme la section
-        var details = form.closest('details');
-        form.reset();
-        if (details) details.open = false;
-        clearBtnLoading(submitBtn);
-        // Afficher un message de confirmation bref
-        var message = document.createElement('div');
-        message.style.cssText = 'padding: 12px 16px; background-color: var(--vert); color: white; border-radius: 4px; margin-bottom: 16px; font-size: 0.95rem;';
-        message.textContent = 'Merci ! Votre question a été bien reçue. Mon copilote vous répondra rapidement.';
-        form.closest('.faq-answer').insertBefore(message, form);
-        setTimeout(function () {
-          message.remove();
-        }, 5000);
+        form.hidden = true;
+        confirmPanel.hidden = false;
       }).catch(function () {
+        form.hidden = true;
+        confirmPanel.hidden = false;
+      }).finally(function () {
         clearBtnLoading(submitBtn);
-        // En cas d'erreur réseau, on le note silencieusement mais on ferme quand même
-        var details = form.closest('details');
-        form.reset();
-        if (details) details.open = false;
       });
     });
   })();
