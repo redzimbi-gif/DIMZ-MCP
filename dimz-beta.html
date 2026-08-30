@@ -1909,6 +1909,33 @@
               <p>Vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Le détail figure dans notre <strong>politique de confidentialité (RGPD)</strong>, accessible en bas de chaque page.</p>
             </div>
           </details>
+
+          <div style="margin-top: 48px; border-top: 1px solid var(--gris-clair); padding-top: 48px;">
+            <details class="faq-item">
+              <summary style="cursor: pointer; font-size: 1.125rem; font-weight: 600; display: flex; align-items: center; gap: 12px;">
+                Vous ne trouvez pas votre question ?
+                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink: 0;"><path d="M6 9l6 6 6-6"/></svg>
+              </summary>
+              <div class="faq-answer" style="margin-top: 16px;">
+                <p style="margin-bottom: 20px; font-size: 0.95rem; color: var(--gris-moyen);">Posez votre question ici — votre copilote se fera un plaisir d'y répondre rapidement.</p>
+                <form id="form-contact-faq" novalidate style="display: grid; gap: 16px;">
+                  <div class="field">
+                    <label for="faq-contact-nom" style="display: block; font-weight: 500; margin-bottom: 6px; font-size: 0.95rem;">Votre nom</label>
+                    <input id="faq-contact-nom" name="nom" type="text" required placeholder="Prénom Nom" style="width: 100%; padding: 10px 12px; border: 1px solid var(--gris-clair); border-radius: 4px; font-size: 1rem; font-family: inherit;">
+                  </div>
+                  <div class="field">
+                    <label for="faq-contact-email" style="display: block; font-weight: 500; margin-bottom: 6px; font-size: 0.95rem;">Votre email</label>
+                    <input id="faq-contact-email" name="email" type="email" required placeholder="vous@exemple.fr" style="width: 100%; padding: 10px 12px; border: 1px solid var(--gris-clair); border-radius: 4px; font-size: 1rem; font-family: inherit;">
+                  </div>
+                  <div class="field">
+                    <label for="faq-contact-message" style="display: block; font-weight: 500; margin-bottom: 6px; font-size: 0.95rem;">Votre question</label>
+                    <textarea id="faq-contact-message" name="message" required placeholder="Décrivez votre question…" rows="4" style="width: 100%; padding: 10px 12px; border: 1px solid var(--gris-clair); border-radius: 4px; font-size: 1rem; font-family: inherit; resize: vertical;"></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary" style="align-self: flex-start; margin-top: 8px;">Envoyer ma question</button>
+                </form>
+              </div>
+            </details>
+          </div>
         </div>
       </div>
     </section>
@@ -3808,6 +3835,7 @@
   var TEST_FEEDBACK_URL = 'https://tlkstfmheprsmbxlmrgr.supabase.co/functions/v1/test-feedback';
   var TRACK_URL = 'https://tlkstfmheprsmbxlmrgr.supabase.co/functions/v1/track-lookup';
   var AVIS_URL = 'https://tlkstfmheprsmbxlmrgr.supabase.co/functions/v1/avis';
+  var CONTACT_FAQ_URL = 'https://tlkstfmheprsmbxlmrgr.supabase.co/functions/v1/contact-faq';
 
   // ---------- Connexion des formulaires à Google Sheets, via un Google Form ----------
   var GOOGLE_FORM_RESPONSE_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdnC-KcwOoDh7cGpsfS7Q3WuEr2yyWJR8T4LKffPqkXLhe_SQ/formResponse';
@@ -5385,6 +5413,52 @@
         }).join('');
       }).catch(function () { /* la liste reste sur son message d'attente par défaut */ });
     }
+  })();
+
+  // ---------- Formulaire de contact FAQ ----------
+  (function () {
+    var form = document.getElementById('form-contact-faq');
+    if (!form) return;
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!form.reportValidity()) return;
+
+      var payload = {
+        nom: document.getElementById('faq-contact-nom').value.trim(),
+        email: document.getElementById('faq-contact-email').value.trim(),
+        message: document.getElementById('faq-contact-message').value.trim()
+      };
+
+      var submitBtn = form.querySelector('button[type="submit"]');
+      setBtnLoading(submitBtn, 'Envoi…');
+
+      fetch(CONTACT_FAQ_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function () {
+        // Succès ou erreur, on réinitialise le formulaire et ferme la section
+        var details = form.closest('details');
+        form.reset();
+        if (details) details.open = false;
+        clearBtnLoading(submitBtn);
+        // Afficher un message de confirmation bref
+        var message = document.createElement('div');
+        message.style.cssText = 'padding: 12px 16px; background-color: var(--vert); color: white; border-radius: 4px; margin-bottom: 16px; font-size: 0.95rem;';
+        message.textContent = 'Merci ! Votre question a été bien reçue. Mon copilote vous répondra rapidement.';
+        form.closest('.faq-answer').insertBefore(message, form);
+        setTimeout(function () {
+          message.remove();
+        }, 5000);
+      }).catch(function () {
+        clearBtnLoading(submitBtn);
+        // En cas d'erreur réseau, on le note silencieusement mais on ferme quand même
+        var details = form.closest('details');
+        form.reset();
+        if (details) details.open = false;
+      });
+    });
   })();
 
   // ---------- Questionnaire de test : envoi dédié (ne crée ni client ni dossier) ----------
