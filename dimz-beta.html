@@ -2385,18 +2385,6 @@
             <form id="form-accompagnement" novalidate>
 
               <div class="form-step">
-                <div class="field-grid">
-                  <div class="field">
-                    <label for="a-email">Email</label>
-                    <input type="email" id="a-email" required>
-                  </div>
-                </div>
-                <div class="field full toggle-row" style="margin-top:22px;">
-                  <label><input type="checkbox" id="a-consentement" required> J'accepte que mes données soient utilisées par DIMZ afin d'être recontacté dans le cadre de ma demande d'accompagnement automobile.</label>
-                </div>
-              </div>
-
-              <div class="form-step">
                 <figure class="feature-photo" style="margin:0 0 20px;"><img src="img/fiat-ruelle.jpg" alt="Petite citadine garée dans une ruelle" loading="lazy" width="1227" height="2180" style="object-position:50% 88%;"></figure>
                 <h3>Situation actuelle</h3>
                 <p class="hint" style="display:block; margin-bottom:20px;">Où en êtes-vous avec votre véhicule aujourd'hui ?</p>
@@ -2687,30 +2675,6 @@
                 <h3>Projet et délai</h3>
                 <p class="hint" style="display:block; margin-bottom:20px;">Les derniers repères avant de vous lancer.</p>
                 <div class="field-grid">
-                  <div class="field full" style="margin-top:0;">
-                    <label class="section-sublabel">Vos coordonnées</label>
-                  </div>
-                  <div class="field">
-                    <label for="a-civilite">Civilité</label>
-                    <select id="a-civilite" required>
-                      <option value="">Choisir…</option>
-                      <option>M.</option>
-                      <option>Mme</option>
-                      <option>Je ne préfère pas préciser</option>
-                    </select>
-                  </div>
-                  <div class="field">
-                    <label for="a-nom">Nom</label>
-                    <input type="text" id="a-nom" required>
-                  </div>
-                  <div class="field">
-                    <label for="a-prenom">Prénom</label>
-                    <input type="text" id="a-prenom" required>
-                  </div>
-                  <div class="field">
-                    <label for="a-tel">Téléphone</label>
-                    <input type="tel" id="a-tel" required>
-                  </div>
                   <div class="field full">
                     <label>Quel accompagnement recherchez-vous ?</label>
                     <div class="offer-pick-grid" id="besoin-choices">
@@ -2761,14 +2725,49 @@
                       <option>Autre</option>
                     </select>
                   </div>
-                  <div class="field">
-                    <label for="a-age">Âge <span class="hint">(optionnel)</span></label>
-                    <input type="number" id="a-age" min="18" max="99">
-                  </div>
                   <div class="field full">
                     <label for="a-inquietudes">Vos principales inquiétudes concernant cet achat</label>
                     <textarea id="a-inquietudes" placeholder="Panne cachée, prix trop élevé, manque de temps pour chercher…"></textarea>
                   </div>
+                </div>
+              </div>
+
+              <div class="form-step">
+                <h3>Coordonnées</h3>
+                <p class="hint" style="display:block; margin-bottom:20px;">Pour que votre copilote puisse vous recontacter.</p>
+                <div class="field-grid">
+                  <div class="field">
+                    <label for="a-civilite">Civilité</label>
+                    <select id="a-civilite" required>
+                      <option value="">Choisir…</option>
+                      <option>M.</option>
+                      <option>Mme</option>
+                      <option>Je ne préfère pas préciser</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="a-nom">Nom</label>
+                    <input type="text" id="a-nom" required>
+                  </div>
+                  <div class="field">
+                    <label for="a-prenom">Prénom</label>
+                    <input type="text" id="a-prenom" required>
+                  </div>
+                  <div class="field">
+                    <label for="a-age">Âge <span class="hint">(optionnel)</span></label>
+                    <input type="number" id="a-age" min="18" max="99">
+                  </div>
+                  <div class="field">
+                    <label for="a-email">Email</label>
+                    <input type="email" id="a-email" required>
+                  </div>
+                  <div class="field">
+                    <label for="a-tel">Téléphone</label>
+                    <input type="tel" id="a-tel" required>
+                  </div>
+                </div>
+                <div class="field full toggle-row" style="margin-top:22px;">
+                  <label><input type="checkbox" id="a-consentement" required> J'accepte que mes données soient utilisées par DIMZ afin d'être recontacté dans le cadre de ma demande d'accompagnement automobile.</label>
                 </div>
               </div>
 
@@ -4219,13 +4218,8 @@
       if (targetEmail) targetEmail.value = email;
       if (targetConsentement) targetConsentement.checked = consentement;
       showMainTab('accompagnement-form', true);
-      // L'étape 1 (email + consentement) vient d'être remplie ici : on
-      // enchaîne directement sur l'étape 2 plutôt que de la redemander.
-      // fromRecap = false, sinon le bouton « Retour au récapitulatif »
-      // s'afficherait alors qu'aucun récapitulatif n'existe encore.
-      if (typeof wizards !== 'undefined' && wizards && wizards['form-accompagnement']) {
-        wizards['form-accompagnement'].goTo(1, false);
-      }
+      // L'email et le consentement sont préremplis ici : ils réapparaîtront
+      // déjà remplis à l'étape Coordonnées, sans avoir à les redemander.
       window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
     });
   })();
@@ -4654,14 +4648,6 @@
   function buildRecapAccompagnement() {
     var groups = [];
 
-    groups.push({ title: 'Informations personnelles', step: 0, rows: [
-      recapRow('Civilité', selectText('a-civilite')),
-      recapRow('Nom', inputVal('a-nom')),
-      recapRow('Prénom', inputVal('a-prenom')),
-      recapRow('Téléphone', inputVal('a-tel')),
-      recapRow('Email', inputVal('a-email'))
-    ].filter(Boolean) });
-
     var situationParts = [recapRow('Véhicule actuel', selectText('a-vehicule-actuel'))];
     if (document.getElementById('a-vehicule-actuel').value === 'oui') {
       var actuelVeh = [inputVal('a-actuel-marque'), inputVal('a-actuel-modele'), inputVal('a-actuel-generation')].filter(Boolean).join(' ');
@@ -4682,10 +4668,10 @@
         situationParts.push(recapRow('Apport initial versé', apport ? apport + ' €' : ''));
       }
     }
-    groups.push({ title: 'Situation actuelle', step: 1, rows: situationParts.filter(Boolean) });
+    groups.push({ title: 'Situation actuelle', step: 0, rows: situationParts.filter(Boolean) });
 
     var enfantsOui = document.getElementById('a-enfants').value === 'oui';
-    groups.push({ title: 'Votre quotidien', step: 2, rows: [
+    groups.push({ title: 'Votre quotidien', step: 1, rows: [
       recapRow('Enfants parmi les passagers', selectText('a-enfants')),
       enfantsOui ? recapRow('Nombre d\'enfants', selectText('a-enfants-nombre')) : null,
       recapRow('Véhicule destiné à', selectText('a-pourqui')),
@@ -4695,7 +4681,7 @@
     ].filter(Boolean) });
 
     var apportSouhaite = inputVal('a-apport-souhaite');
-    groups.push({ title: 'Budget et financement', step: 3, rows: [
+    groups.push({ title: 'Budget et financement', step: 2, rows: [
       recapRow('Budget total envisagé', inputVal('a-budget-text')),
       recapRow('Mode de financement souhaité', recapCheckedList('input[name="financement"]')),
       recapRow('Apport envisagé (si financement)', apportSouhaite ? apportSouhaite + ' €' : ''),
@@ -4714,7 +4700,7 @@
       recapRow('Véhicules ciblés', vehText),
       recapRow('Boîte de vitesses souhaitée', recapCheckedList('#transmission-choices-oui input'))
     ];
-    groups.push({ title: 'La voiture de vos rêves', step: 4, rows: vehiculesRows.concat([
+    groups.push({ title: 'La voiture de vos rêves', step: 3, rows: vehiculesRows.concat([
       recapRow('Remarques', inputVal('a-veh-remarques'))
     ]).filter(Boolean) });
 
@@ -4726,12 +4712,20 @@
     };
     var besoinChecked = document.querySelector('#besoin-choices input:checked');
     var besoinRappel = besoinChecked ? (OFFRE_RAPPELS[besoinChecked.value] || besoinChecked.closest('label').textContent.trim()) : '';
-    groups.push({ title: 'Projet et délai', step: 5, rows: [
+    groups.push({ title: 'Projet et délai', step: 4, rows: [
       recapRow('Accompagnement recherché', besoinRappel),
       recapRow('Délai souhaité', selectText('a-delai')),
       recapRow('Comment vous avez connu Dimz', selectText('a-source')),
-      recapRow('Âge', inputVal('a-age')),
       recapRow('Inquiétudes principales', inputVal('a-inquietudes'))
+    ].filter(Boolean) });
+
+    groups.push({ title: 'Coordonnées', step: 5, rows: [
+      recapRow('Civilité', selectText('a-civilite')),
+      recapRow('Nom', inputVal('a-nom')),
+      recapRow('Prénom', inputVal('a-prenom')),
+      recapRow('Âge', inputVal('a-age')),
+      recapRow('Email', inputVal('a-email')),
+      recapRow('Téléphone', inputVal('a-tel'))
     ].filter(Boolean) });
 
     return groups;
