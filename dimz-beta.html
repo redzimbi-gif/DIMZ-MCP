@@ -534,43 +534,7 @@
   .offer-card li { display: flex; gap: 10px; font-size: 0.91rem; line-height: 1.45; }
   .offer-card li::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--bleu-vif); margin-top: 9px; flex: none; }
   .offer-card .btn { justify-content: center; margin-top: auto; }
-  .offer-note { margin-top: 26px; text-align: center; color: var(--ink-soft); font-size: 0.85rem; max-width: 60ch; margin-left: auto; margin-right: auto; }
-  .offer-note-devis { margin-top: 8px; }
   .offer-footnote { margin-top: 10px; text-align: center; color: color-mix(in srgb, var(--ink-soft) 82%, transparent); font-size: 0.76rem; line-height: 1.5; max-width: 68ch; margin-left: auto; margin-right: auto; }
-
-  /* ---------------- Copilote -> Copilote Plus : déduction permanente ---------------- */
-  .upgrade-flow { margin: 30px auto 0; max-width: 860px; background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--r-xl); padding: 34px 30px; box-shadow: var(--shadow); text-align: center; }
-  .upgrade-flow-kicker { margin: 0 0 8px; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--bleu-vif); }
-  .upgrade-flow-title { margin: 0 0 28px; font-family: "Instrument Sans", var(--sans); font-size: clamp(1.15rem, 1.02rem + 0.6vw, 1.4rem); font-weight: 600; letter-spacing: -0.01em; }
-  .upgrade-flow-steps { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
-  .upgrade-step { display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 118px; }
-  .upgrade-step-label { font-size: 0.72rem; color: var(--ink-soft); font-weight: 600; }
-  .upgrade-step-name { font-size: 0.98rem; font-weight: 700; }
-  .upgrade-step-value { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 800; font-size: 1.3rem; color: var(--ink); letter-spacing: -0.02em; }
-  .upgrade-step-value .upgrade-step-from { display: block; font-family: var(--sans); font-weight: 700; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin-top: 2px; }
-  .upgrade-step-value.deduit { color: var(--vert); }
-  .upgrade-step-value.final { color: var(--bleu-vif); font-size: 1.55rem; }
-  .upgrade-arrow { width: 20px; height: 20px; flex: none; color: var(--line); }
-  @media (max-width: 700px) { .upgrade-arrow { transform: rotate(90deg); } .upgrade-flow-steps { gap: 10px; } }
-  .upgrade-flow-note { margin: 26px 0 0; color: var(--ink-soft); font-size: 0.86rem; line-height: 1.55; max-width: 60ch; margin-left: auto; margin-right: auto; }
-
-  /* ---------------- Zone DIMZ : teaser compact + détail dépliable ---------------- */
-  .zone-teaser { margin: 28px auto 0; max-width: 620px; background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow); transition: border-color 0.15s ease; }
-  .zone-teaser[open] { border-color: color-mix(in srgb, var(--bleu-vif) 32%, var(--line)); }
-  .zone-teaser-summary { list-style: none; cursor: pointer; padding: 16px 22px; display: flex; align-items: center; gap: 14px; }
-  .zone-teaser-summary::-webkit-details-marker { display: none; }
-  .zone-teaser-icon { width: 38px; height: 38px; border-radius: 50%; background: var(--bg-tint); color: var(--bleu-vif); display: flex; align-items: center; justify-content: center; flex: none; }
-  .zone-teaser-icon svg { width: 19px; height: 19px; }
-  .zone-teaser-text { display: flex; flex-direction: column; gap: 2px; text-align: left; flex: 1; min-width: 0; }
-  .zone-teaser-text strong { font-size: 0.94rem; }
-  .zone-teaser-sub { font-size: 0.82rem; color: var(--ink-soft); }
-  .zone-teaser-link { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 700; color: var(--bleu-vif); flex: none; white-space: nowrap; }
-  .zone-teaser-link .chevron { width: 16px; height: 16px; transition: transform 0.2s ease; }
-  .zone-teaser-body { padding: 0 22px 22px; }
-  @media (max-width: 560px) {
-    .zone-teaser-summary { flex-wrap: wrap; }
-    .zone-teaser-link { margin-left: 52px; }
-  }
 
   /* ---------------- Avis clients ---------------- */
   .avis-empty { text-align: center; color: var(--ink-soft); font-size: 0.94rem; padding: 40px 24px; border: 1px dashed var(--line); border-radius: var(--r-lg); }
@@ -639,7 +603,6 @@
   .pc-label { flex: none; font-size: 0.64rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; padding: 2px 8px; border-radius: 100px; }
   .pc-label.good { background: color-mix(in srgb, var(--vert) 16%, transparent); color: var(--vert); }
   .pc-label.bad { background: color-mix(in srgb, var(--rouge) 14%, transparent); color: var(--rouge); }
-  .offer-note strong { color: var(--ink); }
 
   /* Carte "Un principe permanent" : intégrée aux modales d'offres */
   .principle-card { background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--r-md); padding: 20px; margin: 20px 0; }
@@ -1590,62 +1553,6 @@
           <p class="offer-modal-comment">« Je reconnais l'exactitude de cet état des lieux, établi contradictoirement au moment de la prise en charge du véhicule. »</p>
           <p class="offer-modal-footnote">Exemple fictif. Chaque état des lieux réel comprend 14 photos obligatoires, un relevé kilométrage/carburant et une signature électronique.</p>
         </template>
-
-        <div class="upgrade-flow" data-reveal>
-          <p class="upgrade-flow-kicker">Un principe permanent, pas une remise ponctuelle</p>
-          <h3 class="upgrade-flow-title">Commencez par Copilote. Rien n'est jamais payé deux fois.</h3>
-          <div class="upgrade-flow-steps">
-            <div class="upgrade-step">
-              <span class="upgrade-step-label">Vous commencez par</span>
-              <span class="upgrade-step-name">Copilote</span>
-              <span class="upgrade-step-value" id="uf-copilote-price">99 €</span>
-            </div>
-            <svg class="upgrade-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
-            <div class="upgrade-step">
-              <span class="upgrade-step-label">Vous passez à</span>
-              <span class="upgrade-step-name">Copilote Plus</span>
-              <span class="upgrade-step-value">599 €<span class="upgrade-step-from">à partir de</span></span>
-            </div>
-            <svg class="upgrade-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
-            <div class="upgrade-step upgrade-step-deduit">
-              <span class="upgrade-step-label">Votre Copilote déjà réglé</span>
-              <span class="upgrade-step-value deduit" id="uf-deduit">− 99 €</span>
-            </div>
-            <svg class="upgrade-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
-            <div class="upgrade-step upgrade-step-final">
-              <span class="upgrade-step-label">Reste à payer</span>
-              <span class="upgrade-step-value final" id="uf-reste">500 €</span>
-            </div>
-          </div>
-          <p class="upgrade-flow-note">Votre prestation Copilote (99 € ou 149 €) est intégralement déduite du prix de Copilote Plus si vous décidez d'aller plus loin ensuite. Vous pouvez commencer petit et monter en gamme sans rien perdre.</p>
-        </div>
-        <p class="offer-note offer-note-devis" data-reveal>Sur devis, dans l'offre Copilote Plus : 2<sup>e</sup> inspection, livraison hors zone.</p>
-
-        <details class="zone-teaser" data-reveal>
-          <summary class="zone-teaser-summary">
-            <span class="zone-teaser-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24" stroke-width="1.8"><path d="M12 21s7-6.8 7-12.5A7 7 0 1 0 5 8.5C5 14.2 12 21 12 21z"/><circle cx="12" cy="8.5" r="2.6"/></svg></span>
-            <span class="zone-teaser-text">
-              <strong>Livraison incluse dans la Zone DIMZ<sup>*</sup></strong>
-              <span class="zone-teaser-sub">Rhône-Alpes &amp; secteurs limitrophes</span>
-            </span>
-            <span class="zone-teaser-link">Voir la zone couverte<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></span>
-          </summary>
-          <div class="zone-teaser-body">
-            <div class="tag-row">
-              <span class="tag">Rhône (69)</span>
-              <span class="tag">Haute-Savoie (74)</span>
-              <span class="tag">Savoie (73)</span>
-              <span class="tag">Isère (38)</span>
-              <span class="tag">Drôme (26)</span>
-              <span class="tag">Ardèche (07)</span>
-              <span class="tag">Ain (01)</span>
-              <span class="tag">Mâcon</span>
-              <span class="tag">Clermont-Ferrand</span>
-            </div>
-            <p class="offer-footnote" style="margin:14px 0 0;text-align:left;"><sup>*</sup> Hors Porte du Soleil (74), 3 Vallées (73), 2 Alpes (38) et Pays de Gex (01). En dehors de la Zone DIMZ, la livraison reste possible, sur devis.</p>
-          </div>
-        </details>
-
 
         <div class="section-head" data-reveal style="margin-top:64px;">
           <span class="label">Comparatif</span>
@@ -4247,20 +4154,12 @@
   var priceButtons = document.querySelectorAll('.price-toggle button');
   var priceValue = document.getElementById('offer-price-value');
   var offerSubCopilote = document.getElementById('offer-sub-copilote');
-  var ufCopilotePrice = document.getElementById('uf-copilote-price');
-  var ufDeduit = document.getElementById('uf-deduit');
-  var ufReste = document.getElementById('uf-reste');
-  var COPILOTE_PLUS_PRIX = 599;
   priceButtons.forEach(function (btn) {
     btn.addEventListener('click', function () {
       priceButtons.forEach(function (b) { b.setAttribute('aria-selected', 'false'); });
       btn.setAttribute('aria-selected', 'true');
       priceValue.textContent = btn.dataset.price + ' €';
       if (offerSubCopilote && btn.dataset.sub) offerSubCopilote.textContent = btn.dataset.sub;
-      var prix = parseInt(btn.dataset.price, 10);
-      if (ufCopilotePrice) ufCopilotePrice.textContent = prix + ' €';
-      if (ufDeduit) ufDeduit.textContent = '− ' + prix + ' €';
-      if (ufReste) ufReste.textContent = (COPILOTE_PLUS_PRIX - prix) + ' €';
     });
   });
 
