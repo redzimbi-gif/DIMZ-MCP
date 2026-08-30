@@ -450,9 +450,24 @@
   .hero-accueil-bg { --hero-photo: var(--hero-accueil-photo); }
   .hero-accueil-bg::after {
     background:
-      radial-gradient(1100px 520px at var(--glow-x, 82%) -10%, color-mix(in srgb, var(--bleu-vif) 12%, transparent), transparent 60%),
-      linear-gradient(165deg, color-mix(in srgb, var(--bleu-nuit) 12%, transparent) 6%, color-mix(in srgb, var(--noir) 18%, transparent) 94%);
+      radial-gradient(1100px 520px at var(--glow-x, 82%) -10%, color-mix(in srgb, var(--bleu-vif) 3%, transparent), transparent 60%),
+      linear-gradient(165deg, color-mix(in srgb, var(--bleu-nuit) 3%, transparent) 6%, color-mix(in srgb, var(--noir) 5%, transparent) 94%);
   }
+  /* Mode clair : texte plus sombre pour le contraste sur photo lumineuse */
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) .hero-accueil-bg h1,
+    :root:not([data-theme="dark"]) .hero-accueil-bg h2 { color: #1a1a1a; }
+    :root:not([data-theme="dark"]) .hero-accueil-bg h1 em,
+    :root:not([data-theme="dark"]) .hero-accueil-bg h2 em { color: #4a5a8f; }
+    :root:not([data-theme="dark"]) .hero-accueil-bg p.lede { color: rgba(0, 0, 0, 0.72); }
+    :root:not([data-theme="dark"]) .hero-accueil-bg .kicker { color: #4a5a8f; }
+  }
+  :root[data-theme="light"] .hero-accueil-bg h1,
+  :root[data-theme="light"] .hero-accueil-bg h2 { color: #1a1a1a; }
+  :root[data-theme="light"] .hero-accueil-bg h1 em,
+  :root[data-theme="light"] .hero-accueil-bg h2 em { color: #4a5a8f; }
+  :root[data-theme="light"] .hero-accueil-bg p.lede { color: rgba(0, 0, 0, 0.72); }
+  :root[data-theme="light"] .hero-accueil-bg .kicker { color: #4a5a8f; }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) .hero-accueil-bg::after {
       background:
