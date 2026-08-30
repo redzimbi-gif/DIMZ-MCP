@@ -1227,11 +1227,11 @@
           <p class="acc-collapse-intro">Ces quelques questions permettent à votre copilote de vous conduire jusqu'à votre projet idéal.</p>
           <form id="form-accueil-teaser" novalidate style="max-width:560px; margin:0 auto; text-align:left;">
             <div class="field">
-              <label for="accueil-teaser-email">Email</label>
-              <input type="email" id="accueil-teaser-email" required>
-            </div>
-            <div class="field full toggle-row" style="margin-top:16px;">
-              <label><input type="checkbox" id="accueil-teaser-consentement" required> J'accepte que mes données soient utilisées par DIMZ afin d'être recontacté dans le cadre de ma demande d'accompagnement automobile.</label>
+              <label for="accueil-teaser-vehicule-actuel">Avez-vous un véhicule actuellement ?</label>
+              <select id="accueil-teaser-vehicule-actuel">
+                <option value="non">Non</option>
+                <option value="oui">Oui</option>
+              </select>
             </div>
             <button type="submit" class="btn btn-primary acc-band-cta" style="margin-top:20px;">Continuer</button>
           </form>
@@ -4204,22 +4204,25 @@
     });
   })();
 
-  // ---------- Teaser "Votre projet" sur l'accueil : reprend l'email/consentement dans le vrai formulaire ----------
+  // ---------- Teaser "Votre projet" sur l'accueil : reprend la réponse de la 1ère étape dans le vrai formulaire ----------
   (function () {
     var form = document.getElementById('form-accueil-teaser');
     if (!form) return;
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       if (!form.reportValidity()) return;
-      var email = document.getElementById('accueil-teaser-email').value;
-      var consentement = document.getElementById('accueil-teaser-consentement').checked;
-      var targetEmail = document.getElementById('a-email');
-      var targetConsentement = document.getElementById('a-consentement');
-      if (targetEmail) targetEmail.value = email;
-      if (targetConsentement) targetConsentement.checked = consentement;
+      var vehiculeActuel = document.getElementById('accueil-teaser-vehicule-actuel').value;
+      var targetVehiculeActuel = document.getElementById('a-vehicule-actuel');
+      if (targetVehiculeActuel) {
+        targetVehiculeActuel.value = vehiculeActuel;
+        targetVehiculeActuel.dispatchEvent(new Event('change'));
+      }
       showMainTab('accompagnement-form', true);
-      // L'email et le consentement sont préremplis ici : ils réapparaîtront
-      // déjà remplis à l'étape Coordonnées, sans avoir à les redemander.
+      // La réponse est préremplie ici : elle réapparaît déjà sélectionnée à
+      // la 1ère étape (Situation actuelle) du vrai formulaire.
+      if (typeof wizards !== 'undefined' && wizards && wizards['form-accompagnement']) {
+        wizards['form-accompagnement'].goTo(0, false);
+      }
       window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
     });
   })();
