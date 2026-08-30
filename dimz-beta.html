@@ -571,7 +571,6 @@
      (mono, 800) pour tomber exactement sur la même ligne de base que
      "99 €" et "599 €". Seule la couleur change. */
   .offer-price .free { color: var(--vert); text-shadow: 0 2px 20px color-mix(in srgb, var(--vert) 38%, transparent); }
-  .offer-price-note { font-size: 0.85rem; font-weight: 400; color: var(--ink-soft); text-shadow: none; margin-top: 0; margin-left: 8px; display: inline; }
   /* Placé APRÈS le prix dans le markup : légende sous le montant, pour ne
      pas décaler "599 €" vers le bas par rapport aux deux autres cartes. */
   .offer-price .from-label { font-family: var(--sans); font-weight: 700; font-size: 0.28em; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin-bottom: 6px; text-shadow: none; }
@@ -1417,7 +1416,7 @@
             <p class="offer-texte">Faisons la route ensemble.</p>
             <div class="offer-price-zone">
               <div class="offer-price">599 €<span class="from-label">À partir de</span></div>
-              <p class="offer-price-note">500 € si vous avez déjà pris Copilote</p>
+              <div class="offer-sub">500 € si vous avez déjà pris Copilote</div>
             </div>
             <ul>
               <li>Tout le contenu de l'offre Copilote (recherche + analyse)</li>
