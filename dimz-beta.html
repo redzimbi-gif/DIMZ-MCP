@@ -3747,6 +3747,7 @@
     <a href="javascript:void(0)" data-goto-legal="mentions">Mentions légales</a>
     <a href="javascript:void(0)" data-goto-legal="cgv">CGV</a>
     <a href="javascript:void(0)" id="cookie-settings-link">Gérer les cookies</a>
+    <a href="javascript:void(0)" id="footer-contact-link">Nous contacter</a>
     <a href="javascript:void(0)" data-goto-tab="test">Donner votre avis sur le site</a>
   </nav>
   <div class="footer-top">
@@ -3957,6 +3958,27 @@
       window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
     });
   });
+
+  // Lien "Nous contacter" du footer
+  var footerContactLink = document.getElementById('footer-contact-link');
+  if (footerContactLink) {
+    footerContactLink.addEventListener('click', function (e) {
+      e.preventDefault();
+      // Naviguer vers la page FAQ
+      showMainTab('faq', true);
+      // Attendre un moment puis ouvrir la section de contact et scroller
+      setTimeout(function () {
+        var contactForm = document.getElementById('form-contact-faq');
+        if (!contactForm) return;
+        // Remonter jusqu'à la section details la plus proche
+        var contactDetails = contactForm.closest('details');
+        if (contactDetails) {
+          contactDetails.open = true;
+          contactDetails.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+        }
+      }, 300);
+    });
+  }
 
   // ---------- Modale "Ce que vous recevez" : cartes d'offres cliquables ----------
   (function () {
