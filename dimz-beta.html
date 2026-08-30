@@ -447,7 +447,7 @@
      et en mode sombre (route de nuit), via --hero-accueil-photo redéfini par thème.
      Voile plus léger en mode clair (photo lumineuse), voile standard conservé
      en mode sombre (photo de nuit, qui a besoin du voile fort d'origine). */
-  .hero-accueil-bg { --hero-photo: var(--hero-accueil-photo); }
+  .hero-accueil-bg { --hero-photo: var(--hero-accueil-photo); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 0 !important; }
   .hero-accueil-bg::after {
     background:
       radial-gradient(1100px 520px at var(--glow-x, 82%) -10%, color-mix(in srgb, var(--bleu-vif) 20%, transparent), transparent 60%),
