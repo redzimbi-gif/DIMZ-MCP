@@ -554,6 +554,24 @@
   @media (max-width: 700px) { .upgrade-arrow { transform: rotate(90deg); } .upgrade-flow-steps { gap: 10px; } }
   .upgrade-flow-note { margin: 26px 0 0; color: var(--ink-soft); font-size: 0.86rem; line-height: 1.55; max-width: 60ch; margin-left: auto; margin-right: auto; }
 
+  /* ---------------- Zone DIMZ : teaser compact + détail dépliable ---------------- */
+  .zone-teaser { margin: 28px auto 0; max-width: 620px; background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow); transition: border-color 0.15s ease; }
+  .zone-teaser[open] { border-color: color-mix(in srgb, var(--bleu-vif) 32%, var(--line)); }
+  .zone-teaser-summary { list-style: none; cursor: pointer; padding: 16px 22px; display: flex; align-items: center; gap: 14px; }
+  .zone-teaser-summary::-webkit-details-marker { display: none; }
+  .zone-teaser-icon { width: 38px; height: 38px; border-radius: 50%; background: var(--bg-tint); color: var(--bleu-vif); display: flex; align-items: center; justify-content: center; flex: none; }
+  .zone-teaser-icon svg { width: 19px; height: 19px; }
+  .zone-teaser-text { display: flex; flex-direction: column; gap: 2px; text-align: left; flex: 1; min-width: 0; }
+  .zone-teaser-text strong { font-size: 0.94rem; }
+  .zone-teaser-sub { font-size: 0.82rem; color: var(--ink-soft); }
+  .zone-teaser-link { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 700; color: var(--bleu-vif); flex: none; white-space: nowrap; }
+  .zone-teaser-link .chevron { width: 16px; height: 16px; transition: transform 0.2s ease; }
+  .zone-teaser-body { padding: 0 22px 22px; }
+  @media (max-width: 560px) {
+    .zone-teaser-summary { flex-wrap: wrap; }
+    .zone-teaser-link { margin-left: 52px; }
+  }
+
   /* ---------------- Avis clients ---------------- */
   .avis-empty { text-align: center; color: var(--ink-soft); font-size: 0.94rem; padding: 40px 24px; border: 1px dashed var(--line); border-radius: var(--r-lg); }
   .avis-card { border: 1px solid var(--line); border-radius: var(--r-md); padding: 18px 20px; background: var(--bg-raised); box-shadow: var(--shadow); margin-bottom: 14px; }
@@ -1533,7 +1551,31 @@
           <p class="upgrade-flow-note">Votre prestation Copilote (99 € ou 149 €) est intégralement déduite du prix de Copilote Plus si vous décidez d'aller plus loin ensuite. Vous pouvez commencer petit et monter en gamme sans rien perdre.</p>
         </div>
         <p class="offer-note offer-note-devis" data-reveal>Sur devis, dans l'offre Copilote Plus : 2<sup>e</sup> inspection, livraison hors zone.</p>
-        <p class="offer-footnote" data-reveal><sup>*</sup> Zone DIMZ, la zone de livraison incluse dans l'offre Copilote Plus : Rhône (69), Haute-Savoie (74, hors Porte du Soleil), Savoie (73, hors 3 Vallées), Isère (38, hors 2 Alpes), Drôme (26), Ardèche (07), Ain (01, hors Pays de Gex), agglomérations de Mâcon et de Clermont-Ferrand.</p>
+
+        <details class="zone-teaser" data-reveal>
+          <summary class="zone-teaser-summary">
+            <span class="zone-teaser-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24" stroke-width="1.8"><path d="M12 21s7-6.8 7-12.5A7 7 0 1 0 5 8.5C5 14.2 12 21 12 21z"/><circle cx="12" cy="8.5" r="2.6"/></svg></span>
+            <span class="zone-teaser-text">
+              <strong>Livraison incluse dans la Zone DIMZ<sup>*</sup></strong>
+              <span class="zone-teaser-sub">Rhône-Alpes &amp; secteurs limitrophes</span>
+            </span>
+            <span class="zone-teaser-link">Voir la zone couverte<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></span>
+          </summary>
+          <div class="zone-teaser-body">
+            <div class="tag-row">
+              <span class="tag">Rhône (69)</span>
+              <span class="tag">Haute-Savoie (74)</span>
+              <span class="tag">Savoie (73)</span>
+              <span class="tag">Isère (38)</span>
+              <span class="tag">Drôme (26)</span>
+              <span class="tag">Ardèche (07)</span>
+              <span class="tag">Ain (01)</span>
+              <span class="tag">Mâcon</span>
+              <span class="tag">Clermont-Ferrand</span>
+            </div>
+            <p class="offer-footnote" style="margin:14px 0 0;text-align:left;"><sup>*</sup> Hors Porte du Soleil (74), 3 Vallées (73), 2 Alpes (38) et Pays de Gex (01). En dehors de la Zone DIMZ, la livraison reste possible, sur devis.</p>
+          </div>
+        </details>
 
         <div class="grid-2" style="margin-top:32px;" data-reveal>
           <div class="option-card option-card-photo">
