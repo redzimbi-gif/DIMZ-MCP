@@ -641,6 +641,23 @@
   .pc-label.bad { background: color-mix(in srgb, var(--rouge) 14%, transparent); color: var(--rouge); }
   .offer-note strong { color: var(--ink); }
 
+  /* Carte "Un principe permanent" : intégrée aux modales d'offres */
+  .principle-card { background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--r-md); padding: 20px; margin: 20px 0; }
+  .principle-card span:first-child { display: inline-block; font-size: 0.64rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; background: color-mix(in srgb, var(--bleu-vif) 12%, transparent); color: var(--bleu-vif); padding: 4px 10px; border-radius: 100px; margin-bottom: 10px; }
+  .principle-card h4 { font-size: 1.1rem; font-weight: 700; margin: 0 0 6px; }
+  .principle-desc { color: var(--ink-soft); font-size: 0.9rem; margin: 0 0 18px; }
+  .principle-flow { display: flex; flex-direction: column; gap: 14px; }
+  .principle-step { display: flex; flex-direction: column; gap: 6px; }
+  .principle-step-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-soft); }
+  .principle-step-box { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+  .principle-step-name { font-size: 0.92rem; font-weight: 600; color: var(--ink); }
+  .principle-step-price { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 1.1rem; font-weight: 800; color: var(--bleu-vif); }
+  .principle-step-box.benefit { background: color-mix(in srgb, var(--vert) 8%, transparent); border-color: color-mix(in srgb, var(--vert) 32%, var(--line)); }
+  .principle-step-box.benefit .principle-benefit-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--vert); }
+  .principle-step-box.benefit .principle-step-price { color: var(--vert); }
+  .principle-step-box.final { background: color-mix(in srgb, var(--bleu-vif) 8%, transparent); border-color: color-mix(in srgb, var(--bleu-vif) 32%, var(--line)); }
+  .principle-step-box.final .principle-step-price { color: var(--bleu-vif); font-size: 1.35rem; }
+
   .option-card { background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 26px; box-shadow: var(--shadow); display: flex; gap: 18px; align-items: flex-start; overflow: hidden; transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease); }
   .option-card:hover { transform: translateY(-6px) scale(1.015); box-shadow: var(--shadow-lg); }
   .option-card .value-icon { margin-bottom: 0; }
@@ -1472,6 +1489,7 @@
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
             <button type="button" class="btn btn-outline" data-offer-sub="rapport">Exemple de rapport d'inspection</button>
             <button type="button" class="btn btn-outline" data-offer-sub="edl">Exemple d'état des lieux</button>
+            <button type="button" class="btn btn-outline" data-offer-sub="principe">Tout le contenu Copilote</button>
           </div>
         </template>
 
@@ -1496,6 +1514,47 @@
             <p><strong>Recommandation finale :</strong> véhicule envisageable, sous réserve d'une négociation sur le prix et de la prise en compte des plaquettes arrière dans les prochains mois. Aucun point bloquant identifié.</p>
           </div>
           <p class="offer-modal-footnote">Exemple fictif. Chaque rapport réel est établi sur site par votre copilote, avec les photos du véhicule inspecté.</p>
+        </template>
+
+        <template id="offer-example-principe">
+          <button type="button" class="btn btn-outline btn-sm-back" data-offer-sub="copilote_plus">← Retour à l'offre</button>
+          <span class="offer-modal-eyebrow">Copilote Plus — Pricing</span>
+          <h3 id="offer-modal-title">Un principe permanent</h3>
+          <p class="offer-modal-lede">Vous avez déjà commencé avec Copilote ? La différence de prix avec Copilote Plus vous est systématiquement remboursée. Vous ne payez jamais deux fois pour la même chose.</p>
+          <div class="principle-card" style="margin:0;">
+            <span>Remise ponctuelle</span>
+            <h4>Comment ça fonctionne</h4>
+            <p class="principle-desc">Commencez par Copilote. Remboursé jamais deux fois.</p>
+            <div class="principle-flow">
+              <div class="principle-step">
+                <span class="principle-step-label">Vous commencez par</span>
+                <div class="principle-step-box">
+                  <span class="principle-step-name">Copilote</span>
+                  <span class="principle-step-price">99 €</span>
+                </div>
+              </div>
+              <div class="principle-step">
+                <span class="principle-step-label">Vous passez à</span>
+                <div class="principle-step-box">
+                  <span class="principle-step-name">Copilote Plus</span>
+                  <span class="principle-step-price">599 €</span>
+                </div>
+              </div>
+              <div class="principle-step">
+                <span class="principle-step-label">Bénéfice</span>
+                <div class="principle-step-box benefit">
+                  <span class="principle-benefit-label">Remise déduction</span>
+                  <span class="principle-step-price">−99 €</span>
+                </div>
+              </div>
+              <div class="principle-step">
+                <span class="principle-step-label">Vous payez</span>
+                <div class="principle-step-box final">
+                  <span class="principle-step-price">500 €</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </template>
 
         <template id="offer-example-edl">
