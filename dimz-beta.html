@@ -89,7 +89,7 @@
     --noir: #10141c;
     --bleu-nuit: #0e2a55;
     --bleu: #1f4e8c;
-    --bleu-vif: #2f6fed;
+    --bleu-vif: #2861d8;
     --blanc: #ffffff;
     --bg: #f6f7fa;
     --bg-raised: #ffffff;
@@ -144,7 +144,7 @@
     --hero-accueil-photo: none;
     --bg: #f6f7fa; --bg-raised: #ffffff; --bg-tint: #eef1f7;
     --ink: #10141c; --ink-soft: #5b6472; --line: #e2e6ed;
-    --bleu-vif: #2f6fed;
+    --bleu-vif: #2861d8;
     --shadow: 0 1px 0 rgba(16,20,28,0.04), 0 20px 34px -22px rgba(16,20,28,0.28);
     --shadow-lg: 0 1px 0 rgba(16,20,28,0.03), 0 36px 60px -30px rgba(16,20,28,0.32);
   }
@@ -236,6 +236,10 @@
     cursor: pointer; font-weight: 700; font-size: 0.89rem; transition: background 0.15s ease, color 0.15s ease;
   }
   .main-tabs button[aria-selected="true"] { background: var(--bleu-vif); color: #fff; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .main-tabs button[aria-selected="true"] { background: color-mix(in srgb, var(--bleu-vif) 72%, black 28%); }
+  }
+  :root[data-theme="dark"] .main-tabs button[aria-selected="true"] { background: color-mix(in srgb, var(--bleu-vif) 72%, black 28%); }
   .main-tabs button:not([aria-selected="true"]):hover { background: color-mix(in srgb, var(--bleu-vif) 10%, transparent); color: var(--ink); }
   .main-tabs button:focus-visible { outline: 2px solid var(--bleu-vif); outline-offset: 2px; }
 
@@ -364,6 +368,15 @@
   .btn:focus-visible { outline: 2px solid var(--bleu-vif); outline-offset: 2px; }
   .btn-primary { background: var(--bleu-vif); color: #fff; box-shadow: 0 16px 28px -14px color-mix(in srgb, var(--bleu-vif) 65%, transparent); }
   .btn-primary:hover { background: color-mix(in srgb, var(--bleu-vif) 88%, black 10%); box-shadow: 0 20px 34px -14px color-mix(in srgb, var(--bleu-vif) 75%, transparent); }
+  /* Mode sombre : --bleu-vif est éclairci (#6c93e8) pour rester lisible comme texte/icône
+     sur fond sombre ailleurs sur le site, mais ça fait tomber le contraste du texte blanc
+     des boutons sous le seuil AA (3.01). On fonce juste le fond du bouton, pas la variable. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .btn-primary { background: color-mix(in srgb, var(--bleu-vif) 72%, black 28%); }
+    :root:not([data-theme="light"]) .btn-primary:hover { background: color-mix(in srgb, var(--bleu-vif) 60%, black 40%); }
+  }
+  :root[data-theme="dark"] .btn-primary { background: color-mix(in srgb, var(--bleu-vif) 72%, black 28%); }
+  :root[data-theme="dark"] .btn-primary:hover { background: color-mix(in srgb, var(--bleu-vif) 60%, black 40%); }
   .btn-outline { background: transparent; border-color: var(--line); color: var(--ink); }
   .btn-outline:hover { border-color: var(--bleu-vif); color: var(--bleu-vif); box-shadow: 0 12px 22px -16px color-mix(in srgb, var(--bleu-vif) 45%, transparent); }
   .btn-outline-dark { background: transparent; border-color: rgba(255,255,255,0.32); color: #fff; }
@@ -460,6 +473,8 @@
     :root:not([data-theme="dark"]) .hero-accueil-bg .kicker { color: #4a5a8f; }
     :root:not([data-theme="dark"]) .hero-accueil-bg .hero-points li { background: rgba(47,111,237,0.06); border-color: rgba(47,111,237,0.22); color: #1a1a1a; }
     :root:not([data-theme="dark"]) .hero-accueil-bg .hero-points svg { color: #2f6fed; }
+    :root:not([data-theme="dark"]) .hero-accueil-bg .btn-outline-dark { border-color: rgba(47,111,237,0.4); color: #1a1a1a; }
+    :root:not([data-theme="dark"]) .hero-accueil-bg .btn-outline-dark:hover { border-color: #2f6fed; background: rgba(47,111,237,0.06); }
   }
   :root[data-theme="light"] .hero-accueil-bg h1,
   :root[data-theme="light"] .hero-accueil-bg h2 { color: #1a1a1a; }
@@ -469,6 +484,8 @@
   :root[data-theme="light"] .hero-accueil-bg .kicker { color: #4a5a8f; }
   :root[data-theme="light"] .hero-accueil-bg .hero-points li { background: rgba(47,111,237,0.06); border-color: rgba(47,111,237,0.22); color: #1a1a1a; }
   :root[data-theme="light"] .hero-accueil-bg .hero-points svg { color: #2f6fed; }
+  :root[data-theme="light"] .hero-accueil-bg .btn-outline-dark { border-color: rgba(47,111,237,0.4); color: #1a1a1a; }
+  :root[data-theme="light"] .hero-accueil-bg .btn-outline-dark:hover { border-color: #2f6fed; background: rgba(47,111,237,0.06); }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) .hero-accueil-bg::after {
       background:
@@ -561,6 +578,7 @@
   .offer-texte { margin: 0 0 18px; color: var(--ink); font-size: 0.92rem; line-height: 1.5; }
   .price-toggle { display: inline-flex; background: var(--bg-tint); border-radius: 100px; padding: 2px; margin: 2px 0 16px; gap: 2px; }
   .price-toggle button { border: none; background: transparent; padding: 4px 10px; border-radius: 100px; font-size: 0.66rem; font-weight: 700; color: var(--ink-soft); cursor: pointer; }
+  @media (max-width: 640px) { .price-toggle button { min-height: 44px; } }
   .price-toggle button[aria-selected="true"] { background: var(--bg-raised); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
   .offer-price { display: flex; flex-direction: column-reverse; font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 800; font-size: clamp(2.1rem, 1.85rem + 1vw, 2.6rem); line-height: 1; color: var(--bleu); margin-bottom: 10px; letter-spacing: -0.03em; text-shadow: 0 2px 20px color-mix(in srgb, var(--bleu-vif) 38%, transparent); }
   :root[data-theme="dark"] .offer-price { color: var(--bleu-vif); }
@@ -598,6 +616,7 @@
   }
   .offer-card .offer-example-hint svg { width: 13px; height: 13px; }
   .offer-card .offer-example-hint:hover { text-decoration: underline; }
+  @media (max-width: 640px) { .offer-card .offer-example-hint { min-height: 44px; } }
 
   .offer-modal-overlay {
     position: fixed; inset: 0; background: rgba(16,20,28,0.55); backdrop-filter: blur(2px);
@@ -617,6 +636,7 @@
   }
   .offer-modal-close:hover { color: var(--ink); border-color: color-mix(in srgb, var(--bleu-vif) 40%, var(--line)); }
   .offer-modal-close svg { width: 16px; height: 16px; }
+  @media (max-width: 640px) { .offer-modal-close { width: 44px; height: 44px; } }
   .offer-modal-eyebrow { display: block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--bleu-vif); margin-bottom: 8px; }
   .btn-sm-back { padding: 7px 14px; font-size: 0.78rem; margin-bottom: 18px; }
   .offer-modal-body h3 { font-size: 1.35rem; margin: 0 0 10px; padding-right: 30px; }
@@ -1048,6 +1068,7 @@
   .footer-pillars svg { width: 15px; height: 15px; flex: none; }
   .footer-legal { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; padding-top: 22px; border-top: 1px solid var(--line); }
   .footer-legal a { color: var(--ink-soft); text-decoration: none; font-size: 0.82rem; font-weight: 600; transition: color 0.15s ease; }
+  @media (max-width: 640px) { .footer-legal { row-gap: 14px; } .footer-legal a { display: inline-flex; align-items: center; min-height: 44px; } }
   .footer-legal a:hover { color: var(--bleu-vif); text-decoration: underline; }
   .footer-legal a:focus-visible { outline: 2px solid var(--bleu-vif); outline-offset: 2px; }
   .footer-social { display: flex; gap: 14px; justify-content: center; }
@@ -3712,7 +3733,6 @@
 
 <footer class="wrap">
   <div class="footer-social" aria-label="Réseaux sociaux">
-    <a href="javascript:void(0)" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10.5 9.3v5.4l4.7-2.7z" fill="currentColor" stroke="none"/></svg></a>
     <a href="javascript:void(0)" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3.5v11.2a3.3 3.3 0 1 1-2.8-3.26"/><path d="M14 3.5c.4 2.4 2.1 4.2 4.6 4.5"/></svg></a>
     <a href="javascript:void(0)" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="0.9" fill="currentColor" stroke="none"/></svg></a>
   </div>
