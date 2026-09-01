@@ -460,6 +460,10 @@
      bleu nuit + texte blanc), identique aux autres heros photo du site
      (Convoyage...) — pas de surcharge spécifique nécessaire ici. */
   .hero-accueil-bg { --hero-photo: var(--hero-accueil-photo); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 0 !important; }
+  /* Sur mobile la carte a un rayon de 28px pour seulement 16px de marge avec l'écran
+     (voir .acc-content > ... section.dark) : sans respiration verticale propre, le
+     texte du haut et les boutons du bas viennent buter contre les coins arrondis. */
+  @media (max-width: 640px) { .hero-accueil-bg { padding: 56px 0 !important; } }
   .hero-photo .hero-illustration { display: none; }
   .hero-photo > .wrap { position: relative; z-index: 2; }
   .hero-points { list-style: none; margin: 6px 0 26px; padding: 0 4px 6px; display: flex; flex-wrap: wrap; gap: 9px; justify-content: center; }
