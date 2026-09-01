@@ -24,12 +24,43 @@ function escapeLikePattern(value: string): string {
   return value.replace(/[\\%_]/g, "\\$&");
 }
 
+// Plafond générique : un champ de formulaire légitime (nom, budget, marque
+// de véhicule...) ne dépasse jamais quelques dizaines de caractères ; ça
+// borne surtout le pire cas d'un client qui abuserait de ce endpoint public.
+const FIELD_MAX_LENGTH = 500;
+const EMAIL_MAX_LENGTH = 254; // longueur maximale d'un email valide (RFC 5321)
+const DONNEES_BRUTES_MAX_BYTES = 50_000;
+
 function pick(data: Record<string, unknown>, ...keys: string[]): string | null {
   for (const key of keys) {
     const value = data[key];
-    if (typeof value === "string" && value.trim()) return value.trim();
+    if (typeof value === "string" && value.trim()) return value.trim().slice(0, FIELD_MAX_LENGTH);
   }
   return null;
+}
+
+// Limite de fréquence par IP, sur une fenêtre fixe de 10 minutes, pour
+// contenir le spam sur ce formulaire public. Compteur en base (fonction
+// increment_rate_limit, migration 0040) : incrément atomique, pas de
+// condition de course entre deux requêtes simultanées de la même IP.
+const RATE_LIMIT = 5;
+const RATE_WINDOW_MS = 10 * 60 * 1000;
+
+// deno-lint-ignore no-explicit-any
+async function isRateLimited(db: any, ip: string): Promise<boolean> {
+  if (Math.random() < 0.05) await db.rpc("cleanup_rate_limits");
+  const windowStart = new Date(Math.floor(Date.now() / RATE_WINDOW_MS) * RATE_WINDOW_MS).toISOString();
+  const { data: count } = await db.rpc("increment_rate_limit", {
+    p_ip: ip,
+    p_endpoint: "lead-intake",
+    p_window: windowStart,
+  });
+  return (count ?? 0) > RATE_LIMIT;
+}
+
+function getClientIp(req: Request): string {
+  const fwd = req.headers.get("x-forwarded-for");
+  return fwd ? fwd.split(",")[0].trim() : "unknown";
 }
 
 function guessOffre(label: string | null): string {
@@ -101,9 +132,14 @@ Deno.serve(async (req: Request) => {
     return new Response(null, { status: 204, headers: CORS_HEADERS });
   }
 
+  const rawBody = await req.text();
+  if (rawBody.length > DONNEES_BRUTES_MAX_BYTES) {
+    return jsonResponse({ error: "Requête trop volumineuse" }, 413);
+  }
+
   let data: Record<string, unknown>;
   try {
-    data = await req.json();
+    data = JSON.parse(rawBody);
   } catch {
     return jsonResponse({ error: "JSON invalide" }, 400);
   }
@@ -112,6 +148,11 @@ Deno.serve(async (req: Request) => {
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
+
+  const ip = getClientIp(req);
+  if (await isRateLimited(db, ip)) {
+    return jsonResponse({ error: "Trop de requêtes, réessayez plus tard." }, 429);
+  }
 
   const formulaire = pick(data, "Formulaire") || "Accompagnement";
   const isConvoyage = formulaire.toLowerCase() === "convoyage";
@@ -123,7 +164,10 @@ Deno.serve(async (req: Request) => {
     "Nouveau contact";
   const prenom = pick(data, "Informations personnelles — Prénom", "Le trajet — Prénom (contact départ)");
   const telephone = pick(data, "Informations personnelles — Téléphone", "Le trajet — Téléphone (contact départ)");
-  const email = pick(data, "Informations personnelles — Email", "Le trajet — Email (contact départ)");
+  const email = pick(data, "Informations personnelles — Email", "Le trajet — Email (contact départ)")?.slice(
+    0,
+    EMAIL_MAX_LENGTH
+  ) ?? null;
 
   let clientId: string;
   if (email) {

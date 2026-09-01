@@ -20,6 +20,33 @@ function escapeLikePattern(value: string): string {
   return value.replace(/[\\%_]/g, "\\$&");
 }
 
+const EMAIL_MAX_LENGTH = 254; // longueur maximale d'un email valide (RFC 5321)
+
+// Limite de fréquence par IP, sur une fenêtre fixe de 10 minutes : cet
+// endpoint déclenche un vrai envoi d'email (coût, quota, réputation Resend),
+// donc à protéger même s'il n'écrit rien en base. Compteur en base (fonction
+// increment_rate_limit, migration 0040) : incrément atomique, pas de
+// condition de course entre deux requêtes simultanées de la même IP.
+const RATE_LIMIT = 5;
+const RATE_WINDOW_MS = 10 * 60 * 1000;
+
+// deno-lint-ignore no-explicit-any
+async function isRateLimited(db: any, ip: string): Promise<boolean> {
+  if (Math.random() < 0.05) await db.rpc("cleanup_rate_limits");
+  const windowStart = new Date(Math.floor(Date.now() / RATE_WINDOW_MS) * RATE_WINDOW_MS).toISOString();
+  const { data: count } = await db.rpc("increment_rate_limit", {
+    p_ip: ip,
+    p_endpoint: "track-lookup",
+    p_window: windowStart,
+  });
+  return (count ?? 0) > RATE_LIMIT;
+}
+
+function getClientIp(req: Request): string {
+  const fwd = req.headers.get("x-forwarded-for");
+  return fwd ? fwd.split(",")[0].trim() : "unknown";
+}
+
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -115,7 +142,7 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "JSON invalide" }, 400);
   }
 
-  const email = typeof data.email === "string" ? data.email.trim() : "";
+  const email = typeof data.email === "string" ? data.email.trim().slice(0, EMAIL_MAX_LENGTH) : "";
   if (!email || !email.includes("@")) {
     return jsonResponse({ error: "Email invalide" }, 400);
   }
@@ -124,6 +151,10 @@ Deno.serve(async (req: Request) => {
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
+
+  if (await isRateLimited(db, getClientIp(req))) {
+    return jsonResponse({ error: "Trop de requêtes, réessayez plus tard." }, 429);
+  }
 
   // clients.email n'est pas unique en base : un même email peut porter
   // plusieurs fiches (doublons de saisie, demandes successives). On les

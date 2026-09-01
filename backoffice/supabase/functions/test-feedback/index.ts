@@ -55,14 +55,46 @@ const INT_FIELDS = new Set([
   "duree_secondes",
 ]);
 
+const TEXT_FIELD_MAX_LENGTH = 2000;
+const BODY_MAX_BYTES = 50_000;
+
+// Limite de fréquence par IP, sur une fenêtre fixe de 10 minutes, pour
+// contenir le spam sur ce formulaire public. Compteur en base (fonction
+// increment_rate_limit, migration 0040) : incrément atomique, pas de
+// condition de course entre deux requêtes simultanées de la même IP.
+const RATE_LIMIT = 3;
+const RATE_WINDOW_MS = 10 * 60 * 1000;
+
+// deno-lint-ignore no-explicit-any
+async function isRateLimited(db: any, ip: string): Promise<boolean> {
+  if (Math.random() < 0.05) await db.rpc("cleanup_rate_limits");
+  const windowStart = new Date(Math.floor(Date.now() / RATE_WINDOW_MS) * RATE_WINDOW_MS).toISOString();
+  const { data: count } = await db.rpc("increment_rate_limit", {
+    p_ip: ip,
+    p_endpoint: "test-feedback",
+    p_window: windowStart,
+  });
+  return (count ?? 0) > RATE_LIMIT;
+}
+
+function getClientIp(req: Request): string {
+  const fwd = req.headers.get("x-forwarded-for");
+  return fwd ? fwd.split(",")[0].trim() : "unknown";
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: CORS_HEADERS });
   }
 
+  const rawBody = await req.text();
+  if (rawBody.length > BODY_MAX_BYTES) {
+    return jsonResponse({ error: "Requête trop volumineuse" }, 413);
+  }
+
   let data: Record<string, unknown>;
   try {
-    data = await req.json();
+    data = JSON.parse(rawBody);
   } catch {
     return jsonResponse({ error: "JSON invalide" }, 400);
   }
@@ -72,6 +104,10 @@ Deno.serve(async (req: Request) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
 
+  if (await isRateLimited(db, getClientIp(req))) {
+    return jsonResponse({ error: "Trop de requêtes, réessayez plus tard." }, 429);
+  }
+
   const payload: Record<string, unknown> = {
     donnees_brutes: (data.donnees_brutes && typeof data.donnees_brutes === "object") ? data.donnees_brutes : {},
   };
@@ -79,7 +115,7 @@ Deno.serve(async (req: Request) => {
   for (const field of TEXT_FIELDS) {
     const value = data[field];
     if (value === undefined || value === null || value === "") continue;
-    payload[field] = INT_FIELDS.has(field) ? Number(value) : String(value);
+    payload[field] = INT_FIELDS.has(field) ? Number(value) : String(value).slice(0, TEXT_FIELD_MAX_LENGTH);
   }
 
   const { data: created, error } = await db

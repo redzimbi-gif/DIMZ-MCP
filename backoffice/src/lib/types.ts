@@ -562,3 +562,12 @@ export interface TestFeedback {
   donnees_brutes: Record<string, unknown> | null;
   created_at: string;
 }
+
+export interface ContactFaq {
+  id: string;
+  nom: string;
+  email: string;
+  message: string;
+  lu: boolean;
+  created_at: string;
+}

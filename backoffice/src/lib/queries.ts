@@ -5,6 +5,7 @@ import type {
   AgendaEvent,
   Annonce,
   Client,
+  ContactFaq,
   Convoyage,
   ConvoyageEtatLieux,
   ConvoyageExterne,
@@ -630,4 +631,23 @@ export async function getTestFeedback(id: string) {
   const db = createAdminClient();
   const { data } = await db.from("test_feedback").select("*").eq("id", id).maybeSingle();
   return data as TestFeedback | null;
+}
+
+// ---------------------------------------------------------------------------
+// Questions du formulaire de contact de la FAQ (site vitrine)
+// ---------------------------------------------------------------------------
+
+export async function listContactsFaq() {
+  const db = createAdminClient();
+  const { data } = await db.from("contacts_faq").select("*").order("created_at", { ascending: false });
+  return (data ?? []) as ContactFaq[];
+}
+
+export async function countUnreadContactsFaq() {
+  const db = createAdminClient();
+  const { count } = await db
+    .from("contacts_faq")
+    .select("*", { count: "exact", head: true })
+    .eq("lu", false);
+  return count ?? 0;
 }

@@ -6,7 +6,7 @@
 # Settings → Secrets and variables → Actions (jeton créé depuis Supabase →
 # Account settings → Access tokens).
 #
-# Les quatre fonctions sont appelées par des visiteurs anonymes du site
+# Les cinq fonctions sont appelées par des visiteurs anonymes du site
 # vitrine, d'où --no-verify-jwt : elles valident elles-mêmes leurs entrées.
 name: Déployer les Edge Functions Supabase
 
@@ -18,7 +18,7 @@ on:
         required: false
         default: toutes
         type: choice
-        options: [toutes, track-lookup, lead-intake, test-feedback, avis]
+        options: [toutes, track-lookup, lead-intake, test-feedback, avis, contact-faq]
   push:
     branches: [claude/artifact-standalone-webpage-bvi82b]
     paths: ["backoffice/supabase/functions/**"]
@@ -42,7 +42,7 @@ jobs:
           set -euo pipefail
           choix="${{ github.event.inputs.fonction || 'toutes' }}"
           if [ "$choix" = "toutes" ]; then
-            fonctions="track-lookup lead-intake test-feedback avis"
+            fonctions="track-lookup lead-intake test-feedback avis contact-faq"
           else
             fonctions="$choix"
           fi

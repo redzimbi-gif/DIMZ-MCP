@@ -4,6 +4,7 @@ import { notifyStaff } from "@/lib/log";
 import { sendEmail, getAppUrl } from "@/lib/email";
 import { confirmationDemandeEmail } from "@/lib/email-templates";
 import { ETAPE_PAIEMENT_KEY, besoinPaiementOffre } from "@/lib/etapes";
+import { getClientIp, isRateLimited } from "@/lib/rate-limit";
 import type { DossierOffre } from "@/lib/types";
 
 // Endpoint public appelé directement depuis le site vitrine DIMZ (autre
@@ -20,10 +21,15 @@ export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: CORS_HEADERS });
 }
 
+const FIELD_MAX_LENGTH = 500;
+const EMAIL_MAX_LENGTH = 254; // longueur maximale d'un email valide (RFC 5321)
+const BODY_MAX_BYTES = 50_000;
+const RATE_LIMIT = 5;
+
 function pick(data: Record<string, unknown>, ...keys: string[]): string | null {
   for (const key of keys) {
     const value = data[key];
-    if (typeof value === "string" && value.trim()) return value.trim();
+    if (typeof value === "string" && value.trim()) return value.trim().slice(0, FIELD_MAX_LENGTH);
   }
   return null;
 }
@@ -45,11 +51,23 @@ function guessOffre(label: string | null): DossierOffre | null {
 }
 
 export async function POST(request: Request) {
+  const rawBody = await request.text();
+  if (rawBody.length > BODY_MAX_BYTES) {
+    return NextResponse.json({ error: "Requête trop volumineuse" }, { status: 413, headers: CORS_HEADERS });
+  }
+
   let data: Record<string, unknown>;
   try {
-    data = await request.json();
+    data = JSON.parse(rawBody);
   } catch {
     return NextResponse.json({ error: "JSON invalide" }, { status: 400, headers: CORS_HEADERS });
+  }
+
+  if (await isRateLimited("api-public-lead", getClientIp(request), RATE_LIMIT)) {
+    return NextResponse.json(
+      { error: "Trop de requêtes, réessayez plus tard." },
+      { status: 429, headers: CORS_HEADERS }
+    );
   }
 
   const db = createAdminClient();
@@ -64,7 +82,10 @@ export async function POST(request: Request) {
     "Nouveau contact";
   const prenom = pick(data, "Informations personnelles — Prénom", "Le trajet — Prénom (contact départ)");
   const telephone = pick(data, "Informations personnelles — Téléphone", "Le trajet — Téléphone (contact départ)");
-  const email = pick(data, "Informations personnelles — Email", "Le trajet — Email (contact départ)");
+  const email = pick(data, "Informations personnelles — Email", "Le trajet — Email (contact départ)")?.slice(
+    0,
+    EMAIL_MAX_LENGTH
+  ) ?? null;
 
   // Rattache à un client existant par email si possible, sinon en crée un.
   let clientId: string;

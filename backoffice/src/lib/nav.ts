@@ -14,6 +14,7 @@ import {
   Bell,
   Settings,
   Images,
+  CircleHelp,
   type LucideIcon,
 } from "lucide-react";
 
@@ -53,6 +54,7 @@ export const NAV: NavGroup[] = [
       { href: "/inspections", label: "Inspections", icon: ClipboardCheck },
       { href: "/convoyages", label: "Convoyages", icon: Truck },
       { href: "/retours-test", label: "Retours test", icon: ClipboardList },
+      { href: "/contact-faq", label: "Questions FAQ", icon: CircleHelp },
     ],
   },
   {
