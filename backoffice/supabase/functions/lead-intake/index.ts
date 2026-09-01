@@ -17,6 +17,13 @@ function jsonResponse(body: unknown, status = 200) {
   });
 }
 
+// "%" et "_" sont des jokers pour ILIKE : un email saisi avec l'un de ces
+// caractères élargirait la recherche à d'autres clients (même correctif que
+// track-lookup, qui fait la même recherche par email).
+function escapeLikePattern(value: string): string {
+  return value.replace(/[\\%_]/g, "\\$&");
+}
+
 function pick(data: Record<string, unknown>, ...keys: string[]): string | null {
   for (const key of keys) {
     const value = data[key];
@@ -122,12 +129,21 @@ Deno.serve(async (req: Request) => {
   if (email) {
     const { data: existing } = await db
       .from("clients")
-      .select("id")
-      .ilike("email", email)
+      .select("id, nom, prenom, telephone")
+      .ilike("email", escapeLikePattern(email))
       .maybeSingle();
     if (existing) {
       clientId = existing.id;
-      await db.from("clients").update({ nom, prenom, telephone, email }).eq("id", clientId);
+      // Ne jamais écraser des coordonnées déjà connues : ce formulaire est public et
+      // rien ne prouve que le soumetteur est bien le propriétaire de cet email. On ne
+      // comble que les champs encore vides (ex. numéro laissé de côté la première fois).
+      const completion: Record<string, string> = {};
+      if (!existing.nom && nom) completion.nom = nom;
+      if (!existing.prenom && prenom) completion.prenom = prenom;
+      if (!existing.telephone && telephone) completion.telephone = telephone;
+      if (Object.keys(completion).length > 0) {
+        await db.from("clients").update(completion).eq("id", clientId);
+      }
     } else {
       const { data: created, error } = await db
         .from("clients")
