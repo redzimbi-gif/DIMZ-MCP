@@ -3910,6 +3910,7 @@
     document.body.classList.remove('has-acc-sidebar');
     window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
     observeNewReveals();
+    updateHash();
   }
 
   document.querySelectorAll('[data-goto-legal]').forEach(function (el) {
@@ -4150,13 +4151,24 @@
   var HASH_ROUTES = {
     accueil: { tab: 'accompagnement', subtab: 'accueil' },
     offres: { tab: 'accompagnement', subtab: 'offres' },
+    apropos: { tab: 'accompagnement', subtab: 'apropos' },
+    faq: { tab: 'accompagnement', subtab: 'faq' },
+    avis: { tab: 'accompagnement', subtab: 'avis' },
+    import: { tab: 'accompagnement', subtab: 'import' },
+    inspection: { tab: 'accompagnement', subtab: 'inspection' },
+    rapport: { tab: 'accompagnement', subtab: 'rapport' },
+    suivi: { tab: 'accompagnement', subtab: 'suivi' },
     accompagnement: { tab: 'accompagnement', subtab: 'accueil' },
     convoyage: { tab: 'convoyage' },
     test: { tab: 'test' },
     projet: { tab: 'accompagnement-form' },
     'demande-convoyage': { tab: 'convoyage-form' },
+    // Pages légales : ne passent pas par showMainTab/showSubTab mais par
+    // showLegalPage (cf. plus haut), d'où la forme différente { legal: ... }.
+    confidentialite: { legal: 'confidentialite' },
+    cgv: { legal: 'cgv' },
+    mentions: { legal: 'mentions' },
   };
-  var SUBTAB_TO_HASH = { accueil: 'accueil', offres: 'offres' };
   var suppressHashSync = false;
 
   function currentHash() {
@@ -4165,6 +4177,13 @@
 
   function updateHash() {
     if (suppressHashSync) return;
+    var visibleLegal = document.querySelector('.legal-page:not([hidden])');
+    if (visibleLegal) {
+      var legalValue = visibleLegal.id.replace('page-legal-', '');
+      if (currentHash() === legalValue) return;
+      history.pushState(null, '', '#' + legalValue);
+      return;
+    }
     var tab = !document.getElementById('tab-accompagnement').hidden ? 'accompagnement'
       : !document.getElementById('tab-convoyage').hidden ? 'convoyage'
       : !document.getElementById('tab-accompagnement-form').hidden ? 'projet'
@@ -4173,8 +4192,11 @@
     if (!tab) return;
     var value = tab;
     if (tab === 'accompagnement') {
+      // Les noms de sous-onglet (ACC_PAGES) sont déjà des fragments d'URL
+      // valides et lisibles : accueil, offres, faq... pas besoin d'une table
+      // de correspondance séparée, le nom sert directement de hash.
       var activeSub = ACC_PAGES.filter(function (p) { return !document.getElementById('subtab-' + p).hidden; })[0];
-      value = (activeSub && SUBTAB_TO_HASH[activeSub]) || 'accompagnement';
+      value = activeSub || 'accompagnement';
     }
     if (currentHash() === value) return;
     history.pushState(null, '', '#' + value);
@@ -4190,8 +4212,12 @@
       route = HASH_ROUTES.accueil;
     }
     suppressHashSync = true;
-    showMainTab(route.tab, !route.subtab);
-    if (route.subtab) showSubTab(route.subtab);
+    if (route.legal) {
+      showLegalPage(route.legal);
+    } else {
+      showMainTab(route.tab, !route.subtab);
+      if (route.subtab) showSubTab(route.subtab);
+    }
     suppressHashSync = false;
   }
 
