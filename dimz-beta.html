@@ -423,6 +423,11 @@
   .section-head h2 { font-size: clamp(1.75rem, 3.2vw, 2.35rem); margin: 0 0 16px; }
   .section-head p { color: var(--ink-soft); margin: 0; font-size: 1.03rem; }
   .dark .section-head p { color: rgba(255,255,255,0.68); }
+  .launch-offer-banner { margin: 0 0 28px; }
+  .launch-offer-badge { display: inline-flex; align-items: center; gap: 6px; background: color-mix(in srgb, var(--bleu-vif) 12%, transparent); color: var(--bleu-vif); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 6px 14px; border-radius: 100px; margin-bottom: 12px; }
+  .launch-offer-headline { font-family: var(--serif); font-size: clamp(1.3rem, 1.1rem + 1vw, 1.7rem); font-weight: 600; color: var(--ink); margin: 0 0 6px; }
+  .launch-offer-headline strong { color: var(--bleu-vif); }
+  .launch-offer-note { color: var(--ink-soft); font-size: 0.86rem; margin: 0; }
 
   .icon-line { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 
@@ -556,6 +561,10 @@
   /* Placé APRÈS le prix dans le markup : légende sous le montant, pour ne
      pas décaler "599 €" vers le bas par rapport aux deux autres cartes. */
   .offer-price .from-label { font-family: var(--sans); font-weight: 700; font-size: 0.28em; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin-bottom: 6px; text-shadow: none; }
+  /* Prix barré de l'offre de lancement : taille et graisse ramenées à une
+     échelle "texte normal" via em (le parent .offer-price est en clamp
+     géant), pour rester lisible sans rivaliser avec le nouveau prix. */
+  .offer-price .offer-price-old { font-family: var(--sans); font-weight: 600; font-size: 0.36em; color: var(--ink-soft); text-decoration: line-through; text-shadow: none; letter-spacing: 0; }
   .offer-sub { color: var(--ink-soft); font-size: 0.84rem; margin-bottom: 20px; min-height: 2.6em; }
   .offer-card ul { list-style: none; margin: 0 0 28px; padding: 0; display: flex; flex-direction: column; gap: 11px; flex: 1; }
   .offer-card li { display: flex; gap: 10px; font-size: 0.91rem; line-height: 1.45; }
@@ -672,6 +681,7 @@
   .compare-dash { color: var(--ink-soft); opacity: 0.45; }
   .compare-price-row th, .compare-price-row td { font-weight: 700; color: var(--ink); padding-top: 20px; font-family: var(--mono); font-variant-numeric: tabular-nums; }
   .compare-price-row th { font-family: var(--sans); }
+  .compare-price-row .tarif-old { font-weight: 500; color: var(--ink-soft); text-decoration: line-through; margin-right: 4px; }
 
   /* ---------------- Conclusion offres ---------------- */
   .offers-closing { max-width: 620px; margin: 64px auto 0; text-align: center; }
@@ -1346,6 +1356,11 @@
     <section id="offres" class="tint">
       <div class="wrap">
         <div class="section-head" data-reveal>
+          <div class="launch-offer-banner">
+            <span class="launch-offer-badge">Offre de lancement 🚀</span>
+            <p class="launch-offer-headline">Votre copilote à partir de <strong>59 €</strong></p>
+            <p class="launch-offer-note">Pour les 20 premiers clients.</p>
+          </div>
           <span class="label">Nos offres</span>
           <h2>Trois façons de rouler l'esprit tranquille.</h2>
           <p>Que vous ayez juste besoin d'un avis ou que vous souhaitiez être accompagné de A à Z, il y a une offre faite pour vous.</p>
@@ -1377,10 +1392,10 @@
             <p class="offer-subtitle">Je cherche, vous choisissez</p>
             <p class="offer-texte">Votre copilote vous accompagne sur un bout du parcours.</p>
             <div class="offer-price-zone">
-              <div class="offer-price"><span id="offer-price-value">99 €</span></div>
+              <div class="offer-price"><span id="offer-price-value">59 €</span><span class="offer-price-old" id="offer-price-old">99 €</span></div>
               <div class="price-toggle" role="tablist" aria-label="Type de recherche">
-                <button type="button" role="tab" aria-selected="true" data-price="99" data-sub="Pour une recherche courante, sur des véhicules classiques.">Recherche simple</button>
-                <button type="button" role="tab" aria-selected="false" data-price="149" data-sub="Concerne les véhicules rares, de collection, ou les recherches qui demandent plus de temps.">Recherche complexe</button>
+                <button type="button" role="tab" aria-selected="true" data-price="59" data-price-old="99" data-sub="Pour une recherche courante, sur des véhicules classiques.">Recherche simple</button>
+                <button type="button" role="tab" aria-selected="false" data-price="79" data-price-old="149" data-sub="Concerne les véhicules rares, de collection, ou les recherches qui demandent plus de temps.">Recherche complexe</button>
               </div>
               <div class="offer-sub" id="offer-sub-copilote">Pour une recherche courante, sur des véhicules classiques.</div>
             </div>
@@ -1400,8 +1415,8 @@
             <p class="offer-subtitle">Vous n'avez plus qu'à conduire</p>
             <p class="offer-texte">Faisons la route ensemble.</p>
             <div class="offer-price-zone">
-              <div class="offer-price">599 €<span class="from-label">À partir de</span></div>
-              <div class="offer-sub">Votre offre Copilote sera déduite du prix.</div>
+              <div class="offer-price">499 €<span class="offer-price-old">599 €</span><span class="from-label">À partir de</span></div>
+              <div class="offer-sub">100 € offerts pour le lancement. Votre offre Copilote sera déduite du prix.</div>
             </div>
             <ul>
               <li>Tout le contenu de l'offre Copilote (recherche + analyse)</li>
@@ -1623,7 +1638,7 @@
               <tr><th scope="row">Livraison en Zone DIMZ<sup>*</sup></th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
               <tr><th scope="row">Mise en main</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
               <tr><th scope="row">Accompagnement démarches admin.</th><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-dash" aria-hidden="true">–</span></td><td><span class="compare-check" aria-label="Inclus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span></td></tr>
-              <tr class="compare-price-row"><th scope="row">Tarif</th><td>Gratuit</td><td>99 € / 149 €</td><td>À partir de 599 €</td></tr>
+              <tr class="compare-price-row"><th scope="row">Tarif</th><td>Gratuit</td><td><span class="tarif-old">99 € / 149 €</span>59 € / 79 €</td><td>À partir de <span class="tarif-old">599 €</span>499 €</td></tr>
             </tbody>
           </table>
         </div>
@@ -4206,12 +4221,14 @@
   // ---------- Toggle Copilote : recherche simple / complexe ----------
   var priceButtons = document.querySelectorAll('.price-toggle button');
   var priceValue = document.getElementById('offer-price-value');
+  var priceOld = document.getElementById('offer-price-old');
   var offerSubCopilote = document.getElementById('offer-sub-copilote');
   priceButtons.forEach(function (btn) {
     btn.addEventListener('click', function () {
       priceButtons.forEach(function (b) { b.setAttribute('aria-selected', 'false'); });
       btn.setAttribute('aria-selected', 'true');
       priceValue.textContent = btn.dataset.price + ' €';
+      if (priceOld && btn.dataset.priceOld) priceOld.textContent = btn.dataset.priceOld + ' €';
       if (offerSubCopilote && btn.dataset.sub) offerSubCopilote.textContent = btn.dataset.sub;
     });
   });
