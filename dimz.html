@@ -1,0 +1,1536 @@
+<title>Dimz · Mon copilote auto</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --noir: #10141c;
+    --bleu-nuit: #0e2a55;
+    --bleu: #1f4e8c;
+    --bleu-vif: #2f6fed;
+    --blanc: #ffffff;
+    --bg: #f6f7fa;
+    --bg-raised: #ffffff;
+    --bg-tint: #eef1f7;
+    --ink: #10141c;
+    --ink-soft: #5b6472;
+    --line: #e2e6ed;
+    --vert: #1a7a44;
+    --ambre: #b5720f;
+    --rouge: #c0392b;
+    --shadow: 0 1px 0 rgba(16,20,28,0.04), 0 20px 34px -22px rgba(16,20,28,0.28);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #090c12; --bg-raised: #121722; --bg-tint: #0d1119;
+      --ink: #edeff3; --ink-soft: #97a1b3; --line: #232b3a;
+      --bleu-vif: #6c93e8;
+      --shadow: 0 1px 0 rgba(0,0,0,0.4), 0 22px 38px -22px rgba(0,0,0,0.65);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #090c12; --bg-raised: #121722; --bg-tint: #0d1119;
+    --ink: #edeff3; --ink-soft: #97a1b3; --line: #232b3a;
+    --bleu-vif: #6c93e8;
+    --shadow: 0 1px 0 rgba(0,0,0,0.4), 0 22px 38px -22px rgba(0,0,0,0.65);
+  }
+  :root[data-theme="light"] {
+    --bg: #f6f7fa; --bg-raised: #ffffff; --bg-tint: #eef1f7;
+    --ink: #10141c; --ink-soft: #5b6472; --line: #e2e6ed;
+    --bleu-vif: #2f6fed;
+    --shadow: 0 1px 0 rgba(16,20,28,0.04), 0 20px 34px -22px rgba(16,20,28,0.28);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px; line-height: 1.65; -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .display {
+    font-family: "Iowan Old Style", "Palatino Linotype", Georgia, "Times New Roman", serif;
+    font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; margin: 0;
+  }
+
+  a { color: inherit; }
+  button { font: inherit; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+  .label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.14em; font-weight: 700; color: var(--bleu-vif); }
+  [hidden] { display: none !important; }
+
+  [data-reveal] { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  [data-reveal].in-view { opacity: 1; transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) { [data-reveal] { opacity: 1; transform: none; transition: none; } }
+
+  /* ---------------- Nav principale ---------------- */
+  header.topnav {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--bg-raised) 90%, transparent);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 14px 0; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .brand .name { font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif; font-weight: 600; font-size: 1.1rem; color: var(--ink); }
+  .brand .name em { font-style: normal; color: var(--bleu-vif); }
+
+  .main-tabs { display: inline-flex; background: var(--bg-tint); border-radius: 100px; padding: 4px; gap: 2px; }
+  .main-tabs button {
+    background: transparent; border: none; color: var(--ink-soft); padding: 9px 20px; border-radius: 100px;
+    cursor: pointer; font-weight: 700; font-size: 0.9rem; transition: background 0.15s ease, color 0.15s ease;
+  }
+  .main-tabs button[aria-selected="true"] { background: var(--bleu-vif); color: #fff; }
+  .main-tabs button:focus-visible { outline: 2px solid var(--bleu-vif); outline-offset: 2px; }
+
+  .subtabs { display: flex; gap: 10px; margin: 8px 0 44px; flex-wrap: wrap; }
+  .subtabs button {
+    background: var(--bg-raised); border: 1px solid var(--line); color: var(--ink-soft);
+    padding: 9px 18px; border-radius: 100px; cursor: pointer; font-weight: 700; font-size: 0.88rem;
+    box-shadow: var(--shadow); transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .subtabs button[aria-selected="true"] { color: var(--bleu-vif); border-color: var(--bleu-vif); }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; border-radius: 10px; padding: 12px 22px;
+    font-weight: 700; font-size: 0.92rem; text-decoration: none; border: 1px solid transparent; cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn:focus-visible { outline: 2px solid var(--bleu-vif); outline-offset: 2px; }
+  .btn-primary { background: var(--bleu-vif); color: #fff; box-shadow: 0 14px 26px -14px color-mix(in srgb, var(--bleu-vif) 70%, transparent); }
+  .btn-primary:hover { background: color-mix(in srgb, var(--bleu-vif) 88%, black 10%); }
+  .btn-outline { background: transparent; border-color: var(--line); color: var(--ink); }
+  .btn-outline:hover { border-color: var(--bleu-vif); color: var(--bleu-vif); }
+  .btn-outline-dark { background: transparent; border-color: rgba(255,255,255,0.35); color: #fff; }
+  .btn-outline-dark:hover { border-color: #fff; }
+  .btn-sm { padding: 9px 16px; font-size: 0.85rem; }
+
+  /* ---------------- Scaffolding sections ---------------- */
+  section { padding: 88px 0; }
+  section.tint { background: var(--bg-tint); }
+  section.dark { background: linear-gradient(165deg, var(--bleu-nuit), var(--noir)); color: #fff; }
+  .section-head { max-width: 62ch; margin: 0 auto 48px; text-align: center; }
+  .section-head h2 { font-size: clamp(1.7rem, 3.2vw, 2.3rem); margin: 10px 0 14px; }
+  .section-head p { color: var(--ink-soft); margin: 0; font-size: 1.02rem; }
+
+  .icon-line { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---------------- Hero (Accompagnement / Convoyage) ---------------- */
+  .hero { padding: 72px 0 84px; }
+  .hero-solo { max-width: 640px; margin: 0 auto; text-align: center; }
+  .hero-solo .kicker { justify-content: center; }
+  .hero-solo .cta-row { justify-content: center; }
+  .hero .kicker { display: inline-flex; align-items: center; gap: 8px; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: #cfe0ff; font-weight: 700; margin-bottom: 20px; }
+  .hero .kicker .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--bleu-vif); }
+  .hero h1 { font-size: clamp(2.2rem, 4.2vw, 3.2rem); line-height: 1.1; color: #fff; margin-bottom: 20px; }
+  .hero h1 em { font-style: normal; color: #9db9ec; }
+  .hero p.lede { color: rgba(255,255,255,0.72); font-size: 1.06rem; max-width: 48ch; margin: 0 0 30px; }
+  .hero .cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+
+  /* Bandeau d'intro compact (sous-onglet Inspection) */
+  .intro-band { text-align: center; padding: 68px 0 64px; }
+  .intro-band .kicker { justify-content: center; }
+  .intro-band .lede { margin-left: auto; margin-right: auto; }
+  .intro-band .cta-row { justify-content: center; }
+
+  /* ---------------- Grilles génériques ---------------- */
+  .values-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  @media (max-width: 820px) { .values-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .values-grid { grid-template-columns: 1fr; } }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  @media (max-width: 760px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .grid-3 { grid-template-columns: 1fr; } }
+
+  .value-card { background: var(--bg-raised); border: 1px solid var(--line); border-radius: 18px; padding: 24px 20px; box-shadow: var(--shadow); text-align: left; transition: transform 0.18s ease, border-color 0.18s ease; }
+  .value-card:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--bleu-vif) 40%, var(--line)); }
+  .value-icon { width: 42px; height: 42px; border-radius: 12px; background: color-mix(in srgb, var(--bleu-vif) 12%, transparent); color: var(--bleu-vif); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; flex: none; }
+  .method-letter { font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif; font-weight: 700; font-size: 1.3rem; }
+  .value-card h3 { font-size: 1rem; margin-bottom: 6px; font-family: inherit; font-weight: 700; }
+  .value-card p { margin: 0; color: var(--ink-soft); font-size: 0.88rem; }
+
+  /* ---------------- Offres ---------------- */
+  .offers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; align-items: stretch; }
+  @media (max-width: 940px) { .offers { grid-template-columns: 1fr; } }
+  .offer-card { background: var(--bg-raised); border: 1px solid var(--line); border-radius: 22px; padding: 32px 26px; box-shadow: var(--shadow); display: flex; flex-direction: column; position: relative; transition: transform 0.18s ease; }
+  .offer-card:hover { transform: translateY(-5px); }
+  .offer-card.featured { border-color: var(--bleu-vif); border-width: 1.5px; }
+  .offer-tag { position: absolute; top: -12px; left: 28px; background: var(--bleu-vif); color: #fff; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; padding: 5px 12px; border-radius: 100px; }
+  .offer-card h3 { font-size: 1.2rem; margin-bottom: 10px; }
+  .price-toggle { display: inline-flex; background: var(--bg-tint); border-radius: 100px; padding: 3px; margin-bottom: 14px; gap: 2px; }
+  .price-toggle button { border: none; background: transparent; padding: 6px 14px; border-radius: 100px; font-size: 0.78rem; font-weight: 700; color: var(--ink-soft); cursor: pointer; }
+  .price-toggle button[aria-selected="true"] { background: var(--bg-raised); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+  .offer-price { font-family: "Iowan Old Style", Georgia, serif; font-weight: 600; font-size: 1.9rem; color: var(--bleu); margin-bottom: 4px; }
+  :root[data-theme="dark"] .offer-price { color: var(--bleu-vif); }
+  @media (prefers-color-scheme: dark) { .offer-price { color: var(--bleu-vif); } }
+  .offer-price .free { color: var(--vert); }
+  .offer-sub { color: var(--ink-soft); font-size: 0.84rem; margin-bottom: 18px; }
+  .offer-card ul { list-style: none; margin: 0 0 26px; padding: 0; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .offer-card li { display: flex; gap: 10px; font-size: 0.92rem; }
+  .offer-card li::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--bleu-vif); margin-top: 9px; flex: none; }
+  .offer-card .btn { justify-content: center; margin-top: auto; }
+  .offer-note { margin-top: 22px; text-align: center; color: var(--ink-soft); font-size: 0.85rem; max-width: 60ch; margin-left: auto; margin-right: auto; }
+  .offer-note strong { color: var(--ink); }
+
+  .option-card { background: var(--bg-raised); border: 1px solid var(--line); border-radius: 20px; padding: 24px; box-shadow: var(--shadow); display: flex; gap: 16px; align-items: flex-start; transition: transform 0.18s ease; }
+  .option-card:hover { transform: translateY(-4px); }
+  .option-card h3 { font-size: 1.02rem; margin-bottom: 6px; font-family: inherit; font-weight: 700; }
+  .option-card p { margin: 0 0 14px; color: var(--ink-soft); font-size: 0.9rem; }
+
+  /* ---------------- Comment ça fonctionne ---------------- */
+  .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 22px; }
+  @media (max-width: 980px) { .steps { grid-template-columns: 1fr; } }
+  .step { display: flex; flex-direction: column; gap: 14px; }
+  .step-num { width: 40px; height: 40px; border-radius: 50%; background: var(--bleu-nuit); color: #fff; display: flex; align-items: center; justify-content: center; font-family: "Iowan Old Style", Georgia, serif; font-weight: 600; font-size: 1.05rem; flex: none; }
+  .step h3 { font-size: 1rem; font-weight: 700; font-family: inherit; }
+  .step p { margin: 0; color: var(--ink-soft); font-size: 0.9rem; }
+
+  /* ---------------- Inspection : 6 étapes ---------------- */
+  .control-steps { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  @media (max-width: 760px) { .control-steps { grid-template-columns: 1fr; } }
+  .control-card { background: var(--bg-raised); border: 1px solid var(--line); border-radius: 20px; padding: 24px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 14px; transition: transform 0.18s ease; }
+  .control-card:hover { transform: translateY(-4px); }
+  .control-card-head { display: flex; align-items: center; gap: 14px; }
+  .control-card h3 { font-size: 1.02rem; font-family: inherit; font-weight: 700; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag { background: var(--bg-tint); border: 1px solid var(--line); border-radius: 100px; padding: 5px 12px; font-size: 0.78rem; color: var(--ink-soft); font-weight: 600; }
+
+  /* ---------------- Rapport DIMZ ---------------- */
+  .report-mock { background: var(--bg-raised); border: 1px solid var(--line); border-radius: 26px; padding: 36px; box-shadow: var(--shadow); display: grid; grid-template-columns: auto 1fr; gap: 36px; align-items: center; }
+  @media (max-width: 760px) { .report-mock { grid-template-columns: 1fr; } }
+  .score-ring { width: 132px; height: 132px; border-radius: 50%; background: conic-gradient(var(--bleu-vif) 302deg, var(--line) 0deg); display: flex; align-items: center; justify-content: center; position: relative; flex: none; margin: 0 auto; }
+  .score-ring::before { content: ""; position: absolute; inset: 10px; border-radius: 50%; background: var(--bg-raised); }
+  .score-ring .num { position: relative; z-index: 1; font-family: "Iowan Old Style", Georgia, serif; font-weight: 600; font-size: 1.6rem; color: var(--ink); }
+  .score-ring .num small { display: block; font-size: 0.7rem; color: var(--ink-soft); font-weight: 400; }
+  .score-label { text-align: center; margin-top: 10px; font-size: 0.8rem; color: var(--ink-soft); font-weight: 600; }
+
+  .report-content ul.includes { list-style: none; margin: 0 0 22px; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+  .report-content ul.includes li { background: var(--bg-tint); border: 1px solid var(--line); border-radius: 100px; padding: 6px 14px; font-size: 0.82rem; font-weight: 600; color: var(--ink); }
+
+  .reco-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .reco-pill { display: inline-flex; align-items: center; gap: 7px; padding: 8px 15px; border-radius: 100px; font-weight: 700; font-size: 0.85rem; border: 1px solid var(--line); color: var(--ink-soft); opacity: 0.55; }
+  .reco-pill.active { opacity: 1; border-color: transparent; }
+  .reco-pill.vert.active { background: color-mix(in srgb, var(--vert) 16%, transparent); color: var(--vert); }
+  .reco-pill.ambre.active { background: color-mix(in srgb, var(--ambre) 18%, transparent); color: var(--ambre); }
+  .reco-pill.rouge.active { background: color-mix(in srgb, var(--rouge) 16%, transparent); color: var(--rouge); }
+
+  /* ---------------- FAQ ---------------- */
+  .faq-list { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+  details.faq-item { background: var(--bg-raised); border: 1px solid var(--line); border-radius: 16px; padding: 6px 22px; }
+  details.faq-item summary { list-style: none; cursor: pointer; padding: 18px 0; font-weight: 700; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+  details.faq-item summary::-webkit-details-marker { display: none; }
+  .chevron { width: 18px; height: 18px; flex: none; transition: transform 0.2s ease; color: var(--ink-soft); }
+  details[open] .chevron { transform: rotate(180deg); }
+  .faq-answer { padding: 0 0 20px; color: var(--ink-soft); font-size: 0.94rem; max-width: 64ch; }
+
+  /* ---------------- Formulaires (communs) ---------------- */
+  .form-card { background: var(--bg-raised); border: 1px solid var(--line); border-radius: 26px; padding: 40px; box-shadow: var(--shadow); }
+  @media (max-width: 640px) { .form-card { padding: 26px 20px; } }
+
+  .form-progress { margin-bottom: 30px; }
+  .form-progress-bar { height: 6px; border-radius: 100px; background: var(--bg-tint); overflow: hidden; }
+  .form-progress-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--bleu), var(--bleu-vif)); transition: width 0.35s ease; }
+  @media (prefers-reduced-motion: reduce) { .form-progress-fill { transition: none; } }
+  .form-progress-label { margin-top: 10px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); }
+  .form-progress-label strong { color: var(--bleu-vif); }
+
+  .form-step h3 { font-size: 1.2rem; margin-bottom: 22px; }
+
+  .form-nav { display: flex; justify-content: space-between; align-items: center; padding-top: 30px; margin-top: 6px; border-top: 1px solid var(--line); }
+  .form-nav .spacer { flex: 1; }
+  .field-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (max-width: 560px) { .field-grid { grid-template-columns: 1fr; } }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.full { grid-column: 1 / -1; }
+  .field label { font-size: 0.84rem; font-weight: 700; }
+  .hint { font-weight: 400; color: var(--ink-soft); font-size: 0.8rem; }
+  input, select, textarea {
+    font: inherit; font-size: 0.95rem; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--bg); color: var(--ink); width: 100%;
+  }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--bleu-vif); outline-offset: 1px; border-color: transparent; }
+  textarea { resize: vertical; min-height: 90px; }
+
+  .choice-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .choice-grid label {
+    display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--line);
+    padding: 9px 16px; border-radius: 100px; font-size: 0.86rem; font-weight: 600; cursor: pointer; color: var(--ink);
+  }
+  .choice-grid input { width: auto; padding: 0; accent-color: var(--bleu-vif); }
+  .choice-grid label:has(input:checked) { border-color: var(--bleu-vif); background: color-mix(in srgb, var(--bleu-vif) 10%, var(--bg)); }
+
+  .veh-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 12px; align-items: end; margin-bottom: 14px; }
+  @media (max-width: 960px) { .veh-row { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .veh-row { grid-template-columns: 1fr; } }
+  .veh-row .field { margin: 0; }
+  .veh-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  @media (max-width: 700px) { .veh-row-3 { grid-template-columns: 1fr; } }
+  .veh-remove { background: transparent; border: 1px solid var(--line); color: var(--ink-soft); border-radius: 10px; padding: 11px 14px; cursor: pointer; }
+  .veh-remove:hover { color: var(--rouge); border-color: var(--rouge); }
+  .add-vehicle { margin-top: 6px; background: transparent; border: 1px dashed var(--line); color: var(--bleu-vif); border-radius: 12px; padding: 12px 18px; cursor: pointer; font-weight: 700; width: 100%; }
+  .add-vehicle:hover { border-color: var(--bleu-vif); }
+  .add-vehicle:disabled { color: var(--ink-soft); cursor: not-allowed; }
+
+  .veh-bubbles { display: flex; flex-wrap: wrap; gap: 8px; margin: -4px 0 12px; }
+  .veh-bubble { display: inline-flex; align-items: center; gap: 8px; background: color-mix(in srgb, var(--bleu-vif) 10%, var(--bg)); border: 1px solid color-mix(in srgb, var(--bleu-vif) 35%, var(--line)); color: var(--ink); border-radius: 100px; padding: 7px 8px 7px 14px; font-size: 0.84rem; font-weight: 600; }
+  .veh-bubble svg { width: 14px; height: 14px; color: var(--bleu-vif); flex: none; }
+
+  .toggle-row { display: flex; align-items: center; gap: 10px; }
+  .toggle-row input { width: auto; }
+
+  .confirm-panel { text-align: center; padding: 50px 20px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .confirm-icon { width: 58px; height: 58px; border-radius: 50%; background: color-mix(in srgb, var(--bleu-vif) 14%, transparent); color: var(--bleu-vif); display: flex; align-items: center; justify-content: center; }
+  .confirm-panel h3 { font-size: 1.2rem; }
+  .confirm-panel p { color: var(--ink-soft); max-width: 42ch; margin: 0; }
+
+  /* ---------------- Contact ---------------- */
+  .form-solo { max-width: 760px; margin: 0 auto; }
+
+  footer { padding: 40px 0 56px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; color: var(--ink-soft); font-size: 0.85rem; }
+  .footer-slogan { text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700; font-size: 0.76rem; color: var(--bleu-vif); }
+</style>
+
+<header class="topnav">
+  <div class="wrap nav-row">
+    <a href="javascript:void(0)" class="brand" data-goto-tab="accompagnement">
+      <span class="name">Dimz <em>· Mon copilote auto</em></span>
+    </a>
+    
+    <div class="main-tabs" role="tablist" aria-label="Navigation principale">
+      <button type="button" role="tab" id="tab-btn-accompagnement" aria-selected="true" data-tab="accompagnement">Accompagnement</button>
+      <button type="button" role="tab" id="tab-btn-convoyage" aria-selected="false" data-tab="convoyage">Convoyage</button>
+    </div>
+    <button type="button" class="btn btn-primary btn-sm" id="nav-cta">Décrire mon projet</button>
+  </div>
+</header>
+
+<main>
+
+<!-- ===================== ONGLET ACCOMPAGNEMENT ===================== -->
+<div id="tab-accompagnement" role="tabpanel" aria-labelledby="tab-btn-accompagnement">
+  <div class="wrap">
+    <div class="subtabs" role="tablist" aria-label="Sections Accompagnement">
+      <button type="button" role="tab" id="subtab-btn-offres" aria-selected="true" data-subtab="offres">Projet &amp; offres</button>
+      <button type="button" role="tab" id="subtab-btn-inspection" aria-selected="false" data-subtab="inspection">Inspection</button>
+    </div>
+  </div>
+
+  <!-- ---------- Sous-onglet : Les offres ---------- -->
+  <div id="subtab-offres" role="tabpanel" aria-labelledby="subtab-btn-offres">
+
+    <section class="dark hero">
+      <div class="wrap hero-solo">
+        <span class="kicker">Trouver · Sécuriser · Accompagner · Livrer</span>
+        <h1>Votre copilote vous accompagne, <em>de l'idée à la remise des clés.</em></h1>
+        <p class="lede">Avant d'acheter un véhicule, Dimz vous conseille, vérifie et s'occupe des démarches à votre place. Un expert qui défend vos intérêts, pas ceux du vendeur.</p>
+        <div class="cta-row">
+          <a href="#formulaire" class="btn btn-primary">Décrire mon projet</a>
+          <a href="#offres" class="btn btn-outline-dark">Voir les offres</a>
+        </div>
+      </div>
+    </section>
+
+    
+
+    <div class="wrap">
+      <section id="pourquoi">
+        <div class="section-head" data-reveal>
+          <span class="label">La méthode</span>
+          <h2>La méthode DIMZ.</h2>
+          <p>Chaque lettre correspond à une étape du travail de votre copilote, du premier échange à la remise des clés.</p>
+        </div>
+        <div class="values-grid">
+          <div class="value-card" data-reveal>
+            <div class="value-icon method-letter">D</div>
+            <h3>Définir</h3>
+            <p>Votre copilote définit avec vous le projet exact : budget, usage, critères non négociables.</p>
+          </div>
+          <div class="value-card" data-reveal>
+            <div class="value-icon method-letter">I</div>
+            <h3>Identifier</h3>
+            <p>Votre copilote repère les annonces qui correspondent à votre budget et à votre usage réel.</p>
+          </div>
+          <div class="value-card" data-reveal>
+            <div class="value-icon method-letter">M</div>
+            <h3>Mesurer</h3>
+            <p>Votre copilote mesure chaque véhicule avec le Score DIMZ : prix, historique, état, adéquation.</p>
+          </div>
+          <div class="value-card" data-reveal>
+            <div class="value-icon method-letter">Z</div>
+            <h3>Zéro surprise</h3>
+            <p>Vous achetez l'esprit tranquille, sans découvrir un problème après avoir signé.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section id="offres" class="tint">
+      <div class="wrap">
+        <div class="section-head" data-reveal>
+          <span class="label">Les offres</span>
+          <h2>Choisissez le niveau d'accompagnement qui vous correspond.</h2>
+          <p>Du premier conseil gratuit à la remise des clés, votre copilote s'adapte à votre projet.</p>
+        </div>
+
+        <div class="offers">
+          <div class="offer-card" data-reveal>
+            <h3>Découverte</h3>
+            <div class="offer-price"><span class="free">Gratuit</span></div>
+            <div class="offer-sub">Pour y voir clair avant de se lancer</div>
+            <ul>
+              <li>Vous indiquez budget, type de véhicule, usage et critères</li>
+              <li>Votre copilote vous conseille une sélection de modèles adaptés</li>
+              <li>Une estimation du marché pour ce type de véhicule</li>
+            </ul>
+            <a href="#formulaire" class="btn btn-outline preselect-need" data-need="conseil">Demander mon conseil gratuit</a>
+          </div>
+
+          <div class="offer-card featured" data-reveal>
+            <span class="offer-tag">Le plus choisi</span>
+            <h3>Copilote</h3>
+            <div class="price-toggle" role="tablist" aria-label="Type de recherche">
+              <button type="button" role="tab" aria-selected="true" data-price="99" data-sub="Pour une recherche courante, sur des véhicules classiques.">Recherche simple</button>
+              <button type="button" role="tab" aria-selected="false" data-price="149" data-sub="Concerne les véhicules rares, de collection, ou les recherches qui demandent plus de temps.">Recherche complexe</button>
+            </div>
+            <div class="offer-price"><span id="offer-price-value">99 €</span></div>
+            <div class="offer-sub" id="offer-sub-copilote">Pour une recherche courante, sur des véhicules classiques.</div>
+            <ul>
+              <li>Conseils personnalisés tout au long de la recherche</li>
+              <li>Sélection d'annonces pertinentes, triées pour vous</li>
+              <li>Analyse détaillée de chaque offre retenue</li>
+              <li>Recommandations pour éviter les mauvaises affaires</li>
+            </ul>
+            <a href="#formulaire" class="btn btn-primary preselect-need" data-need="accompagnement">Confier ma recherche</a>
+          </div>
+
+          <div class="offer-card" data-reveal>
+            <h3>Copilote Complète</h3>
+            <div class="offer-price">749 €</div>
+            <div class="offer-sub">Hors convoyage · clé en main</div>
+            <ul>
+              <li>Tout le contenu de l'offre Copilote</li>
+              <li>Prise de contact directe avec le vendeur</li>
+              <li>Vérifications administratives complètes</li>
+              <li>Organisation de l'achat jusqu'à la remise des clés</li>
+            </ul>
+            <a href="#formulaire" class="btn btn-outline preselect-need" data-need="complet">Être accompagné clé en main</a>
+          </div>
+        </div>
+
+        <p class="offer-note" data-reveal>Le convoyage est proposé en option, sur devis. Et si vous avez déjà réglé une offre Copilote à <strong>99 €</strong> ou <strong>149 €</strong>, cette somme est intégralement déduite du prix de l'offre Copilote Complète.</p>
+
+        <div class="grid-2" style="margin-top:32px;" data-reveal>
+          <div class="option-card">
+            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div>
+            <div>
+              <h3>Inspection</h3>
+              <p>Vous avez déjà trouvé un véhicule ? Faites-le vérifier par votre copilote avant de vous engager.</p>
+              <button type="button" class="btn btn-outline" data-goto-subtab="inspection">Découvrir l'inspection</button>
+            </div>
+          </div>
+          <div class="option-card">
+            <div class="value-icon" aria-hidden="true"><svg class="icon-line" viewBox="0 0 24 24"><rect x="1" y="7" width="14" height="10"/><path d="M15 10h4l3 3v4h-7z"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg></div>
+            <div>
+              <h3>Livraison</h3>
+              <p>Une fois le véhicule acheté, Dimz organise sa livraison jusqu'à chez vous.</p>
+              <button type="button" class="btn btn-outline" data-goto-tab="convoyage">Découvrir Dimz - Convoyage</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="wrap">
+      <section id="comment">
+        <div class="section-head" data-reveal>
+          <span class="label">Comment ça fonctionne</span>
+          <h2>Un parcours guidé, du premier clic aux clés en main.</h2>
+        </div>
+        <div class="steps">
+          <div class="step" data-reveal>
+            <div class="step-num">1</div>
+            <h3>Découverte</h3>
+            <p>Vous découvrez la méthode DIMZ et ce qui distingue un copilote d'un vendeur.</p>
+          </div>
+          <div class="step" data-reveal>
+            <div class="step-num">2</div>
+            <h3>Compréhension</h3>
+            <p>Vous comparez Découverte, Copilote et Copilote Complète pour voir ce que chacune couvre.</p>
+          </div>
+          <div class="step" data-reveal>
+            <div class="step-num">3</div>
+            <h3>Choix d'une offre</h3>
+            <p>Vous choisissez la formule adaptée à votre budget et à l'urgence de votre projet.</p>
+          </div>
+          <div class="step" data-reveal>
+            <div class="step-num">4</div>
+            <h3>Prise de contact</h3>
+            <p>Vous remplissez le formulaire ; votre copilote vous rappelle sous 24 à 48h.</p>
+          </div>
+          <div class="step" data-reveal>
+            <div class="step-num">5</div>
+            <h3>Accompagnement</h3>
+            <p>Votre copilote cherche, vérifie et négocie avec vous, jusqu'à la remise des clés.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section id="faq">
+      <div class="wrap">
+        <div class="section-head" data-reveal>
+          <span class="label">Questions fréquentes</span>
+          <h2>Tout ce qu'on nous demande le plus souvent.</h2>
+        </div>
+        <div class="faq-list" data-reveal>
+          <details class="faq-item">
+            <summary>Qu'est-ce que Dimz exactement ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">Dimz est un copilote automobile indépendant. Concrètement : on vous aide à acheter ou à faire transporter un véhicule, en vous évitant les erreurs coûteuses et les semaines passées à comparer des annonces seul.</div>
+          </details>
+          <details class="faq-item">
+            <summary>Combien coûte l'offre Copilote ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">99 € pour une recherche simple, 149 € pour une recherche complexe (véhicules rares ou de collection). L'offre Découverte, elle, reste gratuite.</div>
+          </details>
+          <details class="faq-item">
+            <summary>Si j'ai déjà payé 99 € ou 149 €, dois-je repayer pour l'offre Copilote Complète ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">Non. Cette somme est intégralement déduite du prix de l'offre Copilote Complète si vous décidez de passer à cette formule.</div>
+          </details>
+          <details class="faq-item">
+            <summary>Le convoyage est-il inclus dans l'offre Copilote Complète ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">Non, il est proposé en option, sur devis. C'est un service indépendant, accessible depuis l'onglet Convoyage.</div>
+          </details>
+          <details class="faq-item">
+            <summary>Intervenez-vous partout en France ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">Dimz est basé à Lyon, mais votre copilote intervient partout en France pour la recherche, l'inspection et le convoyage.</div>
+          </details>
+          <details class="faq-item">
+            <summary>Combien de temps prend un accompagnement ?<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+            <div class="faq-answer">Ça dépend du véhicule recherché : une citadine courante se trouve vite, un modèle rare peut prendre plusieurs semaines. Votre copilote vous donne un délai réaliste dès le premier échange.</div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- Votre projet : Formulaire Accompagnement ---------- -->
+    <section id="contact" class="tint">
+      <div class="wrap">
+        <div class="section-head" data-reveal>
+          <span class="label">Votre projet</span>
+          <h2 id="formulaire">Parlez-nous de votre projet.</h2>
+          <p>Ces quelques questions permettent à votre copilote de vous conduire jusqu'à votre projet idéal.</p>
+        </div>
+
+        <div class="form-solo">
+          <div class="form-card">
+            <div class="form-progress">
+              <div class="form-progress-bar"><div class="form-progress-fill" id="acc-progress-fill" style="width:16.66%"></div></div>
+              <div class="form-progress-label">Étape <strong id="acc-step-current">1</strong> sur <span id="acc-step-total">6</span></div>
+            </div>
+            <form id="form-accompagnement" novalidate>
+
+              <div class="form-step">
+                <h3>Informations personnelles</h3>
+                <div class="field-grid">
+                  <div class="field">
+                    <label for="a-civilite">Civilité</label>
+                    <select id="a-civilite" required>
+                      <option value="">Choisir…</option>
+                      <option>M.</option>
+                      <option>Mme</option>
+                      <option>Je ne préfère pas préciser</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="a-age">Âge <span class="hint">(optionnel)</span></label>
+                    <input type="number" id="a-age" min="18" max="99">
+                  </div>
+                  <div class="field">
+                    <label for="a-nom">Nom</label>
+                    <input type="text" id="a-nom" required>
+                  </div>
+                  <div class="field">
+                    <label for="a-prenom">Prénom</label>
+                    <input type="text" id="a-prenom" required>
+                  </div>
+                  <div class="field">
+                    <label for="a-tel">Téléphone</label>
+                    <input type="tel" id="a-tel" required>
+                  </div>
+                  <div class="field">
+                    <label for="a-email">Email</label>
+                    <input type="email" id="a-email" required>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-step">
+                <h3>Votre quotidien</h3>
+                <div class="field-grid">
+                  <div class="field full">
+                    <label for="a-pourqui">Le véhicule est destiné à…</label>
+                    <select id="a-pourqui">
+                      <option>Moi-même</option>
+                      <option>Mon foyer / ma famille</option>
+                      <option>Un usage professionnel</option>
+                      <option>Un proche</option>
+                    </select>
+                  </div>
+                  <div class="field full">
+                    <label>Usages principaux</label>
+                    <div class="choice-grid">
+                      <label><input type="checkbox" value="travail"> Trajets travail</label>
+                      <label><input type="checkbox" value="loisirs"> Loisirs</label>
+                      <label><input type="checkbox" value="quotidien"> Trajets quotidiens</label>
+                      <label><input type="checkbox" value="vacances"> Vacances / longs trajets</label>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="a-km">Kilométrage annuel estimé</label>
+                    <select id="a-km">
+                      <option value="">Choisir…</option>
+                      <option>Moins de 5 000 km</option>
+                      <option>5 000 – 10 000 km</option>
+                      <option>10 000 – 15 000 km</option>
+                      <option>15 000 – 20 000 km</option>
+                      <option>20 000 – 25 000 km</option>
+                      <option>25 000 – 30 000 km</option>
+                      <option>30 000 – 35 000 km</option>
+                      <option>35 000 – 40 000 km</option>
+                      <option>40 000 – 45 000 km</option>
+                      <option>45 000 – 50 000 km</option>
+                      <option>Plus de 50 000 km</option>
+                    </select>
+                    <span class="hint">En moyenne, un Français parcourt 13 000 km/an.</span>
+                  </div>
+                  <div class="field">
+                    <label for="a-parcours">Type de parcours dominant</label>
+                    <select id="a-parcours">
+                      <option>Ville</option>
+                      <option>Route / national</option>
+                      <option>Autoroute</option>
+                      <option>Mixte</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-step">
+                <h3>Véhicules souhaités</h3>
+                <div class="field hint" style="margin-bottom:14px;">Choisissez une ou plusieurs pistes : marque, modèle, puis génération, parmi une trentaine de marques.</div>
+                <div id="vehicule-list"></div>
+                <div id="vehicule-bubbles" class="veh-bubbles"></div>
+                <button type="button" class="add-vehicle" id="add-vehicle">+ Ajouter un véhicule</button>
+
+                <div class="field full toggle-row" style="margin-top:26px;">
+                  <label><input type="checkbox" id="a-veh-absente"> Votre recherche ne figure pas dans la liste ? Décrivez-nous le véhicule souhaité</label>
+                </div>
+                <div class="field full" id="veh-absente-detail" hidden style="margin-top:10px;">
+                  <textarea id="a-veh-absente-desc" placeholder="Marque, modèle, année approximative…"></textarea>
+                </div>
+
+                <div class="field-grid" style="margin-top:26px;">
+                  <div class="field full">
+                    <label>Type de carrosserie souhaité</label>
+                    <div class="choice-grid">
+                      <label><input type="checkbox" value="citadine"> Citadine</label>
+                      <label><input type="checkbox" value="berline"> Berline</label>
+                      <label><input type="checkbox" value="break"> Break</label>
+                      <label><input type="checkbox" value="suv"> SUV</label>
+                      <label><input type="checkbox" value="monospace"> Monospace</label>
+                      <label><input type="checkbox" value="coupe"> Coupé</label>
+                      <label><input type="checkbox" value="cabriolet"> Cabriolet</label>
+                      <label><input type="checkbox" value="utilitaire"> Utilitaire</label>
+                    </div>
+                  </div>
+                  <div class="field full">
+                    <label>Énergie du véhicule</label>
+                    <div class="choice-grid">
+                      <label><input type="checkbox" value="essence"> Essence</label>
+                      <label><input type="checkbox" value="diesel"> Diesel</label>
+                      <label><input type="checkbox" value="hybride"> Hybride</label>
+                      <label><input type="checkbox" value="hybride-rechargeable"> Hybride rechargeable</label>
+                      <label><input type="checkbox" value="electrique"> Électrique</label>
+                      <label><input type="checkbox" value="peu-importe"> Peu importe</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-step">
+                <h3>Situation actuelle</h3>
+                <div class="field-grid">
+                  <div class="field">
+                    <label for="a-vehicule-actuel">Avez-vous un véhicule actuellement ?</label>
+                    <select id="a-vehicule-actuel">
+                      <option value="non">Non</option>
+                      <option value="oui">Oui</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div id="veh-actuel-detail" hidden style="margin-top:20px;">
+                  <div class="veh-row-3">
+                    <div class="field"><label>Marque</label><select id="a-actuel-marque"></select></div>
+                    <div class="field"><label>Modèle</label><select id="a-actuel-modele" disabled><option value="">Choisir la marque d'abord</option></select></div>
+                    <div class="field"><label>Génération</label><select id="a-actuel-generation" disabled><option value="">—</option></select></div>
+                  </div>
+
+                  <div class="field full toggle-row" style="margin-top:14px;">
+                    <label><input type="checkbox" id="a-actuel-absent"> Vous ne trouvez pas votre véhicule ? Décrivez-le-nous</label>
+                  </div>
+                  <div class="field full" id="actuel-absent-detail" hidden style="margin-top:6px;">
+                    <textarea id="a-actuel-absent-desc" placeholder="Marque, modèle, année approximative…"></textarea>
+                  </div>
+
+                  <div class="field-grid" style="margin-top:16px;">
+                    <div class="field">
+                      <label for="a-actuel-annee">Année du véhicule</label>
+                      <input type="number" id="a-actuel-annee" min="1970" max="2026">
+                    </div>
+                    <div class="field">
+                      <label for="a-actuel-km">Kilométrage actuel</label>
+                      <input type="number" id="a-actuel-km" step="1000">
+                    </div>
+                    <div class="field full">
+                      <label for="a-actuel-prix">Prix d'achat ou mensualité restante</label>
+                      <input type="text" id="a-actuel-prix" placeholder="ex. Acheté 14 000 €, ou 220 €/mois restants">
+                    </div>
+                  </div>
+
+                  <div class="field-grid" style="margin-top:20px;">
+                    <div class="field">
+                      <label for="a-financement-cours">Financement en cours sur ce véhicule ?</label>
+                      <select id="a-financement-cours">
+                        <option value="non">Non</option>
+                        <option value="oui">Oui</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div id="financement-detail" hidden style="margin-top:20px;">
+                  <div class="field-grid">
+                    <div class="field full">
+                      <label>Type de financement en cours</label>
+                      <div class="choice-grid">
+                        <label><input type="radio" name="financement-actuel-type" value="lld"> LLD</label>
+                        <label><input type="radio" name="financement-actuel-type" value="loa"> LOA</label>
+                        <label><input type="radio" name="financement-actuel-type" value="credit"> Crédit classique</label>
+                      </div>
+                    </div>
+                    <div class="field">
+                      <label for="a-financement-duree">Sur combien de temps ? (mois)</label>
+                      <input type="number" id="a-financement-duree" min="1">
+                    </div>
+                    <div class="field">
+                      <label for="a-financement-restant">Temps restant à solder (mois)</label>
+                      <input type="number" id="a-financement-restant" min="0">
+                    </div>
+                    <div class="field">
+                      <label for="a-solde-restant">Solde restant dû approximatif (€)</label>
+                      <input type="number" id="a-solde-restant" step="100">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-step">
+                <h3>Budget et financement</h3>
+                <div class="field-grid">
+                  <div class="field">
+                    <label for="a-budget">Budget total envisagé</label>
+                    <select id="a-budget">
+                      <option value="">Choisir…</option>
+                      <option>Moins de 10 000 €</option>
+                      <option>10 000 – 15 000 €</option>
+                      <option>15 000 – 20 000 €</option>
+                      <option>20 000 – 25 000 €</option>
+                      <option>25 000 – 30 000 €</option>
+                      <option>30 000 – 40 000 €</option>
+                      <option>40 000 – 50 000 €</option>
+                      <option>50 000 – 75 000 €</option>
+                      <option>75 000 – 100 000 €</option>
+                      <option>Plus de 100 000 €</option>
+                    </select>
+                  </div>
+                  <div class="field full">
+                    <label>Mode de financement souhaité</label>
+                    <div class="choice-grid">
+                      <label><input type="radio" name="financement" value="comptant"> Comptant</label>
+                      <label><input type="radio" name="financement" value="credit"> Crédit classique</label>
+                      <label><input type="radio" name="financement" value="loa"> LOA</label>
+                      <label><input type="radio" name="financement" value="lld"> LLD</label>
+                      <label><input type="radio" name="financement" value="indecis"> Je ne sais pas encore</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-step">
+                <h3>Projet et délai</h3>
+                <div class="field-grid">
+                  <div class="field full">
+                    <label>Quel accompagnement recherchez-vous ?</label>
+                    <div class="choice-grid" id="besoin-choices">
+                      <label><input type="radio" name="besoin" value="conseil"> Découverte</label>
+                      <label><input type="radio" name="besoin" value="accompagnement"> Copilote</label>
+                      <label><input type="radio" name="besoin" value="complet"> Copilote Complète</label>
+                      <label><input type="radio" name="besoin" value="inspection"> Inspection</label>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="a-delai">Délai souhaité</label>
+                    <select id="a-delai">
+                      <option>Urgent (moins d'1 mois)</option>
+                      <option>1 à 3 mois</option>
+                      <option>3 à 6 mois</option>
+                      <option>Je m'informe seulement</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="a-source">Comment avez-vous connu Dimz ? <span class="hint">(optionnel)</span></label>
+                    <select id="a-source">
+                      <option value="">Choisir…</option>
+                      <option>Bouche à oreille</option>
+                      <option>Réseaux sociaux</option>
+                      <option>Recherche Google</option>
+                      <option>Recommandation</option>
+                      <option>Autre</option>
+                    </select>
+                  </div>
+                  <div class="field full">
+                    <label for="a-inquietudes">Vos principales inquiétudes concernant cet achat</label>
+                    <textarea id="a-inquietudes" placeholder="Panne cachée, prix trop élevé, manque de temps pour chercher…"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-nav">
+                <button type="button" class="btn btn-outline" id="acc-back" hidden>Précédent</button>
+                <span class="spacer"></span>
+                <button type="button" class="btn btn-primary" id="acc-next">Continuer</button>
+                <button type="submit" class="btn btn-primary" id="acc-submit" hidden>Envoyer à mon copilote</button>
+              </div>
+            </form>
+
+            <div class="confirm-panel" id="confirm-accompagnement" hidden>
+              <div class="confirm-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+              <h3>Votre projet est transmis</h3>
+              <p>Votre copilote revient vers vous sous 24 à 48h ouvrées avec une première réponse personnalisée.</p>
+              <button type="button" class="btn btn-outline" data-reset="form-accompagnement">Modifier ma demande</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ---------- Sous-onglet : Inspection ---------- -->
+  <div id="subtab-inspection" role="tabpanel" aria-labelledby="subtab-btn-inspection" hidden>
+
+    <section class="dark intro-band">
+      <div class="wrap" style="max-width:760px;">
+        <span class="kicker"><span class="dot"></span>Avant de vous engager</span>
+        <h1>Le contrôle DIMZ, <em>expliqué étape par étape.</em></h1>
+        <p class="lede">Votre copilote inspecte le véhicule que vous avez trouvé et vous dit clairement ce qui va, ce qui doit vous alerter, et si le prix demandé est juste.</p>
+        <div class="cta-row">
+          <button type="button" class="btn btn-primary" id="cta-demander-inspection">Demander une inspection</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="wrap">
+      <section>
+        <div class="section-head" data-reveal>
+          <span class="label">Le processus</span>
+          <h2>Les 6 étapes du contrôle DIMZ</h2>
+        </div>
+        <div class="control-steps">
+          <div class="control-card" data-reveal>
+            <div class="control-card-head"><span class="step-num">1</span><h3>Contrôle administratif</h3></div>
+            <div class="tag-row"><span class="tag">Carte grise</span><span class="tag">VIN</span><span class="tag">Contrôle technique</span><span class="tag">Carnet d'entretien</span><span class="tag">Factures</span><span class="tag">Historique propriétaires</span></div>
+          </div>
+          <div class="control-card" data-reveal>
+            <div class="control-card-head"><span class="step-num">2</span><h3>Inspection extérieure</h3></div>
+            <div class="tag-row"><span class="tag">Carrosserie</span><span class="tag">Pneus</span><span class="tag">Jantes</span><span class="tag">Pare-brise</span><span class="tag">Optiques</span><span class="tag">Corrosion</span><span class="tag">Alignement</span></div>
+          </div>
+          <div class="control-card" data-reveal>
+            <div class="control-card-head"><span class="step-num">3</span><h3>Inspection intérieure</h3></div>
+            <div class="tag-row"><span class="tag">Usure</span><span class="tag">Climatisation</span><span class="tag">Multimédia</span><span class="tag">Équipements</span><span class="tag">Coffre</span><span class="tag">Commandes</span></div>
+          </div>
+          <div class="control-card" data-reveal>
+            <div class="control-card-head"><span class="step-num">4</span><h3>Contrôle mécanique visuel</h3></div>
+            <div class="tag-row"><span class="tag">Moteur</span><span class="tag">Fuites</span><span class="tag">Niveaux</span><span class="tag">Batterie</span><span class="tag">Démarrage</span><span class="tag">Bruits</span></div>
+          </div>
+          <div class="control-card" data-reveal>
+            <div class="control-card-head"><span class="step-num">5</span><h3>Essai routier</h3></div>
+            <div class="tag-row"><span class="tag">Direction</span><span class="tag">Boîte de vitesses</span><span class="tag">Freinage</span><span class="tag">Suspension</span><span class="tag">Voyants</span><span class="tag">Confort</span></div>
+          </div>
+          <div class="control-card" data-reveal>
+            <div class="control-card-head"><span class="step-num">6</span><h3>Analyse du marché</h3></div>
+            <div class="tag-row"><span class="tag">Prix</span><span class="tag">Kilométrage</span><span class="tag">Valeur marché</span><span class="tag">Défauts connus</span><span class="tag">Potentiel de revente</span></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="tint">
+      <div class="wrap">
+        <div class="section-head" data-reveal>
+          <span class="label">Le livrable</span>
+          <h2>Le Rapport DIMZ</h2>
+          <p>Un seul document, remis après chaque inspection, pour décider en connaissance de cause.</p>
+        </div>
+        <div class="report-mock" data-reveal>
+          <div>
+            <div class="score-ring"><div class="num">8,4<small>/ 10</small></div></div>
+            <div class="score-label">Score DIMZ (exemple)</div>
+          </div>
+          <div class="report-content">
+            <ul class="includes">
+              <li>Résumé général</li>
+              <li>Photos</li>
+              <li>Points positifs</li>
+              <li>Points de vigilance</li>
+              <li>Score DIMZ</li>
+              <li>Recommandation finale</li>
+            </ul>
+            <div class="reco-row">
+              <span class="reco-pill vert">🟢 Recommandé</span>
+              <span class="reco-pill ambre active">🟠 Envisageable</span>
+              <span class="reco-pill rouge">🔴 Déconseillé</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ===================== ONGLET CONVOYAGE ===================== -->
+<div id="tab-convoyage" role="tabpanel" aria-labelledby="tab-btn-convoyage" hidden>
+
+  <section class="dark hero">
+    <div class="wrap hero-solo">
+      <span class="kicker"><span class="dot"></span>Un service entièrement indépendant</span>
+      <h1>Besoin de déplacer votre véhicule ? <em>Votre copilote prend le relais.</em></h1>
+      <p class="lede">Achat à distance, déménagement, manque de temps : Dimz confie votre véhicule à un professionnel du convoyage, du point de départ jusqu'à la porte d'arrivée.</p>
+      <div class="cta-row">
+        <a href="#convoyage-formulaire" class="btn btn-primary">Demander un convoyage</a>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="section-head" data-reveal>
+        <span class="label">Convoyage</span>
+        <h2 id="convoyage-formulaire">Organisez votre convoyage</h2>
+        <p>Renseignez le véhicule, le trajet et vos préférences : votre copilote revient vers vous avec un créneau et un tarif.</p>
+      </div>
+
+      <div class="form-card">
+        <div class="form-progress">
+          <div class="form-progress-bar"><div class="form-progress-fill" id="cvg-progress-fill" style="width:33.33%"></div></div>
+          <div class="form-progress-label">Étape <strong id="cvg-step-current">1</strong> sur <span id="cvg-step-total">3</span></div>
+        </div>
+        <form id="form-convoyage" novalidate>
+
+          <div class="form-step">
+            <h3>Le véhicule</h3>
+            <div class="field-grid">
+              <div class="field">
+                <label for="c-marque">Marque</label>
+                <input type="text" id="c-marque" required>
+              </div>
+              <div class="field">
+                <label for="c-modele">Modèle</label>
+                <input type="text" id="c-modele" required>
+              </div>
+              <div class="field">
+                <label for="c-immat">Immatriculation</label>
+                <input type="text" id="c-immat" placeholder="AA-123-AA" required>
+              </div>
+              <div class="field full toggle-row">
+                <label><input type="checkbox" id="c-pas-immatricule"> Mon véhicule n'est pas encore immatriculé</label>
+              </div>
+              <div class="field">
+                <label for="c-vin">Numéro d'identification (VIN)</label>
+                <input type="text" id="c-vin" placeholder="17 caractères" maxlength="17">
+              </div>
+              <div class="field">
+                <label for="c-annee">Année</label>
+                <input type="number" id="c-annee" min="1970" max="2026" required>
+              </div>
+              <div class="field full">
+                <label>Transmission</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="c-transmission" value="Manuelle"> Manuelle</label>
+                  <label><input type="radio" name="c-transmission" value="Automatique"> Automatique</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-step">
+            <h3>Le trajet</h3>
+            <div class="field-grid">
+              <div class="field">
+                <label for="c-depart">Lieu de départ</label>
+                <input type="text" id="c-depart" placeholder="Ville, code postal" required>
+              </div>
+              <div class="field">
+                <label for="c-arrivee">Lieu d'arrivée</label>
+                <input type="text" id="c-arrivee" placeholder="Ville, code postal" required>
+              </div>
+              <div class="field">
+                <label for="c-date-depart">Date de prise en charge souhaitée</label>
+                <input type="date" id="c-date-depart">
+              </div>
+              <div class="field">
+                <label for="c-date-arrivee">Date de livraison souhaitée</label>
+                <input type="date" id="c-date-arrivee">
+              </div>
+              <div class="field">
+                <label for="c-tel">Téléphone</label>
+                <input type="tel" id="c-tel" required>
+              </div>
+              <div class="field">
+                <label for="c-email">Email</label>
+                <input type="email" id="c-email" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-step">
+            <h3>Prise en charge &amp; options</h3>
+            <div class="field-grid">
+              <div class="field full toggle-row">
+                <label><input type="checkbox" id="c-mise-en-main"> Mise en main du véhicule souhaitée à la livraison</label>
+              </div>
+              <div class="field full">
+                <label>Niveau de carburant actuel</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="c-carburant-niveau" value="Réserve"> Réserve</label>
+                  <label><input type="radio" name="c-carburant-niveau" value="1/4"> 1/4</label>
+                  <label><input type="radio" name="c-carburant-niveau" value="1/2"> 1/2</label>
+                  <label><input type="radio" name="c-carburant-niveau" value="3/4"> 3/4</label>
+                  <label><input type="radio" name="c-carburant-niveau" value="Plein"> Plein</label>
+                </div>
+              </div>
+              <div class="field full">
+                <label>Option carburant à la livraison</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="carburant-option" value="ne-pas-remettre"> Ne pas remettre à niveau</label>
+                  <label><input type="radio" name="carburant-option" value="remise-a-niveau"> Remise à niveau</label>
+                  <label><input type="radio" name="carburant-option" value="plein"> Plein</label>
+                </div>
+              </div>
+              <div class="field full">
+                <label>Option lavage</label>
+                <div class="choice-grid">
+                  <label><input type="radio" name="lavage-option" value="aucun"> Aucun</label>
+                  <label><input type="radio" name="lavage-option" value="exterieur"> Extérieur</label>
+                  <label><input type="radio" name="lavage-option" value="complet"> Complet</label>
+                </div>
+              </div>
+              <div class="field full">
+                <label for="c-instructions">Instructions libres</label>
+                <textarea id="c-instructions" placeholder="Accès au parking, code portail, personne à contacter sur place…"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-nav">
+            <button type="button" class="btn btn-outline" id="cvg-back" hidden>Précédent</button>
+            <span class="spacer"></span>
+            <button type="button" class="btn btn-primary" id="cvg-next">Continuer</button>
+            <button type="submit" class="btn btn-primary" id="cvg-submit" hidden>Envoyer ma demande de convoyage</button>
+          </div>
+        </form>
+
+        <div class="confirm-panel" id="confirm-convoyage" hidden>
+          <div class="confirm-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <h3>Votre demande de convoyage est transmise</h3>
+          <p>Votre copilote revient vers vous sous 24 à 48h ouvrées avec un créneau et un tarif.</p>
+          <button type="button" class="btn btn-outline" data-reset="form-convoyage">Modifier ma demande</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+</main>
+
+<footer class="wrap">
+  <span>© 2026 Dimz · Mon copilote auto.</span>
+  <span class="footer-slogan">Trouver · Sécuriser · Accompagner · Livrer</span>
+  <span>Page de démonstration</span>
+</footer>
+
+<script>
+  // ---------- Révélation au scroll ----------
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var io = null;
+  if (!reduceMotion) {
+    io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in-view'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('[data-reveal]').forEach(function (el) { io.observe(el); });
+  } else {
+    document.querySelectorAll('[data-reveal]').forEach(function (el) { el.classList.add('in-view'); });
+  }
+  function observeNewReveals() {
+    if (!io) return;
+    document.querySelectorAll('[data-reveal]:not(.in-view)').forEach(function (el) { io.observe(el); });
+  }
+
+  // ---------- Onglets principaux : Accompagnement / Convoyage ----------
+  var mainTabButtons = document.querySelectorAll('.main-tabs button');
+  var navCta = document.getElementById('nav-cta');
+
+  function setNavCta(tab) {
+    if (tab === 'convoyage') {
+      navCta.textContent = 'Demander un convoyage';
+    } else {
+      navCta.textContent = 'Décrire mon projet';
+    }
+  }
+
+  function showMainTab(tab, resetSubtab) {
+    mainTabButtons.forEach(function (b) { b.setAttribute('aria-selected', b.dataset.tab === tab ? 'true' : 'false'); });
+    document.getElementById('tab-accompagnement').hidden = tab !== 'accompagnement';
+    document.getElementById('tab-convoyage').hidden = tab !== 'convoyage';
+    setNavCta(tab);
+    if (tab === 'accompagnement' && resetSubtab) showSubTab('offres');
+    observeNewReveals();
+  }
+
+  mainTabButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () { showMainTab(btn.dataset.tab, true); });
+  });
+
+  document.querySelectorAll('[data-goto-tab]').forEach(function (el) {
+    el.addEventListener('click', function () { showMainTab(el.dataset.gotoTab, true); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); });
+  });
+
+  // ---------- Sous-onglets Accompagnement : Les offres / Inspection ----------
+  var subTabButtons = document.querySelectorAll('.subtabs button');
+
+  function showSubTab(sub) {
+    subTabButtons.forEach(function (b) { b.setAttribute('aria-selected', b.dataset.subtab === sub ? 'true' : 'false'); });
+    document.getElementById('subtab-offres').hidden = sub !== 'offres';
+    document.getElementById('subtab-inspection').hidden = sub !== 'inspection';
+    observeNewReveals();
+  }
+
+  subTabButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () { showSubTab(btn.dataset.subtab); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); });
+  });
+
+  document.querySelectorAll('[data-goto-subtab]').forEach(function (el) {
+    el.addEventListener('click', function () { showSubTab(el.dataset.gotoSubtab); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); });
+  });
+
+  // ---------- Nav CTA (dynamique selon l'onglet actif) ----------
+  navCta.addEventListener('click', function () {
+    var activeTab = document.querySelector('.main-tabs button[aria-selected="true"]').dataset.tab;
+    if (activeTab === 'convoyage') {
+      document.getElementById('convoyage-formulaire').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    } else {
+      showSubTab('offres');
+      requestAnimationFrame(function () {
+        document.getElementById('formulaire').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+      });
+    }
+  });
+
+  // ---------- Présélection du besoin (radio #besoin-choices) ----------
+  function presetBesoin(need) {
+    var radio = document.querySelector('#besoin-choices input[value="' + need + '"]');
+    if (radio) radio.checked = true;
+  }
+
+  // ---------- CTA "Demander une inspection" depuis le sous-onglet Inspection ----------
+  document.getElementById('cta-demander-inspection').addEventListener('click', function () {
+    showSubTab('offres');
+    presetBesoin('inspection');
+    requestAnimationFrame(function () {
+      document.getElementById('formulaire').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    });
+  });
+
+  // ---------- Présélection du besoin depuis les offres ----------
+  document.querySelectorAll('.preselect-need').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (btn.dataset.need) presetBesoin(btn.dataset.need);
+    });
+  });
+
+  // ---------- Toggle Copilote : recherche simple / complexe ----------
+  var priceButtons = document.querySelectorAll('.price-toggle button');
+  var priceValue = document.getElementById('offer-price-value');
+  var offerSubCopilote = document.getElementById('offer-sub-copilote');
+  priceButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      priceButtons.forEach(function (b) { b.setAttribute('aria-selected', 'false'); });
+      btn.setAttribute('aria-selected', 'true');
+      priceValue.textContent = btn.dataset.price + ' €';
+      if (offerSubCopilote && btn.dataset.sub) offerSubCopilote.textContent = btn.dataset.sub;
+    });
+  });
+
+  // ---------- Cascade véhicules (Formulaire Accompagnement, étape 3) ----------
+  var VEHICLE_DATA = {
+    "Peugeot": {"107": ["I (2005–2014)"], "108": ["I (2014–2021)"], "206": ["I (1998–2012)"], "207": ["I (2006–2014)"], "208": ["I (2012–2019)", "II (2019–présent)"], "308": ["I (2007–2013)", "II (2013–2021)", "III (2021–présent)"], "407": ["I (2004–2011)"], "2008": ["I (2013–2019)", "II (2019–présent)"], "3008": ["I (2009–2016)", "II (2016–2023)", "III (2023–présent)"], "4008": ["I (2012–2017)"], "5008": ["I (2009–2017)", "II (2017–présent)"], "508": ["I (2010–2018)", "II (2018–présent)"], "RCZ": ["I (2010–2015)"]},
+    "Renault": {"Twingo": ["II (2007–2014)", "III (2014–présent)"], "Clio": ["III (2005–2012)", "IV (2012–2019)", "V (2019–présent)"], "Captur": ["I (2013–2019)", "II (2019–présent)"], "Mégane": ["III (2008–2016)", "IV (2016–2023)", "E-Tech (2022–présent)"], "Scénic": ["II (2003–2009)", "III (2009–2016)", "IV (2016–2023)"], "Kadjar": ["I (2015–2022)"], "Kangoo": ["II (2008–2021)"], "Espace": ["IV (2002–2015)", "V (2015–présent)"], "Laguna": ["II (2001–2007)", "III (2007–2015)"], "Talisman": ["I (2015–2022)"], "Zoe": ["I (2012–présent)"], "Koleos": ["I (2008–2016)", "II (2016–présent)"], "Vel Satis": ["I (2001–2009)"], "Avantime": ["I (2001–2003)"]},
+    "Citroën": {"C1": ["I (2005–2014)", "II (2014–2022)"], "C2": ["I (2003–2009)"], "C3": ["I (2002–2009)", "II (2009–2016)", "III (2016–présent)"], "C3 Picasso": ["I (2009–2017)"], "C4": ["I (2004–2010)", "II (2010–2018)", "III (2020–présent)"], "C4 Picasso": ["I (2006–2013)", "II (2013–2018)"], "C5": ["I (2001–2008)", "II (2008–2017)"], "C5 Aircross": ["I (2018–présent)"], "C6": ["I (2005–2012)"], "C8": ["I (2002–2014)"], "Xsara Picasso": ["I (1999–2010)"], "Berlingo": ["II (2008–2018)", "III (2018–présent)"]},
+    "DS Automobiles": {"DS3": ["I (2010–2019)", "Crossback (2019–présent)"], "DS4": ["I (2011–2018)", "II (2021–présent)"], "DS5": ["I (2011–2018)"], "DS7": ["I (2017–présent)"]},
+    "Volkswagen": {"up!": ["I (2011–présent)"], "Polo": ["IV (2001–2009)", "V (2009–2017)", "VI (2017–présent)"], "Golf": ["V (2003–2008)", "VI (2008–2012)", "VII (2012–2019)", "VIII (2019–présent)"], "Jetta": ["V (2005–2011)", "VI (2011–2018)"], "Beetle": ["II (1997–2011)", "III (2011–2019)"], "Scirocco": ["III (2008–2017)"], "Eos": ["I (2006–2015)"], "T-Roc": ["I (2017–présent)"], "T-Cross": ["I (2019–présent)"], "Tiguan": ["I (2007–2016)", "II (2016–présent)"], "Touran": ["I (2003–2010)", "II (2010–2015)"], "Sharan": ["II (2010–présent)"], "Passat": ["B6 (2005–2010)", "B7 (2010–2014)", "B8 (2014–2023)"], "Arteon": ["I (2017–présent)"], "Caddy": ["III (2004–2015)", "IV (2015–2020)"]},
+    "BMW": {"Série 1": ["E87 (2004–2011)", "F20 (2011–2019)", "F40 (2019–présent)"], "Série 2": ["F22 (2014–2021)", "U06 (2021–présent)"], "Série 3": ["E46 (2001–2006)", "E90 (2005–2011)", "F30 (2011–2019)", "G20 (2019–présent)"], "Série 4": ["F32 (2013–2020)", "G22 (2020–présent)"], "Série 5": ["E60 (2003–2010)", "F10 (2010–2017)", "G30 (2017–présent)"], "Série 7": ["E65 (2001–2008)", "F01 (2008–2015)", "G11 (2015–2022)"], "X1": ["E84 (2009–2015)", "F48 (2015–2022)", "U11 (2022–présent)"], "X2": ["F39 (2018–présent)"], "X3": ["E83 (2003–2010)", "F25 (2010–2017)", "G01 (2017–présent)"], "X5": ["E53 (1999–2006)", "E70 (2006–2013)", "F15 (2013–2018)", "G05 (2018–présent)"], "Z4": ["E85 (2002–2008)", "E89 (2009–2016)"]},
+    "Mercedes-Benz": {"Classe A": ["W169 (2004–2012)", "W176 (2012–2018)", "W177 (2018–présent)"], "Classe B": ["W245 (2005–2011)", "W246 (2011–2018)", "W247 (2018–présent)"], "Classe C": ["W203 (2000–2007)", "W204 (2007–2014)", "W205 (2014–2021)", "W206 (2021–présent)"], "Classe E": ["W211 (2002–2009)", "W212 (2009–2016)", "W213 (2016–présent)"], "Classe S": ["W220 (1998–2005)", "W221 (2005–2013)", "W222 (2013–2020)"], "CLA": ["C117 (2013–2019)", "C118 (2019–présent)"], "GLA": ["X156 (2013–2020)", "H247 (2020–présent)"], "GLC": ["X253 (2015–2022)", "X254 (2022–présent)"], "GLE": ["W166 (2015–2019)", "V167 (2019–présent)"]},
+    "Audi": {"A1": ["8X (2010–2018)", "GB (2018–présent)"], "A3": ["8P (2003–2012)", "8V (2012–2020)", "8Y (2020–présent)"], "A4": ["B6 (2000–2004)", "B7 (2004–2008)", "B8 (2008–2015)", "B9 (2015–présent)"], "A5": ["8T (2007–2016)", "F5 (2016–présent)"], "A6": ["C6 (2004–2011)", "C7 (2011–2018)", "C8 (2018–présent)"], "Q3": ["8U (2011–2018)", "F3 (2018–présent)"], "Q5": ["8R (2008–2016)", "FY (2016–présent)"], "Q7": ["4L (2005–2015)", "4M (2015–présent)"], "TT": ["8N (1998–2006)", "8J (2006–2014)", "8S (2014–2023)"]},
+    "Toyota": {"Aygo": ["I (2005–2014)", "II (2014–2022)"], "Yaris": ["XP10 (2000–2005)", "XP90 (2005–2011)", "XP130 (2011–2020)", "XP210 (2020–présent)"], "Auris": ["I (2006–2012)", "II (2012–2018)"], "Corolla": ["E140 (2006–2013)", "E170 (2013–2019)", "E210 (2019–présent)"], "Avensis": ["II (2003–2008)", "III (2009–2018)"], "Prius": ["II (2003–2009)", "III (2009–2015)", "IV (2015–2022)"], "C-HR": ["I (2016–2023)", "II (2023–présent)"], "RAV4": ["XA20 (2000–2005)", "XA30 (2005–2012)", "XA40 (2012–2018)", "XA50 (2018–présent)"], "Land Cruiser": ["J120 (2002–2009)", "J150 (2009–présent)"]},
+    "Ford": {"Ka": ["II (2008–2016)"], "Fiesta": ["Mk5 (2002–2008)", "Mk7 (2008–2017)", "Mk8 (2017–2023)"], "Focus": ["Mk1 (2000–2004)", "Mk2 (2004–2010)", "Mk3 (2010–2018)", "Mk4 (2018–présent)"], "Puma": ["I (2019–présent)"], "EcoSport": ["I (2013–2017)", "II (2017–présent)"], "Kuga": ["I (2008–2012)", "II (2012–2019)", "III (2019–présent)"], "C-Max": ["I (2003–2010)", "II (2010–2019)"], "Mondeo": ["Mk3 (2000–2007)", "Mk4 (2007–2014)", "Mk5 (2014–2022)"], "S-Max": ["I (2006–2015)", "II (2015–présent)"], "Galaxy": ["II (2006–2015)", "III (2015–présent)"], "Edge": ["I (2016–2019)"]},
+    "Opel": {"Adam": ["I (2013–2019)"], "Corsa": ["C (2000–2006)", "D (2006–2014)", "E (2014–2019)", "F (2019–présent)"], "Astra": ["G (2000–2004)", "H (2004–2009)", "J (2009–2015)", "K (2015–2021)", "L (2021–présent)"], "Meriva": ["A (2003–2010)", "B (2010–2017)"], "Zafira": ["A (1999–2005)", "B (2005–2011)", "C (2011–2019)"], "Crossland": ["I (2017–présent)"], "Mokka": ["I (2012–2019)", "II (2019–présent)"], "Grandland": ["I (2017–présent)"], "Insignia": ["A (2008–2017)", "B (2017–présent)"], "Vectra": ["C (2002–2008)"]},
+    "Nissan": {"Micra": ["K12 (2002–2010)", "K13 (2010–2016)", "K14 (2016–présent)"], "Note": ["I (2006–2013)", "II (2013–2016)"], "Juke": ["I (2010–2019)", "II (2019–présent)"], "Qashqai": ["J10 (2007–2013)", "J11 (2013–2021)", "J12 (2021–présent)"], "X-Trail": ["I (2001–2007)", "II (2007–2013)", "III (2013–2022)"], "Leaf": ["I (2010–2017)", "II (2017–présent)"], "Pulsar": ["I (2014–2018)"], "Primera": ["P12 (2002–2008)"]},
+    "Fiat": {"Panda": ["II (2003–2012)", "III (2011–présent)"], "Punto": ["II (1999–2010)", "III / Evo (2005–2018)"], "500": ["II (2007–2020)", "500e (2020–présent)"], "500X": ["I (2014–présent)"], "500L": ["I (2012–2017)"], "Tipo": ["I (2015–présent)"], "Bravo": ["II (2007–2014)"], "Doblo": ["II (2010–présent)"]},
+    "Seat": {"Ibiza": ["III (2002–2008)", "IV (2008–2017)", "V (2017–présent)"], "Leon": ["I (1999–2005)", "II (2005–2012)", "III (2012–2020)", "IV (2020–présent)"], "Altea": ["I (2004–2015)"], "Toledo": ["III (2004–2009)", "IV (2012–2019)"], "Arona": ["I (2017–présent)"], "Ateca": ["I (2016–présent)"], "Tarraco": ["I (2018–présent)"], "Alhambra": ["II (2010–2020)"]},
+    "Cupra": {"Formentor": ["I (2020–présent)"], "Leon": ["I (2020–présent)"], "Born": ["I (2021–présent)"]},
+    "Škoda": {"Fabia": ["I (1999–2007)", "II (2007–2014)", "III (2014–2021)", "IV (2021–présent)"], "Rapid": ["I (2012–2019)"], "Octavia": ["II (2004–2013)", "III (2013–2020)", "IV (2020–présent)"], "Yeti": ["I (2009–2017)"], "Karoq": ["I (2017–présent)"], "Kodiaq": ["I (2016–présent)"], "Superb": ["II (2008–2015)", "III (2015–présent)"], "Roomster": ["I (2006–2015)"]},
+    "Dacia": {"Sandero": ["I (2008–2012)", "II (2012–2020)", "III (2020–présent)"], "Logan": ["I (2004–2012)", "II (2012–2020)", "III (2020–présent)"], "Duster": ["I (2010–2017)", "II (2017–2024)", "III (2024–présent)"], "Lodgy": ["I (2012–2022)"], "Spring": ["I (2021–présent)"], "Jogger": ["I (2021–présent)"]},
+    "Hyundai": {"i10": ["I (2008–2013)", "II (2013–2019)", "III (2019–présent)"], "i20": ["I (2008–2014)", "II (2014–2020)", "III (2020–présent)"], "i30": ["I (2007–2012)", "II (2012–2017)", "III (2017–présent)"], "Getz": ["I (2002–2011)"], "Kona": ["I (2017–2023)"], "Tucson": ["JM (2004–2009)", "LM / ix35 (2009–2015)", "TL (2015–2020)", "NX4 (2020–présent)"], "Santa Fe": ["II (2006–2012)", "III (2012–2018)", "IV (2018–présent)"], "Ioniq": ["I (2016–2022)"]},
+    "Kia": {"Picanto": ["I (2004–2011)", "II (2011–2017)", "III (2017–présent)"], "Rio": ["II (2005–2011)", "III (2011–2017)", "IV (2017–2023)"], "Ceed": ["I (2006–2012)", "II (2012–2018)", "III (2018–présent)"], "Soul": ["I (2008–2014)", "II (2014–2019)"], "Stonic": ["I (2017–présent)"], "Sportage": ["II (2004–2010)", "III (2010–2015)", "QL (2015–2021)", "NQ5 (2021–présent)"], "Sorento": ["II (2009–2014)", "III (2014–2020)", "IV (2020–présent)"], "Niro": ["I (2016–2022)", "II (2022–présent)"]},
+    "Volvo": {"V40": ["II (2012–2019)"], "S60": ["I (2000–2009)", "II (2010–2018)", "III (2018–présent)"], "V60": ["I (2010–2018)", "II (2018–présent)"], "V70": ["II (2000–2007)", "III (2007–2016)"], "XC40": ["I (2017–présent)"], "XC60": ["I (2008–2017)", "II (2017–présent)"], "XC90": ["I (2002–2014)", "II (2014–présent)"]},
+    "Mini": {"Cooper": ["R50/R53 (2001–2006)", "R56 (2006–2014)", "F55/F56 (2014–présent)"], "Clubman": ["I (2007–2014)", "II (2015–présent)"], "Cabrio": ["R52/R57 (2004–2015)", "F57 (2016–présent)"], "Countryman": ["R60 (2010–2017)", "F60 (2017–présent)"]},
+    "Mazda": {"Mazda2": ["I (2002–2007)", "II (2007–2014)", "III (2014–présent)"], "Mazda3": ["I / BK (2003–2009)", "II / BL (2009–2013)", "III / BM (2013–2019)", "IV (2019–présent)"], "Mazda6": ["I (2002–2007)", "II (2007–2012)", "III (2012–présent)"], "MX-5": ["NB (1998–2005)", "NC (2005–2015)", "ND (2015–présent)"], "CX-3": ["I (2015–présent)"], "CX-5": ["I (2012–2017)", "II (2017–présent)"]},
+    "Honda": {"Jazz": ["I (2001–2008)", "II (2008–2015)", "III (2015–2020)", "IV (2020–présent)"], "Civic": ["VII (2000–2005)", "VIII (2005–2011)", "IX (2011–2016)", "X (2016–2022)", "XI (2022–présent)"], "Accord": ["VII (2002–2008)", "VIII (2008–2015)"], "HR-V": ["I (1998–2006)", "II (2015–présent)"], "CR-V": ["II (2001–2006)", "III (2006–2012)", "IV (2012–2018)", "V (2018–2023)"], "Insight": ["II (2009–2014)"]},
+    "Suzuki": {"Swift": ["III (2005–2010)", "IV (2010–2017)", "V (2017–présent)"], "Ignis": ["II (2016–présent)"], "SX4": ["I (2006–2014)", "S-Cross (2013–présent)"], "Vitara": ["III (2015–présent)"], "Jimny": ["III (1998–2018)", "IV (2018–présent)"], "Baleno": ["II (2015–présent)"]},
+    "Mitsubishi": {"Space Star": ["II (2013–présent)"], "ASX": ["I (2010–présent)"], "Lancer": ["IX (2000–2007)", "X (2007–2016)"], "Outlander": ["II (2006–2012)", "III (2012–2021)", "IV (2021–présent)"], "Eclipse Cross": ["I (2017–présent)"], "Pajero": ["III (1999–2006)", "IV (2006–2021)"]},
+    "Jeep": {"Renegade": ["I (2014–présent)"], "Compass": ["I (2006–2017)", "II (2017–présent)"], "Cherokee": ["KL (2013–2023)"], "Grand Cherokee": ["WJ (1999–2004)", "WK (2005–2010)", "WK2 (2010–présent)"], "Wrangler": ["JK (2007–2018)", "JL (2018–présent)"]},
+    "Land Rover": {"Evoque": ["I (2011–2018)", "II (2019–présent)"], "Discovery Sport": ["I (2014–présent)"], "Discovery": ["III (2004–2009)", "IV (2009–2017)", "V (2017–présent)"], "Defender": ["I (1990–2016)", "II (2020–présent)"], "Range Rover": ["III (2002–2012)", "IV (2012–2022)"], "Range Rover Sport": ["I (2005–2013)", "II (2013–2022)"]},
+    "Jaguar": {"XE": ["I (2015–présent)"], "XF": ["I (2007–2015)", "II (2015–présent)"], "F-Type": ["I (2013–présent)"], "E-Pace": ["I (2017–présent)"], "F-Pace": ["I (2016–présent)"]},
+    "Porsche": {"Boxster": ["986 (1996–2004)", "987 (2004–2012)", "981 (2012–2016)"], "Cayman": ["987 (2005–2012)", "981 (2012–2016)"], "911": ["996 (1998–2004)", "997 (2004–2011)", "991 (2011–2019)", "992 (2019–présent)"], "Macan": ["I (2014–présent)"], "Cayenne": ["I (2002–2010)", "II (2010–2017)", "III (2017–présent)"], "Panamera": ["I (2009–2016)", "II (2016–présent)"]},
+    "Alfa Romeo": {"156": ["I (1997–2007)"], "159": ["I (2005–2011)"], "MiTo": ["I (2008–2018)"], "Giulietta": ["I (2010–2020)"], "Giulia": ["I (2016–présent)"], "Stelvio": ["I (2016–présent)"]},
+    "Smart": {"ForTwo": ["II (2007–2014)", "III (2014–présent)"], "ForFour": ["II (2014–présent)"]},
+    "Tesla": {"Model S": ["2012–présent"], "Model 3": ["2017–présent"], "Model X": ["2015–présent"], "Model Y": ["2020–présent"]}
+  };
+
+  var vehicleList = document.getElementById('vehicule-list');
+  var vehicleCount = 0;
+  var MAX_VEHICLES = 4;
+
+  function brandOptions() {
+    return '<option value="">Marque…</option>' + Object.keys(VEHICLE_DATA).map(function (b) {
+      return '<option value="' + b + '">' + b + '</option>';
+    }).join('');
+  }
+
+  // Estimation des motorisations disponibles selon le modèle et la génération
+  var VEH_ELECTRIC_ONLY = ['Model S', 'Model 3', 'Model X', 'Model Y', 'Zoe', 'Leaf', '500e', 'Born', 'Spring'];
+  var VEH_NO_DIESEL = ['up!', 'Aygo', '107', '108', 'C1', 'Twingo', 'i10', 'ForTwo', 'ForFour', 'Ignis'];
+
+  function getMotorisations(model, generation) {
+    if (VEH_ELECTRIC_ONLY.indexOf(model) !== -1) return ['Électrique'];
+    var options = ['Essence'];
+    if (VEH_NO_DIESEL.indexOf(model) === -1) options.push('Diesel');
+    var m = generation.match(/(\d{4})[–-](\d{4}|présent)/);
+    var endYear = m ? (m[2] === 'présent' ? 2026 : parseInt(m[2], 10)) : 2010;
+    if (endYear >= 2015) options.push('Hybride');
+    if (endYear >= 2019) options.push('Hybride rechargeable');
+    if (endYear >= 2021) options.push('Électrique');
+    return options;
+  }
+
+  function addVehicleRow() {
+    if (vehicleCount >= MAX_VEHICLES) return;
+    vehicleCount++;
+    var row = document.createElement('div');
+    row.className = 'veh-row';
+    row.innerHTML =
+      '<div class="field"><label>Marque</label><select class="veh-marque">' + brandOptions() + '</select></div>' +
+      '<div class="field"><label>Modèle</label><select class="veh-modele" disabled><option value="">Choisir la marque d\'abord</option></select></div>' +
+      '<div class="field"><label>Génération</label><select class="veh-generation" disabled><option value="">—</option></select></div>' +
+      '<div class="field"><label>Motorisation</label><select class="veh-motorisation" disabled><option value="">—</option></select></div>' +
+      '<button type="button" class="veh-remove" aria-label="Retirer ce véhicule">✕</button>';
+    vehicleList.appendChild(row);
+    updateAddButton();
+  }
+
+  function updateAddButton() {
+    var btn = document.getElementById('add-vehicle');
+    btn.disabled = vehicleCount >= MAX_VEHICLES;
+    btn.textContent = vehicleCount >= MAX_VEHICLES ? 'Maximum de 4 véhicules atteint' : '+ Ajouter un véhicule';
+  }
+
+  function renderVehicleBubbles() {
+    var container = document.getElementById('vehicule-bubbles');
+    container.innerHTML = '';
+    document.querySelectorAll('#vehicule-list .veh-row').forEach(function (row) {
+      var marque = row.querySelector('.veh-marque').value;
+      var modele = row.querySelector('.veh-modele').value;
+      var gen = row.querySelector('.veh-generation').value;
+      var moteur = row.querySelector('.veh-motorisation').value;
+      if (marque && modele && gen) {
+        var bubble = document.createElement('span');
+        bubble.className = 'veh-bubble';
+        var label = marque + ' ' + modele + ' · ' + gen + (moteur ? ' · ' + moteur : '');
+        bubble.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>' + label;
+        container.appendChild(bubble);
+      }
+    });
+  }
+
+  vehicleList.addEventListener('change', function (e) {
+    var row = e.target.closest('.veh-row');
+    if (!row) return;
+    if (e.target.classList.contains('veh-marque')) {
+      var modeleSelect = row.querySelector('.veh-modele');
+      var genSelect = row.querySelector('.veh-generation');
+      var moteurSelect = row.querySelector('.veh-motorisation');
+      var brand = e.target.value;
+      moteurSelect.innerHTML = '<option value="">—</option>';
+      moteurSelect.disabled = true;
+      if (!brand) {
+        modeleSelect.innerHTML = '<option value="">Choisir la marque d\'abord</option>';
+        modeleSelect.disabled = true;
+        genSelect.innerHTML = '<option value="">—</option>';
+        genSelect.disabled = true;
+        return;
+      }
+      var models = Object.keys(VEHICLE_DATA[brand]);
+      modeleSelect.innerHTML = '<option value="">Modèle…</option>' + models.map(function (m) {
+        return '<option value="' + m + '">' + m + '</option>';
+      }).join('');
+      modeleSelect.disabled = false;
+      genSelect.innerHTML = '<option value="">—</option>';
+      genSelect.disabled = true;
+    }
+    if (e.target.classList.contains('veh-modele')) {
+      var row2 = e.target.closest('.veh-row');
+      var brand2 = row2.querySelector('.veh-marque').value;
+      var genSelect2 = row2.querySelector('.veh-generation');
+      var moteurSelect2 = row2.querySelector('.veh-motorisation');
+      var model = e.target.value;
+      moteurSelect2.innerHTML = '<option value="">—</option>';
+      moteurSelect2.disabled = true;
+      if (!model) {
+        genSelect2.innerHTML = '<option value="">—</option>';
+        genSelect2.disabled = true;
+        return;
+      }
+      var gens = VEHICLE_DATA[brand2][model];
+      genSelect2.innerHTML = '<option value="">Génération…</option>' + gens.map(function (g) {
+        return '<option value="' + g + '">' + g + '</option>';
+      }).join('');
+      genSelect2.disabled = false;
+    }
+    if (e.target.classList.contains('veh-generation')) {
+      var row3 = e.target.closest('.veh-row');
+      var model3 = row3.querySelector('.veh-modele').value;
+      var moteurSelect3 = row3.querySelector('.veh-motorisation');
+      var generation = e.target.value;
+      if (!generation) {
+        moteurSelect3.innerHTML = '<option value="">—</option>';
+        moteurSelect3.disabled = true;
+      } else {
+        var motos = getMotorisations(model3, generation);
+        moteurSelect3.innerHTML = '<option value="">Motorisation…</option>' + motos.map(function (mo) {
+          return '<option value="' + mo + '">' + mo + '</option>';
+        }).join('');
+        moteurSelect3.disabled = false;
+      }
+    }
+    renderVehicleBubbles();
+  });
+
+  vehicleList.addEventListener('click', function (e) {
+    if (e.target.classList.contains('veh-remove')) {
+      e.target.closest('.veh-row').remove();
+      vehicleCount--;
+      updateAddButton();
+      renderVehicleBubbles();
+    }
+  });
+
+  document.getElementById('a-veh-absente').addEventListener('change', function () {
+    document.getElementById('veh-absente-detail').hidden = !this.checked;
+  });
+
+  document.getElementById('add-vehicle').addEventListener('click', addVehicleRow);
+  addVehicleRow();
+
+  // ---------- Sélecteur du véhicule actuel (étape "Situation actuelle") ----------
+  var actuelMarque = document.getElementById('a-actuel-marque');
+  var actuelModele = document.getElementById('a-actuel-modele');
+  var actuelGeneration = document.getElementById('a-actuel-generation');
+  actuelMarque.innerHTML = brandOptions();
+
+  actuelMarque.addEventListener('change', function () {
+    var brand = actuelMarque.value;
+    if (!brand) {
+      actuelModele.innerHTML = '<option value="">Choisir la marque d\'abord</option>';
+      actuelModele.disabled = true;
+      actuelGeneration.innerHTML = '<option value="">—</option>';
+      actuelGeneration.disabled = true;
+      return;
+    }
+    var models = Object.keys(VEHICLE_DATA[brand]);
+    actuelModele.innerHTML = '<option value="">Modèle…</option>' + models.map(function (m) {
+      return '<option value="' + m + '">' + m + '</option>';
+    }).join('');
+    actuelModele.disabled = false;
+    actuelGeneration.innerHTML = '<option value="">—</option>';
+    actuelGeneration.disabled = true;
+  });
+
+  actuelModele.addEventListener('change', function () {
+    var brand = actuelMarque.value;
+    var model = actuelModele.value;
+    if (!model) {
+      actuelGeneration.innerHTML = '<option value="">—</option>';
+      actuelGeneration.disabled = true;
+      return;
+    }
+    var gens = VEHICLE_DATA[brand][model];
+    actuelGeneration.innerHTML = '<option value="">Génération…</option>' + gens.map(function (g) {
+      return '<option value="' + g + '">' + g + '</option>';
+    }).join('');
+    actuelGeneration.disabled = false;
+  });
+
+  // ---------- Parcours par étapes (formulaires) ----------
+  var wizards = {};
+
+  function setupWizard(opts) {
+    var form = document.getElementById(opts.formId);
+    var steps = Array.prototype.slice.call(form.querySelectorAll('.form-step'));
+    var total = steps.length;
+    var current = 0;
+    var fillEl = document.getElementById(opts.fillId);
+    var currentEl = document.getElementById(opts.currentId);
+    var backBtn = document.getElementById(opts.backId);
+    var nextBtn = document.getElementById(opts.nextId);
+    var submitBtn = document.getElementById(opts.submitId);
+
+    function render() {
+      steps.forEach(function (s, i) {
+        s.hidden = i !== current;
+        s.querySelectorAll('input, select, textarea').forEach(function (el) { el.disabled = i !== current; });
+      });
+      fillEl.style.width = (((current + 1) / total) * 100) + '%';
+      currentEl.textContent = current + 1;
+      backBtn.hidden = current === 0;
+      var isLast = current === total - 1;
+      nextBtn.hidden = isLast;
+      submitBtn.hidden = !isLast;
+      submitBtn.disabled = !isLast;
+    }
+
+    function scrollTop() {
+      form.closest('.form-card').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    }
+
+    backBtn.addEventListener('click', function () {
+      if (current > 0) { current--; render(); scrollTop(); }
+    });
+
+    nextBtn.addEventListener('click', function () {
+      if (current < total - 1) {
+        if (!form.reportValidity()) return;
+        current++;
+        render();
+        scrollTop();
+      }
+    });
+
+    render();
+    return { reset: function () { current = 0; render(); } };
+  }
+
+  wizards['form-accompagnement'] = setupWizard({
+    formId: 'form-accompagnement', fillId: 'acc-progress-fill', currentId: 'acc-step-current',
+    backId: 'acc-back', nextId: 'acc-next', submitId: 'acc-submit'
+  });
+  wizards['form-convoyage'] = setupWizard({
+    formId: 'form-convoyage', fillId: 'cvg-progress-fill', currentId: 'cvg-step-current',
+    backId: 'cvg-back', nextId: 'cvg-next', submitId: 'cvg-submit'
+  });
+
+  // ---------- Champs conditionnels (étape "Situation actuelle") ----------
+  function toggleOnValue(selectId, targetId, showValue) {
+    var select = document.getElementById(selectId);
+    var target = document.getElementById(targetId);
+    function sync() { target.hidden = select.value !== showValue; }
+    select.addEventListener('change', sync);
+    sync();
+  }
+  document.getElementById('a-vehicule-actuel').addEventListener('change', function () {
+    var show = this.value === 'oui';
+    document.getElementById('veh-actuel-detail').hidden = !show;
+    if (!show) document.getElementById('financement-detail').hidden = true;
+  });
+  toggleOnValue('a-financement-cours', 'financement-detail', 'oui');
+  document.getElementById('a-actuel-absent').addEventListener('change', function () {
+    document.getElementById('actuel-absent-detail').hidden = !this.checked;
+  });
+
+  // ---------- Convoyage : véhicule pas encore immatriculé ----------
+  var immatInput = document.getElementById('c-immat');
+  document.getElementById('c-pas-immatricule').addEventListener('change', function () {
+    immatInput.required = !this.checked;
+    if (this.checked) immatInput.value = '';
+    immatInput.disabled = this.checked;
+    immatInput.placeholder = this.checked ? 'Pas encore immatriculé' : 'AA-123-AA';
+  });
+
+  // ---------- Soumission des formulaires (simulation front-end) ----------
+  function wireForm(formId, confirmId) {
+    var form = document.getElementById(formId);
+    var confirmPanel = document.getElementById(confirmId);
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!form.reportValidity()) return;
+      form.hidden = true;
+      confirmPanel.hidden = false;
+      confirmPanel.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+    });
+  }
+  wireForm('form-accompagnement', 'confirm-accompagnement');
+  wireForm('form-convoyage', 'confirm-convoyage');
+
+  document.querySelectorAll('[data-reset]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var form = document.getElementById(btn.dataset.reset);
+      form.reset();
+      form.hidden = false;
+      if (wizards[btn.dataset.reset]) wizards[btn.dataset.reset].reset();
+      if (btn.dataset.reset === 'form-accompagnement') {
+        document.getElementById('veh-actuel-detail').hidden = true;
+        document.getElementById('financement-detail').hidden = true;
+        document.getElementById('veh-absente-detail').hidden = true;
+        document.getElementById('actuel-absent-detail').hidden = true;
+        actuelModele.innerHTML = '<option value="">Choisir la marque d\'abord</option>';
+        actuelModele.disabled = true;
+        actuelGeneration.innerHTML = '<option value="">—</option>';
+        actuelGeneration.disabled = true;
+        document.querySelectorAll('#vehicule-list .veh-row').forEach(function (row) { row.remove(); });
+        vehicleCount = 0;
+        addVehicleRow();
+        renderVehicleBubbles();
+      }
+      if (btn.dataset.reset === 'form-convoyage') {
+        immatInput.required = true;
+        immatInput.disabled = false;
+        immatInput.placeholder = 'AA-123-AA';
+      }
+      btn.closest('.confirm-panel').hidden = true;
+      form.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    });
+  });
+</script>
