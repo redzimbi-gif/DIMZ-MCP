@@ -4149,14 +4149,14 @@
   // navigateur. ----------
   var HASH_ROUTES = {
     accueil: { tab: 'accompagnement', subtab: 'accueil' },
-    decouverte: { tab: 'accompagnement', subtab: 'offres' },
+    offres: { tab: 'accompagnement', subtab: 'offres' },
     accompagnement: { tab: 'accompagnement', subtab: 'accueil' },
     convoyage: { tab: 'convoyage' },
     test: { tab: 'test' },
     projet: { tab: 'accompagnement-form' },
     'demande-convoyage': { tab: 'convoyage-form' },
   };
-  var SUBTAB_TO_HASH = { accueil: 'accueil', offres: 'decouverte' };
+  var SUBTAB_TO_HASH = { accueil: 'accueil', offres: 'offres' };
   var suppressHashSync = false;
 
   function currentHash() {
