@@ -16,13 +16,22 @@ create table rate_limits (
   primary key (ip, endpoint, window_start)
 );
 
+-- Comme les 27 autres tables de ce schéma : RLS activé sans policy. Seul le
+-- client service-role (jamais exposé au navigateur) lit/écrit cette table,
+-- depuis les Edge Functions et la route Next.js publiques ; RLS-sans-policy
+-- bloque tout accès direct par la clé publique en verrou dur, au cas où.
+alter table rate_limits enable row level security;
+
 -- Purge les fenêtres expirées : appelée par chaque fonction avant sa propre
 -- vérification, avec une probabilité de 1/20 (pas besoin qu'un ménage ait
 -- lieu à chaque requête pour rester efficace, et ça évite un job cron séparé
 -- pour une table dont le volume reste faible).
+-- search_path fixé : bonne pratique standard pour toute fonction SQL/PLPGSQL,
+-- qui évite qu'un objet malveillant placé plus tôt dans le search_path de
+-- l'appelant ne soit résolu à la place de celui attendu.
 create or replace function cleanup_rate_limits() returns void as $$
   delete from rate_limits where window_start < now() - interval '1 hour';
-$$ language sql;
+$$ language sql set search_path = public;
 
 -- Incrémente atomiquement le compteur de la fenêtre courante et renvoie sa
 -- nouvelle valeur. Un upsert lu-puis-écrit depuis le code appelant serait
@@ -36,4 +45,4 @@ returns int as $$
   on conflict (ip, endpoint, window_start)
   do update set count = rate_limits.count + 1
   returning count;
-$$ language sql;
+$$ language sql set search_path = public;
