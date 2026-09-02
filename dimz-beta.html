@@ -1911,6 +1911,7 @@
               </div>
             </div>
             <button type="submit" class="btn btn-primary" id="faq-contact-submit" style="margin-top:18px;width:100%;">Envoyer ma question</button>
+            <p id="faq-contact-error" role="alert" style="color:var(--rouge);font-size:.9rem;margin-top:10px;" hidden>Une erreur est survenue, votre question n'a pas pu être envoyée. Réessayez dans quelques instants.</p>
           </form>
 
           <div class="confirm-panel" id="confirm-faq-contact" hidden>
@@ -1962,6 +1963,7 @@
               </div>
             </div>
             <button type="submit" class="btn btn-primary" id="avis-submit" style="margin-top:18px;width:100%;">Envoyer mon avis</button>
+            <p id="avis-error" role="alert" style="color:var(--rouge);font-size:.9rem;margin-top:10px;" hidden>Une erreur est survenue, votre avis n'a pas pu être envoyé. Réessayez dans quelques instants.</p>
           </form>
 
           <div class="confirm-panel" id="confirm-avis" hidden>
@@ -5375,6 +5377,7 @@
     var form = document.getElementById('form-avis');
     var confirmPanel = document.getElementById('confirm-avis');
     var submitBtn = document.getElementById('avis-submit');
+    var errorMsg = document.getElementById('avis-error');
     var list = document.getElementById('avis-list');
     if (!toggleBtn || !form) return;
 
@@ -5393,16 +5396,19 @@
         commentaire: document.getElementById('avis-commentaire').value.trim()
       };
       setBtnLoading(submitBtn, 'Envoi…');
+      if (errorMsg) errorMsg.hidden = true;
       fetch(AVIS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-      }).then(function () {
+      }).then(function (r) {
+        if (!r.ok) throw new Error('http_' + r.status);
         form.hidden = true;
         confirmPanel.hidden = false;
       }).catch(function () {
-        form.hidden = true;
-        confirmPanel.hidden = false;
+        // Requête rejetée (validation, limite de fréquence, erreur serveur) : on le dit
+        // au client au lieu d'afficher une confirmation alors que rien n'a été enregistré.
+        if (errorMsg) errorMsg.hidden = false;
       }).finally(function () {
         clearBtnLoading(submitBtn);
       });
@@ -5442,6 +5448,7 @@
     var form = document.getElementById('form-contact-faq');
     var confirmPanel = document.getElementById('confirm-faq-contact');
     var submitBtn = document.getElementById('faq-contact-submit');
+    var errorMsg = document.getElementById('faq-contact-error');
     if (!toggleBtn || !form) return;
 
     toggleBtn.addEventListener('click', function () {
@@ -5459,16 +5466,19 @@
         message: document.getElementById('faq-contact-message').value.trim()
       };
       setBtnLoading(submitBtn, 'Envoi…');
+      if (errorMsg) errorMsg.hidden = true;
       fetch(CONTACT_FAQ_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-      }).then(function () {
+      }).then(function (r) {
+        if (!r.ok) throw new Error('http_' + r.status);
         form.hidden = true;
         confirmPanel.hidden = false;
       }).catch(function () {
-        form.hidden = true;
-        confirmPanel.hidden = false;
+        // Requête rejetée (validation, limite de fréquence, erreur serveur) : on le dit
+        // au client au lieu d'afficher une confirmation alors que rien n'a été enregistré.
+        if (errorMsg) errorMsg.hidden = false;
       }).finally(function () {
         clearBtnLoading(submitBtn);
       });
