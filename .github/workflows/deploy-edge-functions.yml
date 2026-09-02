@@ -1,6 +1,12 @@
 # Déploie les Edge Functions Supabase sans passer par la CLI en local —
 # utile depuis un téléphone : onglet Actions du dépôt → « Run workflow ».
-# Se déclenche aussi automatiquement quand une fonction change sur la branche.
+#
+# Volontairement déclenché à la main uniquement (pas de "on: push") : ces
+# fonctions tournent en prod avec la clé service-role et sont appelées par
+# n'importe quel visiteur anonyme du site vitrine (--no-verify-jwt). Un
+# déclenchement automatique sur push déployait sans revue chaque commit
+# touchant backoffice/supabase/functions/**, y compris sur une branche de
+# travail où ces fichiers changent souvent en cours d'itération.
 #
 # Prérequis, une seule fois : ajouter le secret SUPABASE_ACCESS_TOKEN dans
 # Settings → Secrets and variables → Actions (jeton créé depuis Supabase →
@@ -19,9 +25,6 @@ on:
         default: toutes
         type: choice
         options: [toutes, track-lookup, lead-intake, test-feedback, avis, contact-faq]
-  push:
-    branches: [claude/artifact-standalone-webpage-bvi82b]
-    paths: ["backoffice/supabase/functions/**"]
 
 jobs:
   deploy:
