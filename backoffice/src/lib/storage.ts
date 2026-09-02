@@ -10,7 +10,7 @@ const BUCKET = "dimz-files";
 const ALLOWED_MIME_PREFIXES = ["image/", "video/"];
 const ALLOWED_MIME_EXACT = ["application/pdf"];
 const DISALLOWED_MIME = ["image/svg+xml"];
-const MAX_FILE_BYTES = 100 * 1024 * 1024; // 100 Mo : large pour une vidéo d'inspection, borné malgré tout
+const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 Mo
 
 function isAllowedMime(contentType: string): boolean {
   if (!contentType) return false;
