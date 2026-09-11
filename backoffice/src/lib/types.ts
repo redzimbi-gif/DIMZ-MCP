@@ -1,0 +1,573 @@
+export const DOSSIER_STATUTS = [
+  "demande_recue",
+  "analyse_besoin",
+  "recherche",
+  "vehicules_selectionnes",
+  "inspection",
+  "negociation",
+  "achat_valide",
+  "convoyage",
+  "livraison",
+  "dossier_termine",
+] as const;
+
+export type DossierStatut = (typeof DOSSIER_STATUTS)[number];
+
+export const DOSSIER_STATUT_LABELS: Record<DossierStatut, string> = {
+  demande_recue: "Demande reçue",
+  analyse_besoin: "Analyse du besoin",
+  recherche: "Recherche",
+  vehicules_selectionnes: "Véhicules sélectionnés",
+  inspection: "Inspection",
+  negociation: "Négociation",
+  achat_valide: "Achat validé",
+  convoyage: "Convoyage",
+  livraison: "Livraison",
+  dossier_termine: "Dossier terminé",
+};
+
+export const DOSSIER_OFFRES = [
+  "decouverte",
+  "copilote",
+  "copilote_plus",
+  "convoyage_seul",
+  "expertise_seule",
+] as const;
+export type DossierOffre = (typeof DOSSIER_OFFRES)[number];
+
+export const DOSSIER_OFFRE_LABELS: Record<DossierOffre, string> = {
+  decouverte: "Découverte",
+  copilote: "Copilote",
+  copilote_plus: "Copilote Plus",
+  convoyage_seul: "Livraison seule",
+  expertise_seule: "Inspection",
+};
+
+// Tarif d'entrée de chaque offre payante, utilisé uniquement pour pré-remplir
+// le montant à facturer côté équipe. Copilote monte à 149 € pour une recherche
+// complexe et Copilote Plus est un « à partir de » : le montant reste saisi à
+// la main, rien n'est facturé sans validation.
+export const TARIF_OFFRE_DEFAUT: Partial<Record<DossierOffre, number>> = {
+  copilote: 99,
+  copilote_plus: 599,
+};
+
+export const CONVOYAGE_DECISIONS = ["en_attente", "accepte", "refuse"] as const;
+export type ConvoyageDecision = (typeof CONVOYAGE_DECISIONS)[number];
+
+export const DOCUMENT_TYPES = [
+  "carte_grise",
+  "certificat_cession",
+  "facture",
+  "contrat",
+  "rapport_inspection",
+  "photo",
+  "administratif",
+  "autre",
+] as const;
+export type DocumentType = (typeof DOCUMENT_TYPES)[number];
+
+export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
+  carte_grise: "Carte grise",
+  certificat_cession: "Certificat de cession",
+  facture: "Facture",
+  contrat: "Contrat",
+  rapport_inspection: "Rapport d'inspection",
+  photo: "Photo",
+  administratif: "Administratif",
+  autre: "Autre",
+};
+
+export const AGENDA_EVENT_TYPES = [
+  "rendez_vous",
+  "visioconference",
+  "inspection",
+  "convoyage",
+  "livraison",
+  "convoyage_externe",
+  "conge",
+] as const;
+export type AgendaEventType = (typeof AGENDA_EVENT_TYPES)[number];
+
+export const AGENDA_EVENT_TYPE_LABELS: Record<AgendaEventType, string> = {
+  rendez_vous: "Rendez-vous",
+  visioconference: "Visioconférence",
+  inspection: "Inspection",
+  convoyage: "Convoyage",
+  livraison: "Livraison",
+  convoyage_externe: "Convoyage (hors DIMZ)",
+  conge: "Congé",
+};
+
+export const CONVOYAGE_STATUTS = ["planifie", "en_cours", "livre", "annule"] as const;
+export type ConvoyageStatut = (typeof CONVOYAGE_STATUTS)[number];
+export const CONVOYAGE_STATUT_LABELS: Record<ConvoyageStatut, string> = {
+  planifie: "Planifié",
+  en_cours: "En cours",
+  livre: "Livré",
+  annule: "Annulé",
+};
+
+export const CLIENT_TYPES = ["particulier", "professionnel"] as const;
+export type ClientType = (typeof CLIENT_TYPES)[number];
+export const CLIENT_TYPE_LABELS: Record<ClientType, string> = {
+  particulier: "Particulier",
+  professionnel: "Professionnel",
+};
+
+export interface Client {
+  id: string;
+  civilite: string | null;
+  nom: string;
+  prenom: string | null;
+  telephone: string | null;
+  email: string | null;
+  adresse: string | null;
+  notes_privees: string | null;
+  type_client: ClientType;
+  raison_sociale: string | null;
+  siret: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Dossier {
+  id: string;
+  client_id: string;
+  reference: string;
+  offre: DossierOffre | null;
+  budget: string | null;
+  vehicule_recherche: string | null;
+  marques_souhaitees: string | null;
+  motorisation: string | null;
+  boite_vitesses: string | null;
+  km_max: string | null;
+  region: string | null;
+  commentaires: string | null;
+  statut: DossierStatut;
+  etape_client: string;
+  convoyage_decision: ConvoyageDecision;
+  devis_envoye_at: string | null;
+  paiement_recu_at: string | null;
+  paiement_offre: DossierOffre | null;
+  valeur_estimee: number | null;
+  source: string;
+  portal_token: string;
+  donnees_brutes: Record<string, unknown> | null;
+  fiche_decouverte_intro: string | null;
+  market_commentaire_copilote: string | null;
+  market_commentaire_copilote_plus: string | null;
+  archive: boolean;
+  created_at: string;
+  updated_at: string;
+  clients?: Client;
+}
+
+export interface DossierStatutHistory {
+  id: string;
+  dossier_id: string;
+  statut: DossierStatut;
+  note: string | null;
+  changed_by: string | null;
+  created_at: string;
+}
+
+export interface DossierEtapeHistory {
+  id: string;
+  dossier_id: string;
+  etape_client: string;
+  note: string | null;
+  changed_by: string | null;
+  created_at: string;
+}
+
+export interface Annonce {
+  id: string;
+  dossier_id: string;
+  titre: string;
+  lien: string | null;
+  prix: number | null;
+  prix_negocie: number | null;
+  kilometrage: number | null;
+  annee: number | null;
+  localisation: string | null;
+  avis_copilote: string | null;
+  points_forts: string | null;
+  points_faibles: string | null;
+  score_confiance: number | null;
+  score_prix: number | null;
+  score_historique: number | null;
+  score_etat: number | null;
+  score_adequation: number | null;
+  selectionnee: boolean;
+  photos: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FicheDecouverteVehicule {
+  id: string;
+  dossier_id: string;
+  marque: string | null;
+  modele: string | null;
+  energie: string | null;
+  point_fort: string | null;
+  point_vigilance: string | null;
+  prix_min: number | null;
+  prix_max: number | null;
+  photo_path: string | null;
+  photo_from_bibliotheque: boolean;
+  ordre: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PhotoBibliotheque {
+  id: string;
+  nom: string;
+  storage_path: string;
+  created_at: string;
+}
+
+export const FICHE_DECOUVERTE_ENERGIES = [
+  "Essence",
+  "Diesel",
+  "Hybride (MHEV)",
+  "Hybride rechargeable (PHEV)",
+  "Électrique",
+] as const;
+
+export const INSPECTION_VERDICTS = ["recommande", "envisageable", "deconseille"] as const;
+export type InspectionVerdict = (typeof INSPECTION_VERDICTS)[number];
+export const INSPECTION_VERDICT_LABELS: Record<InspectionVerdict, string> = {
+  recommande: "Recommandé",
+  envisageable: "Envisageable",
+  deconseille: "Déconseillé",
+};
+
+export interface Inspection {
+  id: string;
+  dossier_id: string;
+  annonce_id: string | null;
+  reference: string;
+  date_inspection: string;
+  lieu: string | null;
+  expert_nom: string | null;
+  duree_sur_site: string | null;
+  vehicule_titre: string | null;
+  annonce_comparee: string | null;
+  tags: string | null;
+  score_administratif: number | null;
+  score_exterieur: number | null;
+  score_interieur: number | null;
+  score_mecanique: number | null;
+  score_essai_routier: number | null;
+  score_marche: number | null;
+  points_positifs: string | null;
+  points_vigilance: string | null;
+  avis_copilote: string | null;
+  verdict: InspectionVerdict | null;
+  recommandation_finale: string | null;
+  etat_exterieur: string | null;
+  etat_interieur: string | null;
+  pneus: string | null;
+  freins: string | null;
+  carrosserie: string | null;
+  mecanique: string | null;
+  essai_routier: string | null;
+  defauts_constates: string | null;
+  commentaires: string | null;
+  note_finale: number | null;
+  photos: string[];
+  videos: string[];
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Convoyage {
+  id: string;
+  dossier_id: string;
+  adresse_depart: string | null;
+  adresse_arrivee: string | null;
+  date_convoyage: string | null;
+  heure: string | null;
+  conducteur: string | null;
+  km_depart: number | null;
+  km_arrivee: number | null;
+  niveau_carburant: string | null;
+  photos_avant: string[];
+  photos_apres: string[];
+  signature_client: string | null;
+  rapport_notes: string | null;
+  statut: ConvoyageStatut;
+  created_at: string;
+  updated_at: string;
+}
+
+export type EtatLieuxType = "depart" | "arrivee";
+
+export interface ConvoyageEtatLieux {
+  id: string;
+  convoyage_id: string;
+  type: EtatLieuxType;
+  kilometrage: number | null;
+  carburant_pourcentage: number | null;
+  photos: Record<string, string>;
+  photos_autres: string[];
+  contact_nom: string | null;
+  signature_path: string | null;
+  confirme_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AgendaEvent {
+  id: string;
+  titre: string;
+  type: AgendaEventType;
+  dossier_id: string | null;
+  client_id: string | null;
+  date_debut: string;
+  date_fin: string | null;
+  lieu: string | null;
+  notes: string | null;
+  rappel_envoye: boolean;
+  termine: boolean;
+  convoyage_externe_id: string | null;
+  created_at: string;
+}
+
+export interface DocumentRow {
+  id: string;
+  dossier_id: string | null;
+  client_id: string | null;
+  type: DocumentType;
+  nom: string;
+  storage_path: string;
+  taille: number | null;
+  uploaded_by: string | null;
+  archive: boolean;
+  created_at: string;
+}
+
+export const CONTRAT_TYPES = [
+  "cgv",
+  "contrat_convoyage",
+  "contrat_copilote",
+  "contrat_copilote_plus",
+  "contrat_inspection",
+  "etat_vehicule",
+  "commencement_anticipe",
+  "retractation",
+] as const;
+export type ContratType = (typeof CONTRAT_TYPES)[number];
+
+export const CONTRAT_TYPE_LABELS: Record<ContratType, string> = {
+  cgv: "📄 CGV",
+  contrat_convoyage: "🚗 Contrat Convoyage",
+  contrat_copilote: "🤝 Contrat Copilote",
+  contrat_copilote_plus: "⭐ Contrat Copilote Plus",
+  contrat_inspection: "🔍 Contrat Inspection",
+  etat_vehicule: "📸 État du véhicule",
+  commencement_anticipe: "✍️ Demande de commencement anticipé",
+  retractation: "↩️ Formulaire de rétractation",
+};
+
+export const CONTRAT_STATUTS = ["a_signer", "signe", "archive"] as const;
+export type ContratStatut = (typeof CONTRAT_STATUTS)[number];
+export const CONTRAT_STATUT_LABELS: Record<ContratStatut, string> = {
+  a_signer: "À signer",
+  signe: "Signé",
+  archive: "Archivé",
+};
+
+export interface DossierContrat {
+  id: string;
+  dossier_id: string;
+  type: ContratType;
+  statut: ContratStatut;
+  champs: Record<string, string>;
+  date_generation: string | null;
+  date_signature: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EntrepriseInfo {
+  id: number;
+  nom_dirigeant: string | null;
+  siret: string | null;
+  adresse: string | null;
+  ville: string | null;
+  email: string | null;
+  telephone: string | null;
+  mediateur_nom: string | null;
+  mediateur_adresse: string | null;
+  mediateur_site: string | null;
+  updated_at: string;
+}
+
+export type MessageAuteur = "staff" | "client";
+
+export interface Message {
+  id: string;
+  dossier_id: string;
+  auteur: MessageAuteur;
+  contenu: string;
+  lu_par_client: boolean;
+  lu_par_staff: boolean;
+  created_at: string;
+}
+
+export interface NoteInterne {
+  id: string;
+  dossier_id: string | null;
+  client_id: string | null;
+  auteur: string | null;
+  contenu: string;
+  created_at: string;
+}
+
+export interface Notification {
+  id: string;
+  titre: string;
+  message: string | null;
+  type: string;
+  lien: string | null;
+  lue: boolean;
+  created_at: string;
+}
+
+export interface ActivityLogEntry {
+  id: string;
+  action: string;
+  entite_type: string;
+  entite_id: string | null;
+  description: string;
+  acteur: string | null;
+  created_at: string;
+}
+
+export interface ConvoyageExterne {
+  id: string;
+  date_convoyage: string | null;
+  lieu_depart: string | null;
+  lieu_arrivee: string | null;
+  total_prestation: number;
+  frais: number;
+  notes: string | null;
+  justificatifs: string[];
+  created_at: string;
+}
+
+export interface Facture {
+  id: string;
+  client_id: string | null;
+  numero: string | null;
+  date_facture: string | null;
+  montant_total: number;
+  montant_frais: number;
+  notes: string | null;
+  pdf_path: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type DocumentCommercialType = "devis" | "facture";
+export type DocumentCommercialStatut = "brouillon" | "envoye" | "accepte" | "refuse" | "paye" | "annule";
+
+export interface LigneDocumentCommercial {
+  description: string;
+  quantite: number;
+  prix_unitaire_ht: number;
+}
+
+export interface DocumentCommercial {
+  id: string;
+  numero: string;
+  type: DocumentCommercialType;
+  dossier_id: string | null;
+  client_id: string | null;
+  convoyage_id: string | null;
+  objet: string | null;
+  lignes: LigneDocumentCommercial[];
+  montant_ht: number;
+  montant_tva: number;
+  montant_ttc: number;
+  statut: DocumentCommercialStatut;
+  devis_origine_id: string | null;
+  date_emission: string;
+  date_echeance: string | null;
+  pdf_path: string | null;
+  stripe_checkout_session_id: string | null;
+  stripe_payment_intent_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const DOCUMENT_COMMERCIAL_STATUT_LABELS: Record<DocumentCommercialStatut, string> = {
+  brouillon: "Brouillon",
+  envoye: "Envoyé",
+  accepte: "Accepté",
+  refuse: "Refusé",
+  paye: "Payé",
+  annule: "Annulé",
+};
+
+export const DOCUMENT_COMMERCIAL_TYPE_LABELS: Record<DocumentCommercialType, string> = {
+  devis: "Devis",
+  facture: "Facture",
+};
+
+export const RESSENTI_DUREE_LABELS: Record<string, string> = {
+  tres_rapide: "Très rapide",
+  assez_rapide: "Assez rapide",
+  un_peu_long: "Un peu trop long",
+  beaucoup_trop_long: "Beaucoup trop long",
+};
+
+export const OFFRE_TEST_LABELS: Record<string, string> = {
+  decouverte: "Découverte",
+  copilote: "Copilote",
+  copilote_plus: "Copilote Plus",
+  aucune: "Aucune",
+};
+
+export interface TestFeedback {
+  id: string;
+  reference: string;
+  comprehension_immediate: string | null;
+  confiance_site: number | null;
+  offres_faciles: string | null;
+  tarifs_clairs: string | null;
+  navigation_facile: string | null;
+  note_design_general: number | null;
+  note_professionnalisme: number | null;
+  note_logo: number | null;
+  note_couleurs: number | null;
+  note_lisibilite: number | null;
+  note_modernite: number | null;
+  ressenti_duree: string | null;
+  hesite_abandonner: string | null;
+  note_experience_formulaire: number | null;
+  offre_choisie: string | null;
+  prix_coherents: string | null;
+  meilleur_rapport_qualite_prix: string | null;
+  utiliserait_dimz: string | null;
+  recommanderait_dimz: string | null;
+  note_globale: number | null;
+  duree_secondes: number | null;
+  duree_declaree: string | null;
+  donnees_brutes: Record<string, unknown> | null;
+  created_at: string;
+}
+
+export interface ContactFaq {
+  id: string;
+  nom: string;
+  email: string;
+  message: string;
+  lu: boolean;
+  created_at: string;
+}
