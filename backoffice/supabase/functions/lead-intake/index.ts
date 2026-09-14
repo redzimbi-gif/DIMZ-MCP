@@ -158,13 +158,13 @@ Deno.serve(async (req: Request) => {
   const isConvoyage = formulaire.toLowerCase() === "convoyage";
 
   const nom =
-    pick(data, "Informations personnelles — Nom") ||
+    pick(data, "Coordonnées — Nom") ||
     pick(data, "Le trajet — Nom (contact départ)") ||
     pick(data, "Le véhicule — Marque") ||
     "Nouveau contact";
-  const prenom = pick(data, "Informations personnelles — Prénom", "Le trajet — Prénom (contact départ)");
-  const telephone = pick(data, "Informations personnelles — Téléphone", "Le trajet — Téléphone (contact départ)");
-  const email = pick(data, "Informations personnelles — Email", "Le trajet — Email (contact départ)")?.slice(
+  const prenom = pick(data, "Coordonnées — Prénom", "Le trajet — Prénom (contact départ)");
+  const telephone = pick(data, "Coordonnées — Téléphone", "Le trajet — Téléphone (contact départ)");
+  const email = pick(data, "Coordonnées — Email", "Le trajet — Email (contact départ)")?.slice(
     0,
     EMAIL_MAX_LENGTH
   ) ?? null;
