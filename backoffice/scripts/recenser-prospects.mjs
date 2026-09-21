@@ -38,9 +38,11 @@ const SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 const API_ENTREPRISES = "https://recherche-entreprises.api.gouv.fr/search";
 const API_GEO = "https://geo.api.gouv.fr";
 
-// L'API s'annonce à ~7 requêtes/seconde : 200 ms entre deux appels laisse une
-// marge confortable sans allonger démesurément un job déjà manuel.
-const PAUSE_MS = 200;
+// L'API s'annonce à ~7 requêtes/seconde, mais ce plafond est une limite de
+// pointe, pas un régime soutenable : à 5 req/s le recensement lyonnais se fait
+// couper par un 429 au bout d'une trentaine de pages. 500 ms tient la distance,
+// et un job manuel lancé deux fois par an peut se permettre d'être lent.
+const PAUSE_MS = 500;
 const PAR_PAGE = 25; // maximum accepté par l'API
 // Une même unité légale peut avoir plusieurs établissements dans le
 // département ; sans ce paramètre l'API n'en renvoie qu'une poignée et on
@@ -51,9 +53,16 @@ const MAX_ETABLISSEMENTS = 100;
 const PLAFOND_API = 10000;
 
 const ZONES = {
-  lyon: { code: "lyon", epci: "200046977", nom: "Métropole de Lyon", departement: "69", communesAttendues: 59 },
-  annecy: { code: "annecy", epci: "200066793", nom: "Grand Annecy", departement: "74", communesAttendues: 34 },
+  lyon: { code: "lyon", epci: "200046977", nom: "Métropole de Lyon", departement: "69" },
+  annecy: { code: "annecy", epci: "200066793", nom: "Grand Annecy", departement: "74" },
 };
+
+// On ne compare pas à un nombre de communes écrit en dur : le référentiel
+// officiel fait foi, et une valeur recopiée de mémoire finit par crier au loup
+// (ou par se taire après une fusion de communes). En revanche, un EPCI mal
+// apparié ne renvoie qu'une poignée de communes — ce plancher-là, lui, attrape
+// la vraie panne.
+const COMMUNES_MINIMUM = 10;
 
 // Recopié de src/lib/types.ts (NAF_CATEGORIE) : un script autonome ne peut pas
 // importer du TypeScript. Même duplication assumée que la logique de
@@ -145,24 +154,42 @@ function normaliserNaf(code) {
   return `${brut.slice(0, 2)}.${brut.slice(2, 4)}${brut.slice(4)}`;
 }
 
+// Attentes entre deux tentatives. Un 429 n'est pas un incident passager mais
+// un quota : l'API demande explicitement de lever le pied, et la seule réponse
+// utile est d'attendre franchement plus longtemps que pour une erreur réseau.
+const ATTENTES_RESEAU = [1000, 4000, 16000, 32000];
+const ATTENTES_QUOTA = [15000, 45000, 90000, 120000];
+
 /**
- * GET JSON avec 3 tentatives. Ne retente que ce qui a une chance d'aboutir
- * (429, 5xx, coupure réseau) : une réponse 400 se retentera à l'identique et
- * échouera pareil, autant remonter l'erreur tout de suite.
+ * GET JSON avec plusieurs tentatives. Ne retente que ce qui a une chance
+ * d'aboutir (429, 5xx, coupure réseau) : une réponse 400 se retentera à
+ * l'identique et échouera pareil, autant remonter l'erreur tout de suite.
  */
-async function lireJson(url, tentatives = 3) {
+async function lireJson(url, tentatives = 5) {
   let derniereErreur = "";
   for (let essai = 1; essai <= tentatives; essai++) {
-    if (essai > 1) await dormir(1000 * 4 ** (essai - 2)); // 1 s, puis 4 s
     let res;
     try {
       res = await fetch(url, { signal: AbortSignal.timeout(20000) });
     } catch (err) {
       derniereErreur = `réseau : ${err?.message ?? err}`;
+      await dormir(ATTENTES_RESEAU[essai - 1] ?? 32000);
       continue;
     }
-    if (res.status === 429 || res.status >= 500) {
+    if (res.status === 429) {
+      // On respecte Retry-After quand l'API le fournit, sinon on applique
+      // notre propre palier, qui s'allonge à chaque tentative.
+      const entete = Number(res.headers.get("retry-after"));
+      const attente =
+        Number.isFinite(entete) && entete > 0 ? entete * 1000 : ATTENTES_QUOTA[essai - 1] ?? 120000;
+      derniereErreur = "HTTP 429 (quota de l'API atteint)";
+      console.log(`  ⏳ Quota atteint, pause de ${Math.round(attente / 1000)} s…`);
+      await dormir(attente);
+      continue;
+    }
+    if (res.status >= 500) {
       derniereErreur = `HTTP ${res.status}`;
+      await dormir(ATTENTES_RESEAU[essai - 1] ?? 32000);
       continue;
     }
     if (!res.ok) {
@@ -446,10 +473,13 @@ async function main() {
   for (const zone of zones) {
     journal(`### ${zone.nom}`);
     const { communes, origine } = await resoudreCommunes(zone);
-    journal(
-      `- ${communes.length} communes résolues (${origine})` +
-        (communes.length === zone.communesAttendues ? " ✓" : ` — ⚠︎ ${zone.communesAttendues} attendues, à vérifier`)
-    );
+    if (communes.length < COMMUNES_MINIMUM) {
+      throw new Error(
+        `Seulement ${communes.length} communes trouvées pour « ${zone.nom} » (${origine}). ` +
+          `L'EPCI est probablement mal apparié : on s'arrête plutôt que de recenser une zone tronquée.`
+      );
+    }
+    journal(`- ${communes.length} communes résolues (${origine})`);
 
     const avant = retenus.size;
     for (const naf of nafs) {
