@@ -324,7 +324,19 @@ async function parcourirFlux({ zone, naf, communes, codePostal, compteurs, reten
           compteurs.sansSiret++;
           continue;
         }
-        if (!codesCommunes.has(etab.commune)) {
+        // Le filtre etat_administratif=A de l'API porte sur l'unité légale, pas
+        // sur chacun de ses établissements : une société bien vivante peut
+        // traîner des établissements fermés depuis des années. Sans ce test on
+        // démarcherait des garages qui n'existent plus.
+        if (etab.etat_administratif && etab.etat_administratif !== "A") {
+          compteurs.fermes++;
+          continue;
+        }
+        // L'établissement porte son EPCI : c'est le signal le plus direct
+        // d'appartenance à l'agglomération. La liste de communes reste en
+        // second recours, au cas où le champ manque.
+        const dansZone = etab.epci === zone.epci || codesCommunes.has(etab.commune);
+        if (!dansZone) {
           compteurs.horsZone++;
           continue;
         }
@@ -418,7 +430,7 @@ async function main() {
     }
   }
 
-  const compteurs = { requetes: 0, vus: 0, horsZone: 0, sansSiret: 0, ecrits: 0, erreurs: 0 };
+  const compteurs = { requetes: 0, vus: 0, horsZone: 0, fermes: 0, sansSiret: 0, ecrits: 0, erreurs: 0 };
   const retenus = new Map();
   const echantillon = [];
 
@@ -445,6 +457,7 @@ async function main() {
   journal(`- Requêtes API : ${compteurs.requetes}`);
   journal(`- Établissements examinés : ${compteurs.vus}`);
   journal(`- Écartés hors zone : ${compteurs.horsZone}`);
+  journal(`- Écartés car établissement fermé : ${compteurs.fermes}`);
   if (compteurs.sansSiret > 0) journal(`- Écartés sans SIRET : ${compteurs.sansSiret}`);
   journal(`- **Retenus : ${retenus.size}**`);
   journal("");
@@ -474,7 +487,7 @@ async function main() {
       journal("<details><summary>Enregistrement brut de l'API (contrôle du contrat)</summary>");
       journal("");
       journal("```json");
-      journal(JSON.stringify(echantillon[0], null, 2).slice(0, 6000));
+      journal(JSON.stringify(echantillon[0], null, 2).slice(0, 1800));
       journal("```");
       journal("");
       journal("</details>");
