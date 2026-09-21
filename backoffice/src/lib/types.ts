@@ -115,6 +115,129 @@ export const CLIENT_TYPE_LABELS: Record<ClientType, string> = {
   professionnel: "Professionnel",
 };
 
+export const PROSPECT_STATUTS = [
+  "froid",
+  "a_contacter",
+  "contact_en_cours",
+  "rdv_pris",
+  "pas_interesse",
+  "a_recontacter",
+  "converti",
+] as const;
+export type ProspectStatut = (typeof PROSPECT_STATUTS)[number];
+
+export const PROSPECT_STATUT_LABELS: Record<ProspectStatut, string> = {
+  froid: "Froid",
+  a_contacter: "À contacter",
+  contact_en_cours: "En cours de contact",
+  rdv_pris: "RDV pris",
+  pas_interesse: "Pas intéressé",
+  a_recontacter: "À recontacter",
+  converti: "Devenu client",
+};
+
+// Statuts qui traduisent un contact effectif : les atteindre met à jour la
+// date de dernière relance du prospect.
+export const PROSPECT_STATUTS_CONTACT: ProspectStatut[] = [
+  "contact_en_cours",
+  "rdv_pris",
+  "pas_interesse",
+  "a_recontacter",
+];
+
+export const PROSPECT_CATEGORIES = [
+  "concession",
+  "garage",
+  "carrosserie",
+  "location",
+  "moto",
+  "equipementier",
+  "controle_technique",
+  "autre",
+] as const;
+export type ProspectCategorie = (typeof PROSPECT_CATEGORIES)[number];
+
+export const PROSPECT_CATEGORIE_LABELS: Record<ProspectCategorie, string> = {
+  concession: "Concession / marchand",
+  garage: "Garage",
+  carrosserie: "Carrosserie",
+  location: "Loueur",
+  moto: "Moto",
+  equipementier: "Équipementier",
+  controle_technique: "Contrôle technique",
+  autre: "Autre",
+};
+
+export const PROSPECT_SOURCES = ["sirene", "google_places", "apollo", "manuel", "csv"] as const;
+export type ProspectSource = (typeof PROSPECT_SOURCES)[number];
+
+export const PROSPECT_SOURCE_LABELS: Record<ProspectSource, string> = {
+  sirene: "Base SIRENE",
+  google_places: "Google Maps",
+  apollo: "Apollo",
+  manuel: "Saisie manuelle",
+  csv: "Import CSV",
+};
+
+export const PROSPECT_ZONES = ["lyon", "annecy", "autre"] as const;
+export type ProspectZone = (typeof PROSPECT_ZONES)[number];
+
+export const PROSPECT_ZONE_LABELS: Record<ProspectZone, string> = {
+  lyon: "Métropole de Lyon",
+  annecy: "Bassin annécien",
+  autre: "Autre",
+};
+
+// Traduction du code d'activité officiel (NAF) en catégorie DIMZ, partagée
+// entre le back-office et le script de recensement. « carrosserie » n'a pas de
+// code NAF propre (les carrossiers sont enregistrés en 45.20A) : cette
+// catégorie ne s'obtient qu'en reclassant un prospect à la main.
+export const NAF_CATEGORIE: Record<string, ProspectCategorie> = {
+  "45.11Z": "concession",
+  "45.19Z": "concession",
+  "45.20A": "garage",
+  "45.20B": "garage",
+  "45.31Z": "equipementier",
+  "45.32Z": "equipementier",
+  "45.40Z": "moto",
+  "71.20A": "controle_technique",
+  "77.11A": "location",
+  "77.11B": "location",
+};
+
+export interface Prospect {
+  id: string;
+  raison_sociale: string;
+  enseigne: string | null;
+  siret: string | null;
+  siren: string | null;
+  code_naf: string | null;
+  categorie: ProspectCategorie;
+  tranche_effectif: string | null;
+  adresse: string | null;
+  code_postal: string | null;
+  ville: string | null;
+  code_commune: string | null;
+  zone: ProspectZone | null;
+  telephone: string | null;
+  email: string | null;
+  site_web: string | null;
+  responsable_nom: string | null;
+  responsable_fonction: string | null;
+  statut: ProspectStatut;
+  source: ProspectSource;
+  notes: string | null;
+  derniere_relance_le: string | null;
+  prochaine_relance_le: string | null;
+  converti_client_id: string | null;
+  place_id: string | null;
+  place_rafraichi_le: string | null;
+  apollo_organization_id: string | null;
+  apollo_enrichi_le: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Client {
   id: string;
   civilite: string | null;
@@ -424,6 +547,7 @@ export interface NoteInterne {
   id: string;
   dossier_id: string | null;
   client_id: string | null;
+  prospect_id: string | null;
   auteur: string | null;
   contenu: string;
   created_at: string;
