@@ -24,6 +24,8 @@ import type {
   NoteInterne,
   Notification,
   PhotoBibliotheque,
+  Prospect,
+  ProspectStatut,
   TestFeedback,
 } from "@/lib/types";
 
@@ -205,6 +207,108 @@ export async function getClientNotes(clientId: string) {
     .eq("client_id", clientId)
     .order("created_at", { ascending: false });
   return (data ?? []) as NoteInterne[];
+}
+
+// ---------------------------------------------------------------------------
+// Prospection
+// ---------------------------------------------------------------------------
+// Seule liste paginée du back-office, et c'est volontaire : le recensement
+// SIRENE remplit cette table avec plusieurs milliers d'établissements, or
+// PostgREST plafonne une réponse à 1000 lignes. Tout ramener comme le font les
+// autres listes ferait silencieusement disparaître le reste.
+export const PROSPECTS_PAR_PAGE = 50;
+
+export interface FiltresProspects {
+  q?: string;
+  statut?: string;
+  ville?: string;
+  categorie?: string;
+  zone?: string;
+  relance?: string;
+  page?: number;
+}
+
+export async function listProspects(filtres: FiltresProspects = {}) {
+  const db = createAdminClient();
+  const page = Math.max(1, filtres.page ?? 1);
+  const debut = (page - 1) * PROSPECTS_PAR_PAGE;
+
+  let query = db
+    .from("prospects")
+    .select("*", { count: "exact" })
+    .order("raison_sociale", { ascending: true })
+    .range(debut, debut + PROSPECTS_PAR_PAGE - 1);
+
+  if (filtres.statut) query = query.eq("statut", filtres.statut);
+  if (filtres.ville) query = query.eq("ville", filtres.ville);
+  if (filtres.categorie) query = query.eq("categorie", filtres.categorie);
+  if (filtres.zone) query = query.eq("zone", filtres.zone);
+  // Une relance « due » inclut les dates dépassées, pas seulement aujourd'hui :
+  // un prospect oublié depuis trois jours doit remonter, pas disparaître.
+  if (filtres.relance) query = query.lte("prochaine_relance_le", aujourdhui());
+  if (filtres.q) {
+    query = query.or(
+      `raison_sociale.ilike.%${filtres.q}%,enseigne.ilike.%${filtres.q}%,ville.ilike.%${filtres.q}%,email.ilike.%${filtres.q}%,telephone.ilike.%${filtres.q}%,siret.ilike.%${filtres.q}%`
+    );
+  }
+
+  const { data, count } = await query;
+  const total = count ?? 0;
+  return {
+    rows: (data ?? []) as Prospect[],
+    total,
+    page,
+    pages: Math.max(1, Math.ceil(total / PROSPECTS_PAR_PAGE)),
+  };
+}
+
+export function aujourdhui(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+export async function getProspect(id: string) {
+  const db = createAdminClient();
+  const { data } = await db.from("prospects").select("*").eq("id", id).maybeSingle();
+  return data as Prospect | null;
+}
+
+export async function getProspectNotes(prospectId: string) {
+  const db = createAdminClient();
+  const { data } = await db
+    .from("notes_internes")
+    .select("*")
+    .eq("prospect_id", prospectId)
+    .order("created_at", { ascending: false });
+  return (data ?? []) as NoteInterne[];
+}
+
+/** Décompte par statut + nombre de relances dues, pour les cartes de la liste. */
+export async function getProspectStats() {
+  const db = createAdminClient();
+  const [parStatut, relances] = await Promise.all([
+    db.rpc("stats_prospects"),
+    db
+      .from("prospects")
+      .select("*", { count: "exact", head: true })
+      .lte("prochaine_relance_le", aujourdhui()),
+  ]);
+
+  const compteurs: Partial<Record<ProspectStatut, number>> = {};
+  let total = 0;
+  for (const ligne of (parStatut.data ?? []) as { statut: ProspectStatut; total: number }[]) {
+    compteurs[ligne.statut] = Number(ligne.total);
+    total += Number(ligne.total);
+  }
+
+  return { total, compteurs, relancesDues: relances.count ?? 0 };
+}
+
+/** Villes présentes en base, pour alimenter le filtre de la liste. */
+export async function listVillesProspects() {
+  const db = createAdminClient();
+  const { data } = await db.from("prospects").select("ville").not("ville", "is", null);
+  const villes = new Set((data ?? []).map((r) => (r as { ville: string }).ville));
+  return [...villes].sort((a, b) => a.localeCompare(b, "fr"));
 }
 
 // ---------------------------------------------------------------------------

@@ -1,8 +1,8 @@
 import { type ReactNode } from "react";
 import { clsx } from "clsx";
 import Link from "next/link";
-import type { DossierStatut } from "@/lib/types";
-import { DOSSIER_STATUT_LABELS } from "@/lib/types";
+import type { DossierStatut, ProspectStatut } from "@/lib/types";
+import { DOSSIER_STATUT_LABELS, PROSPECT_STATUT_LABELS } from "@/lib/types";
 
 export function Card({
   className,
@@ -104,6 +104,29 @@ export function StatutBadge({ statut }: { statut: DossierStatut }) {
       )}
     >
       {DOSSIER_STATUT_LABELS[statut]}
+    </span>
+  );
+}
+
+const PROSPECT_STATUT_STYLES: Record<ProspectStatut, string> = {
+  froid: "bg-surface-sunken text-ink-soft",
+  a_contacter: "bg-blue-50 text-blue-700",
+  contact_en_cours: "bg-blue-100 text-blue-700",
+  rdv_pris: "bg-blue-100 text-blue-800",
+  pas_interesse: "bg-bad-bg text-bad",
+  a_recontacter: "bg-warn-bg text-warn",
+  converti: "bg-good-bg text-good",
+};
+
+export function ProspectStatutBadge({ statut }: { statut: ProspectStatut }) {
+  return (
+    <span
+      className={clsx(
+        "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium whitespace-nowrap",
+        PROSPECT_STATUT_STYLES[statut]
+      )}
+    >
+      {PROSPECT_STATUT_LABELS[statut]}
     </span>
   );
 }

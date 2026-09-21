@@ -15,6 +15,7 @@ import {
   Settings,
   Images,
   CircleHelp,
+  Target,
   type LucideIcon,
 } from "lucide-react";
 
@@ -42,6 +43,7 @@ export const NAV: NavGroup[] = [
     items: [
       { href: "/dossiers", label: "Dossiers", icon: FolderKanban },
       { href: "/clients", label: "Clients", icon: Users },
+      { href: "/prospection", label: "Prospection", icon: Target },
       { href: "/annonces", label: "Annonces", icon: Car },
       { href: "/photos", label: "Photos", icon: Images },
     ],
