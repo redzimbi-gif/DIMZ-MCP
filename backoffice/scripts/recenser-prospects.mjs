@@ -240,7 +240,16 @@ function extraireDirigeant(entreprise) {
 function construireProspect(entreprise, etablissement, zone) {
   const naf = normaliserNaf(etablissement?.activite_principale || entreprise?.activite_principale);
   const enseignes = Array.isArray(etablissement?.liste_enseignes) ? etablissement.liste_enseignes : [];
-  const trancheCode = entreprise?.tranche_effectif_salarie;
+
+  // L'effectif de l'établissement, pas celui de l'entreprise : une agence de
+  // trois personnes dans un groupe de 400 reste une agence de trois personnes,
+  // et c'est elle qu'on appelle. « NN » (non renseigné) vaut absence, d'où le
+  // repli sur l'effectif de l'entreprise, qui reste un ordre de grandeur utile.
+  const trancheEtablissement = etablissement?.tranche_effectif_salarie;
+  const trancheCode =
+    trancheEtablissement && trancheEtablissement !== "NN"
+      ? trancheEtablissement
+      : entreprise?.tranche_effectif_salarie;
 
   const prospect = {
     raison_sociale:
