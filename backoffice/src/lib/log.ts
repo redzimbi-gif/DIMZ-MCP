@@ -1,6 +1,8 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { getAppUrl, sendEmail } from "@/lib/email";
+import { alerteInterneEmail } from "@/lib/email-templates";
 
 /**
  * Notification push sur le téléphone de l'équipe via ntfy.sh (gratuit, sans
@@ -48,6 +50,28 @@ async function sendPushNotification(params: { title: string; message: string; li
   }
 }
 
+/**
+ * Alerte l'équipe par email, en parallèle du push. Deux canaux indépendants
+ * plutôt qu'un seul : le push ntfy dépend d'un service gratuit dont le quota
+ * anonyme est partagé par adresse IP, et il s'est déjà tu sans prévenir. Une
+ * demande client manquée coûte bien plus cher qu'un email de trop.
+ *
+ * Chaque canal s'active par sa propre variable (NTFY_TOPIC, ALERTE_EMAIL) et
+ * se désactive en la retirant, sans toucher au code.
+ */
+async function alerterParEmail(params: { titre: string; message: string; lien?: string | null }) {
+  const destinataire = process.env.ALERTE_EMAIL?.trim();
+  if (!destinataire) return;
+
+  const { subject, html } = alerteInterneEmail({
+    titre: params.titre,
+    message: params.message,
+    url: params.lien ? `${getAppUrl()}${params.lien}` : getAppUrl(),
+  });
+  // sendEmail ne lève jamais : un échec d'alerte ne doit pas casser le flux.
+  await sendEmail({ to: destinataire, subject, html });
+}
+
 /** Récupère l'id du membre de l'équipe connecté (pour tracer qui fait quoi). */
 export async function getActorId(): Promise<string | null> {
   const supabase = createClient();
@@ -92,5 +116,11 @@ export async function notifyStaff(params: {
     title: params.titre,
     message: params.message || params.titre,
     link: params.lien,
+  });
+
+  await alerterParEmail({
+    titre: params.titre,
+    message: params.message ?? "",
+    lien: params.lien,
   });
 }

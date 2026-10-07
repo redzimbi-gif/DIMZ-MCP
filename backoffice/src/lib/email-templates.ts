@@ -10,7 +10,13 @@ function escapeHtml(value: string): string {
     .replace(/"/g, "&quot;");
 }
 
-function emailLayout(contentHtml: string): string {
+// Le pied de page par défaut s'adresse à un client. Les alertes internes de
+// l'équipe passent par le même gabarit mais le remplacent : « suite à votre
+// demande » n'aurait aucun sens dans une alerte qu'on s'envoie à soi-même.
+function emailLayout(
+  contentHtml: string,
+  footerText = "Cet email vous a été envoyé suite à votre demande."
+): string {
   return `<!DOCTYPE html>
 <html lang="fr">
   <body style="margin:0;padding:0;background:#f4f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
@@ -31,7 +37,7 @@ function emailLayout(contentHtml: string): string {
             </tr>
             <tr>
               <td style="padding:18px 32px;border-top:1px solid #e6e8ee;color:${INK_SOFT};font-size:12px;">
-                DIMZ · Mon copilote auto<br />Cet email vous a été envoyé suite à votre demande.
+                DIMZ · Mon copilote auto<br />${footerText}
               </td>
             </tr>
           </table>
@@ -48,6 +54,35 @@ function ctaButton(href: string, label: string): string {
 
 function greeting(prenom: string | null): string {
   return prenom ? `Bonjour ${prenom},` : "Bonjour,";
+}
+
+/**
+ * Alerte interne à l'équipe : nouvelle demande, message client, paiement reçu.
+ * Ce n'est pas un email client — le destinataire est ALERTE_EMAIL et le lien
+ * mène au back-office, pas au portail de suivi.
+ *
+ * Titre et message viennent de formulaires publics (nom saisi par un visiteur),
+ * d'où l'échappement : sans lui, un nom contenant un chevron casserait la mise
+ * en page du mail, voire y glisserait du balisage.
+ */
+export function alerteInterneEmail(params: {
+  titre: string;
+  message: string;
+  url: string;
+}): { subject: string; html: string } {
+  const content = `
+    <p style="margin:0 0 6px;font-size:12px;color:${INK_SOFT};text-transform:uppercase;letter-spacing:0.06em;">Alerte back-office</p>
+    <p style="margin:0 0 14px;font-size:17px;font-weight:700;line-height:1.35;">${escapeHtml(params.titre)}</p>
+    ${params.message ? `<p style="margin:0;">${escapeHtml(params.message)}</p>` : ""}
+    ${ctaButton(params.url, "Ouvrir dans le back-office")}
+  `;
+  // Sujet = titre + détail : c'est la seule ligne visible sur un écran
+  // verrouillé, elle doit suffire à décider si ça vaut le déverrouillage.
+  const sujet = params.message ? `${params.titre} — ${params.message}` : params.titre;
+  return {
+    subject: sujet.replace(/\s+/g, " ").trim().slice(0, 180),
+    html: emailLayout(content, "Alerte automatique du back-office DIMZ."),
+  };
 }
 
 export function confirmationDemandeEmail(params: {

@@ -64,6 +64,90 @@ async function notifierEquipe(
     lien: params.lien ?? null,
   });
 
+  // Trois canaux indépendants : la cloche du back-office, le push, l'email.
+  // Chacun dans sa propre fonction, pour qu'un "return" anticipé sur un canal
+  // non configuré ne puisse pas supprimer silencieusement les suivants.
+  await envoyerPush(params);
+  await alerterParEmail(params);
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+// Alerte par email via Resend, second canal à côté du push. Le push dépend
+// d'un service gratuit dont le quota anonyme se compte par adresse IP de
+// sortie, mutualisée entre projets Supabase : il s'est déjà tu sans prévenir.
+// Une demande client manquée coûte bien plus cher qu'un email de trop, d'où
+// deux canaux plutôt qu'un.
+//
+// S'active en posant ALERTE_EMAIL, se désactive en retirant la variable.
+async function alerterParEmail(params: { titre: string; message: string; lien?: string }) {
+  const apiKey = Deno.env.get("RESEND_API_KEY");
+  const destinataire = Deno.env.get("ALERTE_EMAIL")?.trim();
+  if (!apiKey || !destinataire) return;
+
+  const appUrl = (Deno.env.get("APP_URL") || "https://back.dimz-copilote.com").replace(/\/$/, "");
+  const url = params.lien ? `${appUrl}${params.lien}` : appUrl;
+
+  // Sujet = titre + détail : c'est la seule ligne visible sur un écran
+  // verrouillé, elle doit suffire à décider si ça vaut le déverrouillage.
+  const sujet = (params.message ? `${params.titre} — ${params.message}` : params.titre)
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 180);
+
+  // Titre et message viennent d'un formulaire public : sans échappement, un
+  // nom contenant un chevron casserait la mise en page du mail.
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+  <body style="margin:0;padding:0;background:#f4f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f5f7;padding:32px 16px;">
+      <tr><td align="center">
+        <table role="presentation" width="100%" style="max-width:520px;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e6e8ee;">
+          <tr><td style="padding:26px 32px 18px;border-bottom:1px solid #e6e8ee;">
+            <span style="font-size:18px;font-weight:700;color:#0b0d12;letter-spacing:-0.02em;">DIMZ</span>
+            <span style="font-size:13px;color:#565c68;margin-left:8px;">Mon copilote auto</span>
+          </td></tr>
+          <tr><td style="padding:32px;color:#0b0d12;font-size:14px;line-height:1.6;">
+            <p style="margin:0 0 6px;font-size:12px;color:#565c68;text-transform:uppercase;letter-spacing:0.06em;">Alerte back-office</p>
+            <p style="margin:0 0 14px;font-size:17px;font-weight:700;line-height:1.35;">${escapeHtml(params.titre)}</p>
+            ${params.message ? `<p style="margin:0;">${escapeHtml(params.message)}</p>` : ""}
+            <a href="${url}" style="display:inline-block;background:#2f6fed;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;padding:12px 22px;border-radius:8px;margin-top:18px;">Ouvrir dans le back-office</a>
+          </td></tr>
+          <tr><td style="padding:18px 32px;border-top:1px solid #e6e8ee;color:#565c68;font-size:12px;">
+            DIMZ · Mon copilote auto<br />Alerte automatique du back-office.
+          </td></tr>
+        </table>
+      </td></tr>
+    </table>
+  </body>
+</html>`;
+
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: Deno.env.get("EMAIL_FROM") || "DIMZ <onboarding@resend.dev>",
+        to: destinataire,
+        subject: sujet,
+        html,
+      }),
+    });
+    if (!res.ok) {
+      console.error("Échec alerte email:", res.status, await res.text().catch(() => ""));
+    }
+  } catch (err) {
+    console.error("Échec alerte email:", err);
+  }
+}
+
+async function envoyerPush(params: { titre: string; message: string; lien?: string }) {
   // trim() : voir le commentaire dans lead-intake — un espace parasite dans le
   // secret rend le topic invalide pour ntfy et rend l'alerte muette.
   const topic = Deno.env.get("NTFY_TOPIC")?.trim();
