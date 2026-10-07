@@ -108,10 +108,16 @@ async function notifierEquipe(
   }
 
   const appUrl = (Deno.env.get("APP_URL") || "https://back.dimz-copilote.com").replace(/\/$/, "");
+  // Jeton ntfy facultatif : voir le commentaire dans lead-intake. Sans lui, le
+  // quota est celui de l'IP de sortie, partagée avec d'autres projets.
+  const token = Deno.env.get("NTFY_TOKEN")?.trim();
   try {
     const res = await fetch("https://ntfy.sh/", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: JSON.stringify({
         topic,
         title: params.titre,

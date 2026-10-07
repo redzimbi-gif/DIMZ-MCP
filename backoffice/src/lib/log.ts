@@ -23,9 +23,16 @@ async function sendPushNotification(params: { title: string; message: string; li
     // en-têtes n'acceptent que du Latin-1 (ISO-8859-1) et rejetteraient tout
     // titre ou message contenant un tiret cadratin, une emoji ou un caractère
     // hors de cette plage — silencieusement fatal pour une simple notif.
+    // Jeton ntfy facultatif : sans lui, ntfy.sh compte la publication dans le
+    // quota de l'adresse IP de sortie (250 messages par jour), partagée avec
+    // d'autres clients de l'hébergeur. Le jeton rattache l'envoi à notre compte.
+    const token = process.env.NTFY_TOKEN?.trim();
     await fetch("https://ntfy.sh/", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: JSON.stringify({
         topic,
         title: params.title,

@@ -110,13 +110,26 @@ async function notifierEquipe(
   }
 
   const appUrl = (Deno.env.get("APP_URL") || "https://back.dimz-copilote.com").replace(/\/$/, "");
+
+  // Jeton ntfy, facultatif mais vivement recommandé en production. Publier
+  // anonymement place la requête dans le quota du *visiteur*, que ntfy.sh
+  // identifie par l'adresse IP source : 250 messages par jour. Or une Edge
+  // Function sort par des IP mutualisées entre projets Supabase, donc ce seau
+  // est vidé par des inconnus. Constaté en vrai : 429 "daily message quota
+  // reached" après cinq messages. Le jeton rattache la publication à notre
+  // compte et nous rend notre propre quota.
+  const token = Deno.env.get("NTFY_TOKEN")?.trim();
+
   try {
     // Corps JSON plutôt que des en-têtes HTTP : ces derniers n'acceptent que
     // du Latin-1 et rejetteraient un titre contenant une emoji ou un tiret
     // cadratin — silencieusement fatal pour une simple notification.
     const res = await fetch("https://ntfy.sh/", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: JSON.stringify({
         topic,
         title: params.titre,
