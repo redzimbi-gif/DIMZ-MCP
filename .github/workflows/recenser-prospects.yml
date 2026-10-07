@@ -1,0 +1,78 @@
+# Recense les professionnels de l'automobile de la Métropole de Lyon et du
+# Grand Annecy dans la table prospects — utile depuis un téléphone : onglet
+# Actions du dépôt → « Run workflow ».
+#
+# Prérequis, une seule fois : ajouter le secret SUPABASE_SERVICE_ROLE_KEY dans
+# Settings → Secrets and variables → Actions (Supabase → Project Settings →
+# API → clé service_role). L'URL du projet n'est pas secrète, elle est en clair
+# ci-dessous comme l'est déjà le project ref du workflow de déploiement.
+#
+# Le mode simulation est actif par défaut : le job compte et affiche ce qu'il
+# trouverait, sans rien écrire. Lance-le d'abord comme ça, vérifie le
+# compte-rendu, puis relance avec « simulation » décoché pour importer.
+#
+# Relancer l'import est sans danger : la fonction upsert_prospect_sirene
+# rafraîchit les données officielles mais ne touche jamais au statut, aux
+# notes, aux relances ni aux coordonnées saisies à la main.
+name: Recenser les prospects
+
+on:
+  workflow_dispatch:
+    inputs:
+      zone:
+        description: "Zone à recenser"
+        required: false
+        default: toutes
+        type: choice
+        options: [toutes, lyon, annecy]
+      categories:
+        description: "Activités (defaut = celles qui déplacent des véhicules)"
+        required: false
+        default: defaut
+        type: choice
+        options:
+          [
+            defaut,
+            toutes,
+            concession,
+            garage,
+            location,
+            moto,
+            equipementier,
+            controle_technique,
+          ]
+      simulation:
+        description: "Simulation : compter sans rien écrire"
+        required: false
+        default: true
+        type: boolean
+      limite:
+        description: "Plafond d'établissements (0 = sans limite)"
+        required: false
+        default: "0"
+        type: string
+
+jobs:
+  recenser:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: https://tlkstfmheprsmbxlmrgr.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      ZONE: ${{ github.event.inputs.zone || 'toutes' }}
+      CATEGORIES: ${{ github.event.inputs.categories || 'defaut' }}
+      SIMULATION: ${{ github.event.inputs.simulation || 'true' }}
+      LIMITE: ${{ github.event.inputs.limite || '0' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Recenser
+        working-directory: backoffice
+        run: |
+          set -euo pipefail
+          echo "::group::Recensement ($ZONE / $CATEGORIES / simulation=$SIMULATION)"
+          node scripts/recenser-prospects.mjs
+          echo "::endgroup::"

@@ -1,0 +1,370 @@
+# Dimz — Back-office (CRM interne)
+
+CRM automobile interne pour DIMZ : dossiers clients, recherche de véhicules,
+inspections, convoyages, agenda, documents, suivi client. Construit en
+Next.js 14 (App Router) + Supabase (base de données Postgres, authentification,
+stockage de fichiers), pensé pour être hébergé gratuitement sur Vercel.
+
+## 1. Créer le projet Supabase
+
+1. Va sur [supabase.com](https://supabase.com) → **New project**.
+2. Une fois le projet créé, ouvre **SQL Editor** et exécute, dans l'ordre,
+   le contenu de chaque fichier de `supabase/migrations/` :
+   - `0001_init.sql`
+   - `0002_storage.sql`
+   - `0003_lead_intake.sql`
+   - `0004_convoyages_externes.sql`
+   - `0005_agenda_convoyage_externe.sql`
+   - `0006_comptabilite_justificatifs.sql`
+   - `0007_rapport_dimz.sql`
+   - `0008_test_feedback.sql`
+   - `0009_suivi_client_par_offre.sql`
+   - `0010_score_dimz_annonces.sql`
+   - `0011_fiche_decouverte.sql`
+   - `0012_fiche_decouverte_intro.sql`
+   - `0013_dossiers_archive.sql`
+   - `0014_documents_contrats.sql`
+   - `0015_fiche_decouverte_prix.sql`
+   - `0016_market_commentaire.sql`
+   - `0017_market_commentaire_par_offre.sql`
+   - `0018_factures.sql`
+   - `0019_entreprise_info_update.sql`
+   - `0020_entreprise_info_email.sql`
+   - `0021_entreprise_info_siret.sql`
+   - `0022_entreprise_info_rattrapage.sql`
+   - `0023_clients_pro.sql`
+   - `0024_factures_pdf.sql`
+   - `0025_documents_archive.sql`
+   - `0026_dossier_reference_numerotation.sql`
+   - `0027_fiche_decouverte_photo.sql`
+   - `0028_photos_bibliotheque.sql`
+   - `0029_dossier_reference_counters_rls.sql`
+   - `0030_convoyage_devis_envoye.sql`
+   - `0031_convoyage_etats_lieux.sql`
+   - `0032_convoyage_carburant_pourcentage.sql`
+   - `0033_documents_commerciaux.sql`
+   - `0034_avis_clients.sql`
+3. Dans **Project Settings → API**, récupère :
+   - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
+   - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `service_role` key (⚠️ secrète) → `SUPABASE_SERVICE_ROLE_KEY`
+
+## 2. Créer ton compte administrateur
+
+Dans Supabase : **Authentication → Users → Add user**, crée un utilisateur
+avec ton email et un mot de passe. C'est ce compte qui te connecte au
+back-office (pas d'inscription libre : les comptes se créent uniquement
+depuis le dashboard Supabase pour l'instant).
+
+## 3. Créer ton compte Resend (envoi d'emails)
+
+1. Va sur [resend.com](https://resend.com) → crée un compte gratuit
+   (100 emails/jour offerts).
+2. **API Keys → Create API Key**, copie la clé → `RESEND_API_KEY`.
+3. Tant que tu n'as pas encore de nom de domaine à vérifier sur Resend,
+   laisse `EMAIL_FROM=DIMZ - Mon Copilote Auto <onboarding@resend.dev>` : ça
+   fonctionne tout de suite, mais Resend n'autorisera l'envoi qu'à l'adresse
+   email de ton propre compte (utile pour tester). Le jour où tu as un
+   domaine, ajoute-le dans **Domains** sur Resend, suis les enregistrements
+   DNS demandés, puis change `EMAIL_FROM` pour une adresse de ce domaine (ex.
+   `DIMZ - Mon Copilote Auto <contact@dimz.fr>`) — l'envoi à n'importe quel
+   client se débloque automatiquement, sans autre changement de code.
+
+## 4. Créer ton compte Stripe (paiement en ligne des factures)
+
+1. Va sur [stripe.com](https://stripe.com) → crée un compte.
+2. **Développeurs → Clés API**, copie la **clé secrète** (commence par `sk_`,
+   utilise le mode Test tant que tu n'as pas activé le compte) → `STRIPE_SECRET_KEY`.
+3. Une fois le back-office déployé (étape 7) et l'URL connue : **Développeurs
+   → Webhooks → Ajouter un endpoint**, URL `https://TON-URL/api/stripe/webhook`,
+   événement à écouter : `checkout.session.completed`. Stripe affiche alors
+   une **clé de signature** (commence par `whsec_`) → `STRIPE_WEBHOOK_SECRET`.
+4. Tant que le compte Stripe est en mode Test, les paiements ne débitent
+   jamais de vraie carte (utilise `4242 4242 4242 4242`, une date future, un
+   CVC quelconque pour tester). Active le compte (informations bancaires,
+   KYC) quand tu es prêt à encaisser réellement.
+
+Concrètement : quand tu cliques **Envoyer au client** sur une facture (page
+Facturation), un lien de paiement Stripe est créé et inclus dans l'email — la
+facture passe automatiquement en statut **Payée** dès que le client règle en
+ligne (webhook), sans action manuelle de ta part.
+
+## 5. Configurer les variables d'environnement
+
+```bash
+cp .env.local.example .env.local
+```
+
+Remplis les valeurs récupérées aux étapes 1, 3 et 4. `NEXT_PUBLIC_APP_URL` peut
+rester tel quel en local ; mets l'URL Vercel une fois déployé (étape 7).
+
+## 6. Lancer en local
+
+```bash
+npm install
+npm run dev
+```
+
+Ouvre [http://localhost:3000](http://localhost:3000), connecte-toi avec le
+compte créé à l'étape 2.
+
+## 7. Déployer sur Vercel
+
+1. Pousse ce dépôt sur GitHub (déjà fait si tu lis ce fichier depuis le repo).
+2. Sur [vercel.com](https://vercel.com) → **Add New Project** → importe le
+   dépôt → **Root Directory : `backoffice`**.
+3. Ajoute toutes les variables d'environnement (mêmes valeurs que `.env.local`)
+   — pense à mettre `NEXT_PUBLIC_APP_URL` sur l'URL Vercel une fois connue
+   (tu peux redéployer après coup pour la corriger).
+4. Déploie. Vercel te donne une URL du type `https://dimz-backoffice.vercel.app`.
+
+## 8. Connecter le site vitrine
+
+Le site vitrine (`dimz-beta.html`) n'appelle pas directement le back-office
+Vercel : il appelle une **Edge Function Supabase** (`supabase/functions/lead-intake`),
+pour contourner la protection par mot de passe de Vercel qui bloquerait un
+visiteur anonyme. C'est cette fonction qui crée le client + dossier, **et
+maintenant aussi qui envoie l'email de confirmation** — c'est donc elle qu'il
+faut redéployer (pas juste Vercel) à chaque changement de ce fichier.
+
+Dans `dimz-beta.html`, tout en haut du `<script>` :
+
+```js
+var BACKOFFICE_URL = 'https://TON-PROJET.supabase.co/functions/v1/lead-intake';
+```
+
+Pour déployer/mettre à jour la fonction (CLI Supabase, `npx supabase login` puis) :
+
+```bash
+npx supabase functions deploy lead-intake --project-ref TON-PROJET --no-verify-jwt
+```
+
+Et donne-lui ses propres variables d'environnement (distinctes de celles de
+Vercel — les Edge Functions ne lisent pas `.env.local`) :
+
+```bash
+npx supabase secrets set --project-ref TON-PROJET \
+  RESEND_API_KEY=re_... \
+  EMAIL_FROM="DIMZ - Mon Copilote Auto <onboarding@resend.dev>" \
+  APP_URL=https://dimz-backoffice.vercel.app
+```
+
+Le questionnaire de test utilisateur (page « Test » du site) appelle une
+seconde Edge Function, `test-feedback`, à déployer et pointer de la même
+façon (elle n'a pas besoin des secrets ci-dessus, elle n'envoie pas d'email) :
+
+```bash
+npx supabase functions deploy test-feedback --project-ref TON-PROJET --no-verify-jwt
+```
+
+```js
+var TEST_FEEDBACK_URL = 'https://TON-PROJET.supabase.co/functions/v1/test-feedback';
+```
+
+La page « Suivre mon projet » (sous-menu Mon Copilote → Mon projet) appelle une
+troisième Edge Function, `track-lookup` : elle cherche un client par email, et
+si un ou plusieurs dossiers lui sont associés, envoie l'email avec le(s)
+lien(s) de suivi (elle a besoin des mêmes secrets `RESEND_API_KEY`/`EMAIL_FROM`/`APP_URL`
+que `lead-intake` ci-dessus) :
+
+```bash
+npx supabase functions deploy track-lookup --project-ref TON-PROJET --no-verify-jwt
+```
+
+```js
+var TRACK_URL = 'https://TON-PROJET.supabase.co/functions/v1/track-lookup';
+```
+
+La page « Avis clients » appelle une quatrième Edge Function, `avis` : en GET
+elle renvoie les avis déjà validés (colonne `publie = true` dans la table
+`avis` — à passer à `true` manuellement dans l'éditeur de table Supabase
+pour publier un avis reçu), en POST elle enregistre un nouvel avis, toujours
+non publié à la réception (aucun secret nécessaire, elle n'envoie pas d'email) :
+
+```bash
+npx supabase functions deploy avis --project-ref TON-PROJET --no-verify-jwt
+```
+
+```js
+var AVIS_URL = 'https://TON-PROJET.supabase.co/functions/v1/avis';
+```
+
+Chaque soumission des formulaires « Accompagnement » et « Convoyage » du site
+créera automatiquement un client + un dossier dans le back-office, et enverra
+l'email de confirmation si le client a renseigné son adresse.
+
+## Ce qui est inclus (V1)
+
+- Authentification admin (Supabase Auth), toutes les pages protégées.
+- Tableau de bord : dossiers nouveaux/en cours/terminés, CA, convoyages à
+  venir, livraisons du jour, notifications, dernières activités.
+- Clients : fiche complète, historique des dossiers, documents, notes privées,
+  historique des échanges. Suppression définitive (avec confirmation) — supprime
+  aussi, par cascade, tous les dossiers du client et tout ce qui leur est lié.
+  Type de client Particulier / Professionnel (raison sociale, SIRET), repris
+  automatiquement sur ses factures dans Facturation.
+- Dossiers : pipeline en 10 statuts (kanban), historique des changements de
+  statut, infos projet complètes. Archivage (sort du pipeline par défaut,
+  récupérable) et suppression définitive (avec confirmation) depuis la fiche
+  dossier. Référence auto-générée au format `OO-AAMM-0000` (offre sur 2
+  chiffres — 01 Découverte, 02 Copilote, 03 Copilote Plus, 04 Inspection,
+  05 Convoyage — puis année/mois, puis un compteur qui repart à 0001 chaque
+  mois, partagé entre toutes les offres), assignée une fois à la création et
+  jamais modifiée ensuite même si l'offre du dossier change.
+- Recherche de véhicules : annonces avec photos, avis du copilote, points
+  forts/faibles, sélection, et **Score DIMZ** par annonce (score global /10 +
+  4 critères détaillés : prix, historique, état, adéquation), noté via le
+  bouton crayon sur chaque annonce. Pour les offres Copilote / Copilote Plus,
+  les annonces marquées « sélectionnée » (étoile) alimentent le PDF
+  **Copilote Market** / **Copilote + Market** — intro, commentaire libre du
+  copilote, puis les annonces sélectionnées avec leur Score DIMZ (même anneau
+  de score et mêmes barres « score par critère » que le Rapport DIMZ présenté
+  sur le site), et en pied de page soit une invitation à passer à Copilote
+  Plus (offre Copilote), soit l'annonce de l'étape suivante (inspection, offre
+  Copilote Plus) — généré et envoyable par email depuis l'onglet Annonces.
+- Fiche Découverte : pour l'offre gratuite Découverte, une fiche plus légère
+  que le Rapport DIMZ — véhicules repérés (marque, modèle, énergie), un point
+  fort et un point de vigilance chacun, une petite photo par véhicule
+  (optionnelle), sans score. Chaque véhicule est modifiable après ajout
+  (« Modifier », y compris remplacer la photo). La photo peut être uploadée
+  directement ou choisie depuis la bibliothèque de photos réutilisables
+  (menu **Photos**). Générée en PDF (photo incluse) et envoyable au client
+  par email depuis l'onglet dédié d'un dossier.
+- Photos : bibliothèque de photos réutilisables (menu **Photos**) — on
+  uploade une photo une fois, on peut ensuite la réutiliser sur n'importe
+  quel véhicule de fiche Découverte sans la re-uploader. Renommage et
+  suppression depuis la même page.
+- Inspection = Rapport DIMZ : même contenu riche que l'exemple du site (score
+  global, score par étape du contrôle, tags, points positifs/vigilance, avis
+  du copilote, verdict), entièrement éditable depuis le back-office, avec
+  génération automatique d'un rapport PDF au même format. Pour un dossier en
+  offre Copilote Plus, le PDF ajoute en pied de page les étapes suivantes
+  (mise en relation avec le vendeur, accompagnement à l'achat, convoyage). Vue
+  globale de toutes les inspections, tous dossiers confondus, sur `/inspections`.
+- Convoyage : trajet, plus un **état des lieux guidé en deux temps** (départ
+  puis arrivée) — kilométrage, carburant, 14 photos obligatoires à
+  emplacements fixes (permis, selfie, tour du véhicule, intérieur, coffre,
+  pare-brise, compteur), photos facultatives, nom du contact présent, et
+  signature de confirmation (bloquée tant qu'une photo obligatoire manque).
+  Confirmer le départ passe le dossier en « Livraison en cours », confirmer
+  l'arrivée le passe en « Livraison terminée ». Le rapport PDF (bouton
+  « Rapport PDF » / envoi email) combine les deux états des lieux confirmés.
+  Vue globale sur `/convoyages` : convoyages DIMZ (tous dossiers confondus) et
+  convoyages hors plateforme, avec formulaire d'ajout d'un convoyage hors
+  plateforme directement depuis cette page.
+- Devis & factures (`/facturation`, section du haut) : génération de vrais
+  devis puis factures, numérotés séquentiellement sans trou (DEV-AAMM-0000 /
+  FAC-AAMM-0000, requis en droit français — même principe que la référence
+  dossier). Lignes libres (description/quantité/prix HT), TVA à 0 (régime
+  micro-entreprise), PDF généré à la volée avec mentions légales. Cycle :
+  brouillon → envoyé (email + PDF joint) → accepté/refusé (devis) ou payé
+  (facture) ; un devis accepté se convertit en facture en un clic
+  (`devis_origine_id`). Envoyer un devis lié à un dossier convoyage renseigne
+  automatiquement `dossiers.devis_envoye_at`, ce qui fait basculer l'étape
+  « Devis en cours » → « Devis envoyé » sur `/suivi/[token]`. L'ancien journal
+  manuel (`factures`, PDF uploadé de l'extérieur) reste en dessous, inchangé,
+  pour l'historique déjà saisi.
+- Agenda : calendrier mensuel (rendez-vous, visio, inspections, convoyages,
+  livraisons).
+- Documents : bibliothèque liée aux dossiers, avec deux listes — les fichiers
+  uploadés et, séparément, tous les documents & contrats générés (CGV,
+  contrats, Copilote Market...) à travers tous les dossiers.
+- Suivi client (Accompagnement) : sur `/dossiers/[id]`, un bandeau à 4 offres
+  (Découverte / Copilote / Copilote Plus / Inspection — Découverte par défaut
+  à la création du dossier) pilote les étapes que le client voit sur
+  `/suivi/[token]` : communes (« Demande reçue » → étude du dossier) puis
+  spécifiques à l'offre choisie. Bouton « Informer le client » pour envoyer
+  l'email de l'étape en cours (ton copilote, léger). Distinct du pipeline
+  interne à 10 statuts (kanban), qui reste réservé à l'équipe. Pour l'offre
+  Copilote Plus, dès que l'étape client atteint « Livraison », `/suivi/[token]`
+  affiche une invitation à remplir le questionnaire de satisfaction — pour
+  l'instant, un lien vers le questionnaire de retour déjà présent sur le site
+  (page « Test »). Deux paliers d'upsell sur `/suivi/[token]`, chacun avec un
+  message d'accompagnement et un ou deux boutons : offre Découverte une fois
+  la réponse envoyée (dernière étape client) → « Passer à l'offre Copilote »
+  / « Passer à l'offre Copilote Plus » ; offre Copilote une fois le dossier
+  envoyé (dernière étape client) → « Passer à l'offre Copilote Plus » seul.
+  Dans les deux cas, un clic met à jour l'offre du dossier, remet l'étape
+  client sur une valeur commune aux nouvelles étapes, et crée une
+  notification interne (cloche du back-office) pointant vers le dossier.
+- Étape de paiement (offres Copilote et Copilote Plus) : leur parcours client
+  commence par « En attente du paiement », intercalée entre « Demande reçue »
+  et la prise en charge. Découverte (gratuite) et Convoyage (qui a son propre
+  flux de devis) ne sont pas concernées. La règle vit dans une seule fonction,
+  `besoinPaiementOffre` (`src/lib/etapes.ts`), appelée par les quatre chemins
+  qui changent l'offre d'un dossier : upsell depuis `/suivi/[token]`, bandeau
+  d'offres et champ « Offre » de la fiche dossier, et formulaire du site.
+  Elle compare l'offre en cours à `dossiers.paiement_offre` — *quelle* offre a
+  été réglée, pas seulement le fait qu'un paiement a eu lieu — pour qu'un
+  passage Copilote → Copilote Plus redemande bien la différence.
+  Sur la fiche dossier, un encart « Le client attend son lien de paiement »
+  propose un montant (tarif d'entrée de l'offre moins ce qui a déjà été
+  encaissé sur le dossier) et crée la facture d'un clic : le client reçoit le
+  PDF et son lien Stripe. À l'encaissement, le webhook (section 4) renseigne
+  `paiement_recu_at` / `paiement_offre`, l'étape se relabellise en place en
+  « Paiement reçu », le dossier passe à l'étape suivante et le client reçoit
+  un email qui confirme le paiement et annonce cette étape suivante.
+- Suivi client (Convoyage) : flux dédié — Demande reçue → Étude de la demande
+  → boutons Accepté/Refusé (email d'excuse si refusé) → Devis en cours →
+  Livraison programmée → Livraison en cours → Livraison terminée, avec un
+  email pro à chaque étape. « Devis en cours » se remplace en place par
+  « Devis envoyé » (sans devenir une étape barrée) une fois
+  `dossiers.devis_envoye_at` renseigné — bouton manuel « Marquer le devis
+  comme envoyé » sur l'onglet Convoyage du dossier en attendant l'outil de
+  génération de devis.
+- Formulaire du site → dossier créé automatiquement (`/api/public/lead`).
+- Journal des actions (`activity_log`) et notifications internes.
+- Emails automatiques (via Resend) :
+  - confirmation envoyée au client dès qu'il soumet un formulaire du site ;
+  - bouton « Envoyer au client » sur une inspection ou un convoyage → email
+    avec le rapport PDF en pièce jointe ;
+  - un email dédié à chaque étape du suivi client (voir ci-dessus), envoyé à
+    la demande via « Informer le client ».
+- Retours test : questionnaire de test utilisateur sur le site (page « Test »),
+  résultats et durée de remplissage mesurée automatiquement, consultables
+  dans `/retours-test`.
+- Documents & contrats : onglet dédié sur chaque dossier avec les 8 documents
+  légaux DIMZ (CGV, contrats Convoyage/Copilote/Copilote Plus/Inspection,
+  état du véhicule, demande de commencement anticipé, formulaire de
+  rétractation) — génération PDF avec les infos du dossier/client déjà
+  remplies, statut À signer → Signé → Archivé, dates de génération et de
+  signature. Les informations légales de l'entreprise (SIRET, adresse,
+  médiateur…) se règlent une fois dans **Paramètres** et alimentent
+  automatiquement tous les documents générés, dont le pied de page de
+  chaque contrat (nom, SIRET, mention « TVA non applicable, art. 293 B
+  du CGI », logo DIMZ). État du véhicule : deux pages (Départ / Arrivée),
+  chacune avec un schéma à plat de la voiture (vue de dessus) à annoter
+  au stylo à l'impression, et une zone « Autres photos » où on peut
+  ajouter (et retirer) des photos, en plus de la liste standard.
+- Facturation : deux blocs distincts. « Devis & factures générés » crée un
+  document, produit son PDF et l'envoie au client par email ; une facture part
+  avec son lien de paiement Stripe, et repasse automatiquement en « Payée » dès
+  que Stripe confirme le règlement (section 4). « Anciennes factures (import
+  manuel) » reste le journal des factures émises hors back-office — client,
+  numéro, date, montant total, montant des frais, notes, PDF en pièce jointe.
+  Pour un client professionnel, sa raison sociale et son SIRET s'affichent
+  automatiquement sur ses factures.
+
+## Ce qui n'est volontairement pas dans cette V1
+
+Ces modules demandent tes propres comptes/clés API tiers (payants) — on les
+ajoute dès que tu es prêt :
+
+- **SMS** → nécessite Twilio ou équivalent.
+- **Signature électronique légale** (au-delà de la signature à l'écran déjà
+  en place pour le convoyage) → nécessite un prestataire type Yousign/DocuSign.
+- **Gestion fine des rôles** (commercial / inspecteur / convoyeur avec accès
+  limités) : la colonne `role` existe déjà en base, l'interface d'admin des
+  rôles reste à construire.
+
+## Notes techniques
+
+- Toutes les requêtes de données passent par le serveur Next.js avec la clé
+  `service_role` (jamais exposée au navigateur). Le navigateur ne parle à
+  Supabase que pour l'authentification. RLS est activé sur toutes les tables.
+- Les fichiers (photos, vidéos, signatures, documents) sont stockés dans un
+  bucket Supabase Storage privé (`dimz-files`) et servis via des URLs signées
+  temporaires générées côté serveur.
+- Le champ `dossiers.donnees_brutes` conserve l'intégralité de chaque
+  soumission de formulaire du site, même les champs qui ne sont pas encore
+  mappés vers une colonne dédiée — rien n'est jamais perdu.
