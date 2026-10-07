@@ -82,6 +82,50 @@ function getClientIp(req: Request): string {
   return fwd ? fwd.split(",")[0].trim() : "unknown";
 }
 
+// Alerte équipe : ligne dans "notifications" (cloche du back-office) ET push
+// sur le téléphone. Les deux dans la même fonction, pour qu'elles ne puissent
+// plus se désynchroniser — voir le commentaire détaillé dans lead-intake, où
+// l'insert seul a longtemps laissé les alertes muettes. Duplication assumée :
+// une Edge Function ne peut pas importer src/lib/log.ts.
+// deno-lint-ignore no-explicit-any
+async function notifierEquipe(
+  db: any,
+  params: { titre: string; message: string; type: string; lien?: string }
+) {
+  await db.from("notifications").insert({
+    titre: params.titre,
+    message: params.message,
+    type: params.type,
+    lien: params.lien ?? null,
+  });
+
+  const topic = Deno.env.get("NTFY_TOPIC");
+  if (!topic) {
+    console.error("NTFY_TOPIC manquante : notification push non envoyée.");
+    return;
+  }
+
+  const appUrl = (Deno.env.get("APP_URL") || "https://back.dimz-copilote.com").replace(/\/$/, "");
+  try {
+    const res = await fetch("https://ntfy.sh/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        topic,
+        title: params.titre,
+        message: params.message || params.titre,
+        priority: 4,
+        ...(params.lien ? { click: `${appUrl}${params.lien}` } : {}),
+      }),
+    });
+    if (!res.ok) {
+      console.error("Échec notification push:", res.status, await res.text().catch(() => ""));
+    }
+  } catch (err) {
+    console.error("Échec notification push:", err);
+  }
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: CORS_HEADERS });
@@ -128,7 +172,7 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "Erreur enregistrement" }, 500);
   }
 
-  await db.from("notifications").insert({
+  await notifierEquipe(db, {
     titre: "Nouveau retour de test utilisateur",
     message: created.reference,
     type: "test_feedback",
