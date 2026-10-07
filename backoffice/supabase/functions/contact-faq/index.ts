@@ -64,7 +64,9 @@ async function notifierEquipe(
     lien: params.lien ?? null,
   });
 
-  const topic = Deno.env.get("NTFY_TOPIC");
+  // trim() : voir le commentaire dans lead-intake — un espace parasite dans le
+  // secret rend le topic invalide pour ntfy et rend l'alerte muette.
+  const topic = Deno.env.get("NTFY_TOPIC")?.trim();
   if (!topic) {
     console.error("NTFY_TOPIC manquante : notification push non envoyée.");
     return;

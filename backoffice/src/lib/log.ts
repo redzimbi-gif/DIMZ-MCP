@@ -11,7 +11,11 @@ import { createClient } from "@/lib/supabase/server";
  * notif push qui échoue ne doit jamais casser le flux qui l'a déclenchée.
  */
 async function sendPushNotification(params: { title: string; message: string; link?: string | null }) {
-  const topic = process.env.NTFY_TOPIC;
+  // trim() : un espace ou un retour à la ligne collé par mégarde avec la
+  // valeur rend le topic invalide aux yeux de ntfy, qui répond 400 "topic
+  // invalid" — et l'alerte disparaît sans bruit. Le même piège s'est refermé
+  // côté Edge Functions, et il guette ici à chaque rotation du topic.
+  const topic = process.env.NTFY_TOPIC?.trim();
   if (!topic) return;
 
   try {

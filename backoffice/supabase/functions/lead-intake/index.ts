@@ -99,7 +99,11 @@ async function notifierEquipe(
     lien: params.lien ?? null,
   });
 
-  const topic = Deno.env.get("NTFY_TOPIC");
+  // trim() : un espace ou un retour à la ligne collé par mégarde avec la
+  // valeur du secret suffit à rendre le topic invalide aux yeux de ntfy, qui
+  // répond 400 "topic invalid" — et l'alerte disparaît sans bruit. Vécu : 41
+  // caractères stockés pour un topic qui en fait 40.
+  const topic = Deno.env.get("NTFY_TOPIC")?.trim();
   if (!topic) {
     console.error("NTFY_TOPIC manquante : notification push non envoyée.");
     return;
