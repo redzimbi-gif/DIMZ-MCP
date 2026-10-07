@@ -73,6 +73,62 @@ function guessOffre(label: string | null): string {
   return "decouverte";
 }
 
+// ---------------------------------------------------------------------------
+// Alerte équipe : la ligne dans "notifications" (cloche du back-office) ET la
+// notification push sur le téléphone, dans la même fonction — volontairement.
+//
+// La version Next.js (notifyStaff, src/lib/log.ts) fait exactement ça, mais
+// une Edge Function ne peut pas l'importer : même duplication assumée que la
+// logique de limitation de fréquence ci-dessus. Pendant un temps seul l'insert
+// existait ici, et les nouvelles demandes du site — l'alerte la plus utile de
+// toutes — n'ont jamais sonné sur le téléphone. D'où ce couplage : qui écrit
+// la notification envoie le push.
+//
+// N'échoue jamais bruyamment : une alerte manquée ne doit pas faire perdre une
+// demande client.
+// ---------------------------------------------------------------------------
+// deno-lint-ignore no-explicit-any
+async function notifierEquipe(
+  db: any,
+  params: { titre: string; message: string; type: string; lien?: string }
+) {
+  await db.from("notifications").insert({
+    titre: params.titre,
+    message: params.message,
+    type: params.type,
+    lien: params.lien ?? null,
+  });
+
+  const topic = Deno.env.get("NTFY_TOPIC");
+  if (!topic) {
+    console.error("NTFY_TOPIC manquante : notification push non envoyée.");
+    return;
+  }
+
+  const appUrl = (Deno.env.get("APP_URL") || "https://back.dimz-copilote.com").replace(/\/$/, "");
+  try {
+    // Corps JSON plutôt que des en-têtes HTTP : ces derniers n'acceptent que
+    // du Latin-1 et rejetteraient un titre contenant une emoji ou un tiret
+    // cadratin — silencieusement fatal pour une simple notification.
+    const res = await fetch("https://ntfy.sh/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        topic,
+        title: params.titre,
+        message: params.message || params.titre,
+        priority: 4,
+        ...(params.lien ? { click: `${appUrl}${params.lien}` } : {}),
+      }),
+    });
+    if (!res.ok) {
+      console.error("Échec notification push:", res.status, await res.text().catch(() => ""));
+    }
+  } catch (err) {
+    console.error("Échec notification push:", err);
+  }
+}
+
 // Emails via l'API Resend en appel HTTP direct (pas de SDK, pour rester un
 // fichier autonome déployable tel quel comme Edge Function Deno).
 async function sendConfirmationEmail(params: { to: string; prenom: string | null; reference: string; portalUrl: string }) {
@@ -241,7 +297,7 @@ Deno.serve(async (req: Request) => {
     statut: "demande_recue",
   });
 
-  await db.from("notifications").insert({
+  await notifierEquipe(db, {
     titre: `Nouvelle demande : ${formulaire}`,
     message: `${prenom ?? ""} ${nom} (${dossier.reference})`.trim(),
     type: "nouveau_dossier",
