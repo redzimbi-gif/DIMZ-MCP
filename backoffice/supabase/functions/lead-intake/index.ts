@@ -74,15 +74,15 @@ function guessOffre(label: string | null): string {
 }
 
 // ---------------------------------------------------------------------------
-// Alerte équipe : la ligne dans "notifications" (cloche du back-office) ET la
-// notification push sur le téléphone, dans la même fonction — volontairement.
+// Alerte équipe : la ligne dans "notifications" (cloche du back-office), le
+// push sur le téléphone et l'email, déclenchés ensemble — volontairement.
 //
 // La version Next.js (notifyStaff, src/lib/log.ts) fait exactement ça, mais
 // une Edge Function ne peut pas l'importer : même duplication assumée que la
 // logique de limitation de fréquence ci-dessus. Pendant un temps seul l'insert
 // existait ici, et les nouvelles demandes du site — l'alerte la plus utile de
-// toutes — n'ont jamais sonné sur le téléphone. D'où ce couplage : qui écrit
-// la notification envoie le push.
+// toutes — n'ont jamais sonné sur le téléphone. D'où ce point d'entrée unique :
+// qui écrit la notification déclenche aussi les canaux sortants.
 //
 // N'échoue jamais bruyamment : une alerte manquée ne doit pas faire perdre une
 // demande client.

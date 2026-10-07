@@ -47,11 +47,10 @@ function getClientIp(req: Request): string {
   return fwd ? fwd.split(",")[0].trim() : "unknown";
 }
 
-// Alerte équipe : ligne dans "notifications" (cloche du back-office) ET push
-// sur le téléphone. Les deux dans la même fonction, pour qu'elles ne puissent
-// plus se désynchroniser — voir le commentaire détaillé dans lead-intake, où
-// l'insert seul a longtemps laissé les alertes muettes. Duplication assumée :
-// une Edge Function ne peut pas importer src/lib/log.ts.
+// Alerte équipe : la cloche du back-office, le push et l'email, déclenchés
+// ensemble — voir le commentaire détaillé dans lead-intake, où l'insert seul
+// a longtemps laissé les alertes muettes. Duplication assumée : une Edge
+// Function ne peut pas importer src/lib/log.ts.
 // deno-lint-ignore no-explicit-any
 async function notifierEquipe(
   db: any,
