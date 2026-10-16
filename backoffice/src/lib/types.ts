@@ -168,22 +168,23 @@ export const PROSPECT_CATEGORIE_LABELS: Record<ProspectCategorie, string> = {
   autre: "Autre",
 };
 
-export const PROSPECT_SOURCES = ["sirene", "google_places", "apollo", "manuel", "csv"] as const;
+export const PROSPECT_SOURCES = ["sirene", "reg", "google_places", "apollo", "manuel", "csv"] as const;
 export type ProspectSource = (typeof PROSPECT_SOURCES)[number];
 
 export const PROSPECT_SOURCE_LABELS: Record<ProspectSource, string> = {
   sirene: "Base SIRENE",
+  reg: "Registre des entreprises (GE)",
   google_places: "Google Maps",
   apollo: "Apollo",
   manuel: "Saisie manuelle",
   csv: "Import CSV",
 };
 
-export const PROSPECT_ZONES = ["lyon", "annecy", "autre"] as const;
+export const PROSPECT_ZONES = ["geneve", "annecy", "autre"] as const;
 export type ProspectZone = (typeof PROSPECT_ZONES)[number];
 
 export const PROSPECT_ZONE_LABELS: Record<ProspectZone, string> = {
-  lyon: "Métropole de Lyon",
+  geneve: "Canton de Genève",
   annecy: "Bassin annécien",
   autre: "Autre",
 };
@@ -192,6 +193,11 @@ export const PROSPECT_ZONE_LABELS: Record<ProspectZone, string> = {
 // entre le back-office et le script de recensement. « carrosserie » n'a pas de
 // code NAF propre (les carrossiers sont enregistrés en 45.20A) : cette
 // catégorie ne s'obtient qu'en reclassant un prospect à la main.
+//
+// Les prospects genevois portent un code NOGA et non un code NAF : les deux
+// nomenclatures descendent de la NACE européenne et coïncident sur quatre
+// chiffres, et c'est le script de recensement qui fait la traduction. La
+// colonne code_naf stocke donc l'un ou l'autre selon la zone.
 export const NAF_CATEGORIE: Record<string, ProspectCategorie> = {
   "45.11Z": "concession",
   "45.19Z": "concession",
@@ -211,6 +217,11 @@ export interface Prospect {
   enseigne: string | null;
   siret: string | null;
   siren: string | null;
+  // Identité suisse : IDE (« CHE-123.456.789 ») pour les prospects genevois,
+  // et ref_reg, la clé de dédoublonnage des imports depuis le registre du
+  // canton. Null pour les prospects français, et inversement pour siret/siren.
+  ide: string | null;
+  ref_reg: string | null;
   code_naf: string | null;
   categorie: ProspectCategorie;
   tranche_effectif: string | null;

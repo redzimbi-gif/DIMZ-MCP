@@ -23,6 +23,7 @@ function champsProspect(formData: FormData) {
     raison_sociale: String(formData.get("raison_sociale") || "").trim(),
     enseigne: texte(formData, "enseigne"),
     siret: texte(formData, "siret"),
+    ide: texte(formData, "ide"),
     code_naf: texte(formData, "code_naf"),
     categorie: (texte(formData, "categorie") || "autre") as ProspectCategorie,
     adresse: texte(formData, "adresse"),
