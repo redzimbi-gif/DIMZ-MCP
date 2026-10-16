@@ -600,7 +600,7 @@ function clauseNoga(prefixes, champ, typeChamp) {
   return morceaux.join(" OR ");
 }
 
-function construireProspectReg(attributs, couche, zone) {
+function construireProspectReg(attributs, couche, zone, estEtablissement) {
   const c = couche.apparies;
   const valeur = (role) => {
     if (!c[role]) return null;
@@ -626,7 +626,7 @@ function construireProspectReg(attributs, couche, zone) {
     // On ne répète pas le nom légal en enseigne quand les deux coïncident.
     enseigne: enseigne && enseigne !== raisonSociale ? enseigne : null,
     ide: valeur("ide"),
-    ref_reg: refEtablissementReg(attributs, couche),
+    ref_reg: refReg(attributs, couche, estEtablissement),
     code_naf: noga,
     categorie: categorieNoga(noga) ?? "autre",
     tranche_effectif: valeur("effectif"),
@@ -651,13 +651,12 @@ function construireProspectReg(attributs, couche, zone) {
 }
 
 /**
- * Clé de dédoublonnage d'un établissement genevois. On préfère un identifiant
- * d'établissement publié par le REG ; à défaut, le couple IDE + adresse tient
- * ce rôle (une entreprise à une adresse donnée est un établissement), ce qui
- * reste stable d'un import à l'autre — contrairement à l'OBJECTID ArcGIS, qui
- * est réattribué à chaque republication de la couche.
+ * Clé de dédoublonnage d'une ligne du REG, stable d'un import à l'autre —
+ * contrairement à l'OBJECTID ArcGIS, réattribué à chaque republication de la
+ * couche. Les deux natures de ligne ont leur espace de clés, préfixé, afin
+ * qu'un établissement et une entreprise ne puissent jamais se confondre.
  */
-function refEtablissementReg(attributs, couche) {
+function refReg(attributs, couche, estEtablissement) {
   const c = couche.apparies;
   const brut = (role) => {
     if (!c[role]) return null;
@@ -667,6 +666,9 @@ function refEtablissementReg(attributs, couche) {
     return texte === "" ? null : texte;
   };
 
+  const entreprise = brut("refEntreprise");
+  if (!estEtablissement) return entreprise ? `reg:ent:${entreprise}` : null;
+
   const propre = brut("refEtablissement");
   if (propre) return `reg:${propre}`;
 
@@ -675,7 +677,6 @@ function refEtablissementReg(attributs, couche) {
   const ide = brut("ide");
   const adresseId = brut("adresseId");
   if (ide && adresseId) return `reg:${ide}:${adresseId}`;
-  const entreprise = brut("refEntreprise");
   if (entreprise && adresseId) return `reg:${entreprise}:${adresseId}`;
   if (ide) return `reg:${ide}`;
   return null;
@@ -700,6 +701,9 @@ async function recenserReg({ zone, categories, compteurs, retenus, echantillon, 
 
   const where = clauseNoga(prefixes, couche.apparies.noga, couche.typeNoga);
   const parPage = Math.min(couche.maxParPage, 1000);
+  // Lignes d'entreprise mises de côté : retenues seulement si aucun de leurs
+  // établissements ne les représente (voir le commentaire dans la boucle).
+  const candidatsEntreprise = new Map();
   let offset = 0;
   let encore = true;
 
@@ -756,32 +760,35 @@ async function recenserReg({ zone, categories, compteurs, retenus, echantillon, 
       }
 
       // Le REG mêle deux natures de lignes : l'entreprise (l'entité juridique)
-      // et l'établissement (le site physique). C'est le site qu'on démarche —
-      // on y va, on y livre, on y prend un café avec le chef d'atelier — donc
-      // on ne retient que les établissements. Garder les deux produirait un
-      // doublon par entreprise mono-site dans la liste de prospection.
+      // et l'établissement (le site physique). C'est le site qu'on démarche,
+      // donc l'établissement primbe ; mais la première simulation a montré que
+      // 338 entreprises exerçant une activité visée n'ont aucun établissement
+      // rattaché dans la couche. Les écarter perdait autant de prospects
+      // réels, alors l'entreprise est retenue en propre quand — et seulement
+      // quand — aucun de ses établissements ne la représente déjà.
       //
-      // Ce tri n'est sans perte que si toute entreprise visée possède au moins
-      // un établissement : les deux ensembles d'identifiants d'entreprise sont
-      // donc collectés, et le compte-rendu signale celles qui n'en auraient
-      // aucun plutôt que de les laisser disparaître en silence.
+      // D'où la mise en attente : l'ordre des pages étant celui des OBJECTID,
+      // on ne sait pas, en lisant une ligne d'entreprise, si un établissement
+      // la couvrira plus loin. La décision se prend donc après le balayage.
       const refEntreprise = couche.apparies.refEntreprise
         ? String(attributs[couche.apparies.refEntreprise] ?? "").trim()
         : "";
       const estEtablissement = type === "" || /etablissement/i.test(type);
-      if (refEntreprise) {
-        (estEtablissement ? diagnostic.entreprisesAvecSite : diagnostic.entreprisesVues).add(refEntreprise);
-      }
-      if (!estEtablissement) {
-        compteurs.entreprises++;
-        continue;
-      }
-
-      const prospect = construireProspectReg(attributs, couche, zone);
+      const prospect = construireProspectReg(attributs, couche, zone, estEtablissement);
       if (!prospect.ref_reg) {
         compteurs.sansReference++;
         continue;
       }
+
+      if (!estEtablissement) {
+        if (refEntreprise) diagnostic.entreprisesVues.add(refEntreprise);
+        if (!candidatsEntreprise.has(prospect.ref_reg)) {
+          candidatsEntreprise.set(prospect.ref_reg, { prospect, refEntreprise });
+        }
+        continue;
+      }
+
+      if (refEntreprise) diagnostic.entreprisesAvecSite.add(refEntreprise);
       if (retenus.has(prospect.ref_reg)) continue;
       if (LIMITE > 0 && retenus.size >= LIMITE) return;
       retenus.set(prospect.ref_reg, prospect);
@@ -793,6 +800,21 @@ async function recenserReg({ zone, categories, compteurs, retenus, echantillon, 
     encore = data.exceededTransferLimit === true || lignes.length === parPage;
     offset += lignes.length;
     if (encore) await dormir(PAUSE_MS);
+  }
+
+  // Le balayage est fini : on sait maintenant quelles entreprises ont un
+  // établissement. Les autres entrent comme prospects à part entière — leur
+  // adresse et leurs coordonnées sont celles du siège, c'est ce numéro qu'on
+  // appellerait de toute façon.
+  for (const { prospect, refEntreprise } of candidatsEntreprise.values()) {
+    if (refEntreprise && diagnostic.entreprisesAvecSite.has(refEntreprise)) {
+      compteurs.entreprisesCouvertes++;
+      continue;
+    }
+    if (retenus.has(prospect.ref_reg)) continue;
+    if (LIMITE > 0 && retenus.size >= LIMITE) return;
+    retenus.set(prospect.ref_reg, prospect);
+    compteurs.entreprisesSansSite++;
   }
 }
 
@@ -896,7 +918,8 @@ async function main() {
     horsZone: 0,
     horsActivite: 0,
     fermes: 0,
-    entreprises: 0,
+    entreprisesCouvertes: 0,
+    entreprisesSansSite: 0,
     sansSiret: 0,
     sansReference: 0,
     ecrits: 0,
@@ -936,24 +959,31 @@ async function main() {
   if (compteurs.horsZone > 0) journal(`- Écartés hors zone : ${compteurs.horsZone}`);
   if (compteurs.horsActivite > 0) journal(`- Écartés hors activité visée : ${compteurs.horsActivite}`);
   journal(`- Écartés car établissement fermé : ${compteurs.fermes}`);
-  if (compteurs.entreprises > 0) {
-    journal(`- Lignes d'entreprise écartées au profit de leurs établissements : ${compteurs.entreprises}`);
+  if (compteurs.entreprisesCouvertes > 0) {
+    journal(
+      `- Lignes d'entreprise écartées, un établissement les représentant : ${compteurs.entreprisesCouvertes}`
+    );
+  }
+  if (compteurs.entreprisesSansSite > 0) {
+    journal(
+      `- Entreprises retenues faute d'établissement rattaché : ${compteurs.entreprisesSansSite} ` +
+        `(fiches au siège)`
+    );
   }
   if (compteurs.sansSiret > 0) journal(`- Écartés sans SIRET : ${compteurs.sansSiret}`);
   if (compteurs.sansReference > 0) journal(`- Écartés sans identifiant exploitable : ${compteurs.sansReference}`);
 
-  // Une entreprise visée sans aucun établissement serait un prospect perdu par
-  // le tri : on le dit haut et fort plutôt que de finir en vert sur un trou.
-  const sansSite = [...diagnostic.entreprisesVues].filter((e) => !diagnostic.entreprisesAvecSite.has(e));
-  if (sansSite.length > 0) {
+  // Contrôle : toute entreprise visée doit être représentée, soit par un de
+  // ses établissements, soit par sa propre fiche. Un reste non nul voudrait
+  // dire qu'on en a perdu, et c'est le genre de trou qui passe inaperçu si on
+  // ne le compte pas.
+  const perdues = [...diagnostic.entreprisesVues].filter(
+    (e) => !diagnostic.entreprisesAvecSite.has(e)
+  ).length;
+  if (perdues !== compteurs.entreprisesSansSite) {
     journal(
-      `- ⚠︎ **${sansSite.length} entreprise(s) sans établissement rattaché** : écartées par le tri, ` +
-        `alors qu'elles exercent une activité visée. Exemples : ${sansSite.slice(0, 5).join(", ")}`
-    );
-  } else if (diagnostic.entreprisesAvecSite.size > 0) {
-    journal(
-      `- Toutes les entreprises visées ont au moins un établissement ` +
-        `(${diagnostic.entreprisesAvecSite.size}) : le tri ne perd aucun prospect.`
+      `- ⚠︎ **${perdues - compteurs.entreprisesSansSite} entreprise(s) visée(s) ni couverte(s) par un ` +
+        `établissement ni retenue(s) en propre** : à élucider avant l'import réel.`
     );
   }
   journal(`- **Retenus : ${retenus.size}**`);
