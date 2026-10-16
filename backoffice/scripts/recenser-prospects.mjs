@@ -481,21 +481,34 @@ async function recenserSirene({ zone, categories, compteurs, retenus, echantillo
  * soit vérifiable comme l'est celui de l'EPCI côté français.
  */
 const MOTIFS_CHAMPS = {
-  noga: [/^CODE_NOGA/i, /NOGA.*CODE/i, /NOGA/i],
-  branche: [/^BRANCHE/i, /NOGA.*(LIB|TEXT|DESC)/i, /ACTIVITE/i],
-  raisonSociale: [/RAISON_SOCIALE/i, /^NOM_ENTREPRISE/i, /DENOMINATION/i, /^NOM$/i, /^NOM_/i],
-  enseigne: [/ENSEIGNE/i, /NOM_COMMERCIAL/i],
-  ide: [/^IDE$/i, /^NO_IDE/i, /\bIDE\b/i, /^UID$/i],
-  statut: [/STATUT_REG/i, /^STATUT/i, /ETAT/i],
-  type: [/^TYPE_REG/i, /^TYPE$/i],
-  adresse: [/^ADRESSE/i, /^RUE/i, /^NOM_RUE/i],
-  numero: [/^NO_RUE/i, /NUMERO.*RUE/i, /^NUM_RUE/i],
-  codePostal: [/^NPA$/i, /^NPA/i, /CODE_POSTAL/i],
-  commune: [/^COMMUNE$/i, /^NOM_COMMUNE/i, /^LOCALITE/i, /COMMUNE/i],
+  noga: [/^CODE_NOGA$/i, /NOGA.*CODE/i, /NOGA/i],
+  branche: [/^BRANCHE$/i, /NOGA.*(LIB|TEXT|DESC)/i],
+  // La raison sociale du parent est le nom légal complet (« … Sàrl »), le plus
+  // utile au téléphone ; NOM est l'enseigne, souvent la même chaîne en plus
+  // court. On prend donc le parent d'abord, l'enseigne en second recours.
+  raisonSociale: [/^RAISON_SOC_PARENT$/i, /^RAISON_SOCIALE$/i, /DENOMINATION/i, /^NOM$/i],
+  enseigne: [/ENSEIGNE/i, /NOM_COMMERCIAL/i, /^NOM$/i],
+  ide: [/^NUM_IDE$/i, /^IDE$/i, /IDE$/i, /^UID$/i],
+  statut: [/^STATUT_REG$/i, /^STATUT/i],
+  type: [/^TYPE_REG$/i, /^TYPE$/i],
+  // Le REG publie l'adresse déjà recomposée (« Rue du Pré 19 ») en plus de la
+  // rue et du numéro séparés : on préfère la version complète, et le
+  // recollage ne sert que si elle manque — sinon le numéro sortirait deux fois.
+  adresseComplete: [/^ADRESSE$/i],
+  rue: [/^PHYS_RUE$/i, /^RUE$/i, /^NOM_RUE$/i],
+  numero: [/^PHYS_NUMRUE$/i, /^NO_RUE$/i, /NUM.*RUE/i],
+  codePostal: [/^PHYS_NPA$/i, /NPA/i, /CODE_POSTAL/i],
+  commune: [/^PHYS_COMMUNE$/i, /^COMMUNE$/i, /^PHYS_LOCALITE$/i, /^LOCALITE/i, /COMMUNE/i],
   codeCommune: [/NO_COMMUNE/i, /^OFS/i, /COMMUNE.*(NO|CODE)/i],
-  adresseId: [/IDPADR/i, /^EGID/i, /ID_ADRESSE/i],
-  refEtablissement: [/^ID_REG/i, /^NO_REG/i, /^N_REG/i, /ID_ETABLISSEMENT/i],
-  effectif: [/EMPLOI/i, /EFFECTIF/i, /SALARIE/i, /TAILLE/i],
+  adresseId: [/^IDPADR$/i, /^EGID$/i, /ID_ADRESSE/i],
+  refEtablissement: [/^ID_ETABLISSEMENT$/i, /^ID_REG$/i, /^NO_REG$/i],
+  refEntreprise: [/^ID_ENTREPRISE$/i],
+  effectif: [/^TAILLE$/i, /EMPLOI/i, /EFFECTIF/i, /SALARIE/i],
+  // Le REG publie les coordonnées de contact, là où SIRENE n'en donne aucune :
+  // c'est ce qui rend le recensement genevois directement exploitable.
+  telephone: [/^TEL_PRINCIPAL$/i, /^TELEPHONE$/i, /^TEL$/i],
+  email: [/^EMAIL$/i, /^COURRIEL$/i],
+  siteWeb: [/^SITE_INTERNET$/i, /^SITE_WEB$/i, /^WEB$/i],
 };
 
 function apparierChamps(champs) {
@@ -601,28 +614,40 @@ function construireProspectReg(attributs, couche, zone) {
   const raisonSociale = valeur("raisonSociale");
   const enseigne = valeur("enseigne");
 
-  // Le REG éclate parfois la rue et le numéro en deux colonnes : on les
-  // recolle pour que l'adresse reste utilisable telle quelle au téléphone.
-  const rue = valeur("adresse");
-  const numero = valeur("numero");
-  const adresse = [rue, numero].filter(Boolean).join(" ").trim() || null;
+  // L'adresse recomposée par le REG quand elle existe ; sinon, recollage de la
+  // rue et du numéro.
+  const adresse =
+    valeur("adresseComplete") ||
+    [valeur("rue"), valeur("numero")].filter(Boolean).join(" ").trim() ||
+    null;
 
-  const effectif = valeur("effectif");
-
-  return {
+  const prospect = {
     raison_sociale: raisonSociale || enseigne || "Établissement sans nom",
-    enseigne: enseigne,
+    // On ne répète pas le nom légal en enseigne quand les deux coïncident.
+    enseigne: enseigne && enseigne !== raisonSociale ? enseigne : null,
     ide: valeur("ide"),
     ref_reg: refEtablissementReg(attributs, couche),
     code_naf: noga,
     categorie: categorieNoga(noga) ?? "autre",
-    tranche_effectif: effectif,
+    tranche_effectif: valeur("effectif"),
     adresse,
     code_postal: valeur("codePostal"),
     ville: valeur("commune"),
     code_commune: valeur("codeCommune"),
     zone: zone.code,
   };
+
+  // Contrairement à SIRENE, le REG publie téléphone, email et site : on les
+  // transmet, et upsert_prospect_reg ne comblera que les champs encore vides,
+  // sans jamais écraser ce que l'équipe a corrigé à la main.
+  const telephone = valeur("telephone");
+  const email = valeur("email");
+  const siteWeb = valeur("siteWeb");
+  if (telephone) prospect.telephone = telephone;
+  if (email) prospect.email = email;
+  if (siteWeb) prospect.site_web = siteWeb;
+
+  return prospect;
 }
 
 /**
@@ -645,13 +670,14 @@ function refEtablissementReg(attributs, couche) {
   const propre = brut("refEtablissement");
   if (propre) return `reg:${propre}`;
 
+  // Replis, par ordre de stabilité décroissante, pour le cas où le REG
+  // cesserait de publier ID_ETABLISSEMENT.
   const ide = brut("ide");
   const adresseId = brut("adresseId");
   if (ide && adresseId) return `reg:${ide}:${adresseId}`;
-  if (ide) {
-    const lieu = [brut("adresse"), brut("numero"), brut("codePostal")].filter(Boolean).join(" ");
-    return lieu ? `reg:${ide}:${lieu}` : `reg:${ide}`;
-  }
+  const entreprise = brut("refEntreprise");
+  if (entreprise && adresseId) return `reg:${entreprise}:${adresseId}`;
+  if (ide) return `reg:${ide}`;
   return null;
 }
 
@@ -709,6 +735,9 @@ async function recenserReg({ zone, categories, compteurs, retenus, echantillon, 
       if (echantillon.length === 0) echantillon.push(attributs);
       compteurs.vus++;
 
+      const type = couche.apparies.type ? String(attributs[couche.apparies.type] ?? "") : "";
+      diagnostic.typesReg[type || "(vide)"] = (diagnostic.typesReg[type || "(vide)"] ?? 0) + 1;
+
       // Le REG n'expose en principe que des entités en activité, mais le champ
       // de statut existe : s'il annonce une radiation, on écarte plutôt que de
       // démarcher un garage fermé.
@@ -726,14 +755,32 @@ async function recenserReg({ zone, categories, compteurs, retenus, echantillon, 
         continue;
       }
 
+      // Le REG mêle deux natures de lignes : l'entreprise (l'entité juridique)
+      // et l'établissement (le site physique). C'est le site qu'on démarche —
+      // on y va, on y livre, on y prend un café avec le chef d'atelier — donc
+      // on ne retient que les établissements. Garder les deux produirait un
+      // doublon par entreprise mono-site dans la liste de prospection.
+      //
+      // Ce tri n'est sans perte que si toute entreprise visée possède au moins
+      // un établissement : les deux ensembles d'identifiants d'entreprise sont
+      // donc collectés, et le compte-rendu signale celles qui n'en auraient
+      // aucun plutôt que de les laisser disparaître en silence.
+      const refEntreprise = couche.apparies.refEntreprise
+        ? String(attributs[couche.apparies.refEntreprise] ?? "").trim()
+        : "";
+      const estEtablissement = type === "" || /etablissement/i.test(type);
+      if (refEntreprise) {
+        (estEtablissement ? diagnostic.entreprisesAvecSite : diagnostic.entreprisesVues).add(refEntreprise);
+      }
+      if (!estEtablissement) {
+        compteurs.entreprises++;
+        continue;
+      }
+
       const prospect = construireProspectReg(attributs, couche, zone);
       if (!prospect.ref_reg) {
         compteurs.sansReference++;
         continue;
-      }
-      if (couche.apparies.type) {
-        const type = String(attributs[couche.apparies.type] ?? "");
-        diagnostic.typesReg[type] = (diagnostic.typesReg[type] ?? 0) + 1;
       }
       if (retenus.has(prospect.ref_reg)) continue;
       if (LIMITE > 0 && retenus.size >= LIMITE) return;
@@ -849,13 +896,22 @@ async function main() {
     horsZone: 0,
     horsActivite: 0,
     fermes: 0,
+    entreprises: 0,
     sansSiret: 0,
     sansReference: 0,
     ecrits: 0,
     erreurs: 0,
   };
   const retenus = new Map();
-  const diagnostic = { reg: null, typesReg: {} };
+  const diagnostic = {
+    reg: null,
+    typesReg: {},
+    // Identifiants d'entreprise rencontrés, selon qu'un établissement les
+    // porte ou non : sert à prouver que ne garder que les établissements ne
+    // fait perdre aucune entreprise visée.
+    entreprisesVues: new Set(),
+    entreprisesAvecSite: new Set(),
+  };
 
   for (const zone of zones) {
     journal(`### ${zone.nom}`);
@@ -880,8 +936,26 @@ async function main() {
   if (compteurs.horsZone > 0) journal(`- Écartés hors zone : ${compteurs.horsZone}`);
   if (compteurs.horsActivite > 0) journal(`- Écartés hors activité visée : ${compteurs.horsActivite}`);
   journal(`- Écartés car établissement fermé : ${compteurs.fermes}`);
+  if (compteurs.entreprises > 0) {
+    journal(`- Lignes d'entreprise écartées au profit de leurs établissements : ${compteurs.entreprises}`);
+  }
   if (compteurs.sansSiret > 0) journal(`- Écartés sans SIRET : ${compteurs.sansSiret}`);
   if (compteurs.sansReference > 0) journal(`- Écartés sans identifiant exploitable : ${compteurs.sansReference}`);
+
+  // Une entreprise visée sans aucun établissement serait un prospect perdu par
+  // le tri : on le dit haut et fort plutôt que de finir en vert sur un trou.
+  const sansSite = [...diagnostic.entreprisesVues].filter((e) => !diagnostic.entreprisesAvecSite.has(e));
+  if (sansSite.length > 0) {
+    journal(
+      `- ⚠︎ **${sansSite.length} entreprise(s) sans établissement rattaché** : écartées par le tri, ` +
+        `alors qu'elles exercent une activité visée. Exemples : ${sansSite.slice(0, 5).join(", ")}`
+    );
+  } else if (diagnostic.entreprisesAvecSite.size > 0) {
+    journal(
+      `- Toutes les entreprises visées ont au moins un établissement ` +
+        `(${diagnostic.entreprisesAvecSite.size}) : le tri ne perd aucun prospect.`
+    );
+  }
   journal(`- **Retenus : ${retenus.size}**`);
   journal("");
 
@@ -896,7 +970,16 @@ async function main() {
     for (const [zone, nb] of Object.entries(parZone).sort((a, b) => b[1] - a[1])) {
       journal(`- ${zone} : ${nb}`);
     }
-    journal("");
+    const avecTel = [...retenus.values()].filter((p) => p.telephone).length;
+    const avecEmail = [...retenus.values()].filter((p) => p.email).length;
+    const avecSite = [...retenus.values()].filter((p) => p.site_web).length;
+    if (avecTel + avecEmail + avecSite > 0) {
+      journal(
+        `Coordonnées fournies par le registre : ${avecTel} téléphone(s), ` +
+          `${avecEmail} email(s), ${avecSite} site(s) web.`
+      );
+      journal("");
+    }
     journal("Répartition par catégorie :");
     for (const [categorie, nb] of Object.entries(parCategorie).sort((a, b) => b[1] - a[1])) {
       journal(`- ${categorie} : ${nb}`);

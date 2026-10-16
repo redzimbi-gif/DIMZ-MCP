@@ -57,6 +57,11 @@ alter table prospects add constraint prospects_source_check
 -- (statut, notes, relances, conversion) n'est pas touché du tout. Relancer le
 -- recensement genevois est donc aussi sans risque que le français.
 --
+-- Une différence avec SIRENE : le REG publie téléphone, email et site web. La
+-- fonction les accepte donc, mais toujours par "coalesce" — un numéro corrigé
+-- à la main au premier appel survit à tous les ré-imports. L'email est pour la
+-- même raison absent de la jumelle SIRENE, qui n'en reçoit jamais.
+--
 -- Fonction distincte plutôt que paramétrée : la cible du "on conflict" doit
 -- être écrite littéralement, un index partiel ne pouvant pas être désigné
 -- dynamiquement en SQL pur.
@@ -66,7 +71,7 @@ create or replace function upsert_prospect_reg(p jsonb) returns uuid as $$
   insert into prospects (
     raison_sociale, enseigne, ide, ref_reg, code_naf, categorie,
     tranche_effectif, adresse, code_postal, ville, code_commune, zone,
-    telephone, site_web, responsable_nom, source
+    telephone, email, site_web, responsable_nom, source
   )
   values (
     p->>'raison_sociale',
@@ -82,6 +87,7 @@ create or replace function upsert_prospect_reg(p jsonb) returns uuid as $$
     p->>'code_commune',
     p->>'zone',
     p->>'telephone',
+    p->>'email',
     p->>'site_web',
     p->>'responsable_nom',
     'reg'
@@ -101,9 +107,10 @@ create or replace function upsert_prospect_reg(p jsonb) returns uuid as $$
     zone             = excluded.zone,
     -- Coordonnées : on ne comble que ce qui est encore vide.
     telephone        = coalesce(prospects.telephone, excluded.telephone),
+    email            = coalesce(prospects.email, excluded.email),
     site_web         = coalesce(prospects.site_web, excluded.site_web),
     responsable_nom  = coalesce(prospects.responsable_nom, excluded.responsable_nom)
-    -- statut, notes, relances, email, responsable_fonction, converti_client_id
-    -- et source : volontairement absents, ils appartiennent à l'équipe.
+    -- statut, notes, relances, responsable_fonction, converti_client_id et
+    -- source : volontairement absents, ils appartiennent à l'équipe.
   returning id;
 $$ language sql set search_path = public;
