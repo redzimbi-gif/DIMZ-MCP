@@ -4,7 +4,10 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { logActivity, getActorId } from "@/lib/log";
-import { getProspect } from "@/lib/queries";
+import { getProspect, getEntrepriseInfo } from "@/lib/queries";
+import { sendEmail } from "@/lib/email";
+import { prospectionEmail } from "@/lib/email-templates";
+import { remplirVariables, variablesProspect } from "@/lib/prospection-email";
 import {
   PROSPECT_STATUTS_CONTACT,
   PROSPECT_STATUT_LABELS,
@@ -199,4 +202,71 @@ export async function deleteProspect(id: string) {
 
   revalidatePath("/prospection");
   redirect("/prospection");
+}
+
+/**
+ * Envoie le mail de prospection rédigé dans le composeur de la fiche. Le texte
+ * arrive déjà relu par l'équipe : on se contente de remplir les variables
+ * éventuellement retapées à la main, puis de l'habiller de la mise en forme
+ * DIMZ.
+ *
+ * Un envoi réussi vaut contact : il horodate la dernière relance, fait sortir
+ * le prospect des statuts « froid » / « à contacter », et laisse une trace dans
+ * l'historique des échanges pour que personne ne le recontacte à l'aveugle.
+ */
+export async function envoyerEmailProspect(id: string, formData: FormData) {
+  const prospect = await getProspect(id);
+  if (!prospect) throw new Error("Prospect introuvable.");
+
+  const destinataire = texte(formData, "destinataire") || prospect.email;
+  const objetSaisi = texte(formData, "objet");
+  const corpsSaisi = texte(formData, "corps");
+
+  if (!destinataire) {
+    redirect(`/prospection/${id}?notif=prospect-no-email`);
+  }
+  if (!objetSaisi || !corpsSaisi) {
+    throw new Error("L'objet et le message du mail sont obligatoires.");
+  }
+
+  const variables = variablesProspect(prospect, await getEntrepriseInfo());
+
+  const objet = remplirVariables(objetSaisi, variables);
+  const corps = remplirVariables(corpsSaisi, variables);
+  const { subject, html } = prospectionEmail({ objet, corps });
+
+  const envoi = await sendEmail({ to: destinataire, subject, html });
+  if (!envoi.ok) {
+    redirect(`/prospection/${id}?notif=prospect-error`);
+  }
+
+  const payload: Record<string, string | null> = {
+    derniere_relance_le: new Date().toISOString().slice(0, 10),
+  };
+  if (prospect.statut === "froid" || prospect.statut === "a_contacter") {
+    payload.statut = "contact_en_cours";
+  }
+
+  const db = createAdminClient();
+  await db.from("prospects").update(payload).eq("id", id);
+
+  if (formData.get("note")) {
+    const auteur = await getActorId();
+    await db.from("notes_internes").insert({
+      prospect_id: id,
+      contenu: `Mail de prospection envoyé à ${destinataire} — « ${subject} »`,
+      auteur,
+    });
+  }
+
+  await logActivity({
+    action: "prospect.email_envoye",
+    entiteType: "prospect",
+    entiteId: id,
+    description: `Mail de prospection envoyé à ${destinataire} (« ${subject} ») pour ${prospect.raison_sociale}`,
+  });
+
+  revalidatePath(`/prospection/${id}`);
+  revalidatePath("/prospection");
+  redirect(`/prospection/${id}?notif=prospect-sent`);
 }

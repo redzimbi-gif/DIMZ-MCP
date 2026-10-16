@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Search, PhoneCall, Target, Handshake, CalendarClock } from "lucide-react";
+import { Plus, Search, PhoneCall, Target, Handshake, CalendarClock, Mail } from "lucide-react";
 import {
   listProspects,
   getProspectStats,
@@ -197,6 +197,9 @@ export default async function ProspectionPage({
                   <th className="px-5 py-3 font-medium">Responsable</th>
                   <th className="px-5 py-3 font-medium">Statut</th>
                   <th className="px-5 py-3 font-medium">Relance</th>
+                  <th className="px-5 py-3 font-medium">
+                    <span className="sr-only">Envoyer un e-mail</span>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
@@ -230,6 +233,23 @@ export default async function ProspectionPage({
                           </span>
                         ) : (
                           <span className="text-ink-faint">—</span>
+                        )}
+                      </td>
+                      <td className="px-5 py-3.5 text-right">
+                        {/* Raccourci vers le composeur de mail de la fiche : la
+                            rédaction se fait toujours sur la fiche, qui porte le
+                            contexte du prospect. */}
+                        {p.email ? (
+                          <Link
+                            href={`/prospection/${p.id}?email=1`}
+                            title={`Écrire à ${p.email}`}
+                            aria-label={`Écrire à ${p.raison_sociale}`}
+                            className="inline-flex items-center justify-center rounded-md p-1.5 text-ink-soft hover:bg-surface-sunken hover:text-blue-600 focus-ring"
+                          >
+                            <Mail className="h-4 w-4" />
+                          </Link>
+                        ) : (
+                          <span className="text-ink-faint text-xs">—</span>
                         )}
                       </td>
                     </tr>
