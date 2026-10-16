@@ -246,6 +246,12 @@ export async function envoyerEmailProspect(id: string, formData: FormData) {
   if (prospect.statut === "froid" || prospect.statut === "a_contacter") {
     payload.statut = "contact_en_cours";
   }
+  // Beaucoup de fiches françaises arrivent du recensement sans email : celle
+  // qui vient d'être saisie dans le composeur est conservée, sinon elle serait
+  // à retrouver au prochain contact.
+  if (!prospect.email) {
+    payload.email = destinataire;
+  }
 
   const db = createAdminClient();
   await db.from("prospects").update(payload).eq("id", id);

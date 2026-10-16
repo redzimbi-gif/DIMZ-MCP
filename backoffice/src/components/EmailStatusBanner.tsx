@@ -18,7 +18,7 @@ const MESSAGES: Record<string, { text: string; tone: "good" | "bad" | "warn" }> 
     tone: "bad",
   },
   "prospect-no-email": {
-    text: "Impossible d'envoyer : ce prospect n'a pas d'adresse email enregistrée.",
+    text: "Impossible d'envoyer : indique une adresse de destinataire, ou copie le message.",
     tone: "warn",
   },
 };
