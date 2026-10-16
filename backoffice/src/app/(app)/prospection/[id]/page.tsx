@@ -132,6 +132,12 @@ export default async function ProspectDetailPage({ params }: { params: { id: str
                   <dd className="text-ink tnum">{prospect.siret}</dd>
                 </div>
               ) : null}
+              {prospect.ide ? (
+                <div className="flex justify-between gap-2">
+                  <dt className="text-ink-soft">IDE</dt>
+                  <dd className="text-ink tnum">{prospect.ide}</dd>
+                </div>
+              ) : null}
             </dl>
           </Card>
 
@@ -264,6 +270,19 @@ export default async function ProspectDetailPage({ params }: { params: { id: str
                 </Field>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Field label="IDE (Suisse)">
+                  <input
+                    name="ide"
+                    defaultValue={prospect.ide ?? ""}
+                    placeholder="CHE-123.456.789"
+                    className={inputClass}
+                  />
+                </Field>
+                <Field label="Code d'activité (NAF ou NOGA)">
+                  <input name="code_naf" defaultValue={prospect.code_naf ?? ""} className={inputClass} />
+                </Field>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Field label="Téléphone">
                   <input
                     name="telephone"
@@ -301,9 +320,6 @@ export default async function ProspectDetailPage({ params }: { params: { id: str
                   />
                 </Field>
               </div>
-              <Field label="Code NAF">
-                <input name="code_naf" defaultValue={prospect.code_naf ?? ""} className={inputClass} />
-              </Field>
               <Field label="Notes">
                 <textarea
                   name="notes"

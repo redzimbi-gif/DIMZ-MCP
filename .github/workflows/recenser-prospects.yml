@@ -1,6 +1,11 @@
-# Recense les professionnels de l'automobile de la Métropole de Lyon et du
-# Grand Annecy dans la table prospects — utile depuis un téléphone : onglet
-# Actions du dépôt → « Run workflow ».
+# Recense les professionnels de l'automobile du canton de Genève et du Grand
+# Annecy dans la table prospects — utile depuis un téléphone : onglet Actions
+# du dépôt → « Run workflow ».
+#
+# Deux pays, deux registres officiels : SIRENE pour Annecy, le Répertoire des
+# entreprises du canton (REG, open data du SITG) pour Genève. Le REG ne
+# contient que des entités genevoises, donc la zone « geneve » ne peut pas
+# ramener d'établissement français.
 #
 # Prérequis, une seule fois : ajouter le secret SUPABASE_SERVICE_ROLE_KEY dans
 # Settings → Secrets and variables → Actions (Supabase → Project Settings →
@@ -11,9 +16,10 @@
 # trouverait, sans rien écrire. Lance-le d'abord comme ça, vérifie le
 # compte-rendu, puis relance avec « simulation » décoché pour importer.
 #
-# Relancer l'import est sans danger : la fonction upsert_prospect_sirene
-# rafraîchit les données officielles mais ne touche jamais au statut, aux
-# notes, aux relances ni aux coordonnées saisies à la main.
+# Relancer l'import est sans danger : les fonctions upsert_prospect_sirene et
+# upsert_prospect_reg rafraîchissent les données officielles mais ne touchent
+# jamais au statut, aux notes, aux relances ni aux coordonnées saisies à la
+# main.
 name: Recenser les prospects
 
 on:
@@ -24,7 +30,7 @@ on:
         required: false
         default: toutes
         type: choice
-        options: [toutes, lyon, annecy]
+        options: [toutes, geneve, annecy]
       categories:
         description: "Activités (defaut = celles qui déplacent des véhicules)"
         required: false

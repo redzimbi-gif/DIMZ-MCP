@@ -76,7 +76,7 @@ export default function NewProspectPage() {
             </Field>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field label="SIRET">
+            <Field label="SIRET / IDE">
               <input name="siret" className={inputClass} />
             </Field>
             <Field label="Statut de départ">
