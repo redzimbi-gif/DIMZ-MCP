@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Search, PhoneCall, Target, Handshake, CalendarClock } from "lucide-react";
+import { Plus, Search, PhoneCall, Target, Handshake, CalendarClock, Mail } from "lucide-react";
 import {
   listProspects,
   getProspectStats,
@@ -197,6 +197,9 @@ export default async function ProspectionPage({
                   <th className="px-5 py-3 font-medium">Responsable</th>
                   <th className="px-5 py-3 font-medium">Statut</th>
                   <th className="px-5 py-3 font-medium">Relance</th>
+                  <th className="px-5 py-3 font-medium">
+                    <span className="sr-only">Rédiger un e-mail</span>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
@@ -231,6 +234,27 @@ export default async function ProspectionPage({
                         ) : (
                           <span className="text-ink-faint">—</span>
                         )}
+                      </td>
+                      <td className="px-5 py-3.5 text-right">
+                        {/* Raccourci vers le composeur de mail de la fiche : la
+                            rédaction se fait toujours sur la fiche, qui porte le
+                            contexte du prospect. Présent même sans adresse en
+                            base, puisque le message peut être copié ou envoyé à
+                            une adresse saisie sur le moment. */}
+                        <Link
+                          href={`/prospection/${p.id}?email=1`}
+                          title={
+                            p.email
+                              ? `Écrire à ${p.email}`
+                              : "Rédiger un e-mail (pas d'adresse sur la fiche)"
+                          }
+                          aria-label={`Rédiger un e-mail pour ${p.raison_sociale}`}
+                          className={`inline-flex items-center justify-center rounded-md p-1.5 hover:bg-surface-sunken hover:text-blue-600 focus-ring ${
+                            p.email ? "text-ink-soft" : "text-ink-faint"
+                          }`}
+                        >
+                          <Mail className="h-4 w-4" />
+                        </Link>
                       </td>
                     </tr>
                   );
