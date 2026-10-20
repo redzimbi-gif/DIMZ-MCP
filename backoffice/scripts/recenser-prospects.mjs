@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // ---------------------------------------------------------------------------
-// Recensement des professionnels de l'automobile du Grand Annecy et du canton
-// de Genève, pour alimenter la rubrique Prospection du back-office.
+// Recensement des professionnels de l'automobile du Grand Annecy, du Genevois
+// français et du canton de Genève, pour alimenter la rubrique Prospection du
+// back-office.
 //
 // Lancé à la main depuis l'onglet Actions du dépôt (workflow « Recenser les
 // prospects »), jamais automatiquement : c'est un travail de fond qu'on refait
@@ -82,6 +83,23 @@ const ZONES = {
     nom: "Grand Annecy",
     epci: "200066793",
     departement: "74",
+  },
+  // Le Genevois français, c'est la couronne française de Genève : trois
+  // intercommunalités sur deux départements (74 et 01). Une seule zone côté
+  // back-office, parce que c'est un seul bassin de clientèle, mais trois
+  // secteurs côté SIRENE, chacun balayé sur son propre EPCI et son département.
+  // Les codes EPCI sont vérifiés à chaque exécution : le compte-rendu imprime
+  // le nombre de communes résolues, et un code faux bascule sur la recherche
+  // par nom.
+  genevois: {
+    code: "genevois",
+    registre: "sirene",
+    nom: "Genevois français",
+    secteurs: [
+      { nom: "Annemasse Agglo", epci: "200011773", departement: "74" },
+      { nom: "Communauté de communes du Genevois", epci: "247400690", departement: "74" },
+      { nom: "Pays de Gex Agglo", epci: "240100750", departement: "01" },
+    ],
   },
   geneve: {
     code: "geneve",
@@ -455,19 +473,26 @@ async function recenserSirene({ zone, categories, compteurs, retenus, echantillo
   }
   journal(`- Codes NAF interrogés : ${nafs.join(", ")}`);
 
-  const { communes, origine } = await resoudreCommunes(zone);
-  if (communes.length < COMMUNES_MINIMUM) {
-    throw new Error(
-      `Seulement ${communes.length} communes trouvées pour « ${zone.nom} » (${origine}). ` +
-        `L'EPCI est probablement mal apparié : on s'arrête plutôt que de recenser une zone tronquée.`
-    );
-  }
-  journal(`- ${communes.length} communes résolues (${origine})`);
+  // Une zone d'un seul EPCI est son propre secteur. Chaque secteur garde le
+  // code de la zone (c'est lui qui est écrit en base) mais apporte son EPCI et
+  // son département, que parcourirFlux utilise pour interroger et filtrer.
+  const secteurs = (zone.secteurs ?? [zone]).map((s) => ({ ...zone, ...s, code: zone.code }));
 
-  for (const naf of nafs) {
-    if (LIMITE > 0 && retenus.size >= LIMITE) break;
-    await parcourirFlux({ zone, naf, communes, compteurs, retenus, echantillon });
-    await dormir(PAUSE_MS);
+  for (const secteur of secteurs) {
+    const { communes, origine } = await resoudreCommunes(secteur);
+    if (communes.length < COMMUNES_MINIMUM) {
+      throw new Error(
+        `Seulement ${communes.length} communes trouvées pour « ${secteur.nom} » (${origine}). ` +
+          `L'EPCI est probablement mal apparié : on s'arrête plutôt que de recenser une zone tronquée.`
+      );
+    }
+    journal(`- ${secteur.nom} : ${communes.length} communes résolues (${origine})`);
+
+    for (const naf of nafs) {
+      if (LIMITE > 0 && retenus.size >= LIMITE) break;
+      await parcourirFlux({ zone: secteur, naf, communes, compteurs, retenus, echantillon });
+      await dormir(PAUSE_MS);
+    }
   }
 }
 
@@ -881,7 +906,7 @@ function choisirCategories() {
 }
 
 function choisirZones() {
-  if (ZONE_DEMANDEE === "toutes") return [ZONES.geneve, ZONES.annecy];
+  if (ZONE_DEMANDEE === "toutes") return [ZONES.geneve, ZONES.genevois, ZONES.annecy];
   const zone = ZONES[ZONE_DEMANDEE];
   if (!zone) {
     throw new Error(

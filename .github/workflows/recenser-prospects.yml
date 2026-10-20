@@ -1,8 +1,9 @@
-# Recense les professionnels de l'automobile du canton de Genève et du Grand
-# Annecy dans la table prospects — utile depuis un téléphone : onglet Actions
+# Recense les professionnels de l'automobile du canton de Genève, du Genevois
+# français (Annemasse, Saint-Julien, Pays de Gex) et du Grand Annecy dans la
+# table prospects — utile depuis un téléphone : onglet Actions
 # du dépôt → « Run workflow ».
 #
-# Deux pays, deux registres officiels : SIRENE pour Annecy, le Répertoire des
+# Deux pays, deux registres officiels : SIRENE pour Annecy et le Genevois français, le Répertoire des
 # entreprises du canton (REG, open data du SITG) pour Genève. Le REG ne
 # contient que des entités genevoises, donc la zone « geneve » ne peut pas
 # ramener d'établissement français.
@@ -30,7 +31,7 @@ on:
         required: false
         default: toutes
         type: choice
-        options: [toutes, geneve, annecy]
+        options: [toutes, geneve, genevois, annecy]
       categories:
         description: "Activités (defaut = celles qui déplacent des véhicules)"
         required: false
