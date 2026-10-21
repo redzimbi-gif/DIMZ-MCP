@@ -180,11 +180,12 @@ export const PROSPECT_SOURCE_LABELS: Record<ProspectSource, string> = {
   csv: "Import CSV",
 };
 
-export const PROSPECT_ZONES = ["geneve", "annecy", "autre"] as const;
+export const PROSPECT_ZONES = ["geneve", "genevois", "annecy", "autre"] as const;
 export type ProspectZone = (typeof PROSPECT_ZONES)[number];
 
 export const PROSPECT_ZONE_LABELS: Record<ProspectZone, string> = {
   geneve: "Canton de Genève",
+  genevois: "Genevois français",
   annecy: "Bassin annécien",
   autre: "Autre",
 };
