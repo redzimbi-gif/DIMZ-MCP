@@ -12,6 +12,15 @@ const MESSAGES: Record<string, { text: string; tone: "good" | "bad" | "warn" }> 
     tone: "warn",
   },
   "paiement-creation-erreur": { text: "La facture n'a pas pu être créée.", tone: "bad" },
+  "prospect-sent": { text: "Mail de prospection envoyé.", tone: "good" },
+  "prospect-error": {
+    text: "Échec de l'envoi du mail de prospection. Réessaie dans un instant.",
+    tone: "bad",
+  },
+  "prospect-no-email": {
+    text: "Impossible d'envoyer : indique une adresse de destinataire, ou copie le message.",
+    tone: "warn",
+  },
 };
 
 const TONE_CLASSES: Record<string, string> = {
