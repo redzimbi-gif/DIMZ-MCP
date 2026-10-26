@@ -1,0 +1,142 @@
+import { notFound } from "next/navigation";
+import Image from "next/image";
+import { FileDown, Mail } from "lucide-react";
+import { getConvoyage, getConvoyageEtatsLieux } from "@/lib/queries";
+import { getSignedUrls } from "@/lib/storage";
+import { Card, PageHeader, LinkButton, Badge, Button } from "@/components/ui";
+import { EmailStatusBanner } from "@/components/EmailStatusBanner";
+import { CONVOYAGE_STATUT_LABELS } from "@/lib/types";
+import { ETAT_LIEUX_TYPE_LABELS } from "@/lib/etat-lieux";
+import { formatDate, formatDateTime } from "@/lib/format";
+import { sendConvoyageReportEmail } from "./actions";
+
+export default async function ConvoyageDetailPage({
+  params,
+  searchParams,
+}: {
+  params: { id: string; convoyageId: string };
+  searchParams: { email?: string };
+}) {
+  const convoyage = await getConvoyage(params.convoyageId);
+  if (!convoyage || convoyage.dossier_id !== params.id) notFound();
+
+  const etatsLieux = await getConvoyageEtatsLieux(params.convoyageId);
+  const etatDepart = etatsLieux.find((e) => e.type === "depart") ?? null;
+  const etatArrivee = etatsLieux.find((e) => e.type === "arrivee") ?? null;
+
+  const allPhotos = [...convoyage.photos_avant, ...convoyage.photos_apres];
+  const signatureUrl = convoyage.signature_client ? [convoyage.signature_client] : [];
+  const urls = await getSignedUrls([...allPhotos, ...signatureUrl]);
+  const sendReportAction = sendConvoyageReportEmail.bind(null, params.id, convoyage.id);
+
+  return (
+    <div className="max-w-3xl">
+      <PageHeader
+        title={`Convoyage — ${convoyage.adresse_depart || "?"} → ${convoyage.adresse_arrivee || "?"}`}
+        description={`${convoyage.dossiers?.reference} — ${convoyage.dossiers?.clients?.prenom} ${convoyage.dossiers?.clients?.nom}`}
+        actions={
+          <>
+            <Badge tone={convoyage.statut === "livre" ? "good" : "blue"}>
+              {CONVOYAGE_STATUT_LABELS[convoyage.statut]}
+            </Badge>
+            <LinkButton href={`/facturation?dossier_id=${convoyage.dossier_id}`} variant="outline">
+              Créer un devis
+            </LinkButton>
+            <LinkButton href={`/api/convoyages/${convoyage.id}/pdf`} variant="outline">
+              <FileDown className="h-4 w-4" /> Rapport PDF
+            </LinkButton>
+            <form action={sendReportAction}>
+              <Button type="submit" variant="outline">
+                <Mail className="h-4 w-4" /> Envoyer au client
+              </Button>
+            </form>
+          </>
+        }
+      />
+
+      <EmailStatusBanner status={searchParams.email} />
+
+      <Card className="p-6 space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+          <div>
+            <p className="text-xs text-ink-soft">Date</p>
+            <p className="text-ink font-medium">
+              {convoyage.date_convoyage ? formatDate(convoyage.date_convoyage) : "—"} {convoyage.heure ?? ""}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-ink-soft">Conducteur</p>
+            <p className="text-ink font-medium">{convoyage.conducteur || "—"}</p>
+          </div>
+          <div>
+            <p className="text-xs text-ink-soft">Kilométrage départ / arrivée</p>
+            <p className="text-ink font-medium tnum">
+              {convoyage.km_depart ?? "—"} / {convoyage.km_arrivee ?? "—"}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-ink-soft">Niveau de carburant</p>
+            <p className="text-ink font-medium">{convoyage.niveau_carburant || "—"}</p>
+          </div>
+        </div>
+        {convoyage.rapport_notes ? (
+          <div>
+            <p className="text-xs text-ink-soft mb-1">Rapport de livraison</p>
+            <p className="text-sm text-ink whitespace-pre-line">{convoyage.rapport_notes}</p>
+          </div>
+        ) : null}
+      </Card>
+
+      <Card className="p-6 mt-4">
+        <h2 className="text-sm font-semibold text-ink mb-3">État des lieux guidé</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {(["depart", "arrivee"] as const).map((type) => {
+            const etat = type === "depart" ? etatDepart : etatArrivee;
+            const confirmed = !!etat?.confirme_at;
+            return (
+              <div key={type} className="flex items-center justify-between border border-line rounded-md p-3.5">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-ink">{ETAT_LIEUX_TYPE_LABELS[type]}</p>
+                  <p className="text-xs text-ink-soft mt-0.5">
+                    {confirmed ? `Confirmé le ${formatDateTime(etat!.confirme_at!)}` : etat ? "Brouillon en cours" : "Pas encore commencé"}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0 ml-3">
+                  {confirmed ? <Badge tone="good">Confirmé</Badge> : null}
+                  <LinkButton
+                    href={`/dossiers/${params.id}/convoyages/${convoyage.id}/etat-lieux/${type}`}
+                    variant="outline"
+                  >
+                    {confirmed ? "Voir" : "Continuer"}
+                  </LinkButton>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
+      {allPhotos.length > 0 ? (
+        <Card className="p-6 mt-4">
+          <h2 className="text-sm font-semibold text-ink mb-3">Photos avant / après</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {allPhotos.map((path) =>
+              urls[path] ? (
+                <a key={path} href={urls[path]} target="_blank" rel="noreferrer" className="block aspect-square relative rounded-md overflow-hidden border border-line">
+                  <Image src={urls[path]} alt="" fill className="object-cover" unoptimized />
+                </a>
+              ) : null
+            )}
+          </div>
+        </Card>
+      ) : null}
+
+      {convoyage.signature_client && urls[convoyage.signature_client] ? (
+        <Card className="p-6 mt-4">
+          <h2 className="text-sm font-semibold text-ink mb-3">Signature client</h2>
+          <img src={urls[convoyage.signature_client]} alt="Signature" className="h-20" />
+        </Card>
+      ) : null}
+    </div>
+  );
+}
