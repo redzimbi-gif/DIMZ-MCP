@@ -13,10 +13,11 @@ import {
   LinkButton,
   EmptyState,
   StatCard,
-  ProspectStatutBadge,
   Button,
   inputClass,
 } from "@/components/ui";
+import { ProspectStatutSelect, ProspectDeleteButton } from "@/components/ProspectRowActions";
+import { changerStatutProspect, deleteProspect } from "./actions";
 import { formatDate } from "@/lib/format";
 import {
   PROSPECT_STATUTS,
@@ -197,8 +198,8 @@ export default async function ProspectionPage({
                   <th className="px-5 py-3 font-medium">Responsable</th>
                   <th className="px-5 py-3 font-medium">Statut</th>
                   <th className="px-5 py-3 font-medium">Relance</th>
-                  <th className="px-5 py-3 font-medium">
-                    <span className="sr-only">Rédiger un e-mail</span>
+                  <th className="px-5 py-3 font-medium text-right">
+                    <span className="sr-only">Actions</span>
                   </th>
                 </tr>
               </thead>
@@ -224,7 +225,14 @@ export default async function ProspectionPage({
                       <td className="px-5 py-3.5 text-ink whitespace-nowrap">{p.telephone ?? "—"}</td>
                       <td className="px-5 py-3.5 text-ink-soft">{p.responsable_nom ?? "—"}</td>
                       <td className="px-5 py-3.5">
-                        <ProspectStatutBadge statut={p.statut} />
+                        {/* Le badge est remplacé par un select : il garde la
+                            même teinte, et le statut se change sans ouvrir la
+                            fiche, pour enchaîner une session d'appels. */}
+                        <ProspectStatutSelect
+                          action={changerStatutProspect.bind(null, p.id)}
+                          statut={p.statut}
+                          raisonSociale={p.raison_sociale}
+                        />
                       </td>
                       <td className="px-5 py-3.5 whitespace-nowrap">
                         {p.prochaine_relance_le ? (
@@ -235,7 +243,7 @@ export default async function ProspectionPage({
                           <span className="text-ink-faint">—</span>
                         )}
                       </td>
-                      <td className="px-5 py-3.5 text-right">
+                      <td className="px-5 py-3.5 text-right whitespace-nowrap">
                         {/* Raccourci vers le composeur de mail de la fiche : la
                             rédaction se fait toujours sur la fiche, qui porte le
                             contexte du prospect. Présent même sans adresse en
@@ -255,6 +263,10 @@ export default async function ProspectionPage({
                         >
                           <Mail className="h-4 w-4" />
                         </Link>
+                        <ProspectDeleteButton
+                          action={deleteProspect.bind(null, p.id)}
+                          raisonSociale={p.raison_sociale}
+                        />
                       </td>
                     </tr>
                   );
