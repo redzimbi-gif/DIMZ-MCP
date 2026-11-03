@@ -9,6 +9,7 @@ import { sendEmail } from "@/lib/email";
 import { prospectionEmail } from "@/lib/email-templates";
 import { remplirVariables, variablesProspect } from "@/lib/prospection-email";
 import {
+  PROSPECT_STATUTS,
   PROSPECT_STATUTS_CONTACT,
   PROSPECT_STATUT_LABELS,
   type ProspectCategorie,
@@ -183,7 +184,15 @@ export async function convertirEnClient(id: string) {
   redirect(`/clients/${client.id}`);
 }
 
-export async function deleteProspect(id: string) {
+/**
+ * Supprime un prospect, depuis sa fiche ou depuis la liste.
+ *
+ * Le champ caché `retour` distingue les deux : depuis la liste, on reste sur
+ * place pour conserver les filtres et la page courante, et le tableau se
+ * rafraîchit par la revalidation. Depuis la fiche, il faut bien partir
+ * ailleurs, puisqu'elle n'existe plus.
+ */
+export async function deleteProspect(id: string, formData?: FormData) {
   const db = createAdminClient();
   const { data: prospect } = await db
     .from("prospects")
@@ -201,7 +210,42 @@ export async function deleteProspect(id: string) {
   await db.from("prospects").delete().eq("id", id);
 
   revalidatePath("/prospection");
+  if (String(formData?.get("retour") || "") === "liste") return;
   redirect("/prospection");
+}
+
+/**
+ * Changement de statut depuis la liste des prospects, sans ouvrir la fiche.
+ *
+ * Volontairement distinct de `updateProspectStatut` : celui-ci porte aussi la
+ * date de prochaine relance, et l'absence du champ dans le formulaire de la
+ * liste l'effacerait. Ici on ne touche qu'au statut — et à la date de dernière
+ * relance quand le nouveau statut traduit un contact effectif, comme sur la
+ * fiche.
+ */
+export async function changerStatutProspect(id: string, formData: FormData) {
+  const statut = texte(formData, "statut") as ProspectStatut | null;
+  if (!statut || !PROSPECT_STATUTS.includes(statut)) {
+    throw new Error("Statut de prospect inconnu.");
+  }
+
+  const payload: Record<string, string | null> = { statut };
+  if (PROSPECT_STATUTS_CONTACT.includes(statut)) {
+    payload.derniere_relance_le = new Date().toISOString().slice(0, 10);
+  }
+
+  const db = createAdminClient();
+  await db.from("prospects").update(payload).eq("id", id);
+
+  await logActivity({
+    action: "prospect.statut_change",
+    entiteType: "prospect",
+    entiteId: id,
+    description: `Statut du prospect : ${PROSPECT_STATUT_LABELS[statut]}`,
+  });
+
+  revalidatePath("/prospection");
+  revalidatePath(`/prospection/${id}`);
 }
 
 /**

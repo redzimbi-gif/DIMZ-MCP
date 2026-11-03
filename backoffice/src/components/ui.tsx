@@ -108,7 +108,9 @@ export function StatutBadge({ statut }: { statut: DossierStatut }) {
   );
 }
 
-const PROSPECT_STATUT_STYLES: Record<ProspectStatut, string> = {
+// Exporté : le select de statut de la liste de prospection reprend la même
+// teinte que le badge, pour que la colonne reste lisible d'un coup d'oeil.
+export const PROSPECT_STATUT_STYLES: Record<ProspectStatut, string> = {
   froid: "bg-surface-sunken text-ink-soft",
   a_contacter: "bg-blue-50 text-blue-700",
   contact_en_cours: "bg-blue-100 text-blue-700",
