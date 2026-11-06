@@ -2267,7 +2267,7 @@
         <div class="section-head" data-reveal>
           <span class="label">Avant de vous décider</span>
           <h2>Vous avez trouvé une annonce ? On vous dit si elle en vaut le coup.</h2>
-          <p>Collez le lien et dites-nous ce qui vous inquiète : votre copilote revient vers vous sous 24 à 48h avec son avis et un devis d'inspection — et de livraison si besoin.</p>
+          <p>Collez le lien et dites-nous ce qui vous inquiète : votre copilote revient vers vous rapidement avec son avis et un devis d'inspection — et de livraison si besoin.</p>
         </div>
 
         <div class="form-card" data-reveal>
@@ -2279,6 +2279,9 @@
             <div class="field">
               <label for="annonce-craintes">Qu'est-ce qui vous inquiète sur ce véhicule ?</label>
               <textarea id="annonce-craintes" required placeholder="Le prix me semble bas, l'historique n'est pas clair, je m'y connais peu en mécanique…"></textarea>
+            </div>
+            <div class="field">
+              <label><input type="checkbox" id="annonce-inspection-cb"> Je souhaite aussi un devis pour l'inspection physique du véhicule</label>
             </div>
             <div class="field">
               <label><input type="checkbox" id="annonce-livraison-cb"> Je souhaite aussi un devis pour la livraison du véhicule</label>
@@ -2306,7 +2309,7 @@
           <div class="confirm-panel" id="confirm-annonce" hidden>
             <div class="confirm-icon" id="confirm-annonce-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
             <h3 id="confirm-annonce-title">Demande envoyée</h3>
-            <p id="confirm-annonce-text">Votre copilote revient vers vous sous 24 à 48h avec son avis et un devis.</p>
+            <p id="confirm-annonce-text">Votre copilote revient vers vous rapidement avec son avis et un devis.</p>
             <button type="button" class="btn btn-outline" data-reset-annonce>Envoyer une autre annonce</button>
           </div>
         </div>
@@ -5453,6 +5456,7 @@
     var title = document.getElementById('confirm-annonce-title');
     var text = document.getElementById('confirm-annonce-text');
     var submitBtn = document.getElementById('annonce-submit');
+    var inspectionCb = document.getElementById('annonce-inspection-cb');
     var livraisonCb = document.getElementById('annonce-livraison-cb');
     var livraisonDetail = document.getElementById('annonce-livraison-detail');
 
@@ -5465,7 +5469,7 @@
       if (ok) {
         icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
         title.textContent = 'Demande envoyée';
-        text.textContent = 'Votre copilote revient vers vous sous 24 à 48h avec son avis et un devis.';
+        text.textContent = 'Votre copilote revient vers vous rapidement avec son avis et un devis.';
       } else {
         icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>';
         title.textContent = 'Envoi impossible';
@@ -5498,6 +5502,7 @@
         'Projet et délai — Accompagnement recherché': 'Inspection',
         "Véhicule trouvé — Lien de l'annonce": document.getElementById('annonce-lien').value.trim(),
         'Véhicule trouvé — Vos craintes / questions': document.getElementById('annonce-craintes').value.trim(),
+        'Véhicule trouvé — Devis d\'inspection souhaité': inspectionCb.checked ? 'Oui' : 'Non',
         'Livraison — Devis de livraison souhaité': livraisonSouhaitee ? 'Oui' : 'Non',
         'Horodatage': new Date().toISOString()
       };
