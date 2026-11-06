@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Trash2, Handshake, Phone, Mail, Globe } from "lucide-react";
-import { getProspect, getProspectNotes, aujourdhui } from "@/lib/queries";
+import { getProspect, getProspectNotes, getEntrepriseInfo, aujourdhui } from "@/lib/queries";
 import {
   Card,
   PageHeader,
@@ -14,6 +14,9 @@ import {
 } from "@/components/ui";
 import { AutoResetForm } from "@/components/AutoResetForm";
 import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
+import { EmailStatusBanner } from "@/components/EmailStatusBanner";
+import { ProspectEmailComposer } from "@/components/ProspectEmailComposer";
+import { modelesRemplis, variablesProspect } from "@/lib/prospection-email";
 import { formatDate, formatDateTime, formatRelative } from "@/lib/format";
 import {
   PROSPECT_STATUTS,
@@ -30,19 +33,34 @@ import {
   addProspectNote,
   deleteProspect,
   convertirEnClient,
+  envoyerEmailProspect,
 } from "../actions";
 
-export default async function ProspectDetailPage({ params }: { params: { id: string } }) {
+export default async function ProspectDetailPage({
+  params,
+  searchParams,
+}: {
+  params: { id: string };
+  searchParams: { notif?: string; email?: string };
+}) {
   const prospect = await getProspect(params.id);
   if (!prospect) notFound();
 
-  const notes = await getProspectNotes(prospect.id);
+  const [notes, entreprise] = await Promise.all([
+    getProspectNotes(prospect.id),
+    getEntrepriseInfo(),
+  ]);
+
+  // Modèles de mail remplis côté serveur : le composeur reçoit un texte
+  // directement lisible, que l'équipe n'a plus qu'à retoucher.
+  const modeles = modelesRemplis(variablesProspect(prospect, entreprise));
 
   const updateAction = updateProspect.bind(null, prospect.id);
   const statutAction = updateProspectStatut.bind(null, prospect.id);
   const addNoteAction = addProspectNote.bind(null, prospect.id);
   const deleteAction = deleteProspect.bind(null, prospect.id);
   const convertirAction = convertirEnClient.bind(null, prospect.id);
+  const emailAction = envoyerEmailProspect.bind(null, prospect.id);
 
   const relanceDue =
     prospect.prochaine_relance_le && prospect.prochaine_relance_le <= aujourdhui();
@@ -71,6 +89,8 @@ export default async function ProspectDetailPage({ params }: { params: { id: str
           </form>
         }
       />
+
+      <EmailStatusBanner status={searchParams.notif} />
 
       <div className="grid lg:grid-cols-3 gap-4">
         <div className="lg:col-span-1 space-y-4">
@@ -130,6 +150,12 @@ export default async function ProspectDetailPage({ params }: { params: { id: str
                 <div className="flex justify-between gap-2">
                   <dt className="text-ink-soft">SIRET</dt>
                   <dd className="text-ink tnum">{prospect.siret}</dd>
+                </div>
+              ) : null}
+              {prospect.ide ? (
+                <div className="flex justify-between gap-2">
+                  <dt className="text-ink-soft">IDE</dt>
+                  <dd className="text-ink tnum">{prospect.ide}</dd>
                 </div>
               ) : null}
             </dl>
@@ -212,6 +238,15 @@ export default async function ProspectDetailPage({ params }: { params: { id: str
         </div>
 
         <div className="lg:col-span-2 space-y-4">
+          <Card className="p-5">
+            <ProspectEmailComposer
+              action={emailAction}
+              email={prospect.email}
+              modeles={modeles}
+              ouvertParDefaut={searchParams.email === "1"}
+            />
+          </Card>
+
           <Card className="p-6">
             <h2 className="text-sm font-semibold text-ink mb-4">Fiche de l&apos;établissement</h2>
             <form action={updateAction} className="space-y-4">
@@ -264,6 +299,19 @@ export default async function ProspectDetailPage({ params }: { params: { id: str
                 </Field>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Field label="IDE (Suisse)">
+                  <input
+                    name="ide"
+                    defaultValue={prospect.ide ?? ""}
+                    placeholder="CHE-123.456.789"
+                    className={inputClass}
+                  />
+                </Field>
+                <Field label="Code d'activité (NAF ou NOGA)">
+                  <input name="code_naf" defaultValue={prospect.code_naf ?? ""} className={inputClass} />
+                </Field>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Field label="Téléphone">
                   <input
                     name="telephone"
@@ -301,9 +349,6 @@ export default async function ProspectDetailPage({ params }: { params: { id: str
                   />
                 </Field>
               </div>
-              <Field label="Code NAF">
-                <input name="code_naf" defaultValue={prospect.code_naf ?? ""} className={inputClass} />
-              </Field>
               <Field label="Notes">
                 <textarea
                   name="notes"

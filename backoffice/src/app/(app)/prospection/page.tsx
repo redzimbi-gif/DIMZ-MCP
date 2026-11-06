@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Search, PhoneCall, Target, Handshake, CalendarClock } from "lucide-react";
+import { Plus, Search, PhoneCall, Target, Handshake, CalendarClock, Mail } from "lucide-react";
 import {
   listProspects,
   getProspectStats,
@@ -13,10 +13,11 @@ import {
   LinkButton,
   EmptyState,
   StatCard,
-  ProspectStatutBadge,
   Button,
   inputClass,
 } from "@/components/ui";
+import { ProspectStatutSelect, ProspectDeleteButton } from "@/components/ProspectRowActions";
+import { changerStatutProspect, deleteProspect } from "./actions";
 import { formatDate } from "@/lib/format";
 import {
   PROSPECT_STATUTS,
@@ -197,6 +198,9 @@ export default async function ProspectionPage({
                   <th className="px-5 py-3 font-medium">Responsable</th>
                   <th className="px-5 py-3 font-medium">Statut</th>
                   <th className="px-5 py-3 font-medium">Relance</th>
+                  <th className="px-5 py-3 font-medium text-right">
+                    <span className="sr-only">Actions</span>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
@@ -221,7 +225,14 @@ export default async function ProspectionPage({
                       <td className="px-5 py-3.5 text-ink whitespace-nowrap">{p.telephone ?? "—"}</td>
                       <td className="px-5 py-3.5 text-ink-soft">{p.responsable_nom ?? "—"}</td>
                       <td className="px-5 py-3.5">
-                        <ProspectStatutBadge statut={p.statut} />
+                        {/* Le badge est remplacé par un select : il garde la
+                            même teinte, et le statut se change sans ouvrir la
+                            fiche, pour enchaîner une session d'appels. */}
+                        <ProspectStatutSelect
+                          action={changerStatutProspect.bind(null, p.id)}
+                          statut={p.statut}
+                          raisonSociale={p.raison_sociale}
+                        />
                       </td>
                       <td className="px-5 py-3.5 whitespace-nowrap">
                         {p.prochaine_relance_le ? (
@@ -231,6 +242,31 @@ export default async function ProspectionPage({
                         ) : (
                           <span className="text-ink-faint">—</span>
                         )}
+                      </td>
+                      <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                        {/* Raccourci vers le composeur de mail de la fiche : la
+                            rédaction se fait toujours sur la fiche, qui porte le
+                            contexte du prospect. Présent même sans adresse en
+                            base, puisque le message peut être copié ou envoyé à
+                            une adresse saisie sur le moment. */}
+                        <Link
+                          href={`/prospection/${p.id}?email=1`}
+                          title={
+                            p.email
+                              ? `Écrire à ${p.email}`
+                              : "Rédiger un e-mail (pas d'adresse sur la fiche)"
+                          }
+                          aria-label={`Rédiger un e-mail pour ${p.raison_sociale}`}
+                          className={`inline-flex items-center justify-center rounded-md p-1.5 hover:bg-surface-sunken hover:text-blue-600 focus-ring ${
+                            p.email ? "text-ink-soft" : "text-ink-faint"
+                          }`}
+                        >
+                          <Mail className="h-4 w-4" />
+                        </Link>
+                        <ProspectDeleteButton
+                          action={deleteProspect.bind(null, p.id)}
+                          raisonSociale={p.raison_sociale}
+                        />
                       </td>
                     </tr>
                   );

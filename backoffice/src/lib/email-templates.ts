@@ -10,7 +10,7 @@ function escapeHtml(value: string): string {
     .replace(/"/g, "&quot;");
 }
 
-function emailLayout(contentHtml: string): string {
+function emailLayout(contentHtml: string, footerHtml?: string): string {
   return `<!DOCTYPE html>
 <html lang="fr">
   <body style="margin:0;padding:0;background:#f4f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
@@ -31,7 +31,7 @@ function emailLayout(contentHtml: string): string {
             </tr>
             <tr>
               <td style="padding:18px 32px;border-top:1px solid #e6e8ee;color:${INK_SOFT};font-size:12px;">
-                DIMZ · Mon copilote auto<br />Cet email vous a été envoyé suite à votre demande.
+                ${footerHtml ?? "DIMZ · Mon copilote auto<br />Cet email vous a été envoyé suite à votre demande."}
               </td>
             </tr>
           </table>
@@ -392,3 +392,33 @@ export function etapeConvoyageEmail(
 
 export const ETAPE_ACCOMPAGNEMENT_KEYS = Object.keys(ETAPE_ACCOMPAGNEMENT_COPY) as EtapeAccompagnementKey[];
 export const ETAPE_CONVOYAGE_KEYS = Object.keys(ETAPE_CONVOYAGE_COPY) as EtapeConvoyageKey[];
+
+/**
+ * Mail de prospection : l'équipe écrit l'objet et le corps en texte brut dans
+ * le back-office, cette fonction les habille de la mise en forme DIMZ. Le pied
+ * de page des mails clients (« suite à votre demande ») n'a pas de sens pour un
+ * prospect qui n'a rien demandé : il est remplacé par une mention de contact
+ * professionnel.
+ */
+export function prospectionEmail(params: { objet: string; corps: string }): {
+  subject: string;
+  html: string;
+} {
+  const paragraphes = params.corps
+    .split(/\n\s*\n/)
+    .map((bloc) => bloc.trim())
+    .filter(Boolean)
+    .map(
+      (bloc) =>
+        `<p style="margin:0 0 16px;">${escapeHtml(bloc).replace(/\n/g, "<br />")}</p>`
+    )
+    .join("\n");
+
+  return {
+    subject: params.objet,
+    html: emailLayout(
+      paragraphes,
+      "DIMZ · Mon copilote auto<br />Prise de contact professionnelle. Répondez à cet email pour ne plus être contacté."
+    ),
+  };
+}

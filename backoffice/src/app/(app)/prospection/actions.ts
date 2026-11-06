@@ -4,8 +4,12 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { logActivity, getActorId } from "@/lib/log";
-import { getProspect } from "@/lib/queries";
+import { getProspect, getEntrepriseInfo } from "@/lib/queries";
+import { sendEmail } from "@/lib/email";
+import { prospectionEmail } from "@/lib/email-templates";
+import { remplirVariables, variablesProspect } from "@/lib/prospection-email";
 import {
+  PROSPECT_STATUTS,
   PROSPECT_STATUTS_CONTACT,
   PROSPECT_STATUT_LABELS,
   type ProspectCategorie,
@@ -23,6 +27,7 @@ function champsProspect(formData: FormData) {
     raison_sociale: String(formData.get("raison_sociale") || "").trim(),
     enseigne: texte(formData, "enseigne"),
     siret: texte(formData, "siret"),
+    ide: texte(formData, "ide"),
     code_naf: texte(formData, "code_naf"),
     categorie: (texte(formData, "categorie") || "autre") as ProspectCategorie,
     adresse: texte(formData, "adresse"),
@@ -179,7 +184,15 @@ export async function convertirEnClient(id: string) {
   redirect(`/clients/${client.id}`);
 }
 
-export async function deleteProspect(id: string) {
+/**
+ * Supprime un prospect, depuis sa fiche ou depuis la liste.
+ *
+ * Le champ caché `retour` distingue les deux : depuis la liste, on reste sur
+ * place pour conserver les filtres et la page courante, et le tableau se
+ * rafraîchit par la revalidation. Depuis la fiche, il faut bien partir
+ * ailleurs, puisqu'elle n'existe plus.
+ */
+export async function deleteProspect(id: string, formData?: FormData) {
   const db = createAdminClient();
   const { data: prospect } = await db
     .from("prospects")
@@ -197,5 +210,113 @@ export async function deleteProspect(id: string) {
   await db.from("prospects").delete().eq("id", id);
 
   revalidatePath("/prospection");
+  if (String(formData?.get("retour") || "") === "liste") return;
   redirect("/prospection");
+}
+
+/**
+ * Changement de statut depuis la liste des prospects, sans ouvrir la fiche.
+ *
+ * Volontairement distinct de `updateProspectStatut` : celui-ci porte aussi la
+ * date de prochaine relance, et l'absence du champ dans le formulaire de la
+ * liste l'effacerait. Ici on ne touche qu'au statut — et à la date de dernière
+ * relance quand le nouveau statut traduit un contact effectif, comme sur la
+ * fiche.
+ */
+export async function changerStatutProspect(id: string, formData: FormData) {
+  const statut = texte(formData, "statut") as ProspectStatut | null;
+  if (!statut || !PROSPECT_STATUTS.includes(statut)) {
+    throw new Error("Statut de prospect inconnu.");
+  }
+
+  const payload: Record<string, string | null> = { statut };
+  if (PROSPECT_STATUTS_CONTACT.includes(statut)) {
+    payload.derniere_relance_le = new Date().toISOString().slice(0, 10);
+  }
+
+  const db = createAdminClient();
+  await db.from("prospects").update(payload).eq("id", id);
+
+  await logActivity({
+    action: "prospect.statut_change",
+    entiteType: "prospect",
+    entiteId: id,
+    description: `Statut du prospect : ${PROSPECT_STATUT_LABELS[statut]}`,
+  });
+
+  revalidatePath("/prospection");
+  revalidatePath(`/prospection/${id}`);
+}
+
+/**
+ * Envoie le mail de prospection rédigé dans le composeur de la fiche. Le texte
+ * arrive déjà relu par l'équipe : on se contente de remplir les variables
+ * éventuellement retapées à la main, puis de l'habiller de la mise en forme
+ * DIMZ.
+ *
+ * Un envoi réussi vaut contact : il horodate la dernière relance, fait sortir
+ * le prospect des statuts « froid » / « à contacter », et laisse une trace dans
+ * l'historique des échanges pour que personne ne le recontacte à l'aveugle.
+ */
+export async function envoyerEmailProspect(id: string, formData: FormData) {
+  const prospect = await getProspect(id);
+  if (!prospect) throw new Error("Prospect introuvable.");
+
+  const destinataire = texte(formData, "destinataire") || prospect.email;
+  const objetSaisi = texte(formData, "objet");
+  const corpsSaisi = texte(formData, "corps");
+
+  if (!destinataire) {
+    redirect(`/prospection/${id}?notif=prospect-no-email`);
+  }
+  if (!objetSaisi || !corpsSaisi) {
+    throw new Error("L'objet et le message du mail sont obligatoires.");
+  }
+
+  const variables = variablesProspect(prospect, await getEntrepriseInfo());
+
+  const objet = remplirVariables(objetSaisi, variables);
+  const corps = remplirVariables(corpsSaisi, variables);
+  const { subject, html } = prospectionEmail({ objet, corps });
+
+  const envoi = await sendEmail({ to: destinataire, subject, html });
+  if (!envoi.ok) {
+    redirect(`/prospection/${id}?notif=prospect-error`);
+  }
+
+  const payload: Record<string, string | null> = {
+    derniere_relance_le: new Date().toISOString().slice(0, 10),
+  };
+  if (prospect.statut === "froid" || prospect.statut === "a_contacter") {
+    payload.statut = "contact_en_cours";
+  }
+  // Beaucoup de fiches françaises arrivent du recensement sans email : celle
+  // qui vient d'être saisie dans le composeur est conservée, sinon elle serait
+  // à retrouver au prochain contact.
+  if (!prospect.email) {
+    payload.email = destinataire;
+  }
+
+  const db = createAdminClient();
+  await db.from("prospects").update(payload).eq("id", id);
+
+  if (formData.get("note")) {
+    const auteur = await getActorId();
+    await db.from("notes_internes").insert({
+      prospect_id: id,
+      contenu: `Mail de prospection envoyé à ${destinataire} — « ${subject} »`,
+      auteur,
+    });
+  }
+
+  await logActivity({
+    action: "prospect.email_envoye",
+    entiteType: "prospect",
+    entiteId: id,
+    description: `Mail de prospection envoyé à ${destinataire} (« ${subject} ») pour ${prospect.raison_sociale}`,
+  });
+
+  revalidatePath(`/prospection/${id}`);
+  revalidatePath("/prospection");
+  redirect(`/prospection/${id}?notif=prospect-sent`);
 }
