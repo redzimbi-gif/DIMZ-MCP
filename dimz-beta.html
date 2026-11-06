@@ -887,6 +887,13 @@
   }
   input:focus, select:focus, textarea:focus { outline: 2px solid var(--bleu-vif); outline-offset: 1px; border-color: transparent; }
   textarea { resize: vertical; min-height: 90px; }
+  /* Les checkbox/radio "nus" (hors pastille .choice-grid/.offer-pick, qui
+     masquent déjà le contrôle natif) héritaient de la même largeur 100 % que
+     les champs texte : une case à cocher qui s'étirait sur toute la ligne.
+     Repasse ces deux types en taille native, sans toucher à .choice-grid
+     input / .offer-pick input (même spécificité, déclarées après : elles
+     restent prioritaires là où elles s'appliquent). */
+  input[type="checkbox"], input[type="radio"] { width: auto; padding: 0; accent-color: var(--bleu-vif); }
 
   .choice-grid { display: flex; flex-wrap: wrap; gap: 9px; }
   .choice-grid-scroll { max-height: 220px; overflow-y: auto; padding: 4px 4px 4px 0; align-content: flex-start; }
@@ -1158,6 +1165,10 @@
               <button type="button" role="tab" id="subtab-btn-suivi" aria-selected="false" data-subtab="suivi">
                 <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
                 <span>Suivre mon projet</span>
+              </button>
+              <button type="button" role="tab" id="subtab-btn-annonce" aria-selected="false" data-subtab="annonce">
+                <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M11 8v3l2 2"/><path d="M21 21l-4.35-4.35"/></svg>
+                <span>Vérifier une annonce</span>
               </button>
               <button type="button" role="tab" id="subtab-btn-inspection" aria-selected="false" data-subtab="inspection">
                 <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
@@ -1810,6 +1821,7 @@
               <p>Oui, selon la prestation choisie.</p>
               <p>Votre copilote analyse les informations disponibles, échange avec le vendeur et vérifie les éléments importants avant votre décision.</p>
               <p>Pour aller plus loin, une inspection physique sur place est incluse dans l'offre Copilote Plus, et disponible sur devis si vous avez déjà trouvé votre véhicule.</p>
+              <p>Vous avez une annonce précise en tête ? <a href="javascript:void(0)" data-goto-subtab="annonce">Demandez l'avis de votre copilote dessus</a>.</p>
             </div>
           </details>
           <details class="faq-item">
@@ -2064,7 +2076,7 @@
         <div class="offers-closing" data-reveal style="margin-top:48px;">
           <p class="offers-closing-quote">Vous avez trouvé une voiture qui vous plaît ?<br>C'est le bon moment pour faire vérifier ce qu'une annonce ne dit jamais, souvent plus que vous ne le pensez.</p>
           <div class="offers-closing-cta">
-            <button type="button" class="btn btn-primary cta-demander-inspection">Demander une inspection</button>
+            <button type="button" class="btn btn-primary" data-goto-subtab="annonce">Vous avez déjà trouvé une annonce ?</button>
             <button type="button" class="btn btn-outline" data-goto-subtab="rapport">Voir un exemple de rapport</button>
           </div>
         </div>
@@ -2235,6 +2247,67 @@
               <button type="button" class="btn btn-outline" data-reset-suivi>Réessayer avec un autre email</button>
               <a href="javascript:void(0)" class="btn btn-primary" id="confirm-suivi-cta" data-goto-tab="accompagnement-form" hidden>Décrire mon projet</a>
             </div>
+          </div>
+        </div>
+
+        <div class="to-top-row" style="padding:26px 0 0;">
+          <button type="button" class="to-top" data-goto-tab="accompagnement">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+            Retour à l'accueil
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ---------- Page : Vérifier une annonce ---------- -->
+  <div id="subtab-annonce" role="tabpanel" aria-labelledby="subtab-btn-annonce" hidden>
+    <section>
+      <div class="wrap" style="max-width:560px;">
+        <div class="section-head" data-reveal>
+          <span class="label">Avant de vous décider</span>
+          <h2>Vous avez trouvé une annonce ? On vous dit si elle en vaut le coup.</h2>
+          <p>Collez le lien et dites-nous ce qui vous inquiète : votre copilote revient vers vous sous 24 à 48h avec son avis et un devis d'inspection — et de livraison si besoin.</p>
+        </div>
+
+        <div class="form-card" data-reveal>
+          <form id="form-annonce" novalidate>
+            <div class="field">
+              <label for="annonce-lien">Lien de l'annonce</label>
+              <input type="url" id="annonce-lien" required placeholder="https://www.leboncoin.fr/..." autocomplete="url">
+            </div>
+            <div class="field">
+              <label for="annonce-craintes">Qu'est-ce qui vous inquiète sur ce véhicule ?</label>
+              <textarea id="annonce-craintes" required placeholder="Le prix me semble bas, l'historique n'est pas clair, je m'y connais peu en mécanique…"></textarea>
+            </div>
+            <div class="field">
+              <label><input type="checkbox" id="annonce-livraison-cb"> Je souhaite aussi un devis pour la livraison du véhicule</label>
+            </div>
+            <div id="annonce-livraison-detail" class="field" hidden>
+              <label for="annonce-ville">Ville de destination</label>
+              <input type="text" id="annonce-ville" placeholder="Ex. Lyon">
+            </div>
+            <div class="field">
+              <label for="annonce-prenom">Prénom</label>
+              <input type="text" id="annonce-prenom" required autocomplete="given-name">
+            </div>
+            <div class="field">
+              <label for="annonce-email">Email</label>
+              <input type="email" id="annonce-email" required autocomplete="email">
+            </div>
+            <div class="field">
+              <label for="annonce-telephone">Téléphone <span class="hint">(optionnel)</span></label>
+              <input type="tel" id="annonce-telephone" autocomplete="tel">
+            </div>
+            <p class="offer-modal-footnote" style="margin:4px 0 0;">L'inspection, comme une éventuelle livraison, reste toujours <strong>sur devis</strong> : rien n'est dû avant que vous ayez validé le prix avec votre copilote.</p>
+            <button type="submit" class="btn btn-primary" id="annonce-submit" style="margin-top:18px;width:100%;">Demander mon avis</button>
+          </form>
+
+          <div class="confirm-panel" id="confirm-annonce" hidden>
+            <div class="confirm-icon" id="confirm-annonce-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+            <h3 id="confirm-annonce-title">Demande envoyée</h3>
+            <p id="confirm-annonce-text">Votre copilote revient vers vous sous 24 à 48h avec son avis et un devis.</p>
+            <button type="button" class="btn btn-outline" data-reset-annonce>Envoyer une autre annonce</button>
           </div>
         </div>
 
@@ -4061,20 +4134,20 @@
 
   // ---------- Navigation latérale Accompagnement : Accueil / sous-menu Offres / À propos / FAQ ----------
   var subTabButtons = document.querySelectorAll('.acc-sidebar button[data-subtab]');
-  var ACC_PAGES = ['accueil', 'offres', 'apropos', 'faq', 'avis', 'import', 'inspection', 'rapport', 'suivi'];
+  var ACC_PAGES = ['accueil', 'offres', 'apropos', 'faq', 'avis', 'import', 'inspection', 'rapport', 'suivi', 'annonce'];
   var ACC_PAGE_LABELS = {
     accueil: 'Accueil', offres: 'Nos offres', apropos: 'À propos de nous',
     faq: 'Questions fréquentes', avis: 'Avis clients', import: 'Import',
     inspection: 'Inspection', rapport: 'Le Rapport DIMZ',
-    suivi: 'Suivre mon projet'
+    suivi: 'Suivre mon projet', annonce: 'Vérifier une annonce'
   };
   // Deux niveaux de sous-menu déroulant : "Mon Copilote" (offres, mon
   // projet, inspection, rapport) et, imbriqué dedans, "Mon projet" (suivi,
   // inspection, rapport). Chaque sous-menu reste ouvert/actif tant qu'une de
   // ses pages est affichée.
   var SUBMENUS = [
-    { toggle: document.getElementById('acc-submenu-toggle'), panel: document.getElementById('acc-submenu-panel'), pages: ['offres', 'suivi', 'inspection', 'rapport'] },
-    { toggle: document.getElementById('acc-submenu-toggle-projet'), panel: document.getElementById('acc-submenu-panel-projet'), pages: ['suivi', 'inspection', 'rapport'] }
+    { toggle: document.getElementById('acc-submenu-toggle'), panel: document.getElementById('acc-submenu-panel'), pages: ['offres', 'suivi', 'annonce', 'inspection', 'rapport'] },
+    { toggle: document.getElementById('acc-submenu-toggle-projet'), panel: document.getElementById('acc-submenu-panel-projet'), pages: ['suivi', 'annonce', 'inspection', 'rapport'] }
   ];
   var mobileToggle = document.getElementById('acc-mobile-toggle');
   var mobileCurrent = document.getElementById('acc-mobile-current');
@@ -4161,6 +4234,7 @@
     inspection: { tab: 'accompagnement', subtab: 'inspection' },
     rapport: { tab: 'accompagnement', subtab: 'rapport' },
     suivi: { tab: 'accompagnement', subtab: 'suivi' },
+    annonce: { tab: 'accompagnement', subtab: 'annonce' },
     accompagnement: { tab: 'accompagnement', subtab: 'accueil' },
     convoyage: { tab: 'convoyage' },
     test: { tab: 'test' },
@@ -5365,6 +5439,79 @@
         showResult(status === 'ok' || status === 'not_found' || status === 'email_error' ? status : 'error');
       }).catch(function () {
         showResult('error');
+      }).finally(function () {
+        clearBtnLoading(submitBtn);
+      });
+    });
+  })();
+
+  // ---------- Vérifier une annonce : mini-formulaire de demande de devis ----------
+  (function () {
+    var form = document.getElementById('form-annonce');
+    var confirmPanel = document.getElementById('confirm-annonce');
+    var icon = document.getElementById('confirm-annonce-icon');
+    var title = document.getElementById('confirm-annonce-title');
+    var text = document.getElementById('confirm-annonce-text');
+    var submitBtn = document.getElementById('annonce-submit');
+    var livraisonCb = document.getElementById('annonce-livraison-cb');
+    var livraisonDetail = document.getElementById('annonce-livraison-detail');
+
+    livraisonCb.addEventListener('change', function () {
+      livraisonDetail.hidden = !this.checked;
+    });
+
+    function showResult(ok) {
+      icon.classList.toggle('confirm-icon-error', !ok);
+      if (ok) {
+        icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+        title.textContent = 'Demande envoyée';
+        text.textContent = 'Votre copilote revient vers vous sous 24 à 48h avec son avis et un devis.';
+      } else {
+        icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>';
+        title.textContent = 'Envoi impossible';
+        text.textContent = "Une erreur nous empêche d'envoyer votre demande pour le moment. Réessayez dans un instant.";
+      }
+      form.hidden = true;
+      confirmPanel.hidden = false;
+      confirmPanel.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+    }
+
+    document.querySelectorAll('[data-reset-annonce]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        form.reset();
+        livraisonDetail.hidden = true;
+        form.hidden = false;
+        confirmPanel.hidden = true;
+        form.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+      });
+    });
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!form.reportValidity()) return;
+      var livraisonSouhaitee = livraisonCb.checked;
+      var payload = {
+        'Formulaire': 'Accompagnement',
+        'Coordonnées — Prénom': document.getElementById('annonce-prenom').value.trim(),
+        'Coordonnées — Email': document.getElementById('annonce-email').value.trim(),
+        'Coordonnées — Téléphone': document.getElementById('annonce-telephone').value.trim(),
+        'Projet et délai — Accompagnement recherché': 'Inspection',
+        "Véhicule trouvé — Lien de l'annonce": document.getElementById('annonce-lien').value.trim(),
+        'Véhicule trouvé — Vos craintes / questions': document.getElementById('annonce-craintes').value.trim(),
+        'Livraison — Devis de livraison souhaité': livraisonSouhaitee ? 'Oui' : 'Non',
+        'Horodatage': new Date().toISOString()
+      };
+      if (livraisonSouhaitee) payload['Livraison — Ville de destination'] = document.getElementById('annonce-ville').value.trim();
+
+      setBtnLoading(submitBtn, 'Envoi…');
+      fetch(BACKOFFICE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function (res) {
+        showResult(res.ok);
+      }).catch(function () {
+        showResult(false);
       }).finally(function () {
         clearBtnLoading(submitBtn);
       });
