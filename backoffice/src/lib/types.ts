@@ -699,6 +699,21 @@ export interface TestFeedback {
   created_at: string;
 }
 
+export interface ContactFaqReponse {
+  id: string;
+  contact_id: string;
+  contenu: string;
+  auteur: string | null;
+  /**
+   * L'email est la seule livraison : celui qui écrit depuis la FAQ n'a pas de
+   * portail où retrouver la réponse. Un échec reste donc visible, pour que
+   * l'équipe ne croie pas avoir répondu alors que rien n'est parti.
+   */
+  email_statut: "envoye" | "echec";
+  email_erreur: string | null;
+  created_at: string;
+}
+
 export interface ContactFaq {
   id: string;
   nom: string;
@@ -706,4 +721,6 @@ export interface ContactFaq {
   message: string;
   lu: boolean;
   created_at: string;
+  /** Jointure PostgREST, triée du plus ancien au plus récent par la requête. */
+  contacts_faq_reponses?: ContactFaqReponse[];
 }

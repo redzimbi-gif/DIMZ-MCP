@@ -20,6 +20,12 @@ interface SendEmailParams {
   to: string;
   subject: string;
   html: string;
+  /**
+   * Adresse à laquelle le destinataire répondra s'il clique sur « Répondre ».
+   * Sans elle, sa réponse part vers EMAIL_FROM, qui n'est pas forcément une
+   * boîte relevée — une réponse perdue étant pire qu'une réponse absente.
+   */
+  replyTo?: string;
   attachments?: { filename: string; content: string }[]; // content en base64
 }
 
@@ -46,6 +52,7 @@ export async function sendEmail(params: SendEmailParams): Promise<{ ok: boolean;
       body: JSON.stringify({
         from: process.env.EMAIL_FROM || "DIMZ - Mon Copilote Auto <onboarding@resend.dev>",
         to: params.to,
+        reply_to: params.replyTo,
         subject: params.subject,
         html: params.html,
         attachments: params.attachments,

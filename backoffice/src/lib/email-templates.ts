@@ -10,6 +10,18 @@ function escapeHtml(value: string): string {
     .replace(/"/g, "&quot;");
 }
 
+/**
+ * Texte libre saisi par l'équipe : échappé, et retours à la ligne préservés.
+ * Sans la seconde étape, une réponse rédigée en plusieurs paragraphes arrive
+ * en un seul bloc illisible, le HTML ignorant les retours à la ligne.
+ */
+function multiligne(value: string): string {
+  return escapeHtml(value).replace(/\r?\n/g, "<br />");
+}
+
+// footerHtml remplace le pied de page entier, mention DIMZ comprise. Le pied
+// par défaut s'adresse à un client (« suite à votre demande »), ce qui n'a
+// aucun sens dans une alerte interne ni dans un mail de prospection.
 function emailLayout(contentHtml: string, footerHtml?: string): string {
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -48,6 +60,35 @@ function ctaButton(href: string, label: string): string {
 
 function greeting(prenom: string | null): string {
   return prenom ? `Bonjour ${prenom},` : "Bonjour,";
+}
+
+/**
+ * Alerte interne à l'équipe : nouvelle demande, message client, paiement reçu.
+ * Ce n'est pas un email client — le destinataire est ALERTE_EMAIL et le lien
+ * mène au back-office, pas au portail de suivi.
+ *
+ * Titre et message viennent de formulaires publics (nom saisi par un visiteur),
+ * d'où l'échappement : sans lui, un nom contenant un chevron casserait la mise
+ * en page du mail, voire y glisserait du balisage.
+ */
+export function alerteInterneEmail(params: {
+  titre: string;
+  message: string;
+  url: string;
+}): { subject: string; html: string } {
+  const content = `
+    <p style="margin:0 0 6px;font-size:12px;color:${INK_SOFT};text-transform:uppercase;letter-spacing:0.06em;">Alerte back-office</p>
+    <p style="margin:0 0 14px;font-size:17px;font-weight:700;line-height:1.35;">${escapeHtml(params.titre)}</p>
+    ${params.message ? `<p style="margin:0;">${escapeHtml(params.message)}</p>` : ""}
+    ${ctaButton(params.url, "Ouvrir dans le back-office")}
+  `;
+  // Sujet = titre + détail : c'est la seule ligne visible sur un écran
+  // verrouillé, elle doit suffire à décider si ça vaut le déverrouillage.
+  const sujet = params.message ? `${params.titre} — ${params.message}` : params.titre;
+  return {
+    subject: sujet.replace(/\s+/g, " ").trim().slice(0, 180),
+    html: emailLayout(content, "DIMZ · Mon copilote auto<br />Alerte automatique du back-office."),
+  };
 }
 
 export function confirmationDemandeEmail(params: {
@@ -168,6 +209,38 @@ export function messageRecuEmail(params: {
   return {
     subject: `Nouveau message de votre copilote (${params.reference})`,
     html: emailLayout(content),
+  };
+}
+
+/**
+ * Réponse de l'équipe à une question posée depuis la FAQ du site vitrine.
+ *
+ * La question d'origine est rappelée sous la réponse : plusieurs jours peuvent
+ * s'écouler entre les deux, et contrairement à un client, celui qui écrit
+ * depuis la FAQ n'a aucun portail où la retrouver. Sans ce rappel, il reçoit
+ * une réponse sans savoir à quoi.
+ *
+ * Pas de bouton : il n'y a rien à ouvrir, toute la réponse est dans l'email.
+ */
+export function reponseFaqEmail(params: {
+  nom: string;
+  question: string;
+  reponse: string;
+}): { subject: string; html: string } {
+  const content = `
+    <p style="margin:0 0 16px;">${greeting(params.nom)}</p>
+    <p style="margin:0 0 8px;">${multiligne(params.reponse)}</p>
+    <div style="margin:26px 0 0;padding:14px 16px;background:#f4f5f7;border-radius:8px;border-left:3px solid #e6e8ee;">
+      <p style="margin:0 0 6px;font-size:12px;font-weight:600;color:${INK_SOFT};">Votre question</p>
+      <p style="margin:0;font-size:13px;color:${INK_SOFT};">${multiligne(params.question)}</p>
+    </div>
+  `;
+  return {
+    subject: "Réponse à votre question",
+    html: emailLayout(
+      content,
+      "DIMZ · Mon copilote auto<br />Cet email répond à la question que vous nous avez posée."
+    ),
   };
 }
 

@@ -1,6 +1,8 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { getAppUrl, sendEmail } from "@/lib/email";
+import { alerteInterneEmail } from "@/lib/email-templates";
 
 /**
  * Notification push sur le téléphone de l'équipe via ntfy.sh (gratuit, sans
@@ -11,7 +13,11 @@ import { createClient } from "@/lib/supabase/server";
  * notif push qui échoue ne doit jamais casser le flux qui l'a déclenchée.
  */
 async function sendPushNotification(params: { title: string; message: string; link?: string | null }) {
-  const topic = process.env.NTFY_TOPIC;
+  // trim() : un espace ou un retour à la ligne collé par mégarde avec la
+  // valeur rend le topic invalide aux yeux de ntfy, qui répond 400 "topic
+  // invalid" — et l'alerte disparaît sans bruit. Le même piège s'est refermé
+  // côté Edge Functions, et il guette ici à chaque rotation du topic.
+  const topic = process.env.NTFY_TOPIC?.trim();
   if (!topic) return;
 
   try {
@@ -19,9 +25,16 @@ async function sendPushNotification(params: { title: string; message: string; li
     // en-têtes n'acceptent que du Latin-1 (ISO-8859-1) et rejetteraient tout
     // titre ou message contenant un tiret cadratin, une emoji ou un caractère
     // hors de cette plage — silencieusement fatal pour une simple notif.
+    // Jeton ntfy facultatif : sans lui, ntfy.sh compte la publication dans le
+    // quota de l'adresse IP de sortie (250 messages par jour), partagée avec
+    // d'autres clients de l'hébergeur. Le jeton rattache l'envoi à notre compte.
+    const token = process.env.NTFY_TOKEN?.trim();
     await fetch("https://ntfy.sh/", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: JSON.stringify({
         topic,
         title: params.title,
@@ -35,6 +48,28 @@ async function sendPushNotification(params: { title: string; message: string; li
   } catch (err) {
     console.error("Échec envoi notification push:", err);
   }
+}
+
+/**
+ * Alerte l'équipe par email, en parallèle du push. Deux canaux indépendants
+ * plutôt qu'un seul : le push ntfy dépend d'un service gratuit dont le quota
+ * anonyme est partagé par adresse IP, et il s'est déjà tu sans prévenir. Une
+ * demande client manquée coûte bien plus cher qu'un email de trop.
+ *
+ * Chaque canal s'active par sa propre variable (NTFY_TOPIC, ALERTE_EMAIL) et
+ * se désactive en la retirant, sans toucher au code.
+ */
+async function alerterParEmail(params: { titre: string; message: string; lien?: string | null }) {
+  const destinataire = process.env.ALERTE_EMAIL?.trim();
+  if (!destinataire) return;
+
+  const { subject, html } = alerteInterneEmail({
+    titre: params.titre,
+    message: params.message,
+    url: params.lien ? `${getAppUrl()}${params.lien}` : getAppUrl(),
+  });
+  // sendEmail ne lève jamais : un échec d'alerte ne doit pas casser le flux.
+  await sendEmail({ to: destinataire, subject, html });
 }
 
 /** Récupère l'id du membre de l'équipe connecté (pour tracer qui fait quoi). */
@@ -81,5 +116,11 @@ export async function notifyStaff(params: {
     title: params.titre,
     message: params.message || params.titre,
     link: params.lien,
+  });
+
+  await alerterParEmail({
+    titre: params.titre,
+    message: params.message ?? "",
+    lien: params.lien,
   });
 }

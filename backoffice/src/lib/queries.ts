@@ -743,8 +743,21 @@ export async function getTestFeedback(id: string) {
 
 export async function listContactsFaq() {
   const db = createAdminClient();
-  const { data } = await db.from("contacts_faq").select("*").order("created_at", { ascending: false });
-  return (data ?? []) as ContactFaq[];
+  const { data } = await db
+    .from("contacts_faq")
+    .select("*, contacts_faq_reponses(*)")
+    .order("created_at", { ascending: false });
+
+  const contacts = (data ?? []) as ContactFaq[];
+  // PostgREST ne garantit pas l'ordre des lignes jointes, et le nom de l'option
+  // qui le ferait a changé entre deux versions du client. Le tri se fait donc
+  // ici : l'échange se lit du plus ancien au plus récent, dans le sens où il
+  // s'est déroulé, alors que les questions elles-mêmes vont du plus récent au
+  // plus ancien, comme dans toute boîte de réception.
+  for (const contact of contacts) {
+    contact.contacts_faq_reponses?.sort((a, b) => a.created_at.localeCompare(b.created_at));
+  }
+  return contacts;
 }
 
 export async function countUnreadContactsFaq() {
