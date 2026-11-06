@@ -48,6 +48,10 @@ jobs:
           fi
           for f in $fonctions; do
             echo "::group::$f"
-            supabase functions deploy "$f" --project-ref "$PROJECT_REF" --no-verify-jwt
+            # --yes : depuis une version récente, la CLI demande confirmation
+            # avant de déployer. Sans terminal elle ne peut pas poser la
+            # question et s'arrête sans rien changer, ce qui faisait échouer
+            # ce workflow en laissant croire à un problème d'autorisation.
+            supabase functions deploy "$f" --project-ref "$PROJECT_REF" --no-verify-jwt --yes
             echo "::endgroup::"
           done
