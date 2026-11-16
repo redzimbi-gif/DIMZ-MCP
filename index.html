@@ -491,6 +491,45 @@
   .hero p.lede { color: rgba(255,255,255,0.68); font-size: 1.07rem; max-width: 48ch; margin: 0 auto 32px; }
   .hero .cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
 
+  /* ---------------- Hero « Nouveau » : vérification d'annonce (Accueil) ----------------
+     Second hero sombre sous le hero photo d'accueil : texte à gauche, exemple de
+     retour à droite. Se replie sur une colonne centrée sur mobile. */
+  .hero-annonce { padding: 80px 0; }
+  .hero-annonce-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items: center; }
+  .hero-annonce .hero-annonce-text { text-align: left; }
+  .hero-annonce h2 { font-size: clamp(1.9rem, 3.4vw, 2.7rem); }
+  .hero-annonce p.lede { margin: 0 0 26px; }
+  .hero-annonce .hero-points { justify-content: flex-start; padding-left: 0; }
+  .hero-annonce .kicker { flex-wrap: wrap; row-gap: 10px; }
+  .hero-annonce .kicker > span:last-child { white-space: nowrap; }
+  .badge-nouveau { display: inline-flex; align-items: center; background: var(--bleu-vif); color: #fff; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 100px; padding: 5px 11px; box-shadow: 0 10px 22px -12px color-mix(in srgb, var(--bleu-vif) 80%, transparent); }
+  .hero-annonce-note { margin: 18px 0 0; font-size: 0.84rem; color: rgba(255,255,255,0.6); }
+  .annonce-verdict { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); border-radius: var(--r-lg); padding: 26px 26px 22px; box-shadow: 0 40px 60px -36px rgba(0,0,0,0.6); backdrop-filter: blur(6px); }
+  .annonce-verdict-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.12); }
+  .annonce-verdict-title { font-weight: 700; color: #fff; font-size: 0.98rem; }
+  .annonce-verdict-sub { display: block; font-size: 0.78rem; color: rgba(255,255,255,0.55); font-weight: 500; margin-top: 2px; }
+  .annonce-verdict-tag { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #b9cdf5; border: 1px solid rgba(185,205,245,0.35); border-radius: 100px; padding: 4px 10px; white-space: nowrap; }
+  .annonce-verdict ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .annonce-verdict li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: start; font-size: 0.9rem; color: rgba(255,255,255,0.9); line-height: 1.4; }
+  .annonce-verdict li small { display: block; color: rgba(255,255,255,0.55); font-size: 0.8rem; margin-top: 2px; }
+  .annonce-verdict .v-ico { width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
+  .annonce-verdict .v-ico svg { width: 12px; height: 12px; }
+  .annonce-verdict .v-ok { background: color-mix(in srgb, #3fbf7f 22%, transparent); color: #7fe0ad; }
+  .annonce-verdict .v-warn { background: color-mix(in srgb, #f0a830 22%, transparent); color: #f5c46f; }
+  .annonce-verdict-foot { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.12); font-size: 0.86rem; color: #fff; font-weight: 600; }
+  .annonce-verdict-foot span { color: #9db9ec; }
+  @media (max-width: 900px) {
+    .hero-annonce-grid { grid-template-columns: 1fr; gap: 36px; }
+    .hero-annonce .hero-annonce-text { text-align: center; }
+    .hero-annonce p.lede { margin: 0 auto 26px; }
+    .hero-annonce .hero-points, .hero-annonce .cta-row, .hero-annonce .kicker { justify-content: center; }
+    .annonce-verdict { max-width: 460px; margin: 0 auto; width: 100%; }
+  }
+  @media (max-width: 640px) {
+    .hero-annonce { padding: 56px 0; }
+    .hero-annonce .hero-points li { white-space: normal; }
+  }
+
   /* Bandeau d'intro compact (sous-onglet Inspection) */
   .intro-band { text-align: center; padding: 76px 0 72px; }
   .intro-band .kicker { justify-content: center; }
@@ -1221,7 +1260,43 @@
       </div>
     </section>
 
-    
+    <!-- Hero « Nouveau » : vérification d'annonce -->
+    <section class="dark hero hero-annonce" aria-labelledby="hero-annonce-title">
+      <div class="wrap hero-annonce-grid">
+        <div class="hero-annonce-text">
+          <span class="kicker"><span class="badge-nouveau">Nouveau</span><span>Vérification d'annonce</span></span>
+          <h2 id="hero-annonce-title">Vous avez repéré une voiture ? <em>Je vérifie l'annonce avant que vous vous déplaciez.</em></h2>
+          <p class="lede">Envoyez-moi simplement le lien. J'analyse l'annonce, le prix, l'historique et le vendeur, puis je vous dis franchement si elle vaut le déplacement, et quelles questions poser.</p>
+          <ul class="hero-points">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Prix comparé au marché</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Historique et kilométrage</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Signaux d'arnaque</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Questions à poser au vendeur</li>
+          </ul>
+          <div class="cta-row">
+            <a href="javascript:void(0)" class="btn btn-primary" data-goto-subtab="annonce">Faire vérifier une annonce</a>
+          </div>
+          <p class="hero-annonce-note">Réponse rapide, sur devis. Inspection sur place possible autour d'Annecy et de Genève.</p>
+        </div>
+
+        <div class="annonce-verdict" aria-label="Exemple de retour de vérification">
+          <div class="annonce-verdict-head">
+            <div>
+              <span class="annonce-verdict-title">Votre retour de vérification</span>
+              <span class="annonce-verdict-sub">Exemple : citadine, 2019, 68 000 km</span>
+            </div>
+            <span class="annonce-verdict-tag">Exemple</span>
+          </div>
+          <ul>
+            <li><span class="v-ico v-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><span>Prix cohérent avec le marché<small>Dans la moyenne des annonces comparables.</small></span></li>
+            <li><span class="v-ico v-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><span>Kilométrage plausible<small>Cohérent avec l'âge et les contrôles techniques.</small></span></li>
+            <li><span class="v-ico v-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v6"/><path d="M12 17h.01"/></svg></span><span>Carnet d'entretien incomplet<small>Demander les factures de la dernière révision.</small></span></li>
+            <li><span class="v-ico v-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v6"/><path d="M12 17h.01"/></svg></span><span>Photos sans le côté droit<small>Demander des photos supplémentaires avant de se déplacer.</small></span></li>
+          </ul>
+          <p class="annonce-verdict-foot">Mon avis : <span>à voir, avec deux questions à poser au vendeur.</span></p>
+        </div>
+      </div>
+    </section>
 
     <details class="acc-collapse band" open>
       <summary>
