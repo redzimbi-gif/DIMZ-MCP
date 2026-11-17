@@ -36,7 +36,6 @@ import { CompressedImageInput } from "@/components/CompressedImageInput";
 import {
   DOSSIER_STATUTS,
   DOSSIER_STATUT_LABELS,
-  DOSSIER_OFFRES,
   DOSSIER_OFFRE_LABELS,
   DOCUMENT_TYPE_LABELS,
   FICHE_DECOUVERTE_ENERGIES,
@@ -57,7 +56,6 @@ import {
 } from "@/lib/etapes";
 import { formatCurrency, formatDate, formatDateTime, formatRelative } from "@/lib/format";
 import {
-  updateDossierInfos,
   updateDossierStatut,
   addDossierNote,
   updateDossierOffre,
@@ -130,7 +128,6 @@ export default async function DossierDetailPage({
     getDossierDocuments(dossier.id),
   ]);
 
-  const updateInfosAction = updateDossierInfos.bind(null, dossier.id);
   const updateStatutAction = updateDossierStatut.bind(null, dossier.id);
   const addNoteAction = addDossierNote.bind(null, dossier.id);
   const sendMessageAction = sendMessageStaff.bind(null, dossier.id);
@@ -365,53 +362,20 @@ export default async function DossierDetailPage({
 
       <DossierTabs dossierId={dossier.id} active={tab} />
 
-      {tab === "infos" ? (
+      {tab === "infos" && donneesGroups.length === 0 ? (
         <Card className="p-6 max-w-2xl">
-          <form action={updateInfosAction} className="space-y-4">
-            <Field label="Offre">
-              <select name="offre" defaultValue={dossier.offre ?? ""} className={inputClass}>
-                <option value="">—</option>
-                {DOSSIER_OFFRES.map((o) => (
-                  <option key={o} value={o}>
-                    {DOSSIER_OFFRE_LABELS[o]}
-                  </option>
-                ))}
-              </select>
-            </Field>
-            <Field label="Véhicule recherché">
-              <input
-                name="vehicule_recherche"
-                defaultValue={dossier.vehicule_recherche ?? ""}
-                className={inputClass}
-              />
-            </Field>
-            <Field label="Valeur estimée (€)">
-              <input
-                name="valeur_estimee"
-                type="number"
-                step="0.01"
-                defaultValue={dossier.valeur_estimee ?? ""}
-                className={inputClass}
-              />
-            </Field>
-            <Field label="Commentaires">
-              <textarea
-                name="commentaires"
-                defaultValue={dossier.commentaires ?? ""}
-                rows={4}
-                className={inputClass}
-              />
-            </Field>
-            <Button type="submit">Enregistrer</Button>
-          </form>
+          <p className="text-sm text-ink-soft">
+            Aucune réponse de formulaire pour ce dossier. L'offre se change dans le bandeau ci-dessus, et
+            l'onglet « Notes » accueille tes propres notes.
+          </p>
         </Card>
       ) : null}
 
       {tab === "infos" && donneesGroups.length > 0 ? (
-        <Card className="p-6 max-w-2xl mt-4">
+        <Card className="p-6 max-w-2xl">
           <h2 className="text-sm font-semibold text-ink mb-1">Réponses du formulaire</h2>
           <p className="text-xs text-ink-soft mb-4">
-            Tel que rempli par le client, pour référence — champ « Commentaires » ci-dessus pour tes propres notes.
+            Tel que rempli par le client, pour référence — onglet « Notes » pour tes propres notes.
           </p>
           <div className="space-y-5">
             {donneesGroups.map(([section, rows]) => (
