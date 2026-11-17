@@ -76,62 +76,6 @@ export async function createDossier(formData: FormData) {
   redirect(`/dossiers/${data.id}`);
 }
 
-export async function updateDossierInfos(dossierId: string, formData: FormData) {
-  const db = createAdminClient();
-  const previous = await getDossier(dossierId);
-  const offre = String(formData.get("offre") || "") || null;
-
-  const payload: Record<string, unknown> = {
-    offre,
-    budget: String(formData.get("budget") || "").trim() || null,
-    vehicule_recherche: String(formData.get("vehicule_recherche") || "").trim() || null,
-    marques_souhaitees: String(formData.get("marques_souhaitees") || "").trim() || null,
-    motorisation: String(formData.get("motorisation") || "").trim() || null,
-    boite_vitesses: String(formData.get("boite_vitesses") || "").trim() || null,
-    km_max: String(formData.get("km_max") || "").trim() || null,
-    region: String(formData.get("region") || "").trim() || null,
-    commentaires: String(formData.get("commentaires") || "").trim() || null,
-    valeur_estimee: formData.get("valeur_estimee")
-      ? Number(formData.get("valeur_estimee"))
-      : null,
-  };
-
-  // Ce champ "Offre" est un raccourci pratique pour corriger l'offre en même
-  // temps que le reste des infos ; s'il change l'offre, on remet le suivi
-  // client sur une étape commune pour éviter une étape orpheline qui
-  // n'existerait plus dans la nouvelle offre (même logique que le bandeau
-  // d'offres ci-dessus, qui passe par updateDossierOffre).
-  const offreChangee = !!offre && offre !== previous?.offre;
-  const etape = offreChangee
-    ? etapeApresChangementOffre(offre as DossierOffre, previous?.paiement_offre ?? null)
-    : null;
-  if (etape) payload.etape_client = etape;
-
-  await db.from("dossiers").update(payload).eq("id", dossierId);
-
-  // Ce chemin écrivait l'étape sans synchroniser le pipeline ni tracer
-  // l'historique, contrairement à updateDossierOffre : à offre égale, les deux
-  // doivent laisser le dossier dans le même état.
-  if (etape) {
-    await syncStatutAvecEtape(db, dossierId, offre as DossierOffre, etape);
-    await db.from("dossier_etape_history").insert({
-      dossier_id: dossierId,
-      etape_client: etape,
-      note: `Offre choisie : ${DOSSIER_OFFRE_LABELS[offre as DossierOffre]}`,
-      changed_by: await getActorId(),
-    });
-  }
-
-  await logActivity({
-    action: "dossier.modifie",
-    entiteType: "dossier",
-    entiteId: dossierId,
-    description: `Informations du dossier mises à jour`,
-  });
-
-  revalidatePath(`/dossiers/${dossierId}`);
-}
-
 export async function updateDossierStatut(dossierId: string, formData: FormData) {
   const db = createAdminClient();
   const statut = String(formData.get("statut") || "") as DossierStatut;
