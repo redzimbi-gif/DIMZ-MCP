@@ -81,15 +81,14 @@ export async function updateDossierInfos(dossierId: string, formData: FormData) 
   const previous = await getDossier(dossierId);
   const offre = String(formData.get("offre") || "") || null;
 
+  // Le formulaire de l'onglet Infos ne porte plus que ces quatre champs : les
+  // caractéristiques du véhicule (budget, marques, motorisation, boîte, km,
+  // région) viennent du formulaire client et restent consultables dans
+  // « Réponses du formulaire ». Les colonnes existent toujours en base, mais
+  // on ne les écrase plus ici.
   const payload: Record<string, unknown> = {
     offre,
-    budget: String(formData.get("budget") || "").trim() || null,
     vehicule_recherche: String(formData.get("vehicule_recherche") || "").trim() || null,
-    marques_souhaitees: String(formData.get("marques_souhaitees") || "").trim() || null,
-    motorisation: String(formData.get("motorisation") || "").trim() || null,
-    boite_vitesses: String(formData.get("boite_vitesses") || "").trim() || null,
-    km_max: String(formData.get("km_max") || "").trim() || null,
-    region: String(formData.get("region") || "").trim() || null,
     commentaires: String(formData.get("commentaires") || "").trim() || null,
     valeur_estimee: formData.get("valeur_estimee")
       ? Number(formData.get("valeur_estimee"))

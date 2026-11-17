@@ -378,20 +378,6 @@ export default async function DossierDetailPage({
                 ))}
               </select>
             </Field>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label="Budget">
-                <input name="budget" defaultValue={dossier.budget ?? ""} className={inputClass} />
-              </Field>
-              <Field label="Valeur estimée (€)">
-                <input
-                  name="valeur_estimee"
-                  type="number"
-                  step="0.01"
-                  defaultValue={dossier.valeur_estimee ?? ""}
-                  className={inputClass}
-                />
-              </Field>
-            </div>
             <Field label="Véhicule recherché">
               <input
                 name="vehicule_recherche"
@@ -399,28 +385,14 @@ export default async function DossierDetailPage({
                 className={inputClass}
               />
             </Field>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label="Marques souhaitées">
-                <input
-                  name="marques_souhaitees"
-                  defaultValue={dossier.marques_souhaitees ?? ""}
-                  className={inputClass}
-                />
-              </Field>
-              <Field label="Motorisation">
-                <input name="motorisation" defaultValue={dossier.motorisation ?? ""} className={inputClass} />
-              </Field>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label="Boîte de vitesses">
-                <input name="boite_vitesses" defaultValue={dossier.boite_vitesses ?? ""} className={inputClass} />
-              </Field>
-              <Field label="Kilométrage maximum">
-                <input name="km_max" defaultValue={dossier.km_max ?? ""} className={inputClass} />
-              </Field>
-            </div>
-            <Field label="Région">
-              <input name="region" defaultValue={dossier.region ?? ""} className={inputClass} />
+            <Field label="Valeur estimée (€)">
+              <input
+                name="valeur_estimee"
+                type="number"
+                step="0.01"
+                defaultValue={dossier.valeur_estimee ?? ""}
+                className={inputClass}
+              />
             </Field>
             <Field label="Commentaires">
               <textarea
