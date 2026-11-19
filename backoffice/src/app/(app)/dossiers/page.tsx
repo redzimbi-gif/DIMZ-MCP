@@ -3,7 +3,7 @@ import { Plus, Archive } from "lucide-react";
 import { listDossiers } from "@/lib/queries";
 import { PageHeader, LinkButton, StatutBadge } from "@/components/ui";
 import { DOSSIER_STATUTS, DOSSIER_STATUT_LABELS } from "@/lib/types";
-import { formatCurrency, formatDate } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 
 export default async function DossiersPage({
   searchParams,
@@ -58,13 +58,8 @@ export default async function DossiersPage({
                     <p className="text-xs text-ink-soft mt-0.5 truncate">
                       {d.vehicule_recherche || d.reference}
                     </p>
-                    <div className="flex items-center justify-between mt-2.5">
+                    <div className="mt-2.5">
                       <span className="text-xs text-ink-faint tnum">{formatDate(d.created_at)}</span>
-                      {d.valeur_estimee ? (
-                        <span className="text-xs font-medium text-blue-600 tnum">
-                          {formatCurrency(d.valeur_estimee)}
-                        </span>
-                      ) : null}
                     </div>
                   </Link>
                 ))}
