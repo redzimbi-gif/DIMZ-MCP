@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /dimz.html
+Disallow: /dimz-v1.html
+Disallow: /backoffice/
+
+Sitemap: https://dimz-copilote.com/sitemap.xml
