@@ -44,12 +44,12 @@ export const DOSSIER_OFFRE_LABELS: Record<DossierOffre, string> = {
 };
 
 // Tarif d'entrée de chaque offre payante, utilisé uniquement pour pré-remplir
-// le montant à facturer côté équipe. Copilote monte à 149 € pour une recherche
+// le montant à facturer côté équipe. Copilote monte à 79 € pour une recherche
 // complexe et Copilote Plus est un « à partir de » : le montant reste saisi à
 // la main, rien n'est facturé sans validation.
 export const TARIF_OFFRE_DEFAUT: Partial<Record<DossierOffre, number>> = {
-  copilote: 99,
-  copilote_plus: 599,
+  copilote: 59,
+  copilote_plus: 499,
 };
 
 export const CONVOYAGE_DECISIONS = ["en_attente", "accepte", "refuse"] as const;

@@ -16,7 +16,7 @@ const cp = (v: string | null | undefined) => v || "[À COMPLÉTER]";
 
 export function ContratCopiloteDocument({ dossierReference, client, entreprise, champs, dateSignature }: Props) {
   const clientNom = `${client?.prenom ?? ""} ${client?.nom ?? ""}`.trim() || "[●]";
-  const montant = champs.montant ? `${champs.montant} € TTC` : "[99 € ou 149 € TTC]";
+  const montant = champs.montant ? `${champs.montant} € TTC` : "[59 € ou 79 € TTC]";
 
   const blocks: LegalBlock[] = [
     { t: "h2", text: "Entre les soussignés" },
