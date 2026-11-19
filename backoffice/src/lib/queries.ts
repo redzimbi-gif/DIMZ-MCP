@@ -594,7 +594,7 @@ export async function getDocumentCommercial(id: string) {
  *
  * Sert à déduire ce que le client a déjà réglé du montant à facturer lors d'un
  * passage à une offre supérieure — sur du réel plutôt que sur un tarif
- * supposé, puisque Copilote peut avoir été facturé 99 ou 149 €.
+ * supposé, puisque Copilote peut avoir été facturé 59 ou 79 €.
  */
 export async function getMontantDejaPaye(dossierId: string): Promise<number> {
   const db = createAdminClient();

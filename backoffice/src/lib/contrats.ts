@@ -28,7 +28,7 @@ export const CONTRAT_CHAMPS: Record<ContratType, ContratChampDef[]> = {
     { key: "montant_ttc", label: "Montant TTC (€)", type: "number" },
   ],
   contrat_copilote: [
-    { key: "montant", label: "Montant TTC (€)", type: "number", placeholder: "99 ou 149" },
+    { key: "montant", label: "Montant TTC (€)", type: "number", placeholder: "59 ou 79" },
   ],
   contrat_copilote_plus: [
     { key: "montant", label: "Montant TTC (€)", type: "number", placeholder: "749" },

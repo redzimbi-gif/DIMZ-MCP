@@ -198,8 +198,8 @@ export async function updateDossierOffre(dossierId: string, offre: DossierOffre)
  * Facture l'offre d'un dossier en attente de paiement et envoie au client le
  * lien de règlement, sans quitter la fiche dossier.
  *
- * Le montant est saisi par l'équipe : Copilote se facture 99 ou 149 € selon la
- * complexité, Copilote Plus est un « à partir de 599 € », et un passage à
+ * Le montant est saisi par l'équipe : Copilote se facture 59 ou 79 € selon la
+ * complexité, Copilote Plus est un « à partir de 499 € », et un passage à
  * l'offre supérieure déduit ce qui a déjà été réglé. Le formulaire propose une
  * valeur, l'équipe tranche.
  */
