@@ -2,9 +2,10 @@ import { notFound } from "next/navigation";
 import { FileDown, Mail } from "lucide-react";
 import { getDocumentCommercial, listDossiers, listClients } from "@/lib/queries";
 import { Card, PageHeader, LinkButton, Badge, Button, Field, inputClass } from "@/components/ui";
+import { AutoGrowTextarea } from "@/components/AutoGrowTextarea";
 import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
 import { DOCUMENT_COMMERCIAL_STATUT_LABELS, DOCUMENT_COMMERCIAL_TYPE_LABELS } from "@/lib/types";
-import { formatCurrency, formatDate } from "@/lib/format";
+import { formatCurrencyExact, formatDate } from "@/lib/format";
 import {
   updateDocumentCommercial,
   deleteDocumentCommercial,
@@ -156,11 +157,11 @@ function DocumentSummary({ doc }: { doc: NonNullable<Awaited<ReturnType<typeof g
         <tbody>
           {doc.lignes.map((l, i) => (
             <tr key={i} className="border-b border-line">
-              <td className="py-2 text-ink">{l.description}</td>
+              <td className="py-2 text-ink whitespace-pre-line">{l.description}</td>
               <td className="py-2 text-ink text-right tnum">{l.quantite}</td>
-              <td className="py-2 text-ink text-right tnum">{formatCurrency(l.prix_unitaire_ht)}</td>
+              <td className="py-2 text-ink text-right tnum">{formatCurrencyExact(l.prix_unitaire_ht)}</td>
               <td className="py-2 text-ink text-right tnum font-medium">
-                {formatCurrency(l.quantite * l.prix_unitaire_ht)}
+                {formatCurrencyExact(l.quantite * l.prix_unitaire_ht)}
               </td>
             </tr>
           ))}
@@ -170,15 +171,15 @@ function DocumentSummary({ doc }: { doc: NonNullable<Awaited<ReturnType<typeof g
         <div className="w-56 space-y-1 text-sm">
           <div className="flex justify-between text-ink-soft">
             <span>Total HT</span>
-            <span className="tnum">{formatCurrency(doc.montant_ht)}</span>
+            <span className="tnum">{formatCurrencyExact(doc.montant_ht)}</span>
           </div>
           <div className="flex justify-between text-ink-soft">
             <span>TVA</span>
-            <span className="tnum">{formatCurrency(doc.montant_tva)}</span>
+            <span className="tnum">{formatCurrencyExact(doc.montant_tva)}</span>
           </div>
           <div className="flex justify-between font-semibold text-ink pt-1 border-t border-line">
             <span>Total TTC</span>
-            <span className="tnum">{formatCurrency(doc.montant_ttc)}</span>
+            <span className="tnum">{formatCurrencyExact(doc.montant_ttc)}</span>
           </div>
         </div>
       </div>
@@ -233,16 +234,21 @@ function DocumentForm({
 
         <div>
           <p className="text-xs font-medium text-ink-soft mb-2">Lignes (description vide = ignorée)</p>
+          <p className="text-xs text-ink-faint mb-2">
+            La description accepte plusieurs lignes : la boîte s&apos;agrandit à la frappe, et les
+            retours à la ligne sont conservés sur le PDF.
+          </p>
           <div className="space-y-2">
             {Array.from({ length: 8 }).map((_, i) => {
               const ligne = lignesAffichees[i];
               return (
-                <div key={i} className="grid grid-cols-12 gap-2">
-                  <input
+                <div key={i} className="grid grid-cols-12 gap-2 items-start">
+                  <AutoGrowTextarea
                     name={`ligne_description_${i}`}
                     placeholder="Description"
                     defaultValue={ligne?.description ?? ""}
-                    className={`${inputClass} col-span-6`}
+                    rows={2}
+                    className={`${inputClass} col-span-6 leading-relaxed resize-y`}
                   />
                   <input
                     name={`ligne_quantite_${i}`}

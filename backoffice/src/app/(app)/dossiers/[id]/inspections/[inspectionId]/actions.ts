@@ -9,7 +9,7 @@ import { InspectionReport } from "@/lib/pdf/InspectionReport";
 import { sendEmail, getAppUrl } from "@/lib/email";
 import { rapportDisponibleEmail } from "@/lib/email-templates";
 import { logActivity } from "@/lib/log";
-import { uploadFiles, deleteFile } from "@/lib/storage";
+import { uploadFiles, deleteFile, getSignedUrls } from "@/lib/storage";
 import { inspectionFieldsFromForm } from "@/lib/inspection-fields";
 
 export async function updateInspection(dossierId: string, inspectionId: string, formData: FormData) {
@@ -78,12 +78,16 @@ export async function sendInspectionReportEmail(dossierId: string, inspectionId:
     status = "no-email";
   } else {
     try {
+      const photoMap = await getSignedUrls(inspection.photos ?? []);
+      const photoUrls = (inspection.photos ?? []).map((path) => photoMap[path]).filter(Boolean);
+
       const buffer = await renderToBuffer(
         InspectionReport({
           inspection,
           dossierReference: reference ?? "",
           clientNom: `${inspection.dossiers?.clients?.prenom ?? ""} ${inspection.dossiers?.clients?.nom ?? ""}`.trim(),
           offre: inspection.dossiers?.offre ?? null,
+          photoUrls,
         })
       );
 

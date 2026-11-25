@@ -24,7 +24,13 @@ function failDocument(error: unknown, fallback: string): never {
 function parseLignes(formData: FormData): LigneDocumentCommercial[] {
   const lignes: LigneDocumentCommercial[] = [];
   for (let i = 0; i < MAX_LIGNES; i++) {
-    const description = String(formData.get(`ligne_description_${i}`) || "").trim();
+    // Les descriptions sont saisies dans une zone multiligne : on normalise les
+    // retours à la ligne Windows (\r\n), qui laisseraient des caractères
+    // parasites dans le PDF, et on supprime les lignes vides en trop.
+    const description = String(formData.get(`ligne_description_${i}`) || "")
+      .replace(/\r\n?/g, "\n")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
     if (!description) continue;
     const quantite = Number(formData.get(`ligne_quantite_${i}`) || 1);
     const prixUnitaireHt = Number(formData.get(`ligne_prix_${i}`) || 0);

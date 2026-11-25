@@ -4,6 +4,7 @@ import { listFactures, listClients, listDossiers, listDocumentsCommerciaux } fro
 import { getSignedUrls } from "@/lib/storage";
 import { Card, PageHeader, StatCard, EmptyState, Field, inputClass, Button, Badge } from "@/components/ui";
 import { AutoResetForm } from "@/components/AutoResetForm";
+import { AutoGrowTextarea } from "@/components/AutoGrowTextarea";
 import { EmailStatusBanner } from "@/components/EmailStatusBanner";
 import { DOCUMENT_COMMERCIAL_STATUT_LABELS, DOCUMENT_COMMERCIAL_TYPE_LABELS } from "@/lib/types";
 import { formatDate } from "@/lib/format";
@@ -145,7 +146,12 @@ export default async function FacturationPage({
               <input name="objet" placeholder="ex. Convoyage Lyon → Paris" className={inputClass} />
             </Field>
             <Field label="Première ligne">
-              <input name="ligne_description_0" placeholder="Description" className={inputClass} />
+              <AutoGrowTextarea
+                name="ligne_description_0"
+                placeholder="Description de la prestation — plusieurs lignes possibles"
+                rows={3}
+                className={`${inputClass} leading-relaxed resize-y`}
+              />
             </Field>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Quantité">

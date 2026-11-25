@@ -3,7 +3,7 @@ import { pdfStyles } from "./theme";
 import { PdfLogo, PdfFooter } from "./PdfHeader";
 import type { DocumentCommercial, EntrepriseInfo, LigneDocumentCommercial } from "@/lib/types";
 import { DOCUMENT_COMMERCIAL_TYPE_LABELS } from "@/lib/types";
-import { formatCurrency, formatDate } from "@/lib/format";
+import { formatCurrencyExact, formatDate } from "@/lib/format";
 
 interface Props {
   doc: DocumentCommercial;
@@ -25,17 +25,29 @@ function LigneRow({ ligne, isHeader }: { ligne?: LigneDocumentCommercial; isHead
         backgroundColor: isHeader ? "#f7f8fa" : undefined,
       }}
     >
-      <Text style={{ flex: 4, fontSize: 9, fontFamily: isHeader ? "Helvetica-Bold" : "Helvetica", color: isHeader ? "#565c68" : "#0b0d12", textTransform: isHeader ? "uppercase" : undefined }}>
+      {/* lineHeight et paddingRight : une description sur plusieurs lignes doit
+          rester lisible et ne pas venir coller la colonne « Qté ». */}
+      <Text
+        style={{
+          flex: 4,
+          fontSize: 9,
+          lineHeight: 1.4,
+          paddingRight: 8,
+          fontFamily: isHeader ? "Helvetica-Bold" : "Helvetica",
+          color: isHeader ? "#565c68" : "#0b0d12",
+          textTransform: isHeader ? "uppercase" : undefined,
+        }}
+      >
         {isHeader ? "Description" : ligne?.description}
       </Text>
       <Text style={{ flex: 1, fontSize: 9, textAlign: "right", fontFamily: isHeader ? "Helvetica-Bold" : "Helvetica", color: isHeader ? "#565c68" : "#0b0d12", textTransform: isHeader ? "uppercase" : undefined }}>
         {isHeader ? "Qté" : ligne?.quantite}
       </Text>
       <Text style={{ flex: 1.6, fontSize: 9, textAlign: "right", fontFamily: isHeader ? "Helvetica-Bold" : "Helvetica", color: isHeader ? "#565c68" : "#0b0d12", textTransform: isHeader ? "uppercase" : undefined }}>
-        {isHeader ? "Prix unit. HT" : formatCurrency(ligne!.prix_unitaire_ht)}
+        {isHeader ? "Prix unit. HT" : formatCurrencyExact(ligne!.prix_unitaire_ht)}
       </Text>
       <Text style={{ flex: 1.6, fontSize: 9, textAlign: "right", fontFamily: "Helvetica-Bold", color: isHeader ? "#565c68" : "#0b0d12", textTransform: isHeader ? "uppercase" : undefined }}>
-        {isHeader ? "Total HT" : formatCurrency(total)}
+        {isHeader ? "Total HT" : formatCurrencyExact(total)}
       </Text>
     </View>
   );
@@ -87,17 +99,17 @@ export function DocumentCommercialPdf({ doc, clientNom, clientAdresse, clientRai
           <View style={{ width: 220 }}>
             <View style={pdfStyles.row}>
               <Text style={pdfStyles.rowLabel}>Total HT</Text>
-              <Text style={pdfStyles.rowValue}>{formatCurrency(doc.montant_ht)}</Text>
+              <Text style={pdfStyles.rowValue}>{formatCurrencyExact(doc.montant_ht)}</Text>
             </View>
             <View style={pdfStyles.row}>
               <Text style={pdfStyles.rowLabel}>TVA</Text>
-              <Text style={pdfStyles.rowValue}>{formatCurrency(doc.montant_tva)}</Text>
+              <Text style={pdfStyles.rowValue}>{formatCurrencyExact(doc.montant_tva)}</Text>
             </View>
             <View style={{ ...pdfStyles.row, borderTop: "1px solid #e6e8ee", paddingTop: 6 }}>
               <Text style={{ ...pdfStyles.rowLabel, fontFamily: "Helvetica-Bold", color: "#0b0d12" }}>
                 Total {isFacture ? "à payer" : "TTC"}
               </Text>
-              <Text style={{ ...pdfStyles.rowValue, fontSize: 12, color: "#2f6fed" }}>{formatCurrency(doc.montant_ttc)}</Text>
+              <Text style={{ ...pdfStyles.rowValue, fontSize: 12, color: "#2f6fed" }}>{formatCurrencyExact(doc.montant_ttc)}</Text>
             </View>
           </View>
         </View>
