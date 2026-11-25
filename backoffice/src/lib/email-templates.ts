@@ -495,3 +495,65 @@ export function prospectionEmail(params: { objet: string; corps: string }): {
     ),
   };
 }
+
+/**
+ * Mail personnalisé écrit par l'équipe à un client, avec ou sans pièces
+ * jointes. Même traitement du texte que `prospectionEmail` : des paragraphes
+ * séparés par une ligne vide, le HTML ajouté ici pour que personne n'ait à en
+ * écrire dans le composeur.
+ *
+ * Le pied de page est remplacé : « suite à votre demande » n'a pas de sens
+ * pour un mail envoyé à l'initiative de l'équipe, et une réponse doit arriver
+ * dans une boîte relevée (cf. replyTo à l'envoi).
+ */
+export function emailClientPersonnalise(params: {
+  objet: string;
+  corps: string;
+  /** Noms des fichiers joints, rappelés sous le message. */
+  piecesJointes?: string[];
+  portalUrl?: string | null;
+}): { subject: string; html: string } {
+  const paragraphes = params.corps
+    .split(/\n\s*\n/)
+    .map((bloc) => bloc.trim())
+    .filter(Boolean)
+    .map((bloc) => `<p style="margin:0 0 16px;">${escapeHtml(bloc).replace(/\n/g, "<br />")}</p>`)
+    .join("\n");
+
+  // Rappeler les pièces jointes dans le corps du message : sur mobile, elles
+  // sont souvent repliées sous un trombone qu'on ne voit pas, et un client qui
+  // ne les remarque pas redemande le devis.
+  const pieces = (params.piecesJointes ?? []).filter(Boolean);
+  const blocPieces =
+    pieces.length > 0
+      ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:4px 0 16px;background:#f7f8fa;border:1px solid #e6e8ee;border-radius:8px;">
+      <tr>
+        <td style="padding:14px 16px;">
+          <p style="margin:0 0 8px;font-size:12px;color:${INK_SOFT};text-transform:uppercase;letter-spacing:0.06em;">
+            ${pieces.length === 1 ? "Pièce jointe" : `${pieces.length} pièces jointes`}
+          </p>
+          ${pieces
+            .map(
+              (nom) =>
+                `<p style="margin:0 0 4px;font-size:13px;color:${INK};">📎 ${escapeHtml(nom)}</p>`
+            )
+            .join("\n")}
+        </td>
+      </tr>
+    </table>`
+      : "";
+
+  const content = `
+    ${paragraphes}
+    ${blocPieces}
+    ${params.portalUrl ? ctaButton(params.portalUrl, "Voir mon espace de suivi") : ""}
+  `;
+
+  return {
+    subject: params.objet,
+    html: emailLayout(
+      content,
+      "DIMZ · Mon copilote auto<br />Vous pouvez répondre directement à cet email."
+    ),
+  };
+}

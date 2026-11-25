@@ -1,4 +1,4 @@
-import { Document, Page, Text, View } from "@react-pdf/renderer";
+import { Document, Page, Text, View, Image } from "@react-pdf/renderer";
 import { pdfStyles } from "./theme";
 import { PdfLogo, PdfFooter } from "./PdfHeader";
 import { ScoreRing } from "./ScoreRing";
@@ -10,7 +10,27 @@ interface Props {
   dossierReference: string;
   clientNom: string;
   offre?: DossierOffre | null;
+  /**
+   * URLs signées des photos de l'inspection, dans l'ordre d'upload. Le PDF ne
+   * peut pas les récupérer lui-même : le bucket est privé et `renderToBuffer`
+   * est synchrone côté rendu, donc l'appelant signe les chemins avant
+   * (cf. getSignedUrls dans src/lib/storage.ts), comme pour le rapport de
+   * convoyage.
+   *
+   * Promesse publique : le site annonce « avec photos réelles du véhicule
+   * inspecté » et affiche une section « Photos jointes au rapport » dans son
+   * exemple de rapport. Un rapport sans photos ne tient pas cette promesse.
+   */
+  photoUrls?: string[];
 }
+
+/**
+ * Six photos au maximum sur la page du rapport : au-delà, la grille déborde
+ * sur une seconde page et noie les sections de conclusion, qui comptent plus
+ * pour le client. Les autres photos restent accessibles sur le portail de
+ * suivi et dans le back-office.
+ */
+const MAX_PHOTOS_RAPPORT = 6;
 
 const CATEGORY_SCORES: { key: keyof Inspection; label: string }[] = [
   { key: "score_administratif", label: "Contrôle administratif" },
@@ -21,17 +41,41 @@ const CATEGORY_SCORES: { key: keyof Inspection; label: string }[] = [
   { key: "score_marche", label: "Analyse du marché" },
 ];
 
+/**
+ * Les observations écrites du copilote, poste par poste. Elles sont saisies
+ * dans le formulaire d'inspection et stockées en base depuis l'origine, mais
+ * n'apparaissaient nulle part dans le rapport remis au client : de la saisie
+ * perdue, et le détail qui justifie les scores de la page précédente.
+ */
+const CONSTATATIONS: { key: keyof Inspection; label: string }[] = [
+  { key: "etat_exterieur", label: "État extérieur" },
+  { key: "carrosserie", label: "Carrosserie" },
+  { key: "pneus", label: "Pneumatiques" },
+  { key: "etat_interieur", label: "État intérieur" },
+  { key: "mecanique", label: "Mécanique" },
+  { key: "freins", label: "Freinage" },
+  { key: "essai_routier", label: "Essai routier" },
+  { key: "defauts_constates", label: "Défauts constatés" },
+  { key: "commentaires", label: "Commentaires du copilote" },
+];
+
 const VERDICT_COLORS: Record<string, string> = {
   recommande: "#1a9e6b",
   envisageable: "#b5780a",
   deconseille: "#d13f3f",
 };
 
-export function InspectionReport({ inspection, dossierReference, clientNom, offre }: Props) {
+export function InspectionReport({ inspection, dossierReference, clientNom, offre, photoUrls = [] }: Props) {
   const tags = splitTags(inspection.tags);
   const pointsPositifs = splitLines(inspection.points_positifs);
   const pointsVigilance = splitLines(inspection.points_vigilance);
   const categoryScores = CATEGORY_SCORES.filter(({ key }) => inspection[key] != null);
+  const photos = photoUrls.slice(0, MAX_PHOTOS_RAPPORT);
+  const constatations = CONSTATATIONS.map(({ key, label }) => ({
+    label,
+    valeur: (inspection[key] as string | null) || null,
+  })).filter((c) => c.valeur !== null);
+  const photosRestantes = Math.max(0, photoUrls.length - photos.length);
 
   return (
     <Document title={`Rapport DIMZ — ${inspection.reference}`}>
@@ -59,8 +103,11 @@ export function InspectionReport({ inspection, dossierReference, clientNom, offr
 
         <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 16 }}>
           {inspection.note_finale != null ? (
-            <View style={{ marginRight: 16 }}>
-              <ScoreRing value={inspection.note_finale} />
+            <View style={{ marginRight: 16, alignItems: "center", width: 74 }}>
+              <ScoreRing value={inspection.note_finale} suffix="/ 10" />
+              <Text style={{ fontSize: 7, color: "#565c68", marginTop: 4, textAlign: "center" }}>
+                Score DIMZ global
+              </Text>
             </View>
           ) : null}
           <View style={{ flex: 1 }}>
@@ -122,6 +169,28 @@ export function InspectionReport({ inspection, dossierReference, clientNom, offr
                 );
               })}
             </View>
+          </View>
+        ) : null}
+
+        {photos.length > 0 ? (
+          <View style={pdfStyles.section} wrap={false}>
+            <Text style={pdfStyles.sectionTitle}>Photos jointes au rapport</Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+              {photos.map((url, i) => (
+                <Image
+                  key={i}
+                  src={url}
+                  style={{ width: 150, height: 100, borderRadius: 4, objectFit: "cover" }}
+                />
+              ))}
+            </View>
+            {photosRestantes > 0 ? (
+              <Text style={{ fontSize: 7.5, color: "#8a909c", marginTop: 5 }}>
+                {photosRestantes === 1
+                  ? "1 photo supplémentaire est disponible sur votre espace de suivi."
+                  : `${photosRestantes} photos supplémentaires sont disponibles sur votre espace de suivi.`}
+              </Text>
+            ) : null}
           </View>
         ) : null}
 
@@ -204,6 +273,34 @@ export function InspectionReport({ inspection, dossierReference, clientNom, offr
 
         <PdfFooter />
       </Page>
+
+      {constatations.length > 0 ? (
+        <Page size="A4" style={pdfStyles.page}>
+          <View style={pdfStyles.header}>
+            <PdfLogo />
+            <Text style={{ fontSize: 8, color: "#565c68" }}>Référence {inspection.reference}</Text>
+          </View>
+
+          <Text style={pdfStyles.title}>Le détail du contrôle</Text>
+          <Text style={pdfStyles.subtitle}>
+            Les observations de votre copilote poste par poste, derrière les scores de la page
+            précédente.
+          </Text>
+
+          {constatations.map(({ label, valeur }) => (
+            <View key={label} style={{ marginBottom: 14 }} wrap={false}>
+              <Text style={pdfStyles.sectionTitle}>{label}</Text>
+              {splitLines(valeur).map((ligne, i) => (
+                <Text key={i} style={{ fontSize: 9.5, lineHeight: 1.5, marginBottom: 2 }}>
+                  {ligne}
+                </Text>
+              ))}
+            </View>
+          ))}
+
+          <PdfFooter />
+        </Page>
+      ) : null}
     </Document>
   );
 }

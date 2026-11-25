@@ -1,27 +1,77 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getClient, getClientDossiers, getClientDocuments, getClientNotes } from "@/lib/queries";
+import {
+  getClient,
+  getClientDossiers,
+  getClientDocuments,
+  getClientDocumentsCommerciaux,
+  getClientNotes,
+  getEntrepriseInfo,
+} from "@/lib/queries";
 import { Card, PageHeader, StatutBadge, EmptyState, Field, inputClass, Button } from "@/components/ui";
 import { formatDateTime, formatRelative, initials } from "@/lib/format";
-import { DOCUMENT_TYPE_LABELS, CLIENT_TYPES, CLIENT_TYPE_LABELS } from "@/lib/types";
+import {
+  DOCUMENT_TYPE_LABELS,
+  CLIENT_TYPES,
+  CLIENT_TYPE_LABELS,
+  DOCUMENT_COMMERCIAL_TYPE_LABELS,
+  DOCUMENT_COMMERCIAL_STATUT_LABELS,
+} from "@/lib/types";
+import { formatCurrency } from "@/lib/format";
+import { modelesClientRemplis, variablesClient, type PieceJointeOption } from "@/lib/client-email";
+import { ClientEmailComposer } from "@/components/ClientEmailComposer";
+import { EmailStatusBanner } from "@/components/EmailStatusBanner";
 import { AutoResetForm } from "@/components/AutoResetForm";
 import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
 import { Trash2 } from "lucide-react";
-import { updateClient, addClientNote, deleteClient } from "../actions";
+import { updateClient, addClientNote, deleteClient, envoyerEmailClient } from "../actions";
 
-export default async function ClientDetailPage({ params }: { params: { id: string } }) {
+export default async function ClientDetailPage({
+  params,
+  searchParams,
+}: {
+  params: { id: string };
+  searchParams: { notif?: string; error?: string };
+}) {
   const client = await getClient(params.id);
   if (!client) notFound();
 
-  const [dossiers, documents, notes] = await Promise.all([
+  const [dossiers, documents, documentsCommerciaux, notes, entreprise] = await Promise.all([
     getClientDossiers(client.id),
     getClientDocuments(client.id),
+    getClientDocumentsCommerciaux(client.id),
     getClientNotes(client.id),
+    getEntrepriseInfo(),
   ]);
 
   const updateAction = updateClient.bind(null, client.id);
   const addNoteAction = addClientNote.bind(null, client.id);
   const deleteAction = deleteClient.bind(null, client.id);
+  const emailAction = envoyerEmailClient.bind(null, client.id);
+
+  // Les modèles sont remplis ici, côté serveur : le composeur est un composant
+  // client et n'a pas accès aux coordonnées de l'entreprise.
+  const modeles = modelesClientRemplis(variablesClient(client, entreprise));
+
+  // Devis et factures d'abord : c'est ce qu'on joint le plus souvent, et la
+  // liste des documents peut être longue sur un dossier avancé.
+  const piecesJointes: PieceJointeOption[] = [
+    ...documentsCommerciaux.map((d) => ({
+      cle: `commercial:${d.id}`,
+      nom: `${DOCUMENT_COMMERCIAL_TYPE_LABELS[d.type]} ${d.numero}${d.objet ? ` — ${d.objet}` : ""}`,
+      categorie: "document_commercial" as const,
+      detail: `${formatCurrency(d.montant_ttc)} · ${DOCUMENT_COMMERCIAL_STATUT_LABELS[d.statut]}`,
+    })),
+    ...documents
+      // Un document archivé n'a pas à repartir au client par inadvertance.
+      .filter((d) => !d.archive)
+      .map((d) => ({
+        cle: `document:${d.id}`,
+        nom: d.nom,
+        categorie: "document" as const,
+        detail: DOCUMENT_TYPE_LABELS[d.type],
+      })),
+  ];
 
   return (
     <div>
@@ -39,6 +89,22 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
           </form>
         }
       />
+
+      <EmailStatusBanner status={searchParams.notif} />
+      {searchParams.error ? (
+        <div className="rounded-md px-4 py-2.5 text-sm font-medium mb-4 bg-bad-bg text-bad">
+          {searchParams.error}
+        </div>
+      ) : null}
+
+      <Card className="p-5 mb-4">
+        <ClientEmailComposer
+          action={emailAction}
+          email={client.email}
+          modeles={modeles}
+          piecesJointes={piecesJointes}
+        />
+      </Card>
 
       <div className="grid lg:grid-cols-3 gap-4">
         <div className="lg:col-span-1 space-y-4">

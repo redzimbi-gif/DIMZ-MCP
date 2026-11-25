@@ -4,9 +4,23 @@ interface Props {
   value: number;
   size?: number;
   fontSize?: number;
+  /**
+   * Mention de l'échelle sous la note, par exemple « / 10 ». Le site affiche
+   * « 8,2 / 10 » : une note nue se lit mal, surtout quand le barème n'est pas
+   * rappelé à côté.
+   */
+  suffix?: string;
 }
 
-export function ScoreRing({ value, size = 60, fontSize = 13 }: Props) {
+/**
+ * Nombre à la française : la virgule décimale. `String(8.2)` donne « 8.2 »,
+ * qui jure dans un document en français — et le site écrit bien « 8,2 ».
+ */
+function formatNote(value: number): string {
+  return String(value).replace(".", ",");
+}
+
+export function ScoreRing({ value, size = 60, fontSize = 13, suffix }: Props) {
   const strokeWidth = size >= 50 ? 5 : 4;
   const radius = size / 2 - strokeWidth;
   const circumference = 2 * Math.PI * radius;
@@ -27,7 +41,14 @@ export function ScoreRing({ value, size = 60, fontSize = 13 }: Props) {
           strokeLinecap="round"
         />
       </Svg>
-      <Text style={{ fontSize, fontFamily: "Helvetica-Bold", color: "#0b0d12" }}>{value}</Text>
+      <View style={{ alignItems: "center" }}>
+        <Text style={{ fontSize, fontFamily: "Helvetica-Bold", color: "#0b0d12" }}>{formatNote(value)}</Text>
+        {suffix ? (
+          <Text style={{ fontSize: Math.max(5.5, fontSize * 0.5), color: "#565c68", marginTop: -1 }}>
+            {suffix}
+          </Text>
+        ) : null}
+      </View>
     </View>
   );
 }

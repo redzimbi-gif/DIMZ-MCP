@@ -9,6 +9,21 @@ export function formatCurrency(value: number) {
   }).format(value);
 }
 
+/**
+ * Montant au centime près, pour les devis et factures. `formatCurrency`
+ * arrondit à l'euro, ce qui convient aux tableaux de bord mais fausse un
+ * document contractuel : une ligne à 86,50 € s'y affiche « 87 € », et la somme
+ * des lignes ne retombe plus sur le total.
+ */
+export function formatCurrencyExact(value: number) {
+  return new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
 export function formatDate(value: string | Date) {
   return format(new Date(value), "d MMM yyyy", { locale: fr });
 }

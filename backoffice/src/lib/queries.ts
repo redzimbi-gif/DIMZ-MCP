@@ -768,3 +768,22 @@ export async function countUnreadContactsFaq() {
     .eq("lu", false);
   return count ?? 0;
 }
+
+/**
+ * Devis et factures d'un client, pour les proposer en pièce jointe d'un mail.
+ * Un brouillon est volontairement inclus : l'usage courant est justement de
+ * créer un devis puis de l'envoyer avec un mot personnalisé, et l'envoi le
+ * fera passer en « envoyé ».
+ */
+export async function getClientDocumentsCommerciaux(clientId: string) {
+  const db = createAdminClient();
+  const { data } = await db
+    .from("documents_commerciaux")
+    .select("id, numero, type, objet, statut, montant_ttc, created_at")
+    .eq("client_id", clientId)
+    .order("created_at", { ascending: false });
+  return (data ?? []) as Pick<
+    DocumentCommercial,
+    "id" | "numero" | "type" | "objet" | "statut" | "montant_ttc" | "created_at"
+  >[];
+}
