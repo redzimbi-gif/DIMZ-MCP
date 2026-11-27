@@ -4,6 +4,7 @@ import type {
   ActivityLogEntry,
   AgendaEvent,
   Annonce,
+  Article,
   Client,
   ContactFaq,
   Convoyage,
@@ -740,6 +741,18 @@ export async function getTestFeedback(id: string) {
 // ---------------------------------------------------------------------------
 // Questions du formulaire de contact de la FAQ (site vitrine)
 // ---------------------------------------------------------------------------
+
+export async function listArticles() {
+  const db = createAdminClient();
+  const { data } = await db.from("articles").select("*").order("created_at", { ascending: false });
+  return (data ?? []) as Article[];
+}
+
+export async function getArticle(id: string) {
+  const db = createAdminClient();
+  const { data } = await db.from("articles").select("*").eq("id", id).maybeSingle();
+  return data as Article | null;
+}
 
 export async function listContactsFaq() {
   const db = createAdminClient();

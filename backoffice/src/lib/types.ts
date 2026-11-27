@@ -714,6 +714,17 @@ export interface ContactFaqReponse {
   created_at: string;
 }
 
+export interface Article {
+  id: string;
+  titre: string;
+  extrait: string;
+  contenu: string;
+  image_path: string | null;
+  publie: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ContactFaq {
   id: string;
   nom: string;

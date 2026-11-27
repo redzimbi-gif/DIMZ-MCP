@@ -575,6 +575,17 @@
   .avis-card-stars { color: var(--bleu-vif); font-size: 0.9rem; letter-spacing: 1px; }
   .avis-card-date { font-size: 0.76rem; color: var(--ink-soft); }
   .avis-card-text { font-size: 0.9rem; color: var(--ink-soft); line-height: 1.55; margin: 0; }
+  .article-card { border: 1px solid var(--line); border-radius: var(--r-md); background: var(--bg-raised); box-shadow: var(--shadow); margin-bottom: 18px; overflow: hidden; }
+  .article-card:last-child { margin-bottom: 0; }
+  .article-card-img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; background: var(--bg-tint); }
+  .article-card-body { padding: 20px 22px; }
+  .article-card-date { font-size: 0.76rem; color: var(--ink-soft); }
+  .article-card-title { margin: 6px 0 8px; font-size: 1.1rem; }
+  .article-card-excerpt, .article-card-full { color: var(--ink-soft); font-size: 0.92rem; line-height: 1.6; margin: 0 0 12px; white-space: pre-wrap; }
+  .article-card-full { display: none; }
+  .article-card.expanded .article-card-full { display: block; }
+  .article-card.expanded .article-card-excerpt { display: none; }
+  .article-toggle { background: none; border: none; padding: 0; color: var(--bleu-vif); font-weight: 700; font-size: 0.86rem; cursor: pointer; font-family: inherit; }
 
   /* ---------------- Cartes d'offres cliquables + modale "ce que vous recevez" ---------------- */
   .offer-card { cursor: pointer; }
@@ -1182,6 +1193,10 @@
       <button type="button" role="tab" id="subtab-btn-avis" aria-selected="false" data-subtab="avis">
         <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.3l-6.2 3.6 1.6-7L2 9.2l7.1-.6L12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7z"/></svg>
         <span>Avis clients</span>
+      </button>
+      <button type="button" role="tab" id="subtab-btn-actus" aria-selected="false" data-subtab="actus">
+        <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h13a2 2 0 0 1 2 2v13a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2z"/><path d="M19 4a2 2 0 0 1 2 2v12.5a1.5 1.5 0 0 1-1.5 1.5"/><path d="M8 8h7"/><path d="M8 12h7"/><path d="M8 16h4"/></svg>
+        <span>Actualités</span>
       </button>
     </nav>
 
@@ -1973,6 +1988,20 @@
           <h2>Ils ont utilisé Dimz Mon Copilote Auto</h2>
         </div>
         <div id="avis-list" data-reveal><p class="avis-empty">Les premiers clients DIMZ - Mon Copilote Auto pourront bientôt partager leur expérience ici.</p></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ---------- Page : Actualités ---------- -->
+  <div id="subtab-actus" role="tabpanel" aria-labelledby="subtab-btn-actus" hidden>
+    <section>
+      <div class="wrap" style="max-width:640px;">
+        <div class="section-head" data-reveal>
+          <span class="label">Actualités</span>
+          <h2>Nos actualités</h2>
+          <p>Les derniers articles de votre copilote — aussi à retrouver sur Instagram.</p>
+        </div>
+        <div id="actus-list" data-reveal><p class="avis-empty">Les premiers articles arrivent bientôt.</p></div>
       </div>
     </section>
   </div>
@@ -3877,6 +3906,7 @@
   var TEST_FEEDBACK_URL = 'https://tlkstfmheprsmbxlmrgr.supabase.co/functions/v1/test-feedback';
   var TRACK_URL = 'https://tlkstfmheprsmbxlmrgr.supabase.co/functions/v1/track-lookup';
   var AVIS_URL = 'https://tlkstfmheprsmbxlmrgr.supabase.co/functions/v1/avis';
+  var ACTUS_URL = 'https://tlkstfmheprsmbxlmrgr.supabase.co/functions/v1/articles';
   var CONTACT_FAQ_URL = 'https://tlkstfmheprsmbxlmrgr.supabase.co/functions/v1/contact-faq';
 
   // ---------- Connexion des formulaires à Google Sheets, via un Google Form ----------
@@ -4119,10 +4149,10 @@
 
   // ---------- Navigation latérale Accompagnement : Accueil / sous-menu Offres / À propos / FAQ ----------
   var subTabButtons = document.querySelectorAll('.acc-sidebar button[data-subtab]');
-  var ACC_PAGES = ['accueil', 'offres', 'apropos', 'faq', 'avis', 'import', 'inspection', 'rapport', 'suivi', 'annonce'];
+  var ACC_PAGES = ['accueil', 'offres', 'apropos', 'faq', 'avis', 'actus', 'import', 'inspection', 'rapport', 'suivi', 'annonce'];
   var ACC_PAGE_LABELS = {
     accueil: 'Accueil', offres: 'Nos offres', apropos: 'À propos de nous',
-    faq: 'Questions fréquentes', avis: 'Avis clients', import: 'Import',
+    faq: 'Questions fréquentes', avis: 'Avis clients', actus: 'Actualités', import: 'Import',
     inspection: 'Inspection', rapport: 'Le Rapport DIMZ',
     suivi: 'Suivre mon projet', annonce: 'Vérifier une annonce'
   };
@@ -4215,6 +4245,7 @@
     apropos: { tab: 'accompagnement', subtab: 'apropos' },
     faq: { tab: 'accompagnement', subtab: 'faq' },
     avis: { tab: 'accompagnement', subtab: 'avis' },
+    actus: { tab: 'accompagnement', subtab: 'actus' },
     import: { tab: 'accompagnement', subtab: 'import' },
     inspection: { tab: 'accompagnement', subtab: 'inspection' },
     rapport: { tab: 'accompagnement', subtab: 'rapport' },
@@ -5572,6 +5603,45 @@
         }).join('');
       }).catch(function () { /* la liste reste sur son message d'attente par défaut */ });
     }
+  })();
+
+  // ---------- Actualités : liste des articles publiés ----------
+  (function () {
+    var list = document.getElementById('actus-list');
+    if (!list) return;
+
+    function formatActuDate(iso) {
+      try {
+        return new Date(iso).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+      } catch (e) { return ''; }
+    }
+    function escapeHtml(s) { return String(s || '').replace(/</g, '&lt;'); }
+
+    fetch(ACTUS_URL).then(function (r) { return r.json(); }).then(function (json) {
+      var articles = (json && json.articles) || [];
+      if (!articles.length) return;
+      list.innerHTML = articles.map(function (a, i) {
+        var titre = escapeHtml(a.titre);
+        var extrait = escapeHtml(a.extrait);
+        var contenu = escapeHtml(a.contenu);
+        var img = a.image_url ? '<img class="article-card-img" src="' + a.image_url + '" alt="" loading="lazy">' : '';
+        return '<article class="article-card" id="article-' + i + '">' + img +
+          '<div class="article-card-body">' +
+          '<span class="article-card-date">' + formatActuDate(a.created_at) + '</span>' +
+          '<h3 class="article-card-title">' + titre + '</h3>' +
+          '<p class="article-card-excerpt">' + extrait + '</p>' +
+          '<p class="article-card-full">' + contenu + '</p>' +
+          '<button type="button" class="article-toggle" data-article-toggle="article-' + i + '">Lire la suite</button>' +
+          '</div></article>';
+      }).join('');
+      list.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-article-toggle]');
+        if (!btn) return;
+        var card = document.getElementById(btn.dataset.articleToggle);
+        var expanded = card.classList.toggle('expanded');
+        btn.textContent = expanded ? 'Réduire' : 'Lire la suite';
+      });
+    }).catch(function () { /* la liste reste sur son message d'attente par défaut */ });
   })();
 
   // ---------- Formulaire de contact FAQ ----------

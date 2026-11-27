@@ -485,45 +485,6 @@
   .hero p.lede { color: rgba(255,255,255,0.68); font-size: 1.07rem; max-width: 48ch; margin: 0 auto 32px; }
   .hero .cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
 
-  /* ---------------- Hero « Nouveau » : vérification d'annonce (Accueil) ----------------
-     Second hero sombre sous le hero photo d'accueil : texte à gauche, exemple de
-     retour à droite. Se replie sur une colonne centrée sur mobile. */
-  .hero-annonce { padding: 80px 0; }
-  .hero-annonce-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items: center; }
-  .hero-annonce .hero-annonce-text { text-align: left; }
-  .hero-annonce h2 { font-size: clamp(1.9rem, 3.4vw, 2.7rem); }
-  .hero-annonce p.lede { margin: 0 0 26px; }
-  .hero-annonce .hero-points { justify-content: flex-start; padding-left: 0; }
-  .hero-annonce .kicker { flex-wrap: wrap; row-gap: 10px; }
-  .hero-annonce .kicker > span:last-child { white-space: nowrap; }
-  .badge-nouveau { display: inline-flex; align-items: center; background: var(--bleu-vif); color: #fff; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 100px; padding: 5px 11px; box-shadow: 0 10px 22px -12px color-mix(in srgb, var(--bleu-vif) 80%, transparent); }
-  .hero-annonce-note { margin: 18px 0 0; font-size: 0.84rem; color: rgba(255,255,255,0.6); }
-  .annonce-verdict { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); border-radius: var(--r-lg); padding: 26px 26px 22px; box-shadow: 0 40px 60px -36px rgba(0,0,0,0.6); backdrop-filter: blur(6px); }
-  .annonce-verdict-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.12); }
-  .annonce-verdict-title { font-weight: 700; color: #fff; font-size: 0.98rem; }
-  .annonce-verdict-sub { display: block; font-size: 0.78rem; color: rgba(255,255,255,0.55); font-weight: 500; margin-top: 2px; }
-  .annonce-verdict-tag { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #b9cdf5; border: 1px solid rgba(185,205,245,0.35); border-radius: 100px; padding: 4px 10px; white-space: nowrap; }
-  .annonce-verdict ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
-  .annonce-verdict li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: start; font-size: 0.9rem; color: rgba(255,255,255,0.9); line-height: 1.4; }
-  .annonce-verdict li small { display: block; color: rgba(255,255,255,0.55); font-size: 0.8rem; margin-top: 2px; }
-  .annonce-verdict .v-ico { width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
-  .annonce-verdict .v-ico svg { width: 12px; height: 12px; }
-  .annonce-verdict .v-ok { background: color-mix(in srgb, #3fbf7f 22%, transparent); color: #7fe0ad; }
-  .annonce-verdict .v-warn { background: color-mix(in srgb, #f0a830 22%, transparent); color: #f5c46f; }
-  .annonce-verdict-foot { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.12); font-size: 0.86rem; color: #fff; font-weight: 600; }
-  .annonce-verdict-foot span { color: #9db9ec; }
-  @media (max-width: 900px) {
-    .hero-annonce-grid { grid-template-columns: 1fr; gap: 36px; }
-    .hero-annonce .hero-annonce-text { text-align: center; }
-    .hero-annonce p.lede { margin: 0 auto 26px; }
-    .hero-annonce .hero-points, .hero-annonce .cta-row, .hero-annonce .kicker { justify-content: center; }
-    .annonce-verdict { max-width: 460px; margin: 0 auto; width: 100%; }
-  }
-  @media (max-width: 640px) {
-    .hero-annonce { padding: 56px 0; }
-    .hero-annonce .hero-points li { white-space: normal; }
-  }
-
   /* Bandeau d'intro compact (sous-onglet Inspection) */
   .intro-band { text-align: center; padding: 76px 0 72px; }
   .intro-band .kicker { justify-content: center; }
@@ -614,6 +575,17 @@
   .avis-card-stars { color: var(--bleu-vif); font-size: 0.9rem; letter-spacing: 1px; }
   .avis-card-date { font-size: 0.76rem; color: var(--ink-soft); }
   .avis-card-text { font-size: 0.9rem; color: var(--ink-soft); line-height: 1.55; margin: 0; }
+  .article-card { border: 1px solid var(--line); border-radius: var(--r-md); background: var(--bg-raised); box-shadow: var(--shadow); margin-bottom: 18px; overflow: hidden; }
+  .article-card:last-child { margin-bottom: 0; }
+  .article-card-img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; background: var(--bg-tint); }
+  .article-card-body { padding: 20px 22px; }
+  .article-card-date { font-size: 0.76rem; color: var(--ink-soft); }
+  .article-card-title { margin: 6px 0 8px; font-size: 1.1rem; }
+  .article-card-excerpt, .article-card-full { color: var(--ink-soft); font-size: 0.92rem; line-height: 1.6; margin: 0 0 12px; white-space: pre-wrap; }
+  .article-card-full { display: none; }
+  .article-card.expanded .article-card-full { display: block; }
+  .article-card.expanded .article-card-excerpt { display: none; }
+  .article-toggle { background: none; border: none; padding: 0; color: var(--bleu-vif); font-weight: 700; font-size: 0.86rem; cursor: pointer; font-family: inherit; }
 
   /* ---------------- Cartes d'offres cliquables + modale "ce que vous recevez" ---------------- */
   .offer-card { cursor: pointer; }
@@ -1222,6 +1194,10 @@
         <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.3l-6.2 3.6 1.6-7L2 9.2l7.1-.6L12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7z"/></svg>
         <span>Avis clients</span>
       </button>
+      <button type="button" role="tab" id="subtab-btn-actus" aria-selected="false" data-subtab="actus">
+        <svg class="icon-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h13a2 2 0 0 1 2 2v13a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2z"/><path d="M19 4a2 2 0 0 1 2 2v12.5a1.5 1.5 0 0 1-1.5 1.5"/><path d="M8 8h7"/><path d="M8 12h7"/><path d="M8 16h4"/></svg>
+        <span>Actualités</span>
+      </button>
     </nav>
 
     <div class="acc-content">
@@ -1249,43 +1225,7 @@
       </div>
     </section>
 
-    <!-- Hero « Nouveau » : vérification d'annonce -->
-    <section class="dark hero hero-annonce" aria-labelledby="hero-annonce-title">
-      <div class="wrap hero-annonce-grid">
-        <div class="hero-annonce-text">
-          <span class="kicker"><span class="badge-nouveau">Nouveau</span><span>Vérification d'annonce</span></span>
-          <h2 id="hero-annonce-title">Vous avez repéré une voiture ? <em>Votre copilote vérifie l'annonce avant que vous vous déplaciez.</em></h2>
-          <p class="lede">Envoyez simplement le lien à votre copilote. Il analyse l'annonce, le prix, l'historique et le vendeur, puis vous dit franchement si elle vaut le déplacement, et quelles questions poser.</p>
-          <ul class="hero-points">
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Prix comparé au marché</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Historique et kilométrage</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Signaux d'arnaque</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Questions à poser au vendeur</li>
-          </ul>
-          <div class="cta-row">
-            <a href="javascript:void(0)" class="btn btn-primary" data-goto-subtab="annonce">Faire vérifier une annonce</a>
-          </div>
-          <p class="hero-annonce-note">Réponse rapide, sur devis. Inspection sur place possible autour d'Annecy et de Genève.</p>
-        </div>
-
-        <div class="annonce-verdict" aria-label="Exemple de retour de vérification">
-          <div class="annonce-verdict-head">
-            <div>
-              <span class="annonce-verdict-title">Votre retour de vérification</span>
-              <span class="annonce-verdict-sub">Exemple : citadine, 2019, 68 000 km</span>
-            </div>
-            <span class="annonce-verdict-tag">Exemple</span>
-          </div>
-          <ul>
-            <li><span class="v-ico v-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><span>Prix cohérent avec le marché<small>Dans la moyenne des annonces comparables.</small></span></li>
-            <li><span class="v-ico v-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><span>Kilométrage plausible<small>Cohérent avec l'âge et les contrôles techniques.</small></span></li>
-            <li><span class="v-ico v-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v6"/><path d="M12 17h.01"/></svg></span><span>Carnet d'entretien incomplet<small>Demander les factures de la dernière révision.</small></span></li>
-            <li><span class="v-ico v-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v6"/><path d="M12 17h.01"/></svg></span><span>Photos sans le côté droit<small>Demander des photos supplémentaires avant de se déplacer.</small></span></li>
-          </ul>
-          <p class="annonce-verdict-foot">L'avis de votre copilote : <span>à voir, avec deux questions à poser au vendeur.</span></p>
-        </div>
-      </div>
-    </section>
+    
 
     <details class="acc-collapse band" open>
       <summary>
@@ -2048,6 +1988,20 @@
           <h2>Ils ont utilisé Dimz Mon Copilote Auto</h2>
         </div>
         <div id="avis-list" data-reveal><p class="avis-empty">Les premiers clients DIMZ - Mon Copilote Auto pourront bientôt partager leur expérience ici.</p></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ---------- Page : Actualités ---------- -->
+  <div id="subtab-actus" role="tabpanel" aria-labelledby="subtab-btn-actus" hidden>
+    <section>
+      <div class="wrap" style="max-width:640px;">
+        <div class="section-head" data-reveal>
+          <span class="label">Actualités</span>
+          <h2>Nos actualités</h2>
+          <p>Les derniers articles de votre copilote — aussi à retrouver sur Instagram.</p>
+        </div>
+        <div id="actus-list" data-reveal><p class="avis-empty">Les premiers articles arrivent bientôt.</p></div>
       </div>
     </section>
   </div>
@@ -3952,6 +3906,7 @@
   var TEST_FEEDBACK_URL = 'https://tlkstfmheprsmbxlmrgr.supabase.co/functions/v1/test-feedback';
   var TRACK_URL = 'https://tlkstfmheprsmbxlmrgr.supabase.co/functions/v1/track-lookup';
   var AVIS_URL = 'https://tlkstfmheprsmbxlmrgr.supabase.co/functions/v1/avis';
+  var ACTUS_URL = 'https://tlkstfmheprsmbxlmrgr.supabase.co/functions/v1/articles';
   var CONTACT_FAQ_URL = 'https://tlkstfmheprsmbxlmrgr.supabase.co/functions/v1/contact-faq';
 
   // ---------- Connexion des formulaires à Google Sheets, via un Google Form ----------
@@ -4194,10 +4149,10 @@
 
   // ---------- Navigation latérale Accompagnement : Accueil / sous-menu Offres / À propos / FAQ ----------
   var subTabButtons = document.querySelectorAll('.acc-sidebar button[data-subtab]');
-  var ACC_PAGES = ['accueil', 'offres', 'apropos', 'faq', 'avis', 'import', 'inspection', 'rapport', 'suivi', 'annonce'];
+  var ACC_PAGES = ['accueil', 'offres', 'apropos', 'faq', 'avis', 'actus', 'import', 'inspection', 'rapport', 'suivi', 'annonce'];
   var ACC_PAGE_LABELS = {
     accueil: 'Accueil', offres: 'Nos offres', apropos: 'À propos de nous',
-    faq: 'Questions fréquentes', avis: 'Avis clients', import: 'Import',
+    faq: 'Questions fréquentes', avis: 'Avis clients', actus: 'Actualités', import: 'Import',
     inspection: 'Inspection', rapport: 'Le Rapport DIMZ',
     suivi: 'Suivre mon projet', annonce: 'Vérifier une annonce'
   };
@@ -4290,6 +4245,7 @@
     apropos: { tab: 'accompagnement', subtab: 'apropos' },
     faq: { tab: 'accompagnement', subtab: 'faq' },
     avis: { tab: 'accompagnement', subtab: 'avis' },
+    actus: { tab: 'accompagnement', subtab: 'actus' },
     import: { tab: 'accompagnement', subtab: 'import' },
     inspection: { tab: 'accompagnement', subtab: 'inspection' },
     rapport: { tab: 'accompagnement', subtab: 'rapport' },
@@ -5647,6 +5603,45 @@
         }).join('');
       }).catch(function () { /* la liste reste sur son message d'attente par défaut */ });
     }
+  })();
+
+  // ---------- Actualités : liste des articles publiés ----------
+  (function () {
+    var list = document.getElementById('actus-list');
+    if (!list) return;
+
+    function formatActuDate(iso) {
+      try {
+        return new Date(iso).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+      } catch (e) { return ''; }
+    }
+    function escapeHtml(s) { return String(s || '').replace(/</g, '&lt;'); }
+
+    fetch(ACTUS_URL).then(function (r) { return r.json(); }).then(function (json) {
+      var articles = (json && json.articles) || [];
+      if (!articles.length) return;
+      list.innerHTML = articles.map(function (a, i) {
+        var titre = escapeHtml(a.titre);
+        var extrait = escapeHtml(a.extrait);
+        var contenu = escapeHtml(a.contenu);
+        var img = a.image_url ? '<img class="article-card-img" src="' + a.image_url + '" alt="" loading="lazy">' : '';
+        return '<article class="article-card" id="article-' + i + '">' + img +
+          '<div class="article-card-body">' +
+          '<span class="article-card-date">' + formatActuDate(a.created_at) + '</span>' +
+          '<h3 class="article-card-title">' + titre + '</h3>' +
+          '<p class="article-card-excerpt">' + extrait + '</p>' +
+          '<p class="article-card-full">' + contenu + '</p>' +
+          '<button type="button" class="article-toggle" data-article-toggle="article-' + i + '">Lire la suite</button>' +
+          '</div></article>';
+      }).join('');
+      list.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-article-toggle]');
+        if (!btn) return;
+        var card = document.getElementById(btn.dataset.articleToggle);
+        var expanded = card.classList.toggle('expanded');
+        btn.textContent = expanded ? 'Réduire' : 'Lire la suite';
+      });
+    }).catch(function () { /* la liste reste sur son message d'attente par défaut */ });
   })();
 
   // ---------- Formulaire de contact FAQ ----------

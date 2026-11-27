@@ -16,6 +16,7 @@ import {
   Images,
   CircleHelp,
   Target,
+  Newspaper,
   type LucideIcon,
 } from "lucide-react";
 
@@ -57,6 +58,7 @@ export const NAV: NavGroup[] = [
       { href: "/convoyages", label: "Convoyages", icon: Truck },
       { href: "/retours-test", label: "Retours test", icon: ClipboardList },
       { href: "/contact-faq", label: "Questions FAQ", icon: CircleHelp },
+      { href: "/actualites", label: "Actualités", icon: Newspaper },
     ],
   },
   {
